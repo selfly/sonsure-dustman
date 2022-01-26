@@ -16,7 +16,7 @@
     <groupId>com.sonsure</groupId>
     <artifactId>sonsure-dumper</artifactId>
     <packaging>pom</packaging>
-    <version>4.1.1</version>
+    <version>4.1.2</version>
 
     <name>sonsure-dumper</name>
     <description>Java Jdbc Framework.</description>
@@ -50,7 +50,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <sonsure-common.version>4.1.1</sonsure-common.version>
+        <sonsure-common.version>4.1.2</sonsure-common.version>
         <aspectjweaver.version>1.8.13</aspectjweaver.version>
         <spring.version>5.2.5.RELEASE</spring.version>
         <servicemix.spring.version>5.2.5.RELEASE_1</servicemix.spring.version>
@@ -219,11 +219,11 @@
             <distributionManagement>
                 <snapshotRepository>
                     <id>locally</id>
-                    <url>https://nexus.sonsure.com/repository/maven-snapshots/</url>
+                    <url>http://192.168.50.3:8081/repository/maven-snapshots/</url>
                 </snapshotRepository>
                 <repository>
                     <id>locally</id>
-                    <url>https://nexus.sonsure.com/repository/maven-releases/</url>
+                    <url>http://192.168.50.3:8081/repository/maven-releases/</url>
                 </repository>
             </distributionManagement>
         </profile>

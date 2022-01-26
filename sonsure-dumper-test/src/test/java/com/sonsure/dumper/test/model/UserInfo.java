@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.model;
 
 
-import com.sonsure.commons.model.Model;
+import com.sonsure.commons.model.BaseEntity;
 
 import java.util.Date;
 
@@ -20,7 +20,7 @@ import java.util.Date;
  * UserInfo: liyd
  * Date: Wed Dec 24 16:46:48 CST 2014
  */
-public class UserInfo extends Model {
+public class UserInfo extends BaseEntity {
 
     private static final long serialVersionUID = 8166785520231287816L;
 

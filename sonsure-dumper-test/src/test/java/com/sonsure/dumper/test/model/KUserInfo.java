@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.model;
 
-import com.sonsure.commons.model.Model;
+import com.sonsure.commons.model.BaseEntity;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
@@ -24,7 +24,7 @@ import java.util.Date;
  * Date: Wed Dec 24 16:46:48 CST 2014
  */
 @Entity("ktx_user_info")
-public class KUserInfo extends Model {
+public class KUserInfo extends BaseEntity {
 
     private static final long serialVersionUID = 8166785520231287816L;
 

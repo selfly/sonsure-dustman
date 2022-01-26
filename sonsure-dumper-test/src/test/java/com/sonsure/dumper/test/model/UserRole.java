@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.model;
 
-import com.sonsure.commons.model.Model;
+import com.sonsure.commons.model.BaseEntity;
 
 import java.util.Date;
 
@@ -19,7 +19,7 @@ import java.util.Date;
  * Author: Created by code generator
  * Date: Mon Dec 04 15:16:45 CST 2017
  */
-public class UserRole extends Model {
+public class UserRole extends BaseEntity {
 
     /**
      * serialVersionUID

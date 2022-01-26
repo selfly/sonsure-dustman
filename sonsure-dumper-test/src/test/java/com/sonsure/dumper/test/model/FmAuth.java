@@ -9,11 +9,11 @@
 
 package com.sonsure.dumper.test.model;
 
-import com.sonsure.commons.model.Model;
+import com.sonsure.commons.model.BaseEntity;
 
 import java.util.Date;
 
-public class FmAuth extends Model {
+public class FmAuth extends BaseEntity {
 
     private static final long serialVersionUID = -1360192395444996154L;
 

@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.model;
 
 
-import com.sonsure.commons.model.Model;
+import com.sonsure.commons.model.BaseEntity;
 
 /**
  * 权限码
@@ -18,7 +18,7 @@ import com.sonsure.commons.model.Model;
  * Author: Created by code generator
  * Date: Wed Oct 11 19:05:41 CST 2017
  */
-public class AuthCode extends Model {
+public class AuthCode extends BaseEntity {
 
     /**
      * serialVersionUID
@@ -54,8 +54,6 @@ public class AuthCode extends Model {
      * 权限分类
      */
     private String category;
-
-
 
 
     public static class Constant {
