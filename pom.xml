@@ -198,7 +198,7 @@
     </build>
     <profiles>
         <profile>
-            <id>locally</id>
+            <id>sonsure</id>
             <build>
                 <plugins>
                     <plugin>
@@ -218,12 +218,12 @@
             </build>
             <distributionManagement>
                 <snapshotRepository>
-                    <id>locally</id>
-                    <url>http://192.168.50.3:8081/repository/maven-snapshots/</url>
+                    <id>sonsure</id>
+                    <url>http://192.168.50.2:8081/repository/maven-snapshots/</url>
                 </snapshotRepository>
                 <repository>
-                    <id>locally</id>
-                    <url>http://192.168.50.3:8081/repository/maven-releases/</url>
+                    <id>sonsure</id>
+                    <url>http://192.168.50.2:8081/repository/maven-releases/</url>
                 </repository>
             </distributionManagement>
         </profile>
