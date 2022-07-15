@@ -9,7 +9,13 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean deploy -P sonsure -X'
+                script {
+                    if (env.GIT_PREVIOUS_SUCCESSFUL_COMMIT == env.GIT_COMMIT) {
+                        echo 'no commit changes，skip build'
+                    } else {
+                        sh 'mvn clean deploy -P sonsure'
+                    }
+                }
             }
         }
     }
