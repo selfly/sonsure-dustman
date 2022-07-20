@@ -15,15 +15,14 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.ModelClassCache;
 import com.sonsure.dumper.core.management.ModelClassMeta;
 import com.sonsure.dumper.core.management.ModelFieldMeta;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author liyd
@@ -83,27 +82,21 @@ public abstract class AbstractMappingHandler implements MappingHandler {
 
     public AbstractMappingHandler(String modelPackages, ClassLoader classLoader) {
         this.failOnMissingClass = true;
-        loadedClass = new HashMap<>();
-        classMapping = new HashMap<>();
-        customClassMapping = new HashMap<>();
+        loadedClass = new ConcurrentHashMap<>();
+        classMapping = new ConcurrentHashMap<>();
+        customClassMapping = new ConcurrentHashMap<>();
         this.modelPackages = modelPackages;
         this.classLoader = classLoader == null ? getClass().getClassLoader() : classLoader;
         this.init();
     }
 
     public void addClassMapping(Class<?> clazz) {
-        String simpleName = clazz.getSimpleName();
-        if (!classMapping.containsKey(simpleName)) {
-            classMapping.put(clazz.getSimpleName(), clazz);
-        }
-    }
-
-    public void addClassMapping(Class<?>[] classes) {
-        if (ArrayUtils.isEmpty(classes)) {
-            return;
-        }
-        for (Class<?> aClass : classes) {
-            this.addClassMapping(aClass);
+        final String name = clazz.getSimpleName();
+        final Class<?> existCls = classMapping.get(name);
+        if (existCls == null) {
+            classMapping.put(name, clazz);
+        } else if (existCls != clazz) {
+            throw new SonsureJdbcException("Class name冲突:" + existCls.getName() + ", " + clazz.getName());
         }
     }
 
@@ -155,7 +148,6 @@ public abstract class AbstractMappingHandler implements MappingHandler {
         if (StringUtils.isBlank(tableName)) {
             throw new SonsureJdbcException("没有找到对应的表名:" + entityClass);
         }
-
         return tableName;
     }
 

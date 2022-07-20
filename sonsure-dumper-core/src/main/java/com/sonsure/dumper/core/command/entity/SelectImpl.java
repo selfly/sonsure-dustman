@@ -50,12 +50,14 @@ public class SelectImpl extends AbstractEntityConditionCommandExecutor<Select> i
     @Override
     public Select from(Class<?> cls) {
         selectContext.addFromClass(cls);
+        this.getCommandExecutorContext().addModelClass(cls);
         return this;
     }
 
     @Override
     public Select from(Class<?> cls, String alias, Object... clsAndAlias) {
         selectContext.addFromClass(cls, alias);
+        this.getCommandExecutorContext().addModelClass(cls);
         if (ArrayUtils.isNotEmpty(clsAndAlias)) {
             if (ArrayUtils.getLength(clsAndAlias) % 2 != 0) {
                 throw new SonsureJdbcException("指定多表必须一个class一个别名对应");
