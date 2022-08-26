@@ -17,6 +17,8 @@
 package com.sonsure.dumper.springjdbc.persist;
 
 import com.sonsure.dumper.core.mapping.MappingHandler;
+import com.sonsure.dumper.springjdbc.convert.LocalDateTimeConverter;
+import com.sonsure.dumper.springjdbc.convert.TypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
@@ -50,6 +52,8 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      */
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private String dialect;
+
     private MappingHandler mappingHandler;
 
     /**
@@ -78,6 +82,11 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
     private Set<String> mappedProperties;
 
     /**
+     * The Type converters.
+     */
+    private List<TypeConverter> typeConverters;
+
+    /**
      * Create a new {@code BeanPropertyRowMapper} for bean-style configuration.
      *
      * @see #setCheckFullyPopulated
@@ -91,24 +100,26 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * <p>Consider using the {@link #newInstance} factory method instead,
      * which allows for specifying the mapped type once only.
      *
-     * @param mappedClass the class that each row should be mapped to
+     * @param dialect        the dialect
+     * @param mappedClass    the class that each row should be mapped to
+     * @param mappingHandler the mapping handler
      */
-    public JdbcRowMapper(Class<T> mappedClass, MappingHandler mappingHandler) {
-        initialize(mappedClass, mappingHandler);
+    public JdbcRowMapper(String dialect, Class<T> mappedClass, MappingHandler mappingHandler) {
+        initialize(dialect, mappedClass, mappingHandler);
     }
 
-    /**
-     * Create a new {@code BeanPropertyRowMapper}.
-     *
-     * @param mappedClass         the class that each row should be mapped to
-     * @param mappingHandler      the mapping handler
-     * @param checkFullyPopulated whether we're strictly validating that
-     *                            all bean properties have been mapped from corresponding database fields
-     */
-    public JdbcRowMapper(Class<T> mappedClass, MappingHandler mappingHandler, boolean checkFullyPopulated) {
-        initialize(mappedClass, mappingHandler);
-        this.checkFullyPopulated = checkFullyPopulated;
-    }
+//    /**
+//     * Create a new {@code BeanPropertyRowMapper}.
+//     *
+//     * @param mappedClass         the class that each row should be mapped to
+//     * @param mappingHandler      the mapping handler
+//     * @param checkFullyPopulated whether we're strictly validating that
+//     *                            all bean properties have been mapped from corresponding database fields
+//     */
+//    public JdbcRowMapper(Class<T> mappedClass, MappingHandler mappingHandler, boolean checkFullyPopulated) {
+//        initialize(dialect,mappedClass, mappingHandler);
+//        this.checkFullyPopulated = checkFullyPopulated;
+//    }
 
     /**
      * Get the class that we are mapping to.
@@ -154,19 +165,30 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
     /**
      * Initialize the mapping metadata for the given class.
      *
-     * @param mappedClass the mapped class
+     * @param dialect        the dialect
+     * @param mappedClass    the mapped class
+     * @param mappingHandler the mapping handler
      */
-    protected void initialize(Class<T> mappedClass, MappingHandler mappingHandler) {
+    protected void initialize(String dialect, Class<T> mappedClass, MappingHandler mappingHandler) {
+        this.dialect = dialect.toLowerCase();
         this.mappedClass = mappedClass;
         this.mappingHandler = mappingHandler;
         this.mappedFields = new HashMap<>();
         this.mappedProperties = new HashSet<>();
+        this.initializeTypeConverter();
         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(mappedClass);
         for (PropertyDescriptor pd : pds) {
             if (pd.getWriteMethod() != null) {
                 this.mappedFields.put(lowerCaseName(pd.getName()), pd);
                 this.mappedProperties.add(pd.getName());
             }
+        }
+    }
+
+    protected void initializeTypeConverter() {
+        if (this.dialect.contains("sqlite")) {
+            this.typeConverters = new ArrayList<>();
+            this.typeConverters.add(new LocalDateTimeConverter());
         }
     }
 
@@ -237,6 +259,13 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
                         logger.debug("Mapping column '" + column + "' to property '" + pd.getName() + "' of type ["
                                 + ClassUtils.getQualifiedName(pd.getPropertyType()) + "]");
                     }
+                    if (this.typeConverters != null) {
+                        for (TypeConverter typeConverter : this.typeConverters) {
+                            if (typeConverter.support(pd.getPropertyType(), value)) {
+                                value = typeConverter.convert(pd.getPropertyType(), value);
+                            }
+                        }
+                    }
                     try {
                         bw.setPropertyValue(pd.getName(), value);
                     } catch (TypeMismatchException ex) {
@@ -298,10 +327,14 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * Static factory method to create a new {@code BeanPropertyRowMapper}
      * (with the mapped class specified only once).
      *
-     * @param mappedClass the class that each row should be mapped to
+     * @param <T>            the type parameter
+     * @param dialect        the dialect
+     * @param mappedClass    the class that each row should be mapped to
+     * @param mappingHandler the mapping handler
+     * @return the jdbc row mapper
      */
-    public static <T> JdbcRowMapper<T> newInstance(Class<T> mappedClass, MappingHandler mappingHandler) {
-        return new JdbcRowMapper<T>(mappedClass, mappingHandler);
+    public static <T> JdbcRowMapper<T> newInstance(String dialect, Class<T> mappedClass, MappingHandler mappingHandler) {
+        return new JdbcRowMapper<T>(dialect, mappedClass, mappingHandler);
     }
 
 }

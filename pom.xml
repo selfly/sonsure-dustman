@@ -198,7 +198,7 @@
     </build>
     <profiles>
         <profile>
-            <id>sonsure</id>
+            <id>locally</id>
             <build>
                 <plugins>
                     <plugin>

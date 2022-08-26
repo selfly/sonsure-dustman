@@ -15,6 +15,9 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author liyd
+ */
 public class NegotiatingPageHandler implements PageHandler {
 
     protected List<PageHandler> defaultPageHandlers;
@@ -27,6 +30,7 @@ public class NegotiatingPageHandler implements PageHandler {
         defaultPageHandlers.add(new OraclePageHandler());
         defaultPageHandlers.add(new PostgresqlPageHandler());
         defaultPageHandlers.add(new SqlServerPageHandler());
+        defaultPageHandlers.add(new SqlitePageHandler());
     }
 
     @Override

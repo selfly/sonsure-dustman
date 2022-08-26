@@ -81,13 +81,13 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     @Override
     public List<?> queryForList(CommandContext commandContext) {
-        return jdbcOperations.query(commandContext.getCommand(), commandContext.getParameters().toArray(), JdbcRowMapper.newInstance(commandContext.getResultType(), getJdbcEngineConfig().getMappingHandler()));
+        return jdbcOperations.query(commandContext.getCommand(), commandContext.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), commandContext.getResultType(), getJdbcEngineConfig().getMappingHandler()));
     }
 
     @Override
     public Object querySingleResult(CommandContext commandContext) {
         //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<?> list = jdbcOperations.query(commandContext.getCommand(), commandContext.getParameters().toArray(), JdbcRowMapper.newInstance(commandContext.getResultType(), getJdbcEngineConfig().getMappingHandler()));
+        List<?> list = jdbcOperations.query(commandContext.getCommand(), commandContext.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), commandContext.getResultType(), getJdbcEngineConfig().getMappingHandler()));
         return DataAccessUtils.singleResult(list);
     }
 
