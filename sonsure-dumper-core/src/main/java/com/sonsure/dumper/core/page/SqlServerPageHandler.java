@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.page;
 
 import com.sonsure.commons.model.Pagination;
-import org.apache.commons.lang3.StringUtils;
+import com.sonsure.dumper.core.config.DatabaseDialect;
 
 /**
  * @author liyd
@@ -21,7 +21,7 @@ public class SqlServerPageHandler extends AbstractPageHandler {
 
     @Override
     public boolean support(String dialect) {
-        return StringUtils.indexOfIgnoreCase(dialect, "sql server") != -1;
+        return DatabaseDialect.SQL_SERVER.belong(dialect);
     }
 
     @Override

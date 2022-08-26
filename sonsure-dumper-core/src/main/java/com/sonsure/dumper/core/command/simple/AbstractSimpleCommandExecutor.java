@@ -69,12 +69,6 @@ public abstract class AbstractSimpleCommandExecutor<T extends SimpleCommandExecu
     }
 
     @Override
-    public T nativeCommand() {
-        this.getCommandExecutorContext().setNativeCommand(true);
-        return (T) this;
-    }
-
-    @Override
     public <E> T resultHandler(ResultHandler<E> resultHandler) {
         this.resultHandler = resultHandler;
         return (T) this;

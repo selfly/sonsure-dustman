@@ -16,9 +16,9 @@
 
 package com.sonsure.dumper.springjdbc.persist;
 
+import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.convert.JdbcTypeConverter;
 import com.sonsure.dumper.core.mapping.MappingHandler;
-import com.sonsure.dumper.springjdbc.convert.LocalDateTimeConverter;
-import com.sonsure.dumper.springjdbc.convert.TypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
@@ -29,7 +29,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.sql.ResultSet;
@@ -54,7 +53,7 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
 
     private String dialect;
 
-    private MappingHandler mappingHandler;
+    private JdbcEngineConfig jdbcEngineConfig;
 
     /**
      * The class we are mapping to
@@ -82,11 +81,6 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
     private Set<String> mappedProperties;
 
     /**
-     * The Type converters.
-     */
-    private List<TypeConverter> typeConverters;
-
-    /**
      * Create a new {@code BeanPropertyRowMapper} for bean-style configuration.
      *
      * @see #setCheckFullyPopulated
@@ -100,12 +94,17 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * <p>Consider using the {@link #newInstance} factory method instead,
      * which allows for specifying the mapped type once only.
      *
-     * @param dialect        the dialect
-     * @param mappedClass    the class that each row should be mapped to
-     * @param mappingHandler the mapping handler
+     * @param dialect          the dialect
+     * @param jdbcEngineConfig the jdbc engine config
+     * @param mappedClass      the class that each row should be mapped to
      */
-    public JdbcRowMapper(String dialect, Class<T> mappedClass, MappingHandler mappingHandler) {
-        initialize(dialect, mappedClass, mappingHandler);
+    public JdbcRowMapper(String dialect, JdbcEngineConfig jdbcEngineConfig, Class<T> mappedClass) {
+        this.dialect = dialect.toLowerCase();
+        this.jdbcEngineConfig = jdbcEngineConfig;
+        this.mappedClass = mappedClass;
+        this.mappedFields = new HashMap<>();
+        this.mappedProperties = new HashSet<>();
+        initialize();
     }
 
 //    /**
@@ -154,28 +153,18 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
         this.primitivesDefaultedForNullValue = primitivesDefaultedForNullValue;
     }
 
-    /**
-     * Return whether we're defaulting Java primitives in the case of mapping a null value
-     * from corresponding database fields.
-     */
-    public boolean isPrimitivesDefaultedForNullValue() {
-        return this.primitivesDefaultedForNullValue;
-    }
+//    /**
+//     * Return whether we're defaulting Java primitives in the case of mapping a null value
+//     * from corresponding database fields.
+//     */
+//    public boolean isPrimitivesDefaultedForNullValue() {
+//        return this.primitivesDefaultedForNullValue;
+//    }
 
     /**
      * Initialize the mapping metadata for the given class.
-     *
-     * @param dialect        the dialect
-     * @param mappedClass    the mapped class
-     * @param mappingHandler the mapping handler
      */
-    protected void initialize(String dialect, Class<T> mappedClass, MappingHandler mappingHandler) {
-        this.dialect = dialect.toLowerCase();
-        this.mappedClass = mappedClass;
-        this.mappingHandler = mappingHandler;
-        this.mappedFields = new HashMap<>();
-        this.mappedProperties = new HashSet<>();
-        this.initializeTypeConverter();
+    protected void initialize() {
         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(mappedClass);
         for (PropertyDescriptor pd : pds) {
             if (pd.getWriteMethod() != null) {
@@ -184,40 +173,33 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
             }
         }
     }
-
-    protected void initializeTypeConverter() {
-        if (this.dialect.contains("sqlite")) {
-            this.typeConverters = new ArrayList<>();
-            this.typeConverters.add(new LocalDateTimeConverter());
-        }
-    }
-
-    /**
-     * Convert a name in camelCase to an underscored name in lower case.
-     * Any upper case letters are converted to lower case with a preceding underscore.
-     *
-     * @param name the original name
-     * @return the converted name
-     * @see #lowerCaseName
-     * @since 4.2
-     */
-    protected String underscoreName(String name) {
-        if (!StringUtils.hasLength(name)) {
-            return "";
-        }
-        StringBuilder result = new StringBuilder();
-        result.append(lowerCaseName(name.substring(0, 1)));
-        for (int i = 1; i < name.length(); i++) {
-            String s = name.substring(i, i + 1);
-            String slc = lowerCaseName(s);
-            if (!s.equals(slc)) {
-                result.append("_").append(slc);
-            } else {
-                result.append(s);
-            }
-        }
-        return result.toString();
-    }
+//
+//    /**
+//     * Convert a name in camelCase to an underscored name in lower case.
+//     * Any upper case letters are converted to lower case with a preceding underscore.
+//     *
+//     * @param name the original name
+//     * @return the converted name
+//     * @see #lowerCaseName
+//     * @since 4.2
+//     */
+//    protected String underscoreName(String name) {
+//        if (!StringUtils.hasLength(name)) {
+//            return "";
+//        }
+//        StringBuilder result = new StringBuilder();
+//        result.append(lowerCaseName(name.substring(0, 1)));
+//        for (int i = 1; i < name.length(); i++) {
+//            String s = name.substring(i, i + 1);
+//            String slc = lowerCaseName(s);
+//            if (!s.equals(slc)) {
+//                result.append("_").append(slc);
+//            } else {
+//                result.append(s);
+//            }
+//        }
+//        return result.toString();
+//    }
 
     /**
      * Convert the given name to lower case.
@@ -245,8 +227,8 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
 
         ResultSetMetaData rsmd = rs.getMetaData();
         int columnCount = rsmd.getColumnCount();
-        Set<String> populatedProperties = (isCheckFullyPopulated() ? new HashSet<String>() : null);
-
+        Set<String> populatedProperties = (isCheckFullyPopulated() ? new HashSet<>() : null);
+        final MappingHandler mappingHandler = this.jdbcEngineConfig.getMappingHandler();
         for (int index = 1; index <= columnCount; index++) {
             String column = JdbcUtils.lookupColumnName(rsmd, index);
             String field = column.replaceAll(" ", "");
@@ -259,11 +241,10 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
                         logger.debug("Mapping column '" + column + "' to property '" + pd.getName() + "' of type ["
                                 + ClassUtils.getQualifiedName(pd.getPropertyType()) + "]");
                     }
-                    if (this.typeConverters != null) {
-                        for (TypeConverter typeConverter : this.typeConverters) {
-                            if (typeConverter.support(pd.getPropertyType(), value)) {
-                                value = typeConverter.convert(pd.getPropertyType(), value);
-                            }
+                    final List<JdbcTypeConverter> jdbcTypeConverters = this.jdbcEngineConfig.getJdbcTypeConverters();
+                    if (jdbcTypeConverters != null) {
+                        for (JdbcTypeConverter jdbcTypeConverter : jdbcTypeConverters) {
+                            value = jdbcTypeConverter.db2JavaType(this.dialect, pd.getPropertyType(), value);
                         }
                     }
                     try {
@@ -327,14 +308,14 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * Static factory method to create a new {@code BeanPropertyRowMapper}
      * (with the mapped class specified only once).
      *
-     * @param <T>            the type parameter
-     * @param dialect        the dialect
-     * @param mappedClass    the class that each row should be mapped to
-     * @param mappingHandler the mapping handler
+     * @param <T>              the type parameter
+     * @param dialect          the dialect
+     * @param jdbcEngineConfig the jdbc engine config
+     * @param mappedClass      the class that each row should be mapped to
      * @return the jdbc row mapper
      */
-    public static <T> JdbcRowMapper<T> newInstance(String dialect, Class<T> mappedClass, MappingHandler mappingHandler) {
-        return new JdbcRowMapper<T>(dialect, mappedClass, mappingHandler);
+    public static <T> JdbcRowMapper<T> newInstance(String dialect, JdbcEngineConfig jdbcEngineConfig, Class<T> mappedClass) {
+        return new JdbcRowMapper<>(dialect, jdbcEngineConfig, mappedClass);
     }
 
 }

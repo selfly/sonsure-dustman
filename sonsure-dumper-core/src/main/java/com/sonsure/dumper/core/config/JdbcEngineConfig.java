@@ -11,6 +11,8 @@ package com.sonsure.dumper.core.config;
 
 
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
+import com.sonsure.dumper.core.convert.JdbcTypeConverter;
+import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.page.PageHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
@@ -18,6 +20,7 @@ import com.sonsure.dumper.core.persist.PersistExecutor;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * jdbc配置类
@@ -72,6 +75,20 @@ public interface JdbcEngineConfig {
      * @return
      */
     PersistExecutor getPersistExecutor();
+
+    /**
+     * Gets jdbc type converters.
+     *
+     * @return the jdbc type converters
+     */
+    List<JdbcTypeConverter> getJdbcTypeConverters();
+
+    /**
+     * Gets persist interceptors.
+     *
+     * @return the persist interceptors
+     */
+    List<PersistInterceptor> getPersistInterceptors();
 
     /**
      * 获取command解析器

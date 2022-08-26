@@ -10,13 +10,16 @@
 package com.sonsure.dumper.core.page;
 
 import com.sonsure.commons.model.Pagination;
-import org.apache.commons.lang3.StringUtils;
+import com.sonsure.dumper.core.config.DatabaseDialect;
 
+/**
+ * @author selfly
+ */
 public class PostgresqlPageHandler extends AbstractPageHandler {
 
     @Override
     public boolean support(String dialect) {
-        return StringUtils.indexOfIgnoreCase(dialect, "postgresql") != -1;
+        return DatabaseDialect.POSTGRESQL.belong(dialect);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class CommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
     @Override
     public CommandExecutor build(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
 
-        AbstractCommonCommandExecutor commandExecutor = null;
+        AbstractCommonCommandExecutor<?> commandExecutor = null;
         CommandContextBuilder commandContextBuilder = null;
 
         if (commandExecutorClass == Insert.class) {

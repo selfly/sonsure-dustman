@@ -83,16 +83,6 @@ public class SqlServerParser {
      * 转换为分页语句
      *
      * @param sql
-     * @return
-     */
-    public String convertToPageSql(String sql) {
-        return convertToPageSql(sql, null, null);
-    }
-
-    /**
-     * 转换为分页语句
-     *
-     * @param sql
      * @param offset
      * @param limit
      * @return

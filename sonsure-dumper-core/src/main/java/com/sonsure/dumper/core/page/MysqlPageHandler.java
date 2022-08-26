@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.page;
 
 import com.sonsure.commons.model.Pagination;
-import org.apache.commons.lang3.StringUtils;
+import com.sonsure.dumper.core.config.DatabaseDialect;
 
 /**
  * @author liyd
@@ -19,7 +19,7 @@ public class MysqlPageHandler extends AbstractPageHandler {
 
     @Override
     public boolean support(String dialect) {
-        return StringUtils.indexOfIgnoreCase(dialect, "mysql") != -1;
+        return DatabaseDialect.MYSQL.belong(dialect);
     }
 
     @Override

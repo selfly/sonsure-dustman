@@ -30,12 +30,6 @@ public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<Batch
     }
 
     @Override
-    public BatchUpdateExecutor nativeCommand() {
-        this.getCommandExecutorContext().setNativeCommand(true);
-        return this;
-    }
-
-    @Override
     public <T> Object execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
         this.getCommandExecutorContext().setCommand(command);
         final CommandExecutorContext.BatchUpdateExecutorContext<T> batchUpdateExecutorContext = this.getCommandExecutorContext().batchUpdateExecutorContext();
