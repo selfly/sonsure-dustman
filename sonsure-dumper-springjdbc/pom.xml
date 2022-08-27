@@ -76,6 +76,8 @@
                             com.sonsure.dumper.core.exception,
                             com.sonsure.dumper.core.mapping,
                             com.sonsure.dumper.core.persist,
+                            com.sonsure.dumper.core.convert,
+                            com.sonsure.dumper.core.interceptor,
                             org.slf4j;resolution:=optional,
                             org.springframework.beans;resolution:=optional,
                             org.springframework.beans.factory;resolution:=optional,
