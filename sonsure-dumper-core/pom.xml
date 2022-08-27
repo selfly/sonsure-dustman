@@ -107,7 +107,9 @@
                             com.sonsure.dumper.core.management,
                             com.sonsure.dumper.core.mapping,
                             com.sonsure.dumper.core.page,
-                            com.sonsure.dumper.core.persist
+                            com.sonsure.dumper.core.persist,
+                            com.sonsure.dumper.core.convert,
+                            com.sonsure.dumper.core.interceptor
                         </Export-Package>
                         <Bundle-Activator></Bundle-Activator>
                     </instructions>
