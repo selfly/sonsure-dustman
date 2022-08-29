@@ -6,6 +6,14 @@ package com.sonsure.dumper.core.convert;
 public interface JdbcTypeConverter {
 
     /**
+     * Support dialect boolean.
+     *
+     * @param dialect the dialect
+     * @return the boolean
+     */
+    boolean support(String dialect);
+
+    /**
      * Db 2 java type object.
      *
      * @param dialect      the dialect

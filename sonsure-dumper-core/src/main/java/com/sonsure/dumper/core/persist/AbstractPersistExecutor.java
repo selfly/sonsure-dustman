@@ -14,6 +14,7 @@ import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.batch.BatchCommandContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.convert.JdbcTypeConverterComposite;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import org.apache.commons.lang3.StringUtils;
@@ -55,52 +56,63 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
 
     @Override
     public Object execute(CommandContext commandContext, CommandType commandType) {
-        final List<PersistInterceptor> persistInterceptors = getJdbcEngineConfig().getPersistInterceptors();
-        if (persistInterceptors != null) {
-            for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                persistInterceptor.executeBefore(this.getDialect(), commandContext, commandType);
+        if (getJdbcEngineConfig().getJdbcTypeConverters() != null) {
+            JdbcTypeConverterComposite jdbcTypeConverterComposite = new JdbcTypeConverterComposite(getJdbcEngineConfig().getJdbcTypeConverters());
+            if (jdbcTypeConverterComposite.support(this.getDialect())) {
+                jdbcTypeConverterComposite.convert(this.getDialect(), commandContext, commandType);
             }
         }
-        Object result;
-        switch (commandType) {
-            case INSERT:
-                result = this.insert(commandContext);
-                break;
-            case QUERY_FOR_LIST:
-                result = this.queryForList(commandContext);
-                break;
-            case QUERY_SINGLE_RESULT:
-                result = this.querySingleResult(commandContext);
-                break;
-            case QUERY_FOR_MAP:
-                result = this.queryForMap(commandContext);
-                break;
-            case QUERY_FOR_MAP_LIST:
-                result = this.queryForMapList(commandContext);
-                break;
-            case QUERY_ONE_COL:
-                result = this.queryOneCol(commandContext);
-                break;
-            case QUERY_ONE_COL_LIST:
-                result = this.queryOneColList(commandContext);
-                break;
-            case UPDATE:
-                result = this.update(commandContext);
-                break;
-            case BATCH_UPDATE:
-                result = this.batchUpdate(((BatchCommandContext<?>) commandContext));
-                break;
-            case DELETE:
-                result = this.delete(commandContext);
-                break;
-            case EXECUTE:
-                result = this.doExecute(commandContext);
-                break;
-            case EXECUTE_SCRIPT:
-                result = this.doExecuteScript(commandContext);
-                break;
-            default:
-                throw new SonsureJdbcException("不支持的CommandType:" + commandType);
+        final List<PersistInterceptor> persistInterceptors = getJdbcEngineConfig().getPersistInterceptors();
+        boolean process = true;
+        if (persistInterceptors != null) {
+            for (PersistInterceptor persistInterceptor : persistInterceptors) {
+                if (!persistInterceptor.executeBefore(this.getDialect(), commandContext, commandType)) {
+                    process = false;
+                }
+            }
+        }
+        Object result = null;
+        if (process) {
+            switch (commandType) {
+                case INSERT:
+                    result = this.insert(commandContext);
+                    break;
+                case QUERY_FOR_LIST:
+                    result = this.queryForList(commandContext);
+                    break;
+                case QUERY_SINGLE_RESULT:
+                    result = this.querySingleResult(commandContext);
+                    break;
+                case QUERY_FOR_MAP:
+                    result = this.queryForMap(commandContext);
+                    break;
+                case QUERY_FOR_MAP_LIST:
+                    result = this.queryForMapList(commandContext);
+                    break;
+                case QUERY_ONE_COL:
+                    result = this.queryOneCol(commandContext);
+                    break;
+                case QUERY_ONE_COL_LIST:
+                    result = this.queryOneColList(commandContext);
+                    break;
+                case UPDATE:
+                    result = this.update(commandContext);
+                    break;
+                case BATCH_UPDATE:
+                    result = this.batchUpdate(((BatchCommandContext<?>) commandContext));
+                    break;
+                case DELETE:
+                    result = this.delete(commandContext);
+                    break;
+                case EXECUTE:
+                    result = this.doExecute(commandContext);
+                    break;
+                case EXECUTE_SCRIPT:
+                    result = this.doExecuteScript(commandContext);
+                    break;
+                default:
+                    throw new SonsureJdbcException("不支持的CommandType:" + commandType);
+            }
         }
         if (persistInterceptors != null) {
             for (PersistInterceptor persistInterceptor : persistInterceptors) {

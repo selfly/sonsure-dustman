@@ -32,10 +32,12 @@ public class SqliteCompatibleLocalDateTimeConverter implements JdbcTypeConverter
     }
 
     @Override
+    public boolean support(String dialect) {
+        return DatabaseDialect.SQLITE.belong(dialect);
+    }
+
+    @Override
     public Object db2JavaType(String dialect, Class<?> requiredType, Object value) {
-        if (!DatabaseDialect.SQLITE.belong(dialect)) {
-            return value;
-        }
         if (types.contains(requiredType.getSimpleName()) && value instanceof Timestamp) {
             final LocalDateTime localDateTime = ((Timestamp) value).toLocalDateTime();
             if (LOCAL_DATE.equals(requiredType.getSimpleName())) {
@@ -51,9 +53,6 @@ public class SqliteCompatibleLocalDateTimeConverter implements JdbcTypeConverter
 
     @Override
     public Object java2DbType(String dialect, Object value) {
-        if (!DatabaseDialect.SQLITE.belong(dialect)) {
-            return value;
-        }
         if (value instanceof LocalDateTime) {
             return ((LocalDateTime) value).format(DateTimeFormatter.ofPattern(PATTERN_DATETIME));
         } else if (value instanceof LocalDate) {

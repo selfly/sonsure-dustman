@@ -17,7 +17,7 @@
 package com.sonsure.dumper.springjdbc.persist;
 
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.convert.JdbcTypeConverter;
+import com.sonsure.dumper.core.convert.JdbcTypeConverterComposite;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,10 +241,10 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
                         logger.debug("Mapping column '" + column + "' to property '" + pd.getName() + "' of type ["
                                 + ClassUtils.getQualifiedName(pd.getPropertyType()) + "]");
                     }
-                    final List<JdbcTypeConverter> jdbcTypeConverters = this.jdbcEngineConfig.getJdbcTypeConverters();
-                    if (jdbcTypeConverters != null) {
-                        for (JdbcTypeConverter jdbcTypeConverter : jdbcTypeConverters) {
-                            value = jdbcTypeConverter.db2JavaType(this.dialect, pd.getPropertyType(), value);
+                    if (this.jdbcEngineConfig.getJdbcTypeConverters() != null) {
+                        JdbcTypeConverterComposite jdbcTypeConverterComposite = new JdbcTypeConverterComposite(this.jdbcEngineConfig.getJdbcTypeConverters());
+                        if (jdbcTypeConverterComposite.support(this.dialect)) {
+                            value = jdbcTypeConverterComposite.db2JavaType(this.dialect, pd.getPropertyType(), value);
                         }
                     }
                     try {

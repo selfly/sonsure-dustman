@@ -14,8 +14,10 @@ public interface PersistInterceptor {
      * @param dialect        the dialect
      * @param commandContext the command context
      * @param commandType    the command type
+     * @return the boolean
      */
-    default void executeBefore(String dialect, CommandContext commandContext, CommandType commandType) {
+    default boolean executeBefore(String dialect, CommandContext commandContext, CommandType commandType) {
+        return true;
     }
 
     /**

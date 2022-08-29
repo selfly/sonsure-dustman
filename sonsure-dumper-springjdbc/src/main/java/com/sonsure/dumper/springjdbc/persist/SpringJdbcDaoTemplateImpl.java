@@ -14,8 +14,6 @@ import com.sonsure.dumper.core.config.JdbcEngineImpl;
 import com.sonsure.dumper.core.convert.JdbcTypeConverter;
 import com.sonsure.dumper.core.convert.SqliteCompatibleLocalDateTimeConverter;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.interceptor.PersistInterceptor;
-import com.sonsure.dumper.core.interceptor.SqliteCompatiblePersistInterceptor;
 import com.sonsure.dumper.core.persist.AbstractDaoTemplateImpl;
 import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
@@ -39,8 +37,6 @@ public class SpringJdbcDaoTemplateImpl extends AbstractDaoTemplateImpl implement
             jdbcTemplateEngineConfig.setDataSource(getDataSource());
             final List<JdbcTypeConverter> jdbcTypeConverters = Collections.singletonList(new SqliteCompatibleLocalDateTimeConverter());
             jdbcTemplateEngineConfig.setJdbcTypeConverters(jdbcTypeConverters);
-            final List<PersistInterceptor> persistInterceptors = Collections.singletonList(new SqliteCompatiblePersistInterceptor());
-            jdbcTemplateEngineConfig.setPersistInterceptors(persistInterceptors);
             defaultJdbcEngine = new JdbcEngineImpl(jdbcTemplateEngineConfig);
         }
         if (isGlobalJdbc()) {
