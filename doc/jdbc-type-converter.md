@@ -16,14 +16,22 @@ __PS:该类型转换只对查询结果为Bean对象时生效，如果不是Bean�
 
 ## 接口说明
 
-包含2个方法，即Database->Java,Java->Database的相互转换。
+包含3个方法，support方法确认是否对当前的数据库类型生效。剩余两个方法即Database->Java,Java->Database的相互转换。
 
     /**
     * @author selfly
     */
     public interface JdbcTypeConverter {
 
-    /**
+        /**
+         * Support dialect boolean.
+         *
+         * @param dialect the dialect
+         * @return the boolean
+         */
+        boolean support(String dialect);
+    
+        /**
         * Db 2 java type object.
         *
         * @param dialect      the dialect
@@ -32,10 +40,10 @@ __PS:该类型转换只对查询结果为Bean对象时生效，如果不是Bean�
         * @return the object
         */
         default Object db2JavaType(String dialect, Class<?> requiredType, Object value) {
-        return value;
+            return value;
         }
-
-    /**
+    
+        /**
         * Java 2 db type object.
         *
         * @param dialect the dialect
@@ -43,7 +51,7 @@ __PS:该类型转换只对查询结果为Bean对象时生效，如果不是Bean�
         * @return the object
         */
         default Object java2DbType(String dialect, Object value) {
-        return value;
+            return value;
         }
 
     }
@@ -74,10 +82,12 @@ __PS:该类型转换只对查询结果为Bean对象时生效，如果不是Bean�
         }
 
         @Override
+        public boolean support(String dialect) {
+            return DatabaseDialect.SQLITE.belong(dialect);
+        }
+
+        @Override
         public Object db2JavaType(String dialect, Class<?> requiredType, Object value) {
-            if (!DatabaseDialect.SQLITE.belong(dialect)) {
-                return value;
-            }
             if (types.contains(requiredType.getSimpleName()) && value instanceof Timestamp) {
                 final LocalDateTime localDateTime = ((Timestamp) value).toLocalDateTime();
                 if (LOCAL_DATE.equals(requiredType.getSimpleName())) {
@@ -93,9 +103,6 @@ __PS:该类型转换只对查询结果为Bean对象时生效，如果不是Bean�
 
         @Override
         public Object java2DbType(String dialect, Object value) {
-            if (!DatabaseDialect.SQLITE.belong(dialect)) {
-                return value;
-            }
             if (value instanceof LocalDateTime) {
                 return ((LocalDateTime) value).format(DateTimeFormatter.ofPattern(PATTERN_DATETIME));
             } else if (value instanceof LocalDate) {
@@ -107,6 +114,7 @@ __PS:该类型转换只对查询结果为Bean对象时生效，如果不是Bean�
             }
         }
     }
+    
 
 默认配置已添加该`JdbcTypeConverter`，当数据库为`SQLite`时会自动生效，如果是手动声明`JdbcEngine`，需要显示添加：
 

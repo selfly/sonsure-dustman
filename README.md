@@ -107,6 +107,8 @@
 - [分页处理 PageHandler](doc/page-handler.md)
 - [主键生成 KeyGenerator](doc/key-generator.md)
 - [持久化实现 PersistExecutor，扩展Hibernate示例抛砖引玉](doc/persist-executor-hibernate.md)
+- [添加自定义类型转换器 JdbcTypeConverter](doc/jdbc-type-converter.md)
+- [添加自定义拦截器 PersistInterceptor](doc/persist-interceptor.md)
 - [sql的解析转换 CommandConversionHandler](doc/conversion-handler.md)
 - [扩展自定义的执行方式 CommandExecutor](doc/ext-executor.md)
 - [多数据源的使用](doc/multi-ds.md)
