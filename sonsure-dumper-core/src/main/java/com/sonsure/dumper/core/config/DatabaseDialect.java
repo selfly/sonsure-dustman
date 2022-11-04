@@ -10,6 +10,8 @@ public enum DatabaseDialect {
      */
     SQLITE("sqlite"),
 
+    H2("h2"),
+
     MYSQL("mysql"),
 
     ORACLE("oracle"),

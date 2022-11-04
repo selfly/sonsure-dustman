@@ -31,6 +31,7 @@ public class NegotiatingPageHandler implements PageHandler {
         defaultPageHandlers.add(new PostgresqlPageHandler());
         defaultPageHandlers.add(new SqlServerPageHandler());
         defaultPageHandlers.add(new SqlitePageHandler());
+        defaultPageHandlers.add(new H2PageHandler());
     }
 
     @Override
