@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2017 abel533@gmail.com
+ * Copyright (c) 2014-2022 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,8 @@ package com.sonsure.dumper.core.page;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.parser.Token;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
@@ -44,9 +45,10 @@ public class CountSqlParser {
     public static final String KEEP_ORDERBY = "/*keep orderby*/";
     private static final Alias TABLE_ALIAS;
 
-    //<editor-fold desc="聚合函数">
+    /* <editor-fold desc="聚合函数"> **/
     private final Set<String> skipFunctions = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> falseFunctions = Collections.synchronizedSet(new HashSet<String>());
+    private final JSqlParser jSqlParser;
 
     /**
      * 聚合函数，以下列函数开头的都认为是聚合函数
@@ -152,6 +154,14 @@ public class CountSqlParser {
         }
     }
 
+    public CountSqlParser() {
+        this.jSqlParser = JSqlParser.DEFAULT;
+    }
+
+    public CountSqlParser(JSqlParser jSqlParser) {
+        this.jSqlParser = jSqlParser;
+    }
+
     /**
      * 获取智能的countSql
      *
@@ -166,21 +176,21 @@ public class CountSqlParser {
      * 获取智能的countSql
      *
      * @param sql
-     * @param name 列名，默认 0
+     * @param countColumn 列名，默认 0
      * @return
      */
-    public String getSmartCountSql(String sql, String name) {
+    public String getSmartCountSql(String sql, String countColumn) {
         //解析SQL
         Statement stmt = null;
         //特殊sql不需要去掉order by时，使用注释前缀
-        if (sql.indexOf(KEEP_ORDERBY) >= 0) {
-            return getSimpleCountSql(sql, name);
+        if (sql.indexOf(KEEP_ORDERBY) >= 0 || keepOrderBy()) {
+            return getSimpleCountSql(sql, countColumn);
         }
         try {
-            stmt = CCJSqlParserUtil.parse(sql);
+            stmt = jSqlParser.parse(sql);
         } catch (Throwable e) {
             //无法解析的用一般方法返回count语句
-            return getSimpleCountSql(sql, name);
+            return getSimpleCountSql(sql, countColumn);
         }
         Select select = (Select) stmt;
         SelectBody selectBody = select.getSelectBody();
@@ -189,13 +199,23 @@ public class CountSqlParser {
             processSelectBody(selectBody);
         } catch (Exception e) {
             //当 sql 包含 group by 时，不去除 order by
-            return getSimpleCountSql(sql, name);
+            return getSimpleCountSql(sql, countColumn);
         }
         //处理with-去order by
         processWithItemsList(select.getWithItemsList());
         //处理为count查询
-        sqlToCount(select, name);
+        sqlToCount(select, countColumn);
         String result = select.toString();
+        if (selectBody instanceof PlainSelect) {
+            Token token = ((PlainSelect) selectBody).getASTNode().jjtGetFirstToken().specialToken;
+            if (token != null) {
+                String hints = token.toString().trim();
+                // 这里判断是否存在hint, 且result是不包含hint的
+                if (hints.startsWith("/*") && hints.endsWith("*/") && !result.startsWith("/*")) {
+                    result = hints + result;
+                }
+            }
+        }
         return result;
     }
 
@@ -219,9 +239,9 @@ public class CountSqlParser {
         StringBuilder stringBuilder = new StringBuilder(sql.length() + 40);
         stringBuilder.append("select count(");
         stringBuilder.append(name);
-        stringBuilder.append(") from (");
+        stringBuilder.append(") from ( \n");
         stringBuilder.append(sql);
-        stringBuilder.append(") tmp_count");
+        stringBuilder.append("\n ) tmp_count");
         return stringBuilder.toString();
     }
 
@@ -263,6 +283,10 @@ public class CountSqlParser {
         if (select.getDistinct() != null) {
             return false;
         }
+        //#606,包含having时不可以
+        if (select.getHaving() != null) {
+            return false;
+        }
         for (SelectItem item : select.getSelectItems()) {
             //select列中包含参数的时候不可以，否则会引起参数个数错误
             if (item.toString().contains("?")) {
@@ -289,6 +313,10 @@ public class CountSqlParser {
                             skipFunctions.add(NAME);
                         }
                     }
+                } else if (expression instanceof Parenthesis && ((SelectExpressionItem) item).getAlias() != null) {
+                    //#555，当存在 (a+b) as c 时，c 如果出现了 order by 或者 having 中时，会找不到对应的列，
+                    // 这里想要更智能，需要在整个SQL中查找别名出现的位置，暂时不考虑，直接排除
+                    return false;
                 }
             }
         }
@@ -301,23 +329,25 @@ public class CountSqlParser {
      * @param selectBody
      */
     public void processSelectBody(SelectBody selectBody) {
-        if (selectBody instanceof PlainSelect) {
-            processPlainSelect((PlainSelect) selectBody);
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
-            if (withItem.getSelectBody() != null) {
-                processSelectBody(withItem.getSelectBody());
-            }
-        } else {
-            SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                List<SelectBody> plainSelects = operationList.getSelects();
-                for (SelectBody plainSelect : plainSelects) {
-                    processSelectBody(plainSelect);
+        if (selectBody != null) {
+            if (selectBody instanceof PlainSelect) {
+                processPlainSelect((PlainSelect) selectBody);
+            } else if (selectBody instanceof WithItem) {
+                WithItem withItem = (WithItem) selectBody;
+                if (withItem.getSubSelect() != null && !keepSubSelectOrderBy()) {
+                    processSelectBody(withItem.getSubSelect().getSelectBody());
                 }
-            }
-            if (!orderByHashParameters(operationList.getOrderByElements())) {
-                operationList.setOrderByElements(null);
+            } else {
+                SetOperationList operationList = (SetOperationList) selectBody;
+                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+                    List<SelectBody> plainSelects = operationList.getSelects();
+                    for (SelectBody plainSelect : plainSelects) {
+                        processSelectBody(plainSelect);
+                    }
+                }
+                if (!orderByHashParameters(operationList.getOrderByElements())) {
+                    operationList.setOrderByElements(null);
+                }
             }
         }
     }
@@ -352,7 +382,9 @@ public class CountSqlParser {
     public void processWithItemsList(List<WithItem> withItemsList) {
         if (withItemsList != null && withItemsList.size() > 0) {
             for (WithItem item : withItemsList) {
-                processSelectBody(item.getSelectBody());
+                if (item.getSubSelect() != null && !keepSubSelectOrderBy()) {
+                    processSelectBody(item.getSubSelect().getSelectBody());
+                }
             }
         }
     }
@@ -377,7 +409,7 @@ public class CountSqlParser {
             }
         } else if (fromItem instanceof SubSelect) {
             SubSelect subSelect = (SubSelect) fromItem;
-            if (subSelect.getSelectBody() != null) {
+            if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
                 processSelectBody(subSelect.getSelectBody());
             }
         } else if (fromItem instanceof ValuesList) {
@@ -386,12 +418,26 @@ public class CountSqlParser {
             LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
             if (lateralSubSelect.getSubSelect() != null) {
                 SubSelect subSelect = lateralSubSelect.getSubSelect();
-                if (subSelect.getSelectBody() != null) {
+                if (subSelect.getSelectBody() != null && !keepSubSelectOrderBy()) {
                     processSelectBody(subSelect.getSelectBody());
                 }
             }
         }
         //Table时不用处理
+    }
+
+    /**
+     * 保留 order by
+     */
+    protected boolean keepOrderBy() {
+        return false;
+    }
+
+    /**
+     * 保留子查询 order by
+     */
+    protected boolean keepSubSelectOrderBy() {
+        return false;
     }
 
     /**

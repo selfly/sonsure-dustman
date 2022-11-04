@@ -46,7 +46,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String result = "SELECT t1.*, t2.contentNum, t2.CONTENT_TYPE FROM TAG t1 INNER JOIN (SELECT count(*) AS contentNum, rt.TAG_ID, rt.CONTENT_TYPE FROM REL_TAG rt WHERE rt.CONTENT_TYPE = ? GROUP BY rt.TAG_ID ORDER BY contentNum DESC LIMIT 0, ?) t2 ON t1.TAG_ID = t2.TAG_ID";
         System.out.println(sql.toLowerCase());
         System.out.println(result.toLowerCase());
-        Assert.assertTrue(result.toLowerCase().equals(sql.toLowerCase()));
+        Assert.assertEquals(result.toLowerCase(), sql.toLowerCase());
 
     }
 
@@ -55,7 +55,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command2 = "select t1.*,count(*) as contentNum from User t1 inner join Content t2 on t1.userId = t2.userId and t2.gmtCreate > ? and t2.gmtCreate < ? and t2.status in ( ?, ?, ?) group by t2.userId order by contentNum desc limit 0,?";
         String sql2 = commandConversionHandler.convert(command2, null);
         String result2 = "select t1.*, count(*) as contentnum from user t1 inner join content t2 on t1.user_id = t2.user_id and t2.gmt_create > ? and t2.gmt_create < ? and t2.status in (?, ?, ?) group by t2.user_id order by contentnum desc limit 0, ?";
-        Assert.assertTrue(sql2.toLowerCase().equals(result2));
+        Assert.assertEquals(sql2.toLowerCase(), result2);
         System.out.println(sql2.toLowerCase());
     }
 
@@ -64,7 +64,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command3 = "select loginName,password from UserInfo where userInfoId = ?";
         String sql3 = commandConversionHandler.convert(command3, null);
         String result3 = "select login_name, password from user_info where user_info_id = ?";
-        Assert.assertTrue(sql3.toLowerCase().equals(result3));
+        Assert.assertEquals(sql3.toLowerCase(), result3);
         System.out.println(sql3.toLowerCase());
     }
 
@@ -73,7 +73,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command4 = "select t1.*,t2.loginName,t2.userAge from Tag t1,UserInfo t2";
         String sql4 = commandConversionHandler.convert(command4, null);
         String result4 = "select t1.*, t2.login_name, t2.user_age from tag t1, user_info t2";
-        Assert.assertTrue(sql4.toLowerCase().equals(result4));
+        Assert.assertEquals(sql4.toLowerCase(), result4);
         System.out.println(sql4.toLowerCase());
     }
 
@@ -85,7 +85,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String result5 = "insert into tag (tag_name, tag_type) select login_name, user_age from user_info";
         System.out.println(sql5.toLowerCase());
         System.out.println(result5.toLowerCase());
-        Assert.assertTrue(sql5.toLowerCase().equals(result5));
+        Assert.assertEquals(sql5.toLowerCase(), result5);
 
     }
 
@@ -103,7 +103,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command7 = "delete from UserInfo where loginName = ? and password = ? and userInfoId = ?";
         String sql7 = commandConversionHandler.convert(command7, null);
         String result7 = "delete from user_info where login_name = ? and password = ? and user_info_id = ?";
-        Assert.assertTrue(sql7.toLowerCase().equals(result7));
+        Assert.assertEquals(sql7.toLowerCase(), result7);
         System.out.println(sql7.toLowerCase());
     }
 
@@ -112,7 +112,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command = "select t1.* from Series t1 inner join RelSeries t2 inner JOIN Content t3 on t1.seriesId = t2.seriesId and t2.contentId = t3.contentId group by t1.seriesId order by sum(t3.clickCount) desc";
         String sql = commandConversionHandler.convert(command, null);
         String result = "select t1.* from series t1 inner join rel_series t2 inner join content t3 on t1.series_id = t2.series_id and t2.content_id = t3.content_id group by t1.series_id order by sum(t3.click_count) desc";
-        Assert.assertTrue(sql.toLowerCase().equals(result));
+        Assert.assertEquals(sql.toLowerCase(), result);
         System.out.println(sql.toLowerCase());
         System.out.println(result);
 
@@ -123,7 +123,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command = "select username,password from User where parentId is null";
         String sql = commandConversionHandler.convert(command, null);
         String result = "SELECT USERNAME, PASSWORD FROM USER WHERE parentId IS NULL";
-        Assert.assertTrue(sql.toLowerCase().equals(result.toLowerCase()));
+        Assert.assertEquals(sql.toLowerCase(), result.toLowerCase());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command = "select t.* from UserInfo t where t.userInfoId = :userInfoId and userAge = :userAge and password = ?";
         String sql = commandConversionHandler.convert(command, null);
         String result = "SELECT t.* FROM USER_INFO t WHERE t.USER_INFO_ID = :userInfoId AND userAge = :userAge AND password = ?";
-        Assert.assertTrue(sql.toLowerCase().equals(result.toLowerCase()));
+        Assert.assertEquals(sql.toLowerCase(), result.toLowerCase());
     }
 
     @Test
@@ -139,7 +139,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command = "insert into UserInfo (username,testUserId) values (?,`{{SEQ_TEST_USER.NEXTVAL}}`)";
         String sql = commandConversionHandler.convert(command, null);
         String result = "INSERT INTO USER_INFO (username, testUserId) VALUES (?, SEQ_TEST_USER.NEXTVAL)";
-        Assert.assertTrue(sql.toLowerCase().equals(result.toLowerCase()));
+        Assert.assertEquals(sql.toLowerCase(), result.toLowerCase());
     }
 
     @Test
@@ -147,7 +147,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command = "select orderNumber,resourceUrl,resourceIcon,sysResourceId,resourceName,routingUrl,parentId,resourceType from UserInfo where user_info_id in ( select 1 from RelTag) ";
         String sql = commandConversionHandler.convert(command, null);
         String result = "SELECT orderNumber, resourceUrl, resourceIcon, sysResourceId, resourceName, routingUrl, parentId, resourceType FROM USER_INFO WHERE user_info_id IN (SELECT 1 FROM REL_TAG)";
-        Assert.assertTrue(sql.toLowerCase().equals(result.toLowerCase()));
+        Assert.assertEquals(sql.toLowerCase(), result.toLowerCase());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class JSqlParserCommandConversionHandlerTest {
         String command = "update Content set commentCount = commentCount+1 where contentId is null";
         String sql = commandConversionHandler.convert(command, null);
         String result = "UPDATE CONTENT SET COMMENT_COUNT = COMMENT_COUNT + 1 WHERE CONTENT_ID IS NULL";
-        Assert.assertTrue(sql.toLowerCase().equals(result.toLowerCase()));
+        Assert.assertEquals(sql.toLowerCase(), result.toLowerCase());
     }
 
     @Test
@@ -175,7 +175,17 @@ public class JSqlParserCommandConversionHandlerTest {
         JSqlParserCommandConversionHandler cch = new JSqlParserCommandConversionHandler(mh);
         String command3 = "select loginName, password from UnUserInfo where userInfoId = ?";
         String sql3 = cch.convert(command3, null);
-        Assert.assertTrue(command3.toLowerCase().equals(sql3.toLowerCase()));
+        Assert.assertEquals(command3.toLowerCase(), sql3.toLowerCase());
+    }
+
+    @Test
+    public void commandToSql16() throws Exception {
+        DefaultMappingHandler mh = new DefaultMappingHandler();
+        mh.setFailOnMissingClass(false);
+        JSqlParserCommandConversionHandler cch = new JSqlParserCommandConversionHandler(mh);
+        String command3 = "SELECT * FROM articles WHERE MATCH (tags) AGAINST ('哈哈' IN BOOLEAN MODE)";
+        String sql3 = cch.convert(command3, null);
+        Assert.assertEquals(command3.toLowerCase(), sql3.toLowerCase());
     }
 
 

@@ -22,13 +22,12 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
+import net.sf.jsqlparser.statement.update.UpdateSet;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommandMappingHandler {
 
@@ -39,15 +38,15 @@ public class CommandMappingHandler {
      */
     private static final String DEFAULT_ALIAS = "_default_alias";
 
-    private MappingHandler mappingHandler;
+    private final MappingHandler mappingHandler;
 
     /**
      * 参数本身无任何作用，只在调用mappingHandler时传入，方便分表时确定表名
      */
-    private Map<String, Object> params;
+    private final Map<String, Object> params;
 
-    private Map<Column, ColumnMapping> mappingColumns = new HashMap<>();
-    private Map<Table, TableMapping> mappingTables = new HashMap<>();
+    private final Map<Column, ColumnMapping> mappingColumns = new HashMap<>();
+    private final Map<Table, TableMapping> mappingTables = new HashMap<>();
 
     public CommandMappingHandler(Statement statement, MappingHandler mappingHandler, Map<String, Object> params) {
         this.mappingHandler = mappingHandler;
@@ -78,6 +77,7 @@ public class CommandMappingHandler {
             Update update = (Update) statement;
 
             this.extractTableMappings(update.getTable(), mappings);
+            //final ArrayList<UpdateSet> updateSets = update.getUpdateSets();
             this.extractColumnMapping(update.getColumns(), mappings);
             this.extractExpression(update.getExpressions(), mappings);
             this.extractExpression(update.getWhere(), mappings);
@@ -127,9 +127,9 @@ public class CommandMappingHandler {
                 } else if (rightItem instanceof SubSelect) {
                     this.extractSubSelect(((SubSelect) rightItem), mappings);
                 }
-                Expression onExpression = join.getOnExpression();
-                if (onExpression != null) {
-                    this.extractExpression(onExpression, mappings);
+                final Collection<Expression> onExpressions = join.getOnExpressions();
+                if (onExpressions != null && !onExpressions.isEmpty()) {
+                    this.extractExpression(onExpressions, mappings);
                 }
             }
         }
@@ -189,6 +189,7 @@ public class CommandMappingHandler {
             mappingName = mappingHandler.getColumn((String) obj, column.getColumnName());
             mappings.put(column.getColumnName(), mappingName);
         } else if (obj instanceof Map) {
+            @SuppressWarnings("unchecked")
             Map<String, Object> subMap = (Map<String, Object>) obj;
             mappingName = (String) subMap.get(column.getColumnName());
         }
@@ -198,7 +199,7 @@ public class CommandMappingHandler {
         mappingColumns.put(column, mappingColumn);
     }
 
-    protected void extractExpression(List<Expression> expressions, Map<String, Object> mappings) {
+    protected void extractExpression(Collection<Expression> expressions, Map<String, Object> mappings) {
         if (expressions == null) {
             return;
         }
@@ -232,6 +233,10 @@ public class CommandMappingHandler {
             ItemsList rightItemsList = inExpression.getRightItemsList();
             if (rightItemsList instanceof SubSelect) {
                 this.extractSubSelect(((SubSelect) rightItemsList), mappings);
+            }
+            final Expression rightExpression = inExpression.getRightExpression();
+            if (rightExpression instanceof SubSelect) {
+                this.extractSubSelect(((SubSelect) rightExpression), mappings);
             }
         } else if (expression instanceof IsNullExpression) {
             IsNullExpression isNullExpression = (IsNullExpression) expression;
@@ -296,6 +301,9 @@ public class CommandMappingHandler {
         }
         SelectBody selectBody = subSelect.getSelectBody();
         this.extractMappings(selectBody, subMappings);
+    }
+
+    private void extractUpdateSet(ArrayList<UpdateSet> updateSets, Map<String, Object> mappings) {
 
     }
 }

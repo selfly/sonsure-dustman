@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2014-2017 abel533@gmail.com
+ * Copyright (c) 2014-2022 abel533@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
@@ -71,12 +70,31 @@ public class SqlServerParser {
     protected static final Top TOP100_PERCENT;
     //别名前缀
     protected static final String PAGE_COLUMN_ALIAS_PREFIX = "ROW_ALIAS_";
+    private final JSqlParser jSqlParser;
 
     //静态方法处理
     static {
         TOP100_PERCENT = new Top();
         TOP100_PERCENT.setExpression(new LongValue(100));
         TOP100_PERCENT.setPercentage(true);
+    }
+
+    public SqlServerParser() {
+        this.jSqlParser = JSqlParser.DEFAULT;
+    }
+
+    public SqlServerParser(JSqlParser jSqlParser) {
+        this.jSqlParser = jSqlParser;
+    }
+
+    /**
+     * 转换为分页语句
+     *
+     * @param sql
+     * @return
+     */
+    public String convertToPageSql(String sql) {
+        return convertToPageSql(sql, null, null);
     }
 
     /**
@@ -91,7 +109,7 @@ public class SqlServerParser {
         //解析SQL
         Statement stmt;
         try {
-            stmt = CCJSqlParserUtil.parse(sql);
+            stmt = jSqlParser.parse(sql);
         } catch (Throwable e) {
             throw new SonsureJdbcException("不支持该SQL转换为分页查询!", e);
         }
@@ -290,19 +308,21 @@ public class SqlServerParser {
      * @param selectBody
      */
     protected void processSelectBody(SelectBody selectBody, int level) {
-        if (selectBody instanceof PlainSelect) {
-            processPlainSelect((PlainSelect) selectBody, level + 1);
-        } else if (selectBody instanceof WithItem) {
-            WithItem withItem = (WithItem) selectBody;
-            if (withItem.getSelectBody() != null) {
-                processSelectBody(withItem.getSelectBody(), level + 1);
-            }
-        } else {
-            SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
-                List<SelectBody> plainSelects = operationList.getSelects();
-                for (SelectBody plainSelect : plainSelects) {
-                    processSelectBody(plainSelect, level + 1);
+        if (selectBody != null) {
+            if (selectBody instanceof PlainSelect) {
+                processPlainSelect((PlainSelect) selectBody, level + 1);
+            } else if (selectBody instanceof WithItem) {
+                WithItem withItem = (WithItem) selectBody;
+                if (withItem.getSubSelect() != null) {
+                    processSelectBody(withItem.getSubSelect().getSelectBody(), level + 1);
+                }
+            } else {
+                SetOperationList operationList = (SetOperationList) selectBody;
+                if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+                    List<SelectBody> plainSelects = operationList.getSelects();
+                    for (SelectBody plainSelect : plainSelects) {
+                        processSelectBody(plainSelect, level + 1);
+                    }
                 }
             }
         }

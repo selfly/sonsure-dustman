@@ -12,8 +12,9 @@ package com.sonsure.dumper.core.command.sql;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectVisitor;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.InsertDeParser;
@@ -25,7 +26,7 @@ import java.util.Iterator;
  */
 public class CommandInsertDeParser extends InsertDeParser {
 
-    private CommandMappingHandler commandMappingHandler;
+    private final CommandMappingHandler commandMappingHandler;
 
     public CommandInsertDeParser(ExpressionVisitor expressionVisitor, SelectVisitor selectVisitor, StringBuilder buffer, CommandMappingHandler commandMappingHandler) {
         super(expressionVisitor, selectVisitor, buffer);
@@ -34,80 +35,110 @@ public class CommandInsertDeParser extends InsertDeParser {
 
     @Override
     public void deParse(Insert insert) {
-        getBuffer().append("INSERT ");
+        if (insert.getWithItemsList() != null && !insert.getWithItemsList().isEmpty()) {
+            buffer.append("WITH ");
+            for (Iterator<WithItem> iter = insert.getWithItemsList().iterator(); iter.hasNext(); ) {
+                WithItem withItem = iter.next();
+                withItem.accept(getSelectVisitor());
+                if (iter.hasNext()) {
+                    buffer.append(",");
+                }
+                buffer.append(" ");
+            }
+        }
+
+        buffer.append("INSERT ");
         if (insert.getModifierPriority() != null) {
-            getBuffer().append(insert.getModifierPriority()).append(" ");
+            buffer.append(insert.getModifierPriority()).append(" ");
         }
         if (insert.isModifierIgnore()) {
-            getBuffer().append("IGNORE ");
+            buffer.append("IGNORE ");
         }
-        getBuffer().append("INTO ");
+        buffer.append("INTO ");
 
-        String tableName = this.commandMappingHandler.getTableName(insert.getTable());
-        getBuffer().append(tableName);
+        final Table table = insert.getTable();
+        JsqlParserUtils.mappingTableName(table, commandMappingHandler);
+        buffer.append(table.toString());
 
         if (insert.getColumns() != null) {
-
-            //表名实际上是class
-            getBuffer().append(" (");
+            buffer.append(" (");
             for (Iterator<Column> iter = insert.getColumns().iterator(); iter.hasNext(); ) {
                 Column column = iter.next();
-                String columnName = this.commandMappingHandler.getColumnName(column);
-                getBuffer().append(columnName);
+                JsqlParserUtils.mappingColumn(column, commandMappingHandler);
+                buffer.append(column.getColumnName());
                 if (iter.hasNext()) {
-                    getBuffer().append(", ");
+                    buffer.append(", ");
                 }
             }
-            getBuffer().append(")");
+            buffer.append(")");
         }
 
-        if (insert.getItemsList() != null) {
-            insert.getItemsList().accept(this);
+        if (insert.getOutputClause() != null) {
+            buffer.append(insert.getOutputClause().toString());
         }
 
         if (insert.getSelect() != null) {
-            getBuffer().append(" ");
-            if (insert.isUseSelectBrackets()) {
-                getBuffer().append("(");
+            buffer.append(" ");
+            if (insert.getSelect().isUsingWithBrackets()) {
+                buffer.append("(");
             }
             if (insert.getSelect().getWithItemsList() != null) {
-                getBuffer().append("WITH ");
+                buffer.append("WITH ");
                 for (WithItem with : insert.getSelect().getWithItemsList()) {
                     with.accept(getSelectVisitor());
                 }
-                getBuffer().append(" ");
+                buffer.append(" ");
             }
             insert.getSelect().getSelectBody().accept(getSelectVisitor());
-            if (insert.isUseSelectBrackets()) {
-                getBuffer().append(")");
+            if (insert.getSelect().isUsingWithBrackets()) {
+                buffer.append(")");
+            }
+        }
+
+        if (insert.isUseSet()) {
+            buffer.append(" SET ");
+            for (int i = 0; i < insert.getSetColumns().size(); i++) {
+                Column column = insert.getSetColumns().get(i);
+                column.accept(getExpressionVisitor());
+
+                buffer.append(" = ");
+
+                Expression expression = insert.getSetExpressionList().get(i);
+                expression.accept(getExpressionVisitor());
+                if (i < insert.getSetColumns().size() - 1) {
+                    buffer.append(", ");
+                }
             }
         }
 
         if (insert.isUseDuplicate()) {
-            getBuffer().append(" ON DUPLICATE KEY UPDATE ");
+            buffer.append(" ON DUPLICATE KEY UPDATE ");
             for (int i = 0; i < insert.getDuplicateUpdateColumns().size(); i++) {
                 Column column = insert.getDuplicateUpdateColumns().get(i);
-                getBuffer().append(column.getFullyQualifiedName()).append(" = ");
+                JsqlParserUtils.mappingColumn(column, commandMappingHandler);
+                buffer.append(column.getFullyQualifiedName()).append(" = ");
 
                 Expression expression = insert.getDuplicateUpdateExpressionList().get(i);
                 expression.accept(getExpressionVisitor());
                 if (i < insert.getDuplicateUpdateColumns().size() - 1) {
-                    getBuffer().append(", ");
+                    buffer.append(", ");
                 }
             }
         }
 
-        if (insert.isReturningAllColumns()) {
-            getBuffer().append(" RETURNING *");
-        } else if (insert.getReturningExpressionList() != null) {
-            getBuffer().append(" RETURNING ");
-            for (Iterator<SelectExpressionItem> iter = insert.getReturningExpressionList().
-                    iterator(); iter.hasNext(); ) {
-                getBuffer().append(iter.next().toString());
-                if (iter.hasNext()) {
-                    getBuffer().append(", ");
-                }
+        //@todo: Accept some Visitors for the involved Expressions
+        if (insert.getConflictAction() != null) {
+            buffer.append(" ON CONFLICT");
+
+            if (insert.getConflictTarget() != null) {
+                insert.getConflictTarget().appendTo(buffer);
             }
+            insert.getConflictAction().appendTo(buffer);
+        }
+
+        if (insert.getReturningExpressionList() != null) {
+            buffer.append(" RETURNING ").append(PlainSelect.
+                    getStringList(insert.getReturningExpressionList(), true, false));
         }
     }
 

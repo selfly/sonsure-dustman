@@ -11,8 +11,12 @@ package com.sonsure.dumper.core.command.sql;
 
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.MySQLIndexHint;
+import net.sf.jsqlparser.expression.SQLServerHints;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Pivot;
+import net.sf.jsqlparser.statement.select.UnPivot;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 /**
@@ -20,7 +24,7 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
  */
 public class CommandSelectDeParser extends SelectDeParser {
 
-    private CommandMappingHandler commandMappingHandler;
+    private final CommandMappingHandler commandMappingHandler;
 
     public CommandSelectDeParser(ExpressionVisitor expressionVisitor, StringBuilder buffer, CommandMappingHandler commandMappingHandler) {
         super(expressionVisitor, buffer);
@@ -28,22 +32,36 @@ public class CommandSelectDeParser extends SelectDeParser {
     }
 
     @Override
-    public void visit(Table table) {
+    public void visit(Table tableName) {
 
-        String tbName = this.commandMappingHandler.getTableName(table);
-
-        table.setName(tbName);
-
-        StringBuilder buffer = getBuffer();
-        buffer.append(table.getFullyQualifiedName());
-        Pivot pivot = table.getPivot();
-        if (pivot != null) {
-            pivot.accept(this);
-        }
-        Alias alias = table.getAlias();
+        JsqlParserUtils.mappingTableName(tableName, commandMappingHandler);
+        buffer.append(tableName.getFullyQualifiedName());
+        Alias alias = tableName.getAlias();
         if (alias != null) {
             buffer.append(alias);
         }
+        Pivot pivot = tableName.getPivot();
+        if (pivot != null) {
+            pivot.accept(this);
+        }
+        UnPivot unpivot = tableName.getUnPivot();
+        if (unpivot != null) {
+            unpivot.accept(this);
+        }
+        MySQLIndexHint indexHint = tableName.getIndexHint();
+        if (indexHint != null) {
+            buffer.append(indexHint);
+        }
+        SQLServerHints sqlServerHints = tableName.getSqlServerHints();
+        if (sqlServerHints != null) {
+            buffer.append(sqlServerHints);
+        }
+    }
+
+    @Override
+    public void visit(ExpressionList expressionList) {
+        JsqlParserUtils.mappingExpression(expressionList, commandMappingHandler);
+        buffer.append(expressionList);
     }
 
     public CommandMappingHandler getCommandMappingHandler() {

@@ -35,7 +35,7 @@ public class CommandStatementDeParser extends StatementDeParser {
         selectDeParser.setBuffer(getBuffer());
         expressionDeParser.setSelectVisitor(selectDeParser);
         expressionDeParser.setBuffer(getBuffer());
-        UpdateDeParser updateDeParser = new CommandUpdateDeParser(expressionDeParser, selectDeParser, getBuffer(), this.commandMappingHandler);
+        UpdateDeParser updateDeParser = new CommandUpdateDeParser(expressionDeParser, getBuffer(), this.commandMappingHandler);
         selectDeParser.setExpressionVisitor(expressionDeParser);
         updateDeParser.deParse(update);
     }
