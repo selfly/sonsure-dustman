@@ -77,9 +77,7 @@ public class CommandMappingHandler {
             Update update = (Update) statement;
 
             this.extractTableMappings(update.getTable(), mappings);
-            //final ArrayList<UpdateSet> updateSets = update.getUpdateSets();
-            this.extractColumnMapping(update.getColumns(), mappings);
-            this.extractExpression(update.getExpressions(), mappings);
+            this.extractUpdateSet(update.getUpdateSets(), mappings);
             this.extractExpression(update.getWhere(), mappings);
 
         } else if (statement instanceof Delete) {
@@ -140,15 +138,9 @@ public class CommandMappingHandler {
         }
 
         final GroupByElement groupBy = plainSelect.getGroupBy();
-        if (groupBy != null && groupBy.getGroupByExpressions() != null) {
-
-            for (Expression groupByColumnReference : groupBy.getGroupByExpressions()) {
-
-                if (groupByColumnReference instanceof Column) {
-                    this.extractColumnMapping(((Column) groupByColumnReference), mappings);
-                }
-
-            }
+        if (groupBy != null && groupBy.getGroupByExpressionList() != null) {
+            final List<Expression> expressions = groupBy.getGroupByExpressionList().getExpressions();
+            this.extractExpression(expressions, mappings);
         }
 
         List<OrderByElement> orderByElements = plainSelect.getOrderByElements();
@@ -304,6 +296,13 @@ public class CommandMappingHandler {
     }
 
     private void extractUpdateSet(ArrayList<UpdateSet> updateSets, Map<String, Object> mappings) {
+        for (UpdateSet updateSet : updateSets) {
+            this.extractUpdateSet(updateSet, mappings);
+        }
+    }
 
+    private void extractUpdateSet(UpdateSet updateSet, Map<String, Object> mappings) {
+        this.extractColumnMapping(updateSet.getColumns(), mappings);
+        this.extractExpression(updateSet.getExpressions(), mappings);
     }
 }
