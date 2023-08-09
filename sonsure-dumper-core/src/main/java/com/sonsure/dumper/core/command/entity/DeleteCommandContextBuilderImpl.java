@@ -40,7 +40,7 @@ public class DeleteCommandContextBuilderImpl extends AbstractCommandContextBuild
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
         StringBuilder command = new StringBuilder(COMMAND_OPEN);
-        final Class<?> modelClass = this.getUniqueModelClass();
+        final Class<?> modelClass = this.getCommandContextBuilderContext().getUniqueModelClass();
         command.append(this.getModelAliasName(modelClass, null));
 
         CommandContext commandContext = createCommandContext();

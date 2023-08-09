@@ -24,7 +24,9 @@ public class OrderByCommandBuilderImpl extends AbstractCommandContextBuilder {
     }
 
     public void addOrderByField(String... fields) {
-        this.orderByContext.addOrderByField(fields);
+        for (String field : fields) {
+            this.orderByContext.addOrderByField(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+        }
     }
 
     public void asc() {
@@ -63,11 +65,8 @@ public class OrderByCommandBuilderImpl extends AbstractCommandContextBuilder {
             this.orderByFields = new ArrayList<>();
         }
 
-        public void addOrderByField(String... fields) {
-            final List<CommandField> orderByFields = this.getOrderByFields();
-            for (String field : fields) {
-                orderByFields.add(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
-            }
+        public void addOrderByField(CommandField commandField) {
+            getOrderByFields().add(commandField);
         }
 
         public void setOrderByType(String type) {

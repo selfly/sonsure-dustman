@@ -22,7 +22,7 @@ public class CountCommandContextBuilder extends AbstractCommandContextBuilder {
 
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
-        Class<?> clazz = this.getUniqueModelClass();
+        Class<?> clazz = this.getCommandContextBuilderContext().getUniqueModelClass();
         CommandContext commandContext = new CommandContext();
         commandContext.setCommand("select count(*) from " + clazz.getSimpleName());
         return commandContext;

@@ -67,7 +67,7 @@ public class InsertCommandContextBuilderImpl extends AbstractCommandContextBuild
 
         CommandContext commandContext = createCommandContext();
         MappingHandler mappingHandler = jdbcEngineConfig.getMappingHandler();
-        final Class<?> modelClass = this.getUniqueModelClass();
+        final Class<?> modelClass = this.insertContext.getUniqueModelClass();
         String pkField = this.getPkField(modelClass, mappingHandler);
         String pkColumn = mappingHandler.getColumn(modelClass, pkField);
         pkColumn = this.convertCase(pkColumn, jdbcEngineConfig.getCommandCase());

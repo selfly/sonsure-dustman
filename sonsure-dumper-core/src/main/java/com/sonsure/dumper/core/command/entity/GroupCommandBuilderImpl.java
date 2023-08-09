@@ -22,7 +22,9 @@ public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
     }
 
     public void addGroupByField(String... fields) {
-        this.groupContext.addGroupByField(fields);
+        for (String field : fields) {
+            this.groupContext.addGroupByField(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+        }
     }
 
     @Override
@@ -51,11 +53,8 @@ public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
             this.groupByFields = new ArrayList<>();
         }
 
-        public void addGroupByField(String... fields) {
-            final List<CommandField> groupByFields = this.getGroupByFields();
-            for (String field : fields) {
-                groupByFields.add(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
-            }
+        public void addGroupByField(CommandField commandField) {
+            getGroupByFields().add(commandField);
         }
 
         public List<CommandField> getGroupByFields() {

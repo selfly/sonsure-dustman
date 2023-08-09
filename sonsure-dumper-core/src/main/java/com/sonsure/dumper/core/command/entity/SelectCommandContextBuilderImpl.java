@@ -57,19 +57,23 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
     }
 
     public void addSelectFields(String... fields) {
-        this.selectContext.addSelectFields(fields);
+        for (String field : fields) {
+            this.selectContext.addSelectField(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+        }
     }
 
     public void addExcludeFields(String... fields) {
-        this.selectContext.addExcludeFields(fields);
+        for (String field : fields) {
+            this.selectContext.addExcludeField(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+        }
     }
 
     public void addFromClass(Class<?> cls) {
-        this.selectContext.addFromClass(cls);
+        this.addFromClass(cls, null);
     }
 
     public void addFromClass(Class<?> cls, String aliasName) {
-        this.selectContext.addFromClass(cls, aliasName);
+        this.selectContext.addFromClass(this.createCommandClass(cls, aliasName));
     }
 
     public void addGroupByField(String... fields) {
@@ -105,8 +109,9 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
             for (CommandClass fromClass : this.selectContext.getFromClasses()) {
                 Collection<ModelFieldMeta> classFields = this.getClassFields(fromClass.getCls());
                 for (ModelFieldMeta fieldMeta : classFields) {
+                    CommandField commandField = this.createCommandClassField(fieldMeta.getName(), true, CommandField.Type.MANUAL_FIELD);
                     //黑名单
-                    if (this.selectContext.isExcludeField(fieldMeta.getName())) {
+                    if (this.selectContext.isExcludeField(commandField)) {
                         continue;
                     }
                     String field = this.getTableAliasField(fromClass.getAliasName(), fieldMeta.getName());
@@ -170,40 +175,23 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
             this.excludeFields = new ArrayList<>();
         }
 
-        public void addSelectFields(String... fields) {
-            for (String field : fields) {
-                this.selectFields.add(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
-            }
+        public void addSelectField(CommandField commandField) {
+            getSelectFields().add(commandField);
         }
 
-        public void addFromClass(Class<?> cls) {
-            this.addFromClass(cls, null);
+        public void addFromClass(CommandClass commandClass) {
+            getFromClasses().add(commandClass);
         }
 
-        public void addFromClass(Class<?> cls, String aliasName) {
-            final List<CommandClass> fromClasses = this.getFromClasses();
-            fromClasses.add(this.createCommandClass(cls, aliasName));
+        public void addExcludeField(CommandField commandField) {
+            getExcludeFields().add(commandField);
         }
 
-        public void addExcludeFields(String... fields) {
-            final List<CommandField> excludeFields = this.getExcludeFields();
-            for (String field : fields) {
-                excludeFields.add(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
-            }
-        }
-
-        /**
-         * 是否黑名单
-         *
-         * @param field the field
-         * @return boolean
-         */
-        public boolean isExcludeField(String field) {
+        public boolean isExcludeField(CommandField commandField) {
             final List<CommandField> excludeFields = this.getExcludeFields();
             if (excludeFields == null || excludeFields.isEmpty()) {
                 return false;
             }
-            CommandField commandField = this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD);
             for (CommandField excludeField : excludeFields) {
                 if (StringUtils.equals(commandField.getTableAlias(), excludeField.getTableAlias()) && StringUtils.equals(commandField.getFieldName(), excludeField.getFieldName())) {
                     return true;

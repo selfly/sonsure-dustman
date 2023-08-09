@@ -1,7 +1,6 @@
 package com.sonsure.dumper.core.command;
 
-import com.sonsure.dumper.core.management.CommandClass;
-import com.sonsure.dumper.core.management.CommandField;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,37 +33,16 @@ public class CommandContextBuilderContext {
     }
 
     /**
-     * Create command class .
+     * Gets unique model class.
      *
-     * @param cls       the cls
-     * @param aliasName the alias name
-     * @return the command class
+     * @return the unique model class
      */
-    protected CommandClass createCommandClass(Class<?> cls, String aliasName) {
-        return new CommandClass(cls, aliasName);
-    }
-
-    /**
-     * Create class field .
-     *
-     * @param name              the name
-     * @param analyseTableAlias the analyse table alias
-     * @param type              the type
-     * @return the class field
-     */
-    protected CommandField createCommandClassField(String name, boolean analyseTableAlias, CommandField.Type type) {
-        return this.createCommandClassField(name, analyseTableAlias, type, null);
-    }
-
-    /**
-     * Create class field .
-     *
-     * @param name              the name
-     * @param analyseTableAlias analyse table alias
-     * @return the class field
-     */
-    protected CommandField createCommandClassField(String name, boolean analyseTableAlias, CommandField.Type type, Class<?> cls) {
-        return new CommandField(name, analyseTableAlias, type, cls);
+    public Class<?> getUniqueModelClass() {
+        final Set<Class<?>> modelClasses = this.getModelClasses();
+        if (modelClasses == null || modelClasses.size() != 1) {
+            throw new SonsureJdbcException("当前执行业务不止一个Model Class");
+        }
+        return modelClasses.iterator().next();
     }
 
     public boolean isForceNative() {

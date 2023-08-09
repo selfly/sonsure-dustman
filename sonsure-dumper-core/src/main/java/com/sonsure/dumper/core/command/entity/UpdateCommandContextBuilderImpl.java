@@ -43,7 +43,9 @@ public class UpdateCommandContextBuilderImpl extends AbstractCommandContextBuild
     }
 
     public void addSetField(String field, Object value) {
-        this.updateContext.addSetField(field, value);
+        CommandField commandField = this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD);
+        commandField.setValue(value);
+        this.updateContext.addSetField(commandField);
     }
 
     public void setIgnoreNull(boolean ignoreNull) {
@@ -56,7 +58,7 @@ public class UpdateCommandContextBuilderImpl extends AbstractCommandContextBuild
         CommandContext commandContext = this.createCommandContext();
 
         StringBuilder command = new StringBuilder(COMMAND_OPEN);
-        final Class<?> modelClass = this.getUniqueModelClass();
+        final Class<?> modelClass = this.updateContext.getUniqueModelClass();
         command.append(this.getModelAliasName(modelClass, null)).append(" set ");
 
         String pkField = this.getPkField(modelClass, jdbcEngineConfig.getMappingHandler());
@@ -114,10 +116,8 @@ public class UpdateCommandContextBuilderImpl extends AbstractCommandContextBuild
             this.setFields = new ArrayList<>();
         }
 
-        public void addSetField(String field, Object value) {
-            CommandField commandField = this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD);
-            commandField.setValue(value);
-            this.setFields.add(commandField);
+        public void addSetField(CommandField commandField) {
+            this.getSetFields().add(commandField);
         }
 
         public List<CommandField> getSetFields() {

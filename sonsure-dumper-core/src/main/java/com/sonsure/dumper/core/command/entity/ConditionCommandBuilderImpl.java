@@ -27,13 +27,20 @@ public class ConditionCommandBuilderImpl extends AbstractCommandContextBuilder {
     }
 
     public void addWhereField(String logicalOperator, String name, String fieldOperator, Object value, CommandField.Type type) {
-        this.conditionContext.addWhereField(logicalOperator, name, fieldOperator, value, type);
+        boolean analyseTableAlias = CommandField.Type.isAnalyseTableAlias(type);
+        CommandField commandField = this.createCommandClassField(name, analyseTableAlias, CommandField.Type.MANUAL_FIELD);
+        commandField.setLogicalOperator(logicalOperator);
+        commandField.setFieldOperator(fieldOperator);
+        commandField.setValue(value);
+        commandField.setType(type);
+        this.conditionContext.addWhereField(commandField);
     }
 
     public void addWhereFields(List<CommandField> commandFields) {
         this.conditionContext.addWhereFields(commandFields);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
         final boolean isNamedParameter = this.conditionContext.isNamedParameter();
@@ -168,24 +175,13 @@ public class ConditionCommandBuilderImpl extends AbstractCommandContextBuilder {
             this.whereFields = new ArrayList<>();
         }
 
-        public void addWhereField(String logicalOperator, String name, String fieldOperator, Object value, CommandField.Type type) {
-            boolean analyseTableAlias = CommandField.Type.isAnalyseTableAlias(type);
-            CommandField commandField = this.createCommandClassField(name, analyseTableAlias, CommandField.Type.MANUAL_FIELD);
-            commandField.setLogicalOperator(logicalOperator);
-            commandField.setFieldOperator(fieldOperator);
-            commandField.setValue(value);
-            commandField.setType(type);
+        public void addWhereField(CommandField commandField) {
             this.getWhereFields().add(commandField);
         }
 
         public void addWhereFields(List<CommandField> commandFields) {
             this.getWhereFields().addAll(commandFields);
         }
-
-//        public void addWhereField(String logicalOperator, String name, String fieldOperator, Object value) {
-//            this.addWhereField(logicalOperator, name, fieldOperator, value, null);
-//        }
-
 
         public List<CommandField> getWhereFields() {
             return whereFields;

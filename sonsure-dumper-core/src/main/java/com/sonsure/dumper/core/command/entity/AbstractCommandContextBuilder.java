@@ -16,7 +16,7 @@ import com.sonsure.dumper.core.command.CommandParameter;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import com.sonsure.dumper.core.management.CommandClass;
 import com.sonsure.dumper.core.management.CommandField;
 import com.sonsure.dumper.core.management.ModelClassCache;
 import com.sonsure.dumper.core.management.ModelFieldMeta;
@@ -111,18 +111,15 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     public abstract CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig);
 
     /**
-     * Gets unique model class.
+     * Create command class .
      *
-     * @return the unique model class
+     * @param cls       the cls
+     * @param aliasName the alias name
+     * @return the command class
      */
-    protected Class<?> getUniqueModelClass() {
-        final Set<Class<?>> modelClasses = this.commandContextBuilderContext.getModelClasses();
-        if (modelClasses == null || modelClasses.size() != 1) {
-            throw new SonsureJdbcException("当前执行业务不止一个Model Class");
-        }
-        return modelClasses.iterator().next();
+    protected CommandClass createCommandClass(Class<?> cls, String aliasName) {
+        return new CommandClass(cls, aliasName);
     }
-
 
     /**
      * Create class field.
