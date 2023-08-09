@@ -36,6 +36,12 @@ public class UpdateCommandContextBuilderImpl extends AbstractCommandContextBuild
         this.conditionCommandBuilder = new ConditionCommandBuilderImpl(new ConditionCommandBuilderImpl.Context());
     }
 
+    @Override
+    public void namedParameter() {
+        super.namedParameter();
+        this.conditionCommandBuilder.namedParameter();
+    }
+
     public void addSetField(String field, Object value) {
         this.updateContext.addSetField(field, value);
     }

@@ -48,6 +48,14 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
         this.orderByCommandBuilder = new OrderByCommandBuilderImpl(new OrderByCommandBuilderImpl.Context());
     }
 
+    @Override
+    public void namedParameter() {
+        super.namedParameter();
+        this.conditionCommandBuilder.namedParameter();
+        this.groupCommandBuilder.namedParameter();
+        this.orderByCommandBuilder.namedParameter();
+    }
+
     public void addSelectFields(String... fields) {
         this.selectContext.addSelectFields(fields);
     }

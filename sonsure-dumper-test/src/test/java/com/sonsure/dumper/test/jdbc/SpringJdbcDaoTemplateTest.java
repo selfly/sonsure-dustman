@@ -564,21 +564,18 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void singleResultObject2() {
 
-        Object object = daoTemplate.select().from(UserInfo.class, "t1", UidUser.class, "t2")
+        List<Map<String, Object>> list = daoTemplate.select().from(UserInfo.class, "t1", UidUser.class, "t2")
                 .where("{{t1.userInfoId}}", "t2.uidUserId")
                 .list();
 
-        Assert.assertNotNull(object);
-        Assert.assertTrue(object instanceof Map);
+        Assert.assertNotNull(list);
 
-
-        object = daoTemplate.select("t1.loginName as name1", "t2.loginName as name2").from(UserInfo.class, "t1", UidUser.class, "t2")
+        List<Map<String, Object>> list1 = daoTemplate.select("t1.loginName as name1", "t2.loginName as name2").from(UserInfo.class, "t1", UidUser.class, "t2")
                 .where()
                 .append("t1.userInfoId = t2.uidUserId")
                 .list();
 
-        Assert.assertNotNull(object);
-        Assert.assertTrue(object instanceof Map);
+        Assert.assertNotNull(list1);
     }
 
     @Test
