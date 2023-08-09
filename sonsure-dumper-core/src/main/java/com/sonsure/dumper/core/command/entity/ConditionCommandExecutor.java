@@ -21,48 +21,52 @@ import java.util.Map;
  * @author liyd
  * @date 17/4/11
  */
-public interface EntityConditionCommandExecutor<C extends EntityConditionCommandExecutor<C>> extends EntityCommandExecutor<C> {
+public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>> extends EntityCommandExecutor<C> {
 
     /**
      * where 关键字
      *
-     * @return
+     * @return c
      */
     C where();
 
     /**
      * where 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C where(String field, Object value);
 
     /**
      * where 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C where(Function<E, R> function, Object value);
 
     /**
      * where 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C where(String field, Object[] value);
 
     /**
      * where 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C where(Function<E, R> function, Object[] value);
 
@@ -89,36 +93,40 @@ public interface EntityConditionCommandExecutor<C extends EntityConditionCommand
     /**
      * 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C condition(String field, Object value);
 
     /**
      * 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C condition(Function<E, R> function, Object value);
 
     /**
      * 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C condition(String field, Object[] value);
 
     /**
      * 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C condition(Function<E, R> function, Object[] value);
 
@@ -145,69 +153,73 @@ public interface EntityConditionCommandExecutor<C extends EntityConditionCommand
     /**
      * 实体属性条件
      *
-     * @param entity
-     * @return
+     * @param entity the entity
+     * @return c
      */
     C conditionEntity(Object entity);
 
     /**
      * and 属性where条件
      *
-     * @param entity
-     * @return
+     * @param entity the entity
+     * @return c
      */
     C andConditionEntity(Object entity);
 
     /**
      * 拼装entity属性条件
      *
-     * @param entity
+     * @param entity               the entity
      * @param wholeLogicalOperator 全局操作符
      * @param fieldLogicalOperator 属性操作符
-     * @return
+     * @return c
      */
     C conditionEntity(Object entity, String wholeLogicalOperator, String fieldLogicalOperator);
 
     /**
      * and
      *
-     * @return
+     * @return c
      */
     C and();
 
     /**
      * and 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C and(String field, Object value);
 
     /**
      * and 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C and(Function<E, R> function, Object value);
 
     /**
      * and 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C and(String field, Object[] value);
 
     /**
      * and 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C and(Function<E, R> function, Object[] value);
 
@@ -234,43 +246,47 @@ public interface EntityConditionCommandExecutor<C extends EntityConditionCommand
     /**
      * or
      *
-     * @return
+     * @return c
      */
     C or();
 
     /**
      * or 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C or(String field, Object value);
 
     /**
      * or 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C or(Function<E, R> function, Object value);
 
     /**
      * or 属性条件
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the field
+     * @param value the value
+     * @return c
      */
     C or(String field, Object[] value);
 
     /**
      * or 属性条件
      *
-     * @param function
-     * @param value
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return c
      */
     <E, R> C or(Function<E, R> function, Object[] value);
 
@@ -297,14 +313,14 @@ public interface EntityConditionCommandExecutor<C extends EntityConditionCommand
     /**
      * 括号开始
      *
-     * @return
+     * @return c
      */
     C begin();
 
     /**
      * 括号结束
      *
-     * @return
+     * @return c
      */
     C end();
 

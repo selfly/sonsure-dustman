@@ -9,6 +9,9 @@
 
 package com.sonsure.dumper.core.config;
 
+/**
+ * @author liyd
+ */
 public abstract class AbstractCommandExecutorBuilder implements CommandExecutorBuilder {
 
 

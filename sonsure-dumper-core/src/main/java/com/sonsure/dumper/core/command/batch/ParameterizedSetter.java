@@ -23,8 +23,9 @@ public interface ParameterizedSetter<T> {
     /**
      * Sets values.
      *
-     * @param ps       the ps
-     * @param argument the argument
+     * @param ps         the ps
+     * @param paramNames the param names
+     * @param argument   the argument
      * @throws SQLException the sql exception
      */
     void setValues(PreparedStatement ps, List<String> paramNames, T argument) throws SQLException;

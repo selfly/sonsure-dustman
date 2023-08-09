@@ -11,8 +11,8 @@ package com.sonsure.dumper.core.command.batch;
 
 import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
 import com.sonsure.dumper.core.command.CommandType;
+import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.Collection;
@@ -25,18 +25,25 @@ import java.util.Collection;
 @SuppressWarnings("rawtypes")
 public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<BatchUpdateExecutor> implements BatchUpdateExecutor {
 
+    private final BatchUpdateCommandContextBuilderImpl batchUpdateCommandContextBuilder;
+
     public BatchUpdateExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
+        this.batchUpdateCommandContextBuilder = new BatchUpdateCommandContextBuilderImpl(new BatchUpdateCommandContextBuilderImpl.Context());
+    }
+
+    @Override
+    protected AbstractCommandContextBuilder getCommandContextBuilder() {
+        return batchUpdateCommandContextBuilder;
     }
 
     @Override
     public <T> Object execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
-        this.getCommandExecutorContext().setCommand(command);
-        final CommandExecutorContext.BatchUpdateExecutorContext<T> batchUpdateExecutorContext = this.getCommandExecutorContext().batchUpdateExecutorContext();
-        batchUpdateExecutorContext.setBatchSize(batchSize);
-        batchUpdateExecutorContext.setBatchData(batchData);
-        batchUpdateExecutorContext.setParameterizedSetter(parameterizedSetter);
-        CommandContext commandContext = this.getCommandContextBuilder().build(this.getCommandExecutorContext(), getJdbcEngineConfig());
+        this.batchUpdateCommandContextBuilder.command(command);
+        batchUpdateCommandContextBuilder.batchSize(batchSize);
+        batchUpdateCommandContextBuilder.batchData(batchData);
+        batchUpdateCommandContextBuilder.parameterizedSetter(parameterizedSetter);
+        CommandContext commandContext = this.batchUpdateCommandContextBuilder.build(getJdbcEngineConfig());
         return getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.BATCH_UPDATE);
     }
 

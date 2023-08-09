@@ -13,6 +13,7 @@ package com.sonsure.dumper.core.command;
 import com.sonsure.commons.bean.BeanKit;
 import com.sonsure.commons.model.Page;
 import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -30,48 +31,25 @@ import java.util.List;
 public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecutor<E>> implements CommonCommandExecutor<E> {
 
     /**
-     * The Common command executor context.
-     */
-    protected CommandExecutorContext commandExecutorContext;
-
-    /**
-     * The Command context builder.
-     */
-    protected CommandContextBuilder commandContextBuilder;
-
-    /**
      * The Jdbc engine config.
      */
     protected JdbcEngineConfig jdbcEngineConfig;
 
     public AbstractCommonCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
-        commandExecutorContext = new CommandExecutorContext(jdbcEngineConfig);
     }
 
-    public void setCommandContextBuilder(CommandContextBuilder commandContextBuilder) {
-        this.commandContextBuilder = commandContextBuilder;
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public E nativeCommand() {
-        return this.nativeCommand(true);
-    }
-
-    @Override
-    public E nativeCommand(boolean nativeCommand) {
-        this.commandExecutorContext.setNativeCommand(nativeCommand);
+        this.getCommandContextBuilder().forceNative();
         return (E) this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E namedParameter() {
-        return this.namedParameter(true);
-    }
-    
-    @Override
-    public E namedParameter(boolean namedParameter) {
-        this.commandExecutorContext.setNamedParameter(namedParameter);
+        this.getCommandContextBuilder().namedParameter();
         return (E) this;
     }
 
@@ -131,13 +109,12 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
         return newPage;
     }
 
-    public CommandExecutorContext getCommandExecutorContext() {
-        return commandExecutorContext;
-    }
-
-    public CommandContextBuilder getCommandContextBuilder() {
-        return commandContextBuilder;
-    }
+    /**
+     * Gets command context builder.
+     *
+     * @return the command context builder
+     */
+    protected abstract AbstractCommandContextBuilder getCommandContextBuilder();
 
     public JdbcEngineConfig getJdbcEngineConfig() {
         return jdbcEngineConfig;
@@ -146,7 +123,7 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
     protected interface PageQueryHandler<T> {
 
         /**
-         * Query list list.
+         * Query list.
          *
          * @param commandContext the command context
          * @return the list

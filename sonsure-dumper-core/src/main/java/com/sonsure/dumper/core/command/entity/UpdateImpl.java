@@ -13,7 +13,6 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.commons.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
@@ -28,37 +27,42 @@ import java.util.Map;
  * @author liyd
  * @date 17 /4/14
  */
-public class UpdateImpl extends AbstractEntityConditionCommandExecutor<Update> implements Update {
+public class UpdateImpl extends AbstractConditionCommandExecutor<Update> implements Update {
 
-    private CommandExecutorContext.UpdateContext updateContext;
+    private final UpdateCommandContextBuilderImpl updateCommandContextBuilder;
 
     public UpdateImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        updateContext = this.getCommandExecutorContext().updateContext();
+        this.updateCommandContextBuilder = new UpdateCommandContextBuilderImpl(new UpdateCommandContextBuilderImpl.Context());
+    }
+
+    @Override
+    protected AbstractCommandContextBuilder getCommandContextBuilder() {
+        return null;
     }
 
     @Override
     public Update table(Class<?> cls) {
-        this.getCommandExecutorContext().addModelClass(cls);
+        this.updateCommandContextBuilder.addModelClass(cls);
         return this;
     }
 
     @Override
     public Update set(String field, Object value) {
-        this.updateContext.addSetField(field, value);
+        this.updateCommandContextBuilder.addSetField(field, value);
         return this;
     }
 
     @Override
     public <E, R> Update set(Function<E, R> function, Object value) {
         String field = LambdaMethod.getField(function);
-        updateContext.addSetField(field, value);
+        updateCommandContextBuilder.addSetField(field, value);
         return this;
     }
 
     @Override
     public Update setForEntityWhereId(Object entity) {
-        getCommandExecutorContext().addModelClass(entity.getClass());
+        updateCommandContextBuilder.addModelClass(entity.getClass());
         String pkField = getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
         Map<String, Object> beanPropMap = ClassUtils.getSelfBeanPropMap(entity, Transient.class);
         //处理主键成where条件
@@ -72,7 +76,7 @@ public class UpdateImpl extends AbstractEntityConditionCommandExecutor<Update> i
 
         for (Map.Entry<String, Object> entry : beanPropMap.entrySet()) {
             //不忽略null，最后构建时根据updateNull设置处理null值
-            updateContext.addSetField(entry.getKey(), entry.getValue());
+            updateCommandContextBuilder.addSetField(entry.getKey(), entry.getValue());
         }
         return this;
     }
@@ -82,20 +86,20 @@ public class UpdateImpl extends AbstractEntityConditionCommandExecutor<Update> i
         Map<String, Object> beanPropMap = ClassUtils.getSelfBeanPropMap(entity, Transient.class);
         for (Map.Entry<String, Object> entry : beanPropMap.entrySet()) {
             //不忽略null，最后构建时根据updateNull设置处理null值
-            updateContext.addSetField(entry.getKey(), entry.getValue());
+            updateCommandContextBuilder.addSetField(entry.getKey(), entry.getValue());
         }
         return this;
     }
 
     @Override
     public Update updateNull() {
-        updateContext.setIgnoreNull(false);
+        updateCommandContextBuilder.setIgnoreNull(false);
         return this;
     }
 
     @Override
     public int execute() {
-        CommandContext commandContext = this.commandContextBuilder.build(this.getCommandExecutorContext(), getJdbcEngineConfig());
+        CommandContext commandContext = this.updateCommandContextBuilder.build(getJdbcEngineConfig());
         return (Integer) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.UPDATE);
     }
 

@@ -12,7 +12,6 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.commons.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -31,24 +30,18 @@ import java.util.Map;
  * @date 17 /4/11
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractEntityConditionCommandExecutor<T extends EntityConditionCommandExecutor<T>> extends AbstractCommonCommandExecutor<T> implements EntityConditionCommandExecutor<T> {
+public abstract class AbstractConditionCommandExecutor<T extends ConditionCommandExecutor<T>> extends AbstractCommonCommandExecutor<T> implements ConditionCommandExecutor<T> {
 
-    private CommandExecutorContext.EntityWhereContext entityWhereContext;
+    private final ConditionCommandBuilderImpl conditionCommandBuilder;
 
-    public AbstractEntityConditionCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
+    public AbstractConditionCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.entityWhereContext = getCommandExecutorContext().entityWhereContext();
-    }
-
-    @Override
-    public T namedParameter() {
-        this.getCommandExecutorContext().setNamedParameter(true);
-        return (T) this;
+        this.conditionCommandBuilder = new ConditionCommandBuilderImpl(new ConditionCommandBuilderImpl.Context());
     }
 
     @Override
     public T where() {
-        this.entityWhereContext.addWhereField("where", null, null, null);
+        this.conditionCommandBuilder.addWhereField("where", null, null, null, null);
         return (T) this;
     }
 
@@ -81,7 +74,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T where(String field, String operator, Object... values) {
-        this.entityWhereContext.addWhereField("where", field, operator, values);
+        this.conditionCommandBuilder.addWhereField("where", field, operator, values, null);
         return (T) this;
     }
 
@@ -119,7 +112,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T condition(String field, String operator, Object... values) {
-        this.entityWhereContext.addWhereField(null, field, operator, values);
+        this.conditionCommandBuilder.addWhereField(null, field, operator, values, null);
         return (T) this;
     }
 
@@ -152,7 +145,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
             if (entry.getValue() == null) {
                 continue;
             }
-            CommandField commandField = this.getCommandExecutorContext().createCommandClassField(entry.getKey(), false, CommandField.Type.ENTITY_FIELD, entity.getClass());
+            CommandField commandField = this.conditionCommandBuilder.createCommandClassField(entry.getKey(), false, CommandField.Type.ENTITY_FIELD, entity.getClass());
             commandField.setLogicalOperator(count > 1 ? fieldLogicalOperator : null);
             commandField.setFieldOperator("=");
             commandField.setValue(entry.getValue());
@@ -161,9 +154,9 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
         }
         //防止属性全为null的情况
         if (!fieldList.isEmpty()) {
-            this.entityWhereContext.addWhereField(wholeLogicalOperator, null, null, null);
+            this.conditionCommandBuilder.addWhereField(wholeLogicalOperator, null, null, null, null);
             this.begin();
-            this.entityWhereContext.addWhereFields(fieldList);
+            this.conditionCommandBuilder.addWhereFields(fieldList);
             this.end();
         }
         return (T) this;
@@ -171,7 +164,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T and() {
-        this.entityWhereContext.addWhereField("and", null, null, null);
+        this.conditionCommandBuilder.addWhereField("and", null, null, null, null);
         return (T) this;
     }
 
@@ -204,7 +197,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T and(String field, String operator, Object... values) {
-        this.entityWhereContext.addWhereField("and", field, operator, values);
+        this.conditionCommandBuilder.addWhereField("and", field, operator, values, null);
         return (T) this;
     }
 
@@ -217,7 +210,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T or() {
-        this.entityWhereContext.addWhereField("or", null, null, null);
+        this.conditionCommandBuilder.addWhereField("or", null, null, null, null);
         return (T) this;
     }
 
@@ -248,7 +241,7 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T or(String field, String operator, Object... values) {
-        this.entityWhereContext.addWhereField("or", field, operator, values);
+        this.conditionCommandBuilder.addWhereField("or", field, operator, values, null);
         return (T) this;
     }
 
@@ -261,28 +254,28 @@ public abstract class AbstractEntityConditionCommandExecutor<T extends EntityCon
 
     @Override
     public T begin() {
-        this.entityWhereContext.addWhereField("(", null, null, null);
+        this.conditionCommandBuilder.addWhereField("(", null, null, null, null);
         return (T) this;
     }
 
     @Override
     public T end() {
-        this.entityWhereContext.addWhereField(")", null, null, null);
+        this.conditionCommandBuilder.addWhereField(")", null, null, null, null);
         return (T) this;
     }
 
     @Override
     public T append(String segment, Object... params) {
-        if (this.commandExecutorContext.isNamedParameter()) {
+        if (this.conditionCommandBuilder.getCommandContextBuilderContext().isNamedParameter()) {
             throw new SonsureJdbcException("Named Parameter 方式不能使用数组传参");
         }
-        this.entityWhereContext.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        this.conditionCommandBuilder.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
         return (T) this;
     }
 
     @Override
     public T append(String segment, Map<String, Object> params) {
-        this.entityWhereContext.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        this.conditionCommandBuilder.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
         return (T) this;
     }
 }

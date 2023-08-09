@@ -33,20 +33,15 @@ import java.util.List;
  */
 public class JdbcEngineImpl implements JdbcEngine {
 
-    private JdbcEngineConfig jdbcEngineConfig;
+    private final JdbcEngineConfig jdbcEngineConfig;
 
     public JdbcEngineImpl(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
     }
 
     @Override
-    public <T extends CommandExecutor> T createExecutor(Class<T> commandExecutorClass, Object param) {
-        return (T) this.jdbcEngineConfig.getCommandExecutorFactory().getCommandExecutor(commandExecutorClass, param, this.jdbcEngineConfig);
-    }
-
-    @Override
     public <T extends CommandExecutor> T createExecutor(Class<T> commandExecutorClass) {
-        return this.createExecutor(commandExecutorClass, null);
+        return this.jdbcEngineConfig.getCommandExecutorFactory().getCommandExecutor(commandExecutorClass, this.jdbcEngineConfig);
     }
 
     @Override
@@ -66,7 +61,9 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public Select select(String... fields) {
-        return this.createExecutor(Select.class, fields);
+        Select select = this.createExecutor(Select.class);
+        select.select(fields);
+        return select;
     }
 
     @Override
@@ -80,12 +77,14 @@ public class JdbcEngineImpl implements JdbcEngine {
         return this.selectFrom(cls).orderBy(pkField).desc().list(cls);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> find(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
         return (List<T>) this.selectFrom(entity.getClass()).where().conditionEntity(entity).orderBy(pkField).desc().list(entity.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Pageable> Page<T> pageResult(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
@@ -102,11 +101,13 @@ public class JdbcEngineImpl implements JdbcEngine {
         return this.selectFrom(cls).count();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(T entity) {
         return (T) this.selectFrom(entity.getClass()).where().conditionEntity(entity).singleResult(entity.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T firstResult(T entity) {
         return (T) this.selectFrom(entity.getClass()).where().conditionEntity(entity).firstResult(entity.getClass());

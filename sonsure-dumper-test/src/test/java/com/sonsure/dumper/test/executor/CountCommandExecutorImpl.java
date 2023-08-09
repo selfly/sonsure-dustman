@@ -10,8 +10,7 @@
 package com.sonsure.dumper.test.executor;
 
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
+import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
@@ -20,38 +19,26 @@ public class CountCommandExecutorImpl implements CountCommandExecutor {
 
     private JdbcEngineConfig jdbcEngineConfig;
 
-    private CommandContextBuilder commandContextBuilder;
-
-    private CountExecutorContext countExecutorContext;
+    private CountCommandContextBuilder countCommandContextBuilder;
 
     public CountCommandExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
-        countExecutorContext = new CountExecutorContext(jdbcEngineConfig);
+        this.countCommandContextBuilder = new CountCommandContextBuilder(new CommandContextBuilderContext());
     }
 
     @Override
     public CountCommandExecutor clazz(Class<?> clazz) {
-        this.countExecutorContext.addModelClass(clazz);
+        this.countCommandContextBuilder.addModelClass(clazz);
         return this;
     }
 
     @Override
     public long getCount() {
-        CommandContext commandContext = this.commandContextBuilder.build(this.countExecutorContext, this.jdbcEngineConfig);
+        CommandContext commandContext = this.countCommandContextBuilder.build(this.jdbcEngineConfig);
         PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
         commandContext.setResultType(Long.class);
         Object result = persistExecutor.execute(commandContext, CommandType.QUERY_ONE_COL);
         return (Long) result;
     }
 
-    public void setCommandContextBuilder(CommandContextBuilder commandContextBuilder) {
-        this.commandContextBuilder = commandContextBuilder;
-    }
-
-    private static class CountExecutorContext extends CommandExecutorContext {
-
-        public CountExecutorContext(JdbcEngineConfig jdbcEngineConfig) {
-            super(jdbcEngineConfig);
-        }
-    }
 }

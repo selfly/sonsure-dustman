@@ -23,10 +23,9 @@ public interface CommandContextBuilder {
     /**
      * 构建执行内容
      *
-     * @param executorContext  the executor context
      * @param jdbcEngineConfig the jdbc engine config
      * @return command context
      */
-    CommandContext build(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig);
+    CommandContext build(JdbcEngineConfig jdbcEngineConfig);
 
 }

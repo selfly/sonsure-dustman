@@ -52,7 +52,7 @@ public class SpringJdbcDaoTemplateTest {
                 .execute();
         for (int i = 1; i < 51; i++) {
             UserInfo user = new UserInfo();
-            user.setUserInfoId(Long.valueOf(i));
+            user.setUserInfoId((long) i);
             user.setLoginName("name-" + i);
             user.setPassword("123456-" + i);
             user.setUserAge(i);
@@ -67,9 +67,9 @@ public class SpringJdbcDaoTemplateTest {
     public void jdbcDaoGet() {
         UserInfo user = daoTemplate.get(UserInfo.class, 30L);
         Assert.assertNotNull(user);
-        Assert.assertTrue(user.getUserInfoId().equals(30L));
-        Assert.assertTrue(user.getLoginName().equals("name-30"));
-        Assert.assertTrue(user.getPassword().equals("123456-30"));
+        Assert.assertEquals(30L, (long) user.getUserInfoId());
+        Assert.assertEquals("name-30", user.getLoginName());
+        Assert.assertEquals("123456-30", user.getPassword());
     }
 
     @Test
@@ -85,8 +85,8 @@ public class SpringJdbcDaoTemplateTest {
         Assert.assertTrue(id > 0);
 
         UserInfo userInfo = daoTemplate.get(UserInfo.class, id);
-        Assert.assertTrue(user.getLoginName().equals(userInfo.getLoginName()));
-        Assert.assertTrue(user.getPassword().equals(userInfo.getPassword()));
+        Assert.assertEquals(user.getLoginName(), userInfo.getLoginName());
+        Assert.assertEquals(user.getPassword(), userInfo.getPassword());
     }
 
 
@@ -98,20 +98,20 @@ public class SpringJdbcDaoTemplateTest {
         user.setLoginName("666777");
         user.setGmtModify(new Date());
         int count = daoTemplate.executeUpdate(user);
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
 
         UserInfo user1 = daoTemplate.get(UserInfo.class, 20L);
         Assert.assertNotNull(user1);
-        Assert.assertTrue(user1.getUserInfoId().equals(20L));
-        Assert.assertTrue(user1.getLoginName().equals("666777"));
-        Assert.assertTrue(user1.getPassword().equals("666666"));
+        Assert.assertEquals(20L, (long) user1.getUserInfoId());
+        Assert.assertEquals("666777", user1.getLoginName());
+        Assert.assertEquals("666666", user1.getPassword());
         Assert.assertNotNull(user1.getGmtModify());
     }
 
     @Test
     public void jdbcDaoDelete() {
         int count = daoTemplate.executeDelete(UserInfo.class, 38L);
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
         UserInfo user = daoTemplate.get(UserInfo.class, 38L);
         Assert.assertNull(user);
     }
@@ -121,7 +121,7 @@ public class SpringJdbcDaoTemplateTest {
     public void jdbcDaoFind() {
         List<UserInfo> users = daoTemplate.find(UserInfo.class);
         Assert.assertNotNull(users);
-        Assert.assertTrue(users.size() == 50);
+        Assert.assertEquals(50, users.size());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class SpringJdbcDaoTemplateTest {
         user.setUserAge(10);
         List<UserInfo> users = daoTemplate.find(user);
         Assert.assertNotNull(users);
-        Assert.assertTrue(users.size() == 1);
+        Assert.assertEquals(1, users.size());
     }
 
     @Test
@@ -139,7 +139,7 @@ public class SpringJdbcDaoTemplateTest {
         user.setPageSize(10);
         Page<UserInfo> page = daoTemplate.pageResult(user);
         Assert.assertNotNull(page);
-        Assert.assertTrue(page.getList().size() == 10);
+        Assert.assertEquals(10, page.getList().size());
     }
 
 
@@ -150,7 +150,7 @@ public class SpringJdbcDaoTemplateTest {
         user.setUserAge(10);
         Page<UserInfo> page = daoTemplate.pageResult(user);
         Assert.assertNotNull(page);
-        Assert.assertTrue(page.getList().size() == 1);
+        Assert.assertEquals(1, page.getList().size());
     }
 
     @Test
@@ -159,8 +159,8 @@ public class SpringJdbcDaoTemplateTest {
                 .orderBy("userInfoId").asc()
                 .limit(15, 10)
                 .pageResult(UserInfo.class);
-        Assert.assertTrue(page.getList().get(0).getUserInfoId().equals(11L));
-        Assert.assertTrue(page.getList().get(9).getUserInfoId().equals(20L));
+        Assert.assertEquals(11L, (long) page.getList().get(0).getUserInfoId());
+        Assert.assertEquals(20L, (long) page.getList().get(9).getUserInfoId());
     }
 
 
@@ -169,13 +169,13 @@ public class SpringJdbcDaoTemplateTest {
         UserInfo user = new UserInfo();
         user.setUserAge(10);
         long count = daoTemplate.findCount(user);
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
     }
 
     @Test
     public void jdbcDaoQueryCount2() {
         long count = daoTemplate.findCount(UserInfo.class);
-        Assert.assertTrue(count == 50);
+        Assert.assertEquals(50, count);
     }
 
     @Test
@@ -184,9 +184,9 @@ public class SpringJdbcDaoTemplateTest {
         tmp.setUserAge(10);
         UserInfo user = daoTemplate.singleResult(tmp);
         Assert.assertNotNull(user);
-        Assert.assertTrue(user.getUserInfoId().equals(10L));
-        Assert.assertTrue(user.getLoginName().equals("name-10"));
-        Assert.assertTrue(user.getUserAge().equals(10));
+        Assert.assertEquals(10L, (long) user.getUserInfoId());
+        Assert.assertEquals("name-10", user.getLoginName());
+        Assert.assertEquals(10, (int) user.getUserAge());
         Assert.assertNotNull(user.getGmtCreate());
     }
 
@@ -197,9 +197,9 @@ public class SpringJdbcDaoTemplateTest {
         tmp.setUserAge(10);
         UserInfo user = daoTemplate.firstResult(tmp);
         Assert.assertNotNull(user);
-        Assert.assertTrue(user.getUserInfoId().equals(10L));
-        Assert.assertTrue(user.getLoginName().equals("name-10"));
-        Assert.assertTrue(user.getUserAge().equals(10));
+        Assert.assertEquals(10L, (long) user.getUserInfoId());
+        Assert.assertEquals("name-10", user.getLoginName());
+        Assert.assertEquals(10, (int) user.getUserAge());
         Assert.assertNotNull(user.getGmtCreate());
     }
 
@@ -208,7 +208,7 @@ public class SpringJdbcDaoTemplateTest {
         UserInfo user = new UserInfo();
         user.setLoginName("name-17");
         int count = daoTemplate.executeDelete(user);
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
 
         UserInfo tmp = new UserInfo();
         tmp.setLoginName("name-17");
@@ -221,7 +221,7 @@ public class SpringJdbcDaoTemplateTest {
         int count = daoTemplate.executeDelete(UserInfo.class);
         Assert.assertTrue(count > 0);
         long result = daoTemplate.findCount(UserInfo.class);
-        Assert.assertTrue(result == 0);
+        Assert.assertEquals(0, result);
     }
 
     @Test
@@ -237,9 +237,9 @@ public class SpringJdbcDaoTemplateTest {
 
         UserInfo user1 = daoTemplate.get(UserInfo.class, id);
         Assert.assertNotNull(user1);
-        Assert.assertTrue(user1.getUserInfoId().equals(id));
-        Assert.assertTrue(user1.getLoginName().equals("name-60"));
-        Assert.assertTrue(user1.getPassword().equals("606060"));
+        Assert.assertEquals(user1.getUserInfoId(), id);
+        Assert.assertEquals("name-60", user1.getLoginName());
+        Assert.assertEquals("606060", user1.getPassword());
     }
 
     @Test
@@ -252,9 +252,9 @@ public class SpringJdbcDaoTemplateTest {
 
         UserInfo user1 = daoTemplate.get(UserInfo.class, id);
         Assert.assertNotNull(user1);
-        Assert.assertTrue(user1.getUserInfoId().equals(id));
-        Assert.assertTrue(user1.getLoginName().equals("name123"));
-        Assert.assertTrue(user1.getPassword().equals("123321"));
+        Assert.assertEquals(user1.getUserInfoId(), id);
+        Assert.assertEquals("name123", user1.getLoginName());
+        Assert.assertEquals("123321", user1.getPassword());
     }
 
     @Test
@@ -280,7 +280,7 @@ public class SpringJdbcDaoTemplateTest {
         daoTemplate.executeDelete(UserInfo.class);
         for (int i = 60; i < 70; i++) {
             UserInfo user = new UserInfo();
-            user.setUserInfoId(Long.valueOf(i));
+            user.setUserInfoId((long) i);
             user.setLoginName("name2-19");
             user.setPassword("123456-" + i);
             user.setUserAge(19);
@@ -291,25 +291,25 @@ public class SpringJdbcDaoTemplateTest {
         Select select1 = daoTemplate.selectFrom(UserInfo.class)
                 .where("userAge", 19);
         long count1 = select1.count();
-        Assert.assertTrue(count1 == 10);
+        Assert.assertEquals(10, count1);
 
         List<UserInfo> list1 = select1.list(UserInfo.class);
-        Assert.assertTrue(list1.size() == 10);
+        Assert.assertEquals(10, list1.size());
 
         Page<UserInfo> page1 = select1.paginate(1, 5).pageResult(UserInfo.class);
-        Assert.assertTrue(page1.getList().size() == 5);
+        Assert.assertEquals(5, page1.getList().size());
 
         Select select2 = daoTemplate.selectFrom(UserInfo.class)
                 .where("userAge", 19)
                 .and("loginName", "name2-19");
         long count2 = select2.count();
-        Assert.assertTrue(count2 == 10);
+        Assert.assertEquals(10, count2);
 
         List<UserInfo> list2 = select2.list(UserInfo.class);
-        Assert.assertTrue(list2.size() == 10);
+        Assert.assertEquals(10, list2.size());
 
         Page<UserInfo> page2 = select2.paginate(1, 5).pageResult(UserInfo.class);
-        Assert.assertTrue(page2.getList().size() == 5);
+        Assert.assertEquals(5, page2.getList().size());
     }
 
     @Test
@@ -318,7 +318,7 @@ public class SpringJdbcDaoTemplateTest {
         daoTemplate.executeDelete(UserInfo.class);
         for (int i = 1; i < 3; i++) {
             UserInfo user = new UserInfo();
-            user.setUserInfoId(Long.valueOf(i));
+            user.setUserInfoId((long) i);
             user.setLoginName("name-19");
             user.setPassword("123456-" + i);
             user.setUserAge(21);
@@ -326,7 +326,7 @@ public class SpringJdbcDaoTemplateTest {
             daoTemplate.executeInsert(user);
         }
         try {
-            UserInfo user = daoTemplate.selectFrom(UserInfo.class)
+            daoTemplate.selectFrom(UserInfo.class)
                     .where()
                     .begin()
                     .condition("loginName", "name-19")
@@ -334,7 +334,7 @@ public class SpringJdbcDaoTemplateTest {
                     .end()
                     .singleResult(UserInfo.class);
         } catch (IncorrectResultSizeDataAccessException e) {
-            Assert.assertTrue("Incorrect result size: expected 1, actual 2".equals(e.getMessage()));
+            Assert.assertEquals("Incorrect result size: expected 1, actual 2", e.getMessage());
         }
 
         UserInfo user2 = daoTemplate.selectFrom(UserInfo.class)
@@ -355,7 +355,7 @@ public class SpringJdbcDaoTemplateTest {
                 .where("user_Age", "<=", 10)
                 .list(UserInfo.class);
         Assert.assertNotNull(list);
-        Assert.assertTrue(list.size() == 10);
+        Assert.assertEquals(10, list.size());
         for (UserInfo user : list) {
             Assert.assertNotNull(user.getUserInfoId());
             Assert.assertNotNull(user.getPassword());
@@ -390,7 +390,7 @@ public class SpringJdbcDaoTemplateTest {
 
         Long maxId = daoTemplate.select("max(userInfoId) maxid").from(UserInfo.class)
                 .oneColResult(Long.class);
-        Assert.assertTrue(maxId == 50);
+        Assert.assertEquals(50, (long) maxId);
     }
 
     @Test
@@ -406,15 +406,16 @@ public class SpringJdbcDaoTemplateTest {
         Object result = daoTemplate.selectFrom(UserInfo.class)
                 .where("userInfoId", 15L)
                 .singleResult();
-        Assert.assertTrue(result instanceof Map);
+        Assert.assertNotNull(result);
     }
 
+    @SuppressWarnings("CastCanBeRemovedNarrowingVariableType")
     @Test
     public void select10() {
         Object result = daoTemplate.selectFrom(UserInfo.class)
                 .list();
-        Assert.assertTrue(result instanceof List);
-        Assert.assertTrue(((List) result).get(0) instanceof Map);
+        Assert.assertNotNull(result);
+        Assert.assertTrue(((List<?>) result).get(0) instanceof Map);
     }
 
     @Test
@@ -424,7 +425,7 @@ public class SpringJdbcDaoTemplateTest {
         Page<?> result = daoTemplate.selectFrom(UserInfo.class)
                 .paginate(pageable)
                 .pageResult();
-        Assert.assertTrue(result.getList().size() == 5);
+        Assert.assertEquals(5, result.getList().size());
         Assert.assertTrue(result.getList().get(0) instanceof Map);
     }
 
@@ -436,7 +437,7 @@ public class SpringJdbcDaoTemplateTest {
                 .and()
                 .condition("t1.userAge", new Object[]{11L, 12L, 13L})
                 .list(UserInfo.class);
-        Assert.assertTrue(users.size() == 3);
+        Assert.assertEquals(3, users.size());
     }
 
     @Test
@@ -507,24 +508,25 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void select18() {
         try {
-            Object result = daoTemplate.select()
+            daoTemplate.select()
                     .from(UserInfo.class)
                     .asc()
                     .firstResult();
         } catch (SonsureJdbcException e) {
-            Assert.assertTrue("请先指定需要排序的属性".equals(e.getMessage()));
+            Assert.assertEquals("请先指定需要排序的属性", e.getMessage());
         }
     }
 
+    @SuppressWarnings({"unchecked", "CastCanBeRemovedNarrowingVariableType"})
     @Test
     public void select19() {
         Object result = daoTemplate.select()
                 .from(UserInfo.class)
                 .orderBy("userInfoId").asc()
                 .firstResult();
-        Assert.assertTrue(result instanceof Map);
+        Assert.assertNotNull(result);
         Map<String, Object> map = (Map<String, Object>) result;
-        Assert.assertTrue(map.get("USER_INFO_ID").equals(1L));
+        Assert.assertEquals(1L, map.get("USER_INFO_ID"));
     }
 
     @Test
@@ -533,7 +535,7 @@ public class SpringJdbcDaoTemplateTest {
                 .from(UserInfo.class)
                 .orderBy("userInfoId").asc()
                 .oneColFirstResult(Long.class);
-        Assert.assertTrue(result.equals(1L));
+        Assert.assertEquals(1L, (long) result);
     }
 
     @Test
@@ -543,8 +545,8 @@ public class SpringJdbcDaoTemplateTest {
                 .orderBy("userInfoId").asc()
                 .paginate(1, 10)
                 .oneColPageResult(Long.class);
-        Assert.assertTrue(page.getList().size() == 10);
-        Assert.assertTrue(page.getList().get(0).equals(1L));
+        Assert.assertEquals(10, page.getList().size());
+        Assert.assertEquals(1L, (long) page.getList().get(0));
     }
 
 
@@ -556,7 +558,7 @@ public class SpringJdbcDaoTemplateTest {
                 .where("userInfoId", 5L)
                 .singleResult();
 
-        Assert.assertNotNull(object instanceof Map);
+        Assert.assertNotNull(object);
     }
 
     @Test
@@ -566,7 +568,8 @@ public class SpringJdbcDaoTemplateTest {
                 .where("{{t1.userInfoId}}", "t2.uidUserId")
                 .list();
 
-        Assert.assertNotNull(object instanceof Map);
+        Assert.assertNotNull(object);
+        Assert.assertTrue(object instanceof Map);
 
 
         object = daoTemplate.select("t1.loginName as name1", "t2.loginName as name2").from(UserInfo.class, "t1", UidUser.class, "t2")
@@ -574,7 +577,8 @@ public class SpringJdbcDaoTemplateTest {
                 .append("t1.userInfoId = t2.uidUserId")
                 .list();
 
-        Assert.assertNotNull(object instanceof Map);
+        Assert.assertNotNull(object);
+        Assert.assertTrue(object instanceof Map);
     }
 
     @Test
@@ -601,10 +605,10 @@ public class SpringJdbcDaoTemplateTest {
                 .orderBy("Num").desc();
         Page<Map<String, Object>> page = select.paginate(1, 5).pageResult();
 
-        Assert.assertTrue(page.getList().size() == 5);
+        Assert.assertEquals(5, page.getList().size());
 
         List<Map<String, Object>> objects = select.list();
-        Assert.assertTrue(objects.size() == 50);
+        Assert.assertEquals(50, objects.size());
     }
 
     @Test
@@ -637,7 +641,7 @@ public class SpringJdbcDaoTemplateTest {
                 .execute();
 
         UserInfo user1 = daoTemplate.get(UserInfo.class, 15L);
-        Assert.assertTrue(user1.getLoginName().equals("newName"));
+        Assert.assertEquals("newName", user1.getLoginName());
     }
 
     @Test
@@ -653,8 +657,8 @@ public class SpringJdbcDaoTemplateTest {
                 .execute();
 
         UserInfo user1 = daoTemplate.get(UserInfo.class, 17L);
-        Assert.assertTrue(user1.getLoginName().equals("newName22"));
-        Assert.assertTrue(user1.getPassword().equals("abc"));
+        Assert.assertEquals("newName22", user1.getLoginName());
+        Assert.assertEquals("abc", user1.getPassword());
     }
 
     @Test
@@ -702,8 +706,8 @@ public class SpringJdbcDaoTemplateTest {
         Long id = (Long) daoTemplate.executeInsert(ku);
 
         KUserInfo kUserInfo = daoTemplate.get(KUserInfo.class, id);
-        Assert.assertTrue(ku.getLoginName().equals(kUserInfo.getLoginName()));
-        Assert.assertTrue(ku.getPassword().equals(kUserInfo.getPassword()));
+        Assert.assertEquals(ku.getLoginName(), kUserInfo.getLoginName());
+        Assert.assertEquals(ku.getPassword(), kUserInfo.getPassword());
     }
 
     @Test
@@ -715,7 +719,7 @@ public class SpringJdbcDaoTemplateTest {
         ku.setPassword("787878");
         ku.setGmtModify(new Date());
         int count = daoTemplate.executeUpdate(ku);
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
     }
 
     @Test
@@ -726,7 +730,7 @@ public class SpringJdbcDaoTemplateTest {
         Serializable id = (Serializable) daoTemplate.executeInsert(ku);
 
         int count = daoTemplate.executeDelete(KUserInfo.class, id);
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
     }
 
 
@@ -739,7 +743,7 @@ public class SpringJdbcDaoTemplateTest {
                 .execute();
 
         UserInfo user = daoTemplate.get(UserInfo.class, 17L);
-        Assert.assertTrue(user.getUserAge() == 18);
+        Assert.assertEquals(18, (int) user.getUserAge());
     }
 
     @Test
@@ -772,7 +776,7 @@ public class SpringJdbcDaoTemplateTest {
                 .command("update UserInfo set loginName = ? where userInfoId = ?")
                 .parameters(new Object[]{"newName", 39L})
                 .update();
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
         UserInfo user = daoTemplate.get(UserInfo.class, 39L);
         Assert.assertEquals(user.getLoginName(), "newName");
     }
@@ -786,7 +790,7 @@ public class SpringJdbcDaoTemplateTest {
                 .parameter("loginName", "newName")
                 .parameter("userInfoId", 39L)
                 .update();
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
         UserInfo user = daoTemplate.get(UserInfo.class, 39L);
         Assert.assertEquals(user.getLoginName(), "newName");
     }
@@ -798,7 +802,7 @@ public class SpringJdbcDaoTemplateTest {
         ids.add(39L);
         ids.add(40L);
 
-        Long[] userInfoId2 = new Long[]{23L, 24l};
+        Long[] userInfoId2 = new Long[]{23L, 24L};
 
         Map<String, Object> params = new HashMap<>();
         params.put("loginName", "newName");
@@ -825,7 +829,7 @@ public class SpringJdbcDaoTemplateTest {
                 .command("update UserInfo set loginName = ? where userInfoId = ?")
                 .parameters("newName", 39L)
                 .update();
-        Assert.assertTrue(count == 1);
+        Assert.assertEquals(1, count);
         UserInfo user = daoTemplate.get(UserInfo.class, 39L);
         Assert.assertEquals(user.getLoginName(), "newName");
     }
@@ -834,10 +838,10 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void nativeExecutor5() {
 
-        Long result = daoTemplate.nativeExecutor()
+        long result = daoTemplate.nativeExecutor()
                 .command("select count(*) from UserInfo")
                 .count();
-        Assert.assertTrue(result == 50);
+        Assert.assertEquals(50, result);
     }
 
     @Test
@@ -851,7 +855,7 @@ public class SpringJdbcDaoTemplateTest {
         long count = daoTemplate.selectFrom(UserInfo.class)
                 .where("userAge", "<", 18)
                 .count();
-        Assert.assertTrue(count == 0);
+        Assert.assertEquals(0, count);
     }
 
     @Test
@@ -864,7 +868,7 @@ public class SpringJdbcDaoTemplateTest {
         long count = daoTemplate.selectFrom(UserInfo.class)
                 .where("userAge", "<", 18)
                 .count();
-        Assert.assertTrue(count == 0);
+        Assert.assertEquals(0, count);
     }
 
     @Test
@@ -881,7 +885,7 @@ public class SpringJdbcDaoTemplateTest {
                 .command("select * from UserInfo order by userInfoId asc")
                 .firstResult(UserInfo.class);
 
-        Assert.assertTrue(userInfo.getUserInfoId().equals(1L));
+        Assert.assertEquals(1L, (long) userInfo.getUserInfoId());
     }
 
     @Test
@@ -890,7 +894,7 @@ public class SpringJdbcDaoTemplateTest {
                 .command("select userInfoId from UserInfo order by userInfoId asc")
                 .oneColFirstResult(Long.class);
 
-        Assert.assertTrue(id.equals(1L));
+        Assert.assertEquals(1L, (long) id);
     }
 
     @Test
@@ -901,10 +905,10 @@ public class SpringJdbcDaoTemplateTest {
                 .insert();
 
         UserInfo userInfo = daoTemplate.get(UserInfo.class, 100L);
-        Assert.assertTrue(userInfo.getUserInfoId().equals(100L));
-        Assert.assertTrue(userInfo.getLoginName().equals("100user"));
-        Assert.assertTrue(userInfo.getPassword().equals("123321"));
-        Assert.assertTrue(userInfo.getUserAge().equals(18));
+        Assert.assertEquals(100L, (long) userInfo.getUserInfoId());
+        Assert.assertEquals("100user", userInfo.getLoginName());
+        Assert.assertEquals("123321", userInfo.getPassword());
+        Assert.assertEquals(18, (int) userInfo.getUserAge());
     }
 
     @Test
@@ -915,9 +919,9 @@ public class SpringJdbcDaoTemplateTest {
                 .insert(UserInfo.class);
 
         UserInfo userInfo = daoTemplate.get(UserInfo.class, id);
-        Assert.assertTrue(userInfo.getLoginName().equals("100user"));
-        Assert.assertTrue(userInfo.getPassword().equals("123321"));
-        Assert.assertTrue(userInfo.getUserAge().equals(18));
+        Assert.assertEquals("100user", userInfo.getLoginName());
+        Assert.assertEquals("123321", userInfo.getPassword());
+        Assert.assertEquals(18, (int) userInfo.getUserAge());
     }
 
     @Test
@@ -938,13 +942,14 @@ public class SpringJdbcDaoTemplateTest {
         Assert.assertTrue(list != null && !list.isEmpty());
     }
 
+    @SuppressWarnings("CastCanBeRemovedNarrowingVariableType")
     @Test
     public void nativeFirstList() {
         Object result = daoTemplate.nativeExecutor()
                 .command("select userInfoId from UserInfo")
                 .firstResult();
-        Assert.assertTrue(result instanceof Map);
-        Assert.assertTrue(((Map) result).size() == 1);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1, ((Map<?, ?>) result).size());
     }
 
     @Test
@@ -956,12 +961,12 @@ public class SpringJdbcDaoTemplateTest {
                 .command("select userInfoId from UserInfo order by userInfoId asc")
                 .paginate(pageable)
                 .pageResult();
-        Assert.assertTrue(page.getList().size() == 10);
-        Assert.assertTrue(page.getList().get(0) instanceof Map);
+        Assert.assertEquals(10, page.getList().size());
+        Assert.assertNotNull(page.getList().get(0));
         Map<String, Object> map = page.getList().get(0);
-        Assert.assertTrue(map.get("USER_INFO_ID").equals(11L));
+        Assert.assertEquals(11L, map.get("USER_INFO_ID"));
         Map<String, Object> map2 = page.getList().get(9);
-        Assert.assertTrue(map2.get("USER_INFO_ID").equals(20L));
+        Assert.assertEquals(20L, map2.get("USER_INFO_ID"));
     }
 
     @Test
@@ -972,9 +977,9 @@ public class SpringJdbcDaoTemplateTest {
                 .paginate(2, 5)
                 .resultHandler(new CustomResultHandler())
                 .pageResult(AuthCode.class);
-        Assert.assertTrue(page.getList().size() == 5);
-        Assert.assertTrue(page.getList().get(0).getCode().equals("name-6"));
-        Assert.assertTrue(page.getList().get(4).getCode().equals("name-10"));
+        Assert.assertEquals(5, page.getList().size());
+        Assert.assertEquals("name-6", page.getList().get(0).getCode());
+        Assert.assertEquals("name-10", page.getList().get(4).getCode());
     }
 
     @Test
@@ -983,12 +988,13 @@ public class SpringJdbcDaoTemplateTest {
                 .command("select userInfoId from UserInfo order by userInfoId asc")
                 .limit(15, 10)
                 .pageResult();
-        Assert.assertTrue(page.getList().size() == 10);
-        Assert.assertTrue(page.getList().get(0) instanceof Map);
+        Assert.assertEquals(10, page.getList().size());
+        Assert.assertNotNull(page.getList());
+        Assert.assertNotNull(page.getList().get(0));
         Map<String, Object> map = page.getList().get(0);
-        Assert.assertTrue(map.get("USER_INFO_ID").equals(11L));
+        Assert.assertEquals(11L, map.get("USER_INFO_ID"));
         Map<String, Object> map2 = page.getList().get(9);
-        Assert.assertTrue(map2.get("USER_INFO_ID").equals(20L));
+        Assert.assertEquals(20L, map2.get("USER_INFO_ID"));
     }
 
     @Test
@@ -1047,7 +1053,7 @@ public class SpringJdbcDaoTemplateTest {
                 .nativeCommand()
                 .list();
 
-        Assert.assertTrue(list.size() == 3);
+        Assert.assertEquals(3, list.size());
     }
 
     @Test
@@ -1060,9 +1066,9 @@ public class SpringJdbcDaoTemplateTest {
                 .nativeCommand()
                 .update();
 
-        Assert.assertTrue(update == 1);
+        Assert.assertEquals(1, update);
         UserInfo userInfo = daoTemplate.get(UserInfo.class, 9L);
-        Assert.assertTrue("newName".equals(userInfo.getLoginName()));
+        Assert.assertEquals("newName", userInfo.getLoginName());
     }
 
 
@@ -1080,13 +1086,13 @@ public class SpringJdbcDaoTemplateTest {
 
     @Test
     public void mybatisExecutor7() {
-        UserInfo userInfo = (UserInfo) daoTemplate.myBatisExecutor()
+        UserInfo userInfo = daoTemplate.myBatisExecutor()
                 .command("getUser3")
                 .parameter("userInfoId", 9L)
                 .parameter("loginName", "name-9")
                 .singleResult(UserInfo.class);
 
-        Assert.assertTrue("name-9".equals(userInfo.getLoginName()));
+        Assert.assertEquals("name-9", userInfo.getLoginName());
     }
 
     @Test
@@ -1096,7 +1102,7 @@ public class SpringJdbcDaoTemplateTest {
                 .paginate(1, 10)
                 .pageResult(UserInfo.class);
 
-        Assert.assertTrue(page.getList().size() == 10);
+        Assert.assertEquals(10, page.getList().size());
     }
 
     @Test
@@ -1119,6 +1125,7 @@ public class SpringJdbcDaoTemplateTest {
 
         InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("test-script.sql");
 
+        assert resourceAsStream != null;
         byte[] bytes = FileIOUtils.toByteArray(resourceAsStream);
         daoTemplate.nativeExecutor()
                 .command(new String(bytes))
@@ -1169,7 +1176,7 @@ public class SpringJdbcDaoTemplateTest {
         List<UserInfo> userInfoList = new ArrayList<>();
         for (int i = 1; i < 10000; i++) {
             UserInfo user = new UserInfo();
-            user.setUserInfoId(Long.valueOf(i));
+            user.setUserInfoId((long) i);
             user.setLoginName("name-" + i);
             user.setPassword("123456-" + i);
             user.setUserAge(i);

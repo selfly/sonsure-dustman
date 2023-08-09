@@ -149,7 +149,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
     /**
      * 分页列表查询
      *
-     * @return page page
+     * @return page
      */
     Page<Map<String,Object>> pageResult();
 

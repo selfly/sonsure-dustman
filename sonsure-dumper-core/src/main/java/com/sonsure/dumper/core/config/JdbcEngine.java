@@ -52,16 +52,6 @@ public interface JdbcEngine {
      *
      * @param <T>                  the type parameter
      * @param commandExecutorClass 执行器class
-     * @param param                the param
-     * @return t
-     */
-    <T extends CommandExecutor> T createExecutor(Class<T> commandExecutorClass, Object param);
-
-    /**
-     * 创建执行器
-     *
-     * @param <T>                  the type parameter
-     * @param commandExecutorClass 执行器class
      * @return t
      */
     <T extends CommandExecutor> T createExecutor(Class<T> commandExecutorClass);

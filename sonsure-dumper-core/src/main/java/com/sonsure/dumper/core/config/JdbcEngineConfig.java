@@ -41,7 +41,7 @@ public interface JdbcEngineConfig {
     /**
      * 获取CommandExecutorFactory
      *
-     * @return
+     * @return command executor factory
      */
     CommandExecutorFactory getCommandExecutorFactory();
 
@@ -72,7 +72,7 @@ public interface JdbcEngineConfig {
     /**
      * 获取持久化执行器
      *
-     * @return
+     * @return persist executor
      */
     PersistExecutor getPersistExecutor();
 
@@ -93,14 +93,14 @@ public interface JdbcEngineConfig {
     /**
      * 获取command解析器
      *
-     * @return
+     * @return command conversion handler
      */
     CommandConversionHandler getCommandConversionHandler();
 
     /**
      * 获取mybatis SqlSessionFactory
      *
-     * @return
+     * @return mybatis sql session factory
      */
     SqlSessionFactory getMybatisSqlSessionFactory();
 
@@ -121,7 +121,7 @@ public interface JdbcEngineConfig {
     /**
      * command大小写
      *
-     * @return
+     * @return command case
      */
     String getCommandCase();
 

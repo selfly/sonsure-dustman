@@ -11,13 +11,16 @@ package com.sonsure.dumper.core.command.entity;
 
 
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
+import com.sonsure.dumper.core.command.QueryCommandContextBuilder;
+import com.sonsure.dumper.core.command.QueryCommandContextBuilderContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.CommandClass;
 import com.sonsure.dumper.core.management.CommandField;
 import com.sonsure.dumper.core.management.ModelFieldMeta;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,28 +28,77 @@ import java.util.List;
  * @author liyd
  * @date 17/4/12
  */
-public class SelectCommandContextBuilderImpl extends AbstractCommandContextBuilder {
+public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder {
 
     private static final String COMMAND_OPEN = "select ";
 
+    private final Context selectContext;
+
+    private final ConditionCommandBuilderImpl conditionCommandBuilder;
+
+    private final GroupCommandBuilderImpl groupCommandBuilder;
+
+    private final OrderByCommandBuilderImpl orderByCommandBuilder;
+
+    public SelectCommandContextBuilderImpl(Context selectContext) {
+        super(selectContext);
+        this.selectContext = selectContext;
+        this.conditionCommandBuilder = new ConditionCommandBuilderImpl(new ConditionCommandBuilderImpl.Context());
+        this.groupCommandBuilder = new GroupCommandBuilderImpl(new GroupCommandBuilderImpl.Context());
+        this.orderByCommandBuilder = new OrderByCommandBuilderImpl(new OrderByCommandBuilderImpl.Context());
+    }
+
+    public void addSelectFields(String... fields) {
+        this.selectContext.addSelectFields(fields);
+    }
+
+    public void addExcludeFields(String... fields) {
+        this.selectContext.addExcludeFields(fields);
+    }
+
+    public void addFromClass(Class<?> cls) {
+        this.selectContext.addFromClass(cls);
+    }
+
+    public void addFromClass(Class<?> cls, String aliasName) {
+        this.selectContext.addFromClass(cls, aliasName);
+    }
+
+    public void addGroupByField(String... fields) {
+        this.groupCommandBuilder.addGroupByField(fields);
+    }
+
+    public void addOrderByField(String... fields) {
+        this.orderByCommandBuilder.addOrderByField(fields);
+    }
+
+    public void asc() {
+        this.orderByCommandBuilder.asc();
+    }
+
+    public void desc() {
+        this.orderByCommandBuilder.desc();
+    }
+
+    public Context getSelectContext() {
+        return selectContext;
+    }
+
     @Override
-    public CommandContext doBuild(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig) {
+    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
 
         StringBuilder command = new StringBuilder(COMMAND_OPEN);
 
-        final CommandExecutorContext.SelectContext selectContext = executorContext.selectContext();
-        List<CommandField> selectFields = selectContext.getSelectFields();
-        List<CommandClass> fromClasses = selectContext.getFromClasses();
-        if (fromClasses.isEmpty()) {
+        if (this.selectContext.getFromClasses().isEmpty()) {
             throw new SonsureJdbcException("from class必须指定");
         }
         //如果为空没有指定，获取class的属性
-        if (selectFields.isEmpty()) {
-            for (CommandClass fromClass : fromClasses) {
+        if (this.selectContext.getSelectFields().isEmpty()) {
+            for (CommandClass fromClass : this.selectContext.getFromClasses()) {
                 Collection<ModelFieldMeta> classFields = this.getClassFields(fromClass.getCls());
                 for (ModelFieldMeta fieldMeta : classFields) {
                     //黑名单
-                    if (selectContext.isExcludeField(fieldMeta.getName())) {
+                    if (this.selectContext.isExcludeField(fieldMeta.getName())) {
                         continue;
                     }
                     String field = this.getTableAliasField(fromClass.getAliasName(), fieldMeta.getName());
@@ -54,8 +106,8 @@ public class SelectCommandContextBuilderImpl extends AbstractCommandContextBuild
                 }
             }
         } else {
-            for (CommandField selectField : selectFields) {
-                final String filedCommandName = this.getFiledCommandName(selectField, executorContext);
+            for (CommandField selectField : this.selectContext.getSelectFields()) {
+                final String filedCommandName = this.getFiledCommandName(selectField, jdbcEngineConfig);
                 String field = this.getTableAliasField(selectField.getTableAlias(), filedCommandName);
                 command.append(field).append(",");
             }
@@ -63,28 +115,100 @@ public class SelectCommandContextBuilderImpl extends AbstractCommandContextBuild
         command.deleteCharAt(command.length() - 1);
 
         command.append(" from ");
-        for (CommandClass fromClass : fromClasses) {
+        for (CommandClass fromClass : this.selectContext.getFromClasses()) {
             command.append(this.getModelAliasName(fromClass.getCls(), fromClass.getAliasName()))
                     .append(",");
         }
         command.deleteCharAt(command.length() - 1);
 
-        CommandContext commandContext = getCommonCommandContext(executorContext);
+        CommandContext commandContext = createCommandContext();
 
-        CommandContext whereCommandContext = this.buildWhereSql(executorContext);
+        CommandContext whereCommandContext = this.conditionCommandBuilder.build(jdbcEngineConfig);
         if (whereCommandContext != null) {
             command.append(whereCommandContext.getCommand());
             commandContext.addCommandParameters(whereCommandContext.getCommandParameters());
         }
 
-        String groupBySql = this.buildGroupBySql(executorContext);
-        command.append(groupBySql);
+        CommandContext groupCommandContext = this.groupCommandBuilder.build(jdbcEngineConfig);
+        command.append(groupCommandContext.getCommand());
 
-        String orderBySql = this.buildOrderBySql(executorContext);
-        command.append(orderBySql);
+        CommandContext orderByCommandContext = this.orderByCommandBuilder.build(jdbcEngineConfig);
+        command.append(orderByCommandContext.getCommand());
 
         commandContext.setCommand(command.toString());
 
         return commandContext;
     }
+
+    public static class Context extends QueryCommandContextBuilderContext {
+
+        private final List<CommandField> selectFields;
+
+        private final List<CommandClass> fromClasses;
+
+        private final List<CommandField> excludeFields;
+
+        public Context() {
+            this.selectFields = new ArrayList<>();
+            this.fromClasses = new ArrayList<>();
+            this.excludeFields = new ArrayList<>();
+        }
+
+        public void addSelectFields(String... fields) {
+            for (String field : fields) {
+                this.selectFields.add(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+            }
+        }
+
+        public void addFromClass(Class<?> cls) {
+            this.addFromClass(cls, null);
+        }
+
+        public void addFromClass(Class<?> cls, String aliasName) {
+            final List<CommandClass> fromClasses = this.getFromClasses();
+            fromClasses.add(this.createCommandClass(cls, aliasName));
+        }
+
+        public void addExcludeFields(String... fields) {
+            final List<CommandField> excludeFields = this.getExcludeFields();
+            for (String field : fields) {
+                excludeFields.add(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+            }
+        }
+
+        /**
+         * 是否黑名单
+         *
+         * @param field the field
+         * @return boolean
+         */
+        public boolean isExcludeField(String field) {
+            final List<CommandField> excludeFields = this.getExcludeFields();
+            if (excludeFields == null || excludeFields.isEmpty()) {
+                return false;
+            }
+            CommandField commandField = this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD);
+            for (CommandField excludeField : excludeFields) {
+                if (StringUtils.equals(commandField.getTableAlias(), excludeField.getTableAlias()) && StringUtils.equals(commandField.getFieldName(), excludeField.getFieldName())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public List<CommandField> getSelectFields() {
+            return selectFields;
+        }
+
+        public List<CommandClass> getFromClasses() {
+            return fromClasses;
+        }
+
+        public List<CommandField> getExcludeFields() {
+            return excludeFields;
+        }
+
+    }
+
+
 }

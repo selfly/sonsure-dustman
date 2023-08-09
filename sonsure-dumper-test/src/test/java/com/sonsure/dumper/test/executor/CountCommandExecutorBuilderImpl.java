@@ -9,7 +9,6 @@
 
 package com.sonsure.dumper.test.executor;
 
-import com.sonsure.dumper.core.command.CommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.config.AbstractCommandExecutorBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -17,15 +16,14 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 public class CountCommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 
     @Override
-    public boolean support(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
+    public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
         return commandExecutorClass == CountCommandExecutor.class;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public CommandExecutor build(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
+    public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
         CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcEngineConfig);
-        CommandContextBuilder commandContextBuilder = new CountCommandContextBuilder();
-        commandExecutor.setCommandContextBuilder(commandContextBuilder);
-        return commandExecutor;
+        return (T) commandExecutor;
     }
 }

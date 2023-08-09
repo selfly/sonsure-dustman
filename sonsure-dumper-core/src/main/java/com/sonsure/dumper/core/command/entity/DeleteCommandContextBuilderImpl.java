@@ -11,7 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
+import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 /**
@@ -24,15 +24,26 @@ public class DeleteCommandContextBuilderImpl extends AbstractCommandContextBuild
 
     private static final String COMMAND_OPEN = "delete from ";
 
+    private final Context deleteContext;
+
+    private final ConditionCommandBuilderImpl conditionCommandBuilder;
+
+    public DeleteCommandContextBuilderImpl(Context deleteContext) {
+        super(deleteContext);
+        this.deleteContext = deleteContext;
+        this.conditionCommandBuilder = new ConditionCommandBuilderImpl(new ConditionCommandBuilderImpl.Context());
+    }
+
+
     @Override
-    public CommandContext doBuild(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig) {
+    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
         StringBuilder command = new StringBuilder(COMMAND_OPEN);
-        final Class<?> modelClass = executorContext.getUniqueModelClass();
+        final Class<?> modelClass = this.getUniqueModelClass();
         command.append(this.getModelAliasName(modelClass, null));
 
-        CommandContext commandContext = getCommonCommandContext(executorContext);
+        CommandContext commandContext = createCommandContext();
 
-        CommandContext whereCommandContext = this.buildWhereSql(executorContext);
+        CommandContext whereCommandContext = this.conditionCommandBuilder.build(jdbcEngineConfig);
         if (whereCommandContext != null) {
             command.append(whereCommandContext.getCommand());
             commandContext.addCommandParameters(whereCommandContext.getCommandParameters());
@@ -40,4 +51,8 @@ public class DeleteCommandContextBuilderImpl extends AbstractCommandContextBuild
         commandContext.setCommand(command.toString());
         return commandContext;
     }
+
+    public static class Context extends CommandContextBuilderContext {
+    }
+
 }

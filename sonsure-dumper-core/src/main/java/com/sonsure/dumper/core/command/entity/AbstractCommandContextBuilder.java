@@ -11,7 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
+import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.command.CommandParameter;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
@@ -22,7 +22,6 @@ import com.sonsure.dumper.core.management.ModelClassCache;
 import com.sonsure.dumper.core.management.ModelFieldMeta;
 import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -36,24 +35,48 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractCommandContextBuilder implements CommandContextBuilder {
 
-    @Override
-    public CommandContext build(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig) {
+    private final CommandContextBuilderContext commandContextBuilderContext;
 
-        CommandContext commandContext = this.doBuild(executorContext, jdbcEngineConfig);
+    public AbstractCommandContextBuilder(CommandContextBuilderContext commandContextBuilderContext) {
+        this.commandContextBuilderContext = commandContextBuilderContext;
+    }
+
+    public void addModelClass(Class<?> cls) {
+        this.commandContextBuilderContext.addModelClass(cls);
+    }
+
+    /**
+     * Native command.
+     */
+    public void forceNative() {
+        commandContextBuilderContext.setForceNative(true);
+    }
+
+    public void namedParameter() {
+        this.commandContextBuilderContext.setNamedParameter(true);
+    }
+
+    public CommandContextBuilderContext getCommandContextBuilderContext() {
+        return commandContextBuilderContext;
+    }
+
+    @Override
+    public CommandContext build(JdbcEngineConfig jdbcEngineConfig) {
+
+        CommandContext commandContext = this.doBuild(jdbcEngineConfig);
         MappingHandler mappingHandler = jdbcEngineConfig.getMappingHandler();
         if (mappingHandler instanceof AbstractMappingHandler) {
-            Set<Class<?>> modelClasses = executorContext.getModelClasses();
-            ((AbstractMappingHandler) mappingHandler).addClassMapping(modelClasses);
+            ((AbstractMappingHandler) mappingHandler).addClassMapping(this.commandContextBuilderContext.getModelClasses());
         }
 
-        if (!executorContext.isNativeCommand()) {
+        if (!this.commandContextBuilderContext.isForceNative()) {
             // todo 需要收集参数信息，待完成
             Map<String, Object> params = Collections.emptyMap();
             final String resolvedCommand = jdbcEngineConfig.getCommandConversionHandler().convert(commandContext.getCommand(), params);
             commandContext.setCommand(resolvedCommand);
         }
 
-        if (executorContext.isNamedParameter()) {
+        if (this.commandContextBuilderContext.isNamedParameter()) {
             final ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(commandContext.getCommand());
             final Map<String, Object> paramMap = commandContext.getCommandParameters().stream()
                     .collect(Collectors.toMap(CommandParameter::getName, CommandParameter::getValue));
@@ -78,11 +101,47 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     /**
      * 构建执行内容
      *
-     * @param executorContext  the executor context
      * @param jdbcEngineConfig the jdbc engine config
      * @return command context
      */
-    public abstract CommandContext doBuild(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig);
+    public abstract CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig);
+
+    /**
+     * Gets unique model class.
+     *
+     * @return the unique model class
+     */
+    protected Class<?> getUniqueModelClass() {
+        final Set<Class<?>> modelClasses = this.commandContextBuilderContext.getModelClasses();
+        if (modelClasses == null || modelClasses.size() != 1) {
+            throw new SonsureJdbcException("当前执行业务不止一个Model Class");
+        }
+        return modelClasses.iterator().next();
+    }
+
+
+    /**
+     * Create class field.
+     *
+     * @param name              the name
+     * @param analyseTableAlias the analyse table alias
+     * @return the class field
+     */
+    protected CommandField createCommandClassField(String name, boolean analyseTableAlias, CommandField.Type type, Class<?> cls) {
+        return new CommandField(name, analyseTableAlias, type, cls);
+    }
+
+    /**
+     * Create class field .
+     *
+     * @param name              the name
+     * @param analyseTableAlias the analyse table alias
+     * @param type              the type
+     * @return the class field
+     */
+    public CommandField createCommandClassField(String name, boolean analyseTableAlias, CommandField.Type type) {
+        return this.createCommandClassField(name, analyseTableAlias, type, null);
+    }
 
     /**
      * 转换大小写
@@ -140,7 +199,8 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     /**
      * 获取class的属性
      *
-     * @return
+     * @param clazz the clazz
+     * @return class fields
      */
     protected Collection<ModelFieldMeta> getClassFields(Class<?> clazz) {
         return ModelClassCache.getClassFieldMetas(clazz);
@@ -149,193 +209,16 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     /**
      * 获取设置了通用参数的CommandContext
      *
-     * @param executorContext the executor context
      * @return generic command context
      */
-    protected CommandContext getCommonCommandContext(CommandExecutorContext executorContext) {
+    protected CommandContext createCommandContext() {
         return new CommandContext();
     }
 
-    /**
-     * 构建where部分sql
-     *
-     * @param commandExecutorContext the command executor context
-     * @return string command context
-     */
-    protected CommandContext buildWhereSql(CommandExecutorContext commandExecutorContext) {
-        final CommandExecutorContext.EntityWhereContext entityWhereContext = commandExecutorContext.entityWhereContext();
-        final boolean isNamedParameter = commandExecutorContext.isNamedParameter();
-        List<CommandField> whereFields = entityWhereContext.getWhereFields();
-        if (whereFields == null || whereFields.isEmpty()) {
-            return null;
-        }
 
-        StringBuilder whereCommand = new StringBuilder(" ");
-        List<CommandParameter> commandParameters = new ArrayList<>();
-        for (CommandField commandField : whereFields) {
-
-            //在前面处理，有单独where or and 的情况
-            if (StringUtils.isNotBlank(commandField.getLogicalOperator())) {
-                //没有where不管如何and or等操作符都换成where
-                if (whereCommand.length() < 5) {
-                    whereCommand.append("where ");
-                } else {
-                    whereCommand.append(commandField.getLogicalOperator()).append(" ");
-                }
-            }
-            //只有where or and 的情况
-            if (StringUtils.isBlank(commandField.getFieldName())) {
-                continue;
-            }
-            final String filedCommandName = this.getFiledCommandName(commandField, commandExecutorContext);
-            if (commandField.getType() == CommandField.Type.WHERE_APPEND) {
-                whereCommand.append(filedCommandName);
-                if (commandField.getValue() != null) {
-                    if (commandField.getValue() instanceof Object[]) {
-                        Object[] values = (Object[]) commandField.getValue();
-                        for (int i = 0; i < values.length; i++) {
-                            commandParameters.add(new CommandParameter(commandField.getFieldName() + i, values[i]));
-                        }
-                    } else if (commandField.getValue() instanceof Map) {
-                        final Map<String, Object> valueMap = (Map<String, Object>) commandField.getValue();
-                        for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
-                            commandParameters.add(new CommandParameter(entry.getKey(), entry.getValue()));
-                        }
-                    } else {
-                        throw new SonsureJdbcException("不支持的参数类型");
-                    }
-                }
-            } else if (commandField.getValue() == null) {
-                String operator = StringUtils.isBlank(commandField.getFieldOperator()) ? "is" : commandField.getFieldOperator();
-                whereCommand.append(this.getTableAliasField(commandField.getTableAlias(), filedCommandName))
-                        .append(" ")
-                        .append(operator)
-                        .append(" null ");
-            } else if (commandField.getValue() instanceof Object[]) {
-                this.processArrayArgs(commandField, whereCommand, commandParameters, commandExecutorContext);
-            } else {
-                whereCommand.append(this.getTableAliasField(commandField.getTableAlias(), filedCommandName))
-                        .append(" ")
-                        .append(commandField.getFieldOperator())
-                        .append(" ");
-
-                //native 不传参方式
-                if (commandField.isNative()) {
-                    whereCommand.append(commandField.isFieldOperatorNeedBracket() ? String.format(" ( %s ) ", commandField.getValue()) : String.format(" %s ", commandField.getValue()));
-                } else {
-                    final String placeholder = this.createParameterPlaceholder(commandField.getFieldName(), isNamedParameter);
-                    whereCommand.append(commandField.isFieldOperatorNeedBracket() ? String.format(" ( %s ) ", placeholder) : String.format(" %s ", placeholder));
-                    commandParameters.add(new CommandParameter(commandField.getFieldName(), commandField.getValue()));
-                }
-            }
-        }
-        //只有where的情况
-        if (whereCommand.length() < 8) {
-            whereCommand.delete(0, whereCommand.length());
-        }
-        CommandContext commandContext = new CommandContext();
-        commandContext.setCommand(whereCommand.toString());
-        commandContext.addCommandParameters(commandParameters);
-        return commandContext;
-    }
-
-    /**
-     * 构建group by部分sql
-     *
-     * @param commandExecutorContext the command executor context
-     * @return string string
-     */
-    protected String buildGroupBySql(CommandExecutorContext commandExecutorContext) {
-        final CommandExecutorContext.SelectContext selectContext = commandExecutorContext.selectContext();
-        List<CommandField> groupByFields = selectContext.getGroupByFields();
-        if (groupByFields == null || groupByFields.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(" group by ");
-        for (CommandField groupByField : groupByFields) {
-            final String filedCommandName = this.getFiledCommandName(groupByField, commandExecutorContext);
-            String aliasField = this.getTableAliasField(groupByField.getTableAlias(), filedCommandName);
-            sb.append(aliasField).append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
-    }
-
-    /**
-     * 构建order by部分sql
-     *
-     * @param commandExecutorContext the command executor context
-     * @return string string
-     */
-    protected String buildOrderBySql(CommandExecutorContext commandExecutorContext) {
-
-        final CommandExecutorContext.SelectContext selectContext = commandExecutorContext.selectContext();
-        List<CommandField> orderByFields = selectContext.getOrderByFields();
-        if (orderByFields == null || orderByFields.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(" order by ");
-        for (CommandField orderByField : orderByFields) {
-            final String filedCommandName = this.getFiledCommandName(orderByField, commandExecutorContext);
-            String aliasField = this.getTableAliasField(orderByField.getTableAlias(), filedCommandName);
-            sb.append(aliasField).append(" ").append(orderByField.getFieldOperator()).append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-
-        return sb.toString();
-    }
-
-
-    /**
-     * 处理数组参数
-     */
-    protected void processArrayArgs(CommandField commandField, StringBuilder whereCommand, List<CommandParameter> parameters, CommandExecutorContext commandExecutorContext) {
-        final String filedCommandName = this.getFiledCommandName(commandField, commandExecutorContext);
-        String aliasField = this.getTableAliasField(commandField.getTableAlias(), filedCommandName);
-        Object[] args = (Object[]) commandField.getValue();
-        if (commandField.isFieldOperatorNeedBracket()) {
-            whereCommand.append(aliasField).append(" ").append(commandField.getFieldOperator()).append(" (");
-            for (int i = 0; i < args.length; i++) {
-                if (commandField.isNative()) {
-                    whereCommand.append(args[i]);
-                } else {
-                    final String name = commandField.getFieldName() + i;
-                    String placeholder = this.createParameterPlaceholder(name, commandExecutorContext.isNamedParameter());
-                    whereCommand.append(placeholder);
-                    parameters.add(new CommandParameter(name, args[i]));
-                }
-                if (i != args.length - 1) {
-                    whereCommand.append(",");
-                }
-            }
-            whereCommand.append(") ");
-        } else {
-            if (ArrayUtils.getLength(args) > 1) {
-                whereCommand.append(" (");
-            }
-            for (int i = 0; i < args.length; i++) {
-                whereCommand.append(aliasField).append(" ").append(commandField.getFieldOperator());
-                if (commandField.isNative()) {
-                    whereCommand.append(String.format(" %s ", args[i]));
-                } else {
-                    final String name = commandField.getFieldName() + i;
-                    String placeholder = this.createParameterPlaceholder(name, commandExecutorContext.isNamedParameter());
-                    whereCommand.append(" ").append(placeholder).append(" ");
-                    parameters.add(new CommandParameter(name, args[i]));
-                }
-                if (i != args.length - 1) {
-                    whereCommand.append(" or ");
-                }
-            }
-            if (ArrayUtils.getLength(args) > 1) {
-                whereCommand.append(") ");
-            }
-        }
-    }
-
-    protected String getFiledCommandName(CommandField commandField, CommandExecutorContext commandExecutorContext) {
-        if (commandExecutorContext.isNativeCommand() && commandField.getType() == CommandField.Type.ENTITY_FIELD) {
-            final MappingHandler mappingHandler = commandExecutorContext.getJdbcEngineConfig().getMappingHandler();
+    protected String getFiledCommandName(CommandField commandField, JdbcEngineConfig jdbcEngineConfig) {
+        if (this.commandContextBuilderContext.isForceNative() && commandField.getType() == CommandField.Type.ENTITY_FIELD) {
+            final MappingHandler mappingHandler = jdbcEngineConfig.getMappingHandler();
             return mappingHandler.getColumn(commandField.getCls(), commandField.getFieldName());
         }
         return commandField.getFieldName();
@@ -344,4 +227,5 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     protected String createParameterPlaceholder(String fieldName, boolean isNamedParameter) {
         return isNamedParameter ? ":" + fieldName : "?";
     }
+
 }

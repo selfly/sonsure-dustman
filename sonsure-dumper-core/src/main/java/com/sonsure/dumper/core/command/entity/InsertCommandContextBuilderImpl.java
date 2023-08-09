@@ -11,7 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
+import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.command.CommandParameter;
 import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -19,6 +19,9 @@ import com.sonsure.dumper.core.management.CommandField;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author liyd
@@ -28,12 +31,43 @@ public class InsertCommandContextBuilderImpl extends AbstractCommandContextBuild
 
     private static final String COMMAND_OPEN = "insert into ";
 
-    @Override
-    public CommandContext doBuild(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig) {
+    private final Context insertContext;
 
-        CommandContext commandContext = getCommonCommandContext(executorContext);
+    public InsertCommandContextBuilderImpl(Context insertContext) {
+        super(insertContext);
+        this.insertContext = insertContext;
+    }
+
+    /**
+     * Add insert field.
+     *
+     * @param field the field
+     * @param value the value
+     */
+    public void addInsertField(String field, Object value) {
+        this.addInsertField(field, value, null);
+    }
+
+    /**
+     * Add insert field.
+     *
+     * @param field the field
+     * @param value the value
+     * @param cls   the cls
+     */
+    public void addInsertField(String field, Object value, Class<?> cls) {
+        CommandField.Type type = cls == null ? CommandField.Type.MANUAL_FIELD : CommandField.Type.ENTITY_FIELD;
+        CommandField commandField = this.createCommandClassField(field, false, type, cls);
+        commandField.setValue(value);
+        this.insertContext.addInsertFields(commandField);
+    }
+
+    @Override
+    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+
+        CommandContext commandContext = createCommandContext();
         MappingHandler mappingHandler = jdbcEngineConfig.getMappingHandler();
-        final Class<?> modelClass = executorContext.getUniqueModelClass();
+        final Class<?> modelClass = this.getUniqueModelClass();
         String pkField = this.getPkField(modelClass, mappingHandler);
         String pkColumn = mappingHandler.getColumn(modelClass, pkField);
         pkColumn = this.convertCase(pkColumn, jdbcEngineConfig.getCommandCase());
@@ -49,12 +83,12 @@ public class InsertCommandContextBuilderImpl extends AbstractCommandContextBuild
         command.append(this.getModelName(modelClass)).append(" (");
 
         boolean hasPkParam = false;
-        for (CommandField commandField : executorContext.getInsertFields()) {
+        for (CommandField commandField : this.insertContext.getInsertFields()) {
             if (StringUtils.equalsIgnoreCase(pkField, commandField.getFieldName())) {
                 hasPkParam = true;
             }
-            final String placeholder = this.createParameterPlaceholder(commandField.getFieldName(), executorContext.isNamedParameter());
-            final String filedCommandName = this.getFiledCommandName(commandField, executorContext);
+            final String placeholder = this.createParameterPlaceholder(commandField.getFieldName(), this.insertContext.isNamedParameter());
+            final String filedCommandName = this.getFiledCommandName(commandField, jdbcEngineConfig);
             command.append(filedCommandName).append(",");
             argsCommand.append(placeholder).append(",");
             commandContext.addCommandParameter(new CommandParameter(commandField.getFieldName(), commandField.getValue()));
@@ -74,7 +108,7 @@ public class InsertCommandContextBuilderImpl extends AbstractCommandContextBuild
                 //传参
                 command.append(pkField).append(",");
                 if (isParam) {
-                    final String placeholder = this.createParameterPlaceholder(pkField, executorContext.isNamedParameter());
+                    final String placeholder = this.createParameterPlaceholder(pkField, this.insertContext.isNamedParameter());
                     argsCommand.append(placeholder).append(",");
                     commandContext.addCommandParameter(pkField, generateKeyValue);
                 } else {
@@ -89,5 +123,22 @@ public class InsertCommandContextBuilderImpl extends AbstractCommandContextBuild
         command.append(")").append(" values ").append(argsCommand);
         commandContext.setCommand(command.toString());
         return commandContext;
+    }
+
+    public static class Context extends CommandContextBuilderContext {
+
+        private final List<CommandField> insertFields;
+
+        public Context() {
+            this.insertFields = new ArrayList<>();
+        }
+
+        public void addInsertFields(CommandField commandField) {
+            this.insertFields.add(commandField);
+        }
+
+        public List<CommandField> getInsertFields() {
+            return insertFields;
+        }
     }
 }

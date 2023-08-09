@@ -24,25 +24,10 @@ public interface CommonCommandExecutor<T extends CommonCommandExecutor<T>> exten
     T nativeCommand();
 
     /**
-     * 是否禁止转换，command不做任何加工
-     *
-     * @param nativeCommand the native command
-     * @return t t
-     */
-    T nativeCommand(boolean nativeCommand);
-
-    /**
      * 是否使用named parameter 方式
      *
      * @return t t
      */
     T namedParameter();
 
-    /**
-     * 是否使用named parameter 方式
-     *
-     * @param namedParameter the named parameter
-     * @return t t
-     */
-    T namedParameter(boolean namedParameter);
 }

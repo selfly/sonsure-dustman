@@ -15,6 +15,9 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author liyd
+ */
 public class CommandExecutorFactoryImpl implements CommandExecutorFactory {
 
     protected List<CommandExecutorBuilder> defaultCommandExecutorBuilders;
@@ -27,22 +30,21 @@ public class CommandExecutorFactoryImpl implements CommandExecutorFactory {
     }
 
     @Override
-    public CommandExecutor getCommandExecutor(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
-        CommandExecutorBuilder commandExecutorBuilder = this.getCommandExecutorBuilder(commandExecutorClass, param, jdbcEngineConfig);
-        CommandExecutor commandExecutor = commandExecutorBuilder.build(commandExecutorClass, param, jdbcEngineConfig);
-        return commandExecutor;
+    public <T extends CommandExecutor> T getCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
+        CommandExecutorBuilder commandExecutorBuilder = this.getCommandExecutorBuilder(commandExecutorClass, jdbcEngineConfig);
+        return commandExecutorBuilder.build(commandExecutorClass, jdbcEngineConfig);
     }
 
-    protected CommandExecutorBuilder getCommandExecutorBuilder(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
+    protected CommandExecutorBuilder getCommandExecutorBuilder(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
         if (this.commandExecutorBuilders != null) {
             for (CommandExecutorBuilder ceb : this.commandExecutorBuilders) {
-                if (ceb.support(commandExecutorClass, param, jdbcEngineConfig)) {
+                if (ceb.support(commandExecutorClass, jdbcEngineConfig)) {
                     return ceb;
                 }
             }
         }
         for (CommandExecutorBuilder ceb : this.defaultCommandExecutorBuilders) {
-            if (ceb.support(commandExecutorClass, param, jdbcEngineConfig)) {
+            if (ceb.support(commandExecutorClass, jdbcEngineConfig)) {
                 return ceb;
             }
         }

@@ -88,7 +88,7 @@ public class CommandField {
     /**
      * fieldOperator是否需要括号
      *
-     * @return
+     * @return boolean
      */
     public boolean isFieldOperatorNeedBracket() {
         return StringUtils.indexOf(StringUtils.upperCase(this.getFieldOperator()), "IN") != -1;
@@ -118,8 +118,8 @@ public class CommandField {
         /**
          * field名字是否需要解析表别名
          *
-         * @param type
-         * @return
+         * @param type the type
+         * @return boolean
          */
         public static boolean isAnalyseTableAlias(Type type) {
             //append片断无需解析表别名

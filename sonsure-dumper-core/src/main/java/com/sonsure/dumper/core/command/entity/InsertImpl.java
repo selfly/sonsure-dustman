@@ -25,26 +25,30 @@ import java.util.Map;
  */
 public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements Insert {
 
+    private final InsertCommandContextBuilderImpl insertCommandContextBuilder;
+
     public InsertImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
+        this.insertCommandContextBuilder = new InsertCommandContextBuilderImpl(new InsertCommandContextBuilderImpl.Context());
     }
+
 
     @Override
     public Insert into(Class<?> cls) {
-        this.getCommandExecutorContext().addModelClass(cls);
+        this.insertCommandContextBuilder.addModelClass(cls);
         return this;
     }
 
     @Override
     public Insert set(String field, Object value) {
-        this.getCommandExecutorContext().addInsertField(field, value);
+        this.insertCommandContextBuilder.addInsertField(field, value);
         return this;
     }
 
     @Override
     public <E, R> Insert set(Function<E, R> function, Object value) {
         String field = LambdaMethod.getField(function);
-        this.getCommandExecutorContext().addInsertField(field, value);
+        this.insertCommandContextBuilder.addInsertField(field, value);
         return this;
     }
 
@@ -57,15 +61,19 @@ public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements
             if (entry.getValue() == null) {
                 continue;
             }
-            this.getCommandExecutorContext().addInsertField(entry.getKey(), entry.getValue(), entity.getClass());
+            this.insertCommandContextBuilder.addInsertField(entry.getKey(), entry.getValue(), entity.getClass());
         }
         return this;
     }
 
     @Override
     public Object execute() {
-        CommandContext commandContext = this.commandContextBuilder.build(getCommandExecutorContext(), getJdbcEngineConfig());
+        CommandContext commandContext = this.insertCommandContextBuilder.build(getJdbcEngineConfig());
         return getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
     }
 
+    @Override
+    protected AbstractCommandContextBuilder getCommandContextBuilder() {
+        return this.insertCommandContextBuilder;
+    }
 }

@@ -10,9 +10,8 @@
 package com.sonsure.dumper.core.command.mybatis;
 
 import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandExecutorContext;
 import com.sonsure.dumper.core.command.CommandParameter;
-import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
+import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandContextBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -28,18 +27,23 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class MybatisCommandContextBuilder extends AbstractCommandContextBuilder {
+public class MybatisCommandContextBuilderImpl extends AbstractSimpleCommandContextBuilder {
+
+
+    public MybatisCommandContextBuilderImpl(Context simpleContext) {
+        super(simpleContext);
+    }
 
     @Override
-    public CommandContext doBuild(CommandExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig) {
+    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
 
         CommandContext commandContext = new CommandContext();
 
         SqlSessionFactory sqlSessionFactory = jdbcEngineConfig.getMybatisSqlSessionFactory();
-        MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(executorContext.getCommand());
+        MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(getSimpleContext().getCommand());
         Configuration configuration = sqlSessionFactory.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
-        BoundSql boundSql = statement.getBoundSql(executorContext.getParameters());
+        BoundSql boundSql = statement.getBoundSql(getSimpleContext().getParameters());
         Object parameterObject = boundSql.getParameterObject();
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         if (parameterMappings != null) {
@@ -63,7 +67,7 @@ public class MybatisCommandContextBuilder extends AbstractCommandContextBuilder 
             }
         }
         commandContext.setCommand(boundSql.getSql());
-        executorContext.setNamedParameter(false);
+        getSimpleContext().setNamedParameter(false);
         return commandContext;
     }
 }

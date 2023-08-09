@@ -39,6 +39,7 @@ public class LambdaMethod {
         return getMethodField(method);
     }
 
+    @SafeVarargs
     public static <T, R> String[] getFields(Function<T, R>... functions) {
         String[] fields = new String[functions.length];
         for (int i = 0; i < functions.length; i++) {
