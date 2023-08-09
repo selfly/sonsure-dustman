@@ -64,6 +64,10 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     public CommandContext build(JdbcEngineConfig jdbcEngineConfig) {
 
         CommandContext commandContext = this.doBuild(jdbcEngineConfig);
+        //如果是where、group等子构建，直接返回
+        if (this.commandContextBuilderContext.isSubBuilderContext()) {
+            return commandContext;
+        }
         MappingHandler mappingHandler = jdbcEngineConfig.getMappingHandler();
         if (mappingHandler instanceof AbstractMappingHandler) {
             ((AbstractMappingHandler) mappingHandler).addClassMapping(this.commandContextBuilderContext.getModelClasses());

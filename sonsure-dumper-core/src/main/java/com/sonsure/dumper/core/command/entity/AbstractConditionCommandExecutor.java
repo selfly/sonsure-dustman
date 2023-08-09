@@ -32,16 +32,15 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public abstract class AbstractConditionCommandExecutor<T extends ConditionCommandExecutor<T>> extends AbstractCommonCommandExecutor<T> implements ConditionCommandExecutor<T> {
 
-    private final ConditionCommandBuilderImpl conditionCommandBuilder;
-
     public AbstractConditionCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.conditionCommandBuilder = new ConditionCommandBuilderImpl(new ConditionCommandBuilderImpl.Context());
     }
+
+    protected abstract ConditionCommandBuilderImpl getConditionCommandBuilder();
 
     @Override
     public T where() {
-        this.conditionCommandBuilder.addWhereField("where", null, null, null, null);
+        this.getConditionCommandBuilder().addWhereField("where", null, null, null, null);
         return (T) this;
     }
 
@@ -74,7 +73,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T where(String field, String operator, Object... values) {
-        this.conditionCommandBuilder.addWhereField("where", field, operator, values, null);
+        this.getConditionCommandBuilder().addWhereField("where", field, operator, values, null);
         return (T) this;
     }
 
@@ -112,7 +111,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T condition(String field, String operator, Object... values) {
-        this.conditionCommandBuilder.addWhereField(null, field, operator, values, null);
+        this.getConditionCommandBuilder().addWhereField(null, field, operator, values, null);
         return (T) this;
     }
 
@@ -145,7 +144,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
             if (entry.getValue() == null) {
                 continue;
             }
-            CommandField commandField = this.conditionCommandBuilder.createCommandClassField(entry.getKey(), false, CommandField.Type.ENTITY_FIELD, entity.getClass());
+            CommandField commandField = this.getConditionCommandBuilder().createCommandClassField(entry.getKey(), false, CommandField.Type.ENTITY_FIELD, entity.getClass());
             commandField.setLogicalOperator(count > 1 ? fieldLogicalOperator : null);
             commandField.setFieldOperator("=");
             commandField.setValue(entry.getValue());
@@ -154,9 +153,9 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
         }
         //防止属性全为null的情况
         if (!fieldList.isEmpty()) {
-            this.conditionCommandBuilder.addWhereField(wholeLogicalOperator, null, null, null, null);
+            this.getConditionCommandBuilder().addWhereField(wholeLogicalOperator, null, null, null, null);
             this.begin();
-            this.conditionCommandBuilder.addWhereFields(fieldList);
+            this.getConditionCommandBuilder().addWhereFields(fieldList);
             this.end();
         }
         return (T) this;
@@ -164,7 +163,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T and() {
-        this.conditionCommandBuilder.addWhereField("and", null, null, null, null);
+        this.getConditionCommandBuilder().addWhereField("and", null, null, null, null);
         return (T) this;
     }
 
@@ -197,7 +196,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T and(String field, String operator, Object... values) {
-        this.conditionCommandBuilder.addWhereField("and", field, operator, values, null);
+        this.getConditionCommandBuilder().addWhereField("and", field, operator, values, null);
         return (T) this;
     }
 
@@ -210,7 +209,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T or() {
-        this.conditionCommandBuilder.addWhereField("or", null, null, null, null);
+        this.getConditionCommandBuilder().addWhereField("or", null, null, null, null);
         return (T) this;
     }
 
@@ -241,7 +240,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T or(String field, String operator, Object... values) {
-        this.conditionCommandBuilder.addWhereField("or", field, operator, values, null);
+        this.getConditionCommandBuilder().addWhereField("or", field, operator, values, null);
         return (T) this;
     }
 
@@ -254,28 +253,28 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T begin() {
-        this.conditionCommandBuilder.addWhereField("(", null, null, null, null);
+        this.getConditionCommandBuilder().addWhereField("(", null, null, null, null);
         return (T) this;
     }
 
     @Override
     public T end() {
-        this.conditionCommandBuilder.addWhereField(")", null, null, null, null);
+        this.getConditionCommandBuilder().addWhereField(")", null, null, null, null);
         return (T) this;
     }
 
     @Override
     public T append(String segment, Object... params) {
-        if (this.conditionCommandBuilder.getCommandContextBuilderContext().isNamedParameter()) {
+        if (this.getConditionCommandBuilder().getCommandContextBuilderContext().isNamedParameter()) {
             throw new SonsureJdbcException("Named Parameter 方式不能使用数组传参");
         }
-        this.conditionCommandBuilder.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        this.getConditionCommandBuilder().addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
         return (T) this;
     }
 
     @Override
     public T append(String segment, Map<String, Object> params) {
-        this.conditionCommandBuilder.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        this.getConditionCommandBuilder().addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
         return (T) this;
     }
 }

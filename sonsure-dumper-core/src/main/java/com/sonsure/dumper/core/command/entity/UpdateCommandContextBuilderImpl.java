@@ -91,6 +91,10 @@ public class UpdateCommandContextBuilderImpl extends AbstractCommandContextBuild
         return commandContext;
     }
 
+    public ConditionCommandBuilderImpl getConditionCommandBuilder() {
+        return conditionCommandBuilder;
+    }
+
     public static class Context extends CommandContextBuilderContext {
 
         private final List<CommandField> setFields;

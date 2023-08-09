@@ -18,6 +18,7 @@ public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
     public GroupCommandBuilderImpl(Context groupContext) {
         super(groupContext);
         this.groupContext = groupContext;
+        this.groupContext.setSubBuilderContext(true);
     }
 
     public void addGroupByField(String... fields) {
@@ -26,10 +27,9 @@ public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
 
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
-        CommandContext commandContext = this.createCommandContext();
         List<CommandField> groupByFields = this.groupContext.getGroupByFields();
         if (groupByFields == null || groupByFields.isEmpty()) {
-            return commandContext;
+            return null;
         }
         StringBuilder sb = new StringBuilder(" group by ");
         for (CommandField groupByField : groupByFields) {
@@ -38,6 +38,7 @@ public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
             sb.append(aliasField).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
+        CommandContext commandContext = this.createCommandContext();
         commandContext.setCommand(sb.toString());
         return commandContext;
     }

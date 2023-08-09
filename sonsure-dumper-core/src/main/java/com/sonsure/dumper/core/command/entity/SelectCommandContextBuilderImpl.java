@@ -130,14 +130,22 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
         }
 
         CommandContext groupCommandContext = this.groupCommandBuilder.build(jdbcEngineConfig);
-        command.append(groupCommandContext.getCommand());
+        if (groupCommandContext != null) {
+            command.append(groupCommandContext.getCommand());
+        }
 
         CommandContext orderByCommandContext = this.orderByCommandBuilder.build(jdbcEngineConfig);
-        command.append(orderByCommandContext.getCommand());
+        if (orderByCommandContext != null) {
+            command.append(orderByCommandContext.getCommand());
+        }
 
         commandContext.setCommand(command.toString());
 
         return commandContext;
+    }
+
+    public ConditionCommandBuilderImpl getConditionCommandBuilder() {
+        return conditionCommandBuilder;
     }
 
     public static class Context extends QueryCommandContextBuilderContext {

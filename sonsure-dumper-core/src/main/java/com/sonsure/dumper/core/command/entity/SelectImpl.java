@@ -44,6 +44,11 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
     }
 
     @Override
+    protected ConditionCommandBuilderImpl getConditionCommandBuilder() {
+        return this.selectCommandContextBuilder.getConditionCommandBuilder();
+    }
+
+    @Override
     public Select select(String... fields) {
         this.selectCommandContextBuilder.addSelectFields(fields);
         return this;

@@ -37,6 +37,11 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
     }
 
     @Override
+    protected ConditionCommandBuilderImpl getConditionCommandBuilder() {
+        return this.updateCommandContextBuilder.getConditionCommandBuilder();
+    }
+
+    @Override
     protected AbstractCommandContextBuilder getCommandContextBuilder() {
         return null;
     }

@@ -24,13 +24,13 @@ public class DeleteCommandContextBuilderImpl extends AbstractCommandContextBuild
 
     private static final String COMMAND_OPEN = "delete from ";
 
-    private final Context deleteContext;
+//    private final Context deleteContext;
 
     private final ConditionCommandBuilderImpl conditionCommandBuilder;
 
     public DeleteCommandContextBuilderImpl(Context deleteContext) {
         super(deleteContext);
-        this.deleteContext = deleteContext;
+//        this.deleteContext = deleteContext;
         this.conditionCommandBuilder = new ConditionCommandBuilderImpl(new ConditionCommandBuilderImpl.Context());
     }
 
@@ -50,6 +50,10 @@ public class DeleteCommandContextBuilderImpl extends AbstractCommandContextBuild
         }
         commandContext.setCommand(command.toString());
         return commandContext;
+    }
+
+    public ConditionCommandBuilderImpl getConditionCommandBuilder() {
+        return conditionCommandBuilder;
     }
 
     public static class Context extends CommandContextBuilderContext {

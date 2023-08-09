@@ -11,17 +11,17 @@ package com.sonsure.dumper.core.config;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
-import com.sonsure.dumper.core.command.entity.Delete;
-import com.sonsure.dumper.core.command.entity.Insert;
-import com.sonsure.dumper.core.command.entity.Select;
-import com.sonsure.dumper.core.command.entity.Update;
+import com.sonsure.dumper.core.command.batch.BatchUpdateExecutorImpl;
+import com.sonsure.dumper.core.command.entity.*;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
+import com.sonsure.dumper.core.command.mybatis.MybatisExecutorImpl;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
+import com.sonsure.dumper.core.command.natives.NativeExecutorImpl;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The type Command executor builder.
@@ -30,22 +30,30 @@ import java.util.List;
  */
 public class CommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 
-    protected List<Class<? extends CommandExecutor>> commandExecutorClasses;
+    protected Map<Class<? extends CommandExecutor>, Class<? extends CommandExecutor>> commandExecutorClassMap = new HashMap<>();
 
     public CommandExecutorBuilderImpl() {
-        commandExecutorClasses = Arrays.asList(Insert.class, Select.class, Update.class, Delete.class, NativeExecutor.class, MybatisExecutor.class, BatchUpdateExecutor.class);
+        commandExecutorClassMap.put(Insert.class, InsertImpl.class);
+        commandExecutorClassMap.put(Select.class, SelectImpl.class);
+        commandExecutorClassMap.put(Update.class, UpdateImpl.class);
+        commandExecutorClassMap.put(Delete.class, DeleteImpl.class);
+        commandExecutorClassMap.put(NativeExecutor.class, NativeExecutorImpl.class);
+        commandExecutorClassMap.put(MybatisExecutor.class, MybatisExecutorImpl.class);
+        commandExecutorClassMap.put(BatchUpdateExecutor.class, BatchUpdateExecutorImpl.class);
     }
 
     @Override
     public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-        return commandExecutorClasses.contains(commandExecutorClass);
+        return commandExecutorClassMap.containsKey(commandExecutorClass);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
         try {
-            Constructor<T> constructor = commandExecutorClass.getDeclaredConstructor(JdbcEngineConfig.class);
-            return constructor.newInstance(jdbcEngineConfig);
+            Class<? extends CommandExecutor> implClass = commandExecutorClassMap.get(commandExecutorClass);
+            Constructor<? extends CommandExecutor> constructor = implClass.getDeclaredConstructor(JdbcEngineConfig.class);
+            return (T) constructor.newInstance(jdbcEngineConfig);
         } catch (Exception e) {
             throw new SonsureJdbcException("创建CommandExecutor失败", e);
         }

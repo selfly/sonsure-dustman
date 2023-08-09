@@ -35,6 +35,11 @@ public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> impleme
     }
 
     @Override
+    protected ConditionCommandBuilderImpl getConditionCommandBuilder() {
+        return this.deleteCommandContextBuilder.getConditionCommandBuilder();
+    }
+
+    @Override
     public Delete from(Class<?> cls) {
         deleteCommandContextBuilder.addModelClass(cls);
         return this;

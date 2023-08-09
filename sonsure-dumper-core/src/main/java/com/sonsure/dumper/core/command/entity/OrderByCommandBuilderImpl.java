@@ -20,6 +20,7 @@ public class OrderByCommandBuilderImpl extends AbstractCommandContextBuilder {
     public OrderByCommandBuilderImpl(Context orderByContext) {
         super(orderByContext);
         this.orderByContext = orderByContext;
+        this.orderByContext.setSubBuilderContext(true);
     }
 
     public void addOrderByField(String... fields) {
@@ -37,10 +38,9 @@ public class OrderByCommandBuilderImpl extends AbstractCommandContextBuilder {
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
 
-        CommandContext commandContext = this.createCommandContext();
         List<CommandField> orderByFields = this.orderByContext.getOrderByFields();
         if (orderByFields == null || orderByFields.isEmpty()) {
-            return commandContext;
+            return null;
         }
         StringBuilder sb = new StringBuilder(" order by ");
         for (CommandField orderByField : orderByFields) {
@@ -50,6 +50,7 @@ public class OrderByCommandBuilderImpl extends AbstractCommandContextBuilder {
         }
         sb.deleteCharAt(sb.length() - 1);
 
+        CommandContext commandContext = this.createCommandContext();
         commandContext.setCommand(sb.toString());
         return commandContext;
     }

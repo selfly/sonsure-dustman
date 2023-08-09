@@ -19,8 +19,14 @@ public class CommandContextBuilderContext {
 
     private final Set<Class<?>> modelClasses;
 
+    /**
+     * where group orderBy 等context为true
+     */
+    private boolean subBuilderContext;
+
     public CommandContextBuilderContext() {
         this.modelClasses = new HashSet<>();
+        this.subBuilderContext = false;
     }
 
     public void addModelClass(Class<?> cls) {
@@ -79,5 +85,13 @@ public class CommandContextBuilderContext {
 
     public Set<Class<?>> getModelClasses() {
         return modelClasses;
+    }
+
+    public boolean isSubBuilderContext() {
+        return subBuilderContext;
+    }
+
+    public void setSubBuilderContext(boolean subBuilderContext) {
+        this.subBuilderContext = subBuilderContext;
     }
 }

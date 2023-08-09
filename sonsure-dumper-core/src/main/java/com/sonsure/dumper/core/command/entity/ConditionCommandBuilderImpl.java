@@ -23,6 +23,7 @@ public class ConditionCommandBuilderImpl extends AbstractCommandContextBuilder {
     public ConditionCommandBuilderImpl(Context conditionContext) {
         super(conditionContext);
         this.conditionContext = conditionContext;
+        this.conditionContext.setSubBuilderContext(true);
     }
 
     public void addWhereField(String logicalOperator, String name, String fieldOperator, Object value, CommandField.Type type) {
