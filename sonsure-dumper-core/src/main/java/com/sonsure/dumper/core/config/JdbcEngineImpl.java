@@ -33,7 +33,10 @@ import java.util.List;
  */
 public class JdbcEngineImpl implements JdbcEngine {
 
-    private final JdbcEngineConfig jdbcEngineConfig;
+    private JdbcEngineConfig jdbcEngineConfig;
+
+    public JdbcEngineImpl() {
+    }
 
     public JdbcEngineImpl(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
@@ -183,5 +186,9 @@ public class JdbcEngineImpl implements JdbcEngine {
     @Override
     public int executeDelete(Class<?> cls) {
         return this.delete().from(cls).execute();
+    }
+
+    public void setJdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
+        this.jdbcEngineConfig = jdbcEngineConfig;
     }
 }

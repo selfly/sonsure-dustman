@@ -79,16 +79,15 @@ CountCommandExecutorBuilderImpl 代码：
     public class CountCommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
     
         @Override
-        public boolean support(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
+        public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
             return commandExecutorClass == CountCommandExecutor.class;
         }
     
+        @SuppressWarnings("unchecked")
         @Override
-        public CommandExecutor build(Class<? extends CommandExecutor> commandExecutorClass, Object param, JdbcEngineConfig jdbcEngineConfig) {
+        public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
             CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcEngineConfig);
-            CommandContextBuilder commandContextBuilder = new CountCommandContextBuilder();
-            commandExecutor.setCommandContextBuilder(commandContextBuilder);
-            return commandExecutor;
+            return (T) commandExecutor;
         }
     }
     
@@ -96,33 +95,16 @@ CountCommandContextBuilder 代码：
 
     public class CountCommandContextBuilder extends AbstractCommandContextBuilder {
     
+        public CountCommandContextBuilder(CommandContextBuilderContext commandContextBuilderContext) {
+            super(commandContextBuilderContext);
+        }
+    
         @Override
-        public CommandContext doBuild(ExecutorContext executorContext, JdbcEngineConfig jdbcEngineConfig) {
-            Class<?> clazz = executorContext.getModelClasses()[0];
+        public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+            Class<?> clazz = this.getCommandContextBuilderContext().getUniqueModelClass();
             CommandContext commandContext = new CommandContext();
             commandContext.setCommand("select count(*) from " + clazz.getSimpleName());
             return commandContext;
-        }
-    }
-
-CountExecutorContext 代码：
-
-    public class CountExecutorContext implements ExecutorContext {
-    
-        private Class<?> clazz;
-    
-        @Override
-        public Class<?>[] getModelClasses() {
-            return new Class<?>[]{clazz};
-        }
-    
-        @Override
-        public boolean isNativeCommand() {
-            return false;
-        }
-    
-        public void setClazz(Class<?> clazz) {
-            this.clazz = clazz;
         }
     }
     

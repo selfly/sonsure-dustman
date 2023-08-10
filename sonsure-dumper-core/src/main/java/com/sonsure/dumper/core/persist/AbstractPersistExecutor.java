@@ -228,6 +228,10 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      */
     protected abstract String doGetDialect();
 
+    public void setJdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
+        this.jdbcEngineConfig = jdbcEngineConfig;
+    }
+
     public JdbcEngineConfig getJdbcEngineConfig() {
         return jdbcEngineConfig;
     }

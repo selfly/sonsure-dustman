@@ -28,8 +28,7 @@ public class JdbcTemplateEngineConfigImpl extends AbstractJdbcEngineConfig {
         if (jdbcOperations == null) {
             jdbcOperations = new JdbcTemplate(dataSource);
         }
-        JdbcTemplatePersistExecutor jdbcTemplatePersistExecutor = new JdbcTemplatePersistExecutor(this.jdbcOperations, this);
-        return jdbcTemplatePersistExecutor;
+        return new JdbcTemplatePersistExecutor(this.jdbcOperations, this);
     }
 
     public void setJdbcOperations(JdbcOperations jdbcOperations) {

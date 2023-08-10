@@ -10,9 +10,9 @@
 package com.sonsure.dumper.test.jdbc;
 
 
-import com.sonsure.dumper.core.persist.DaoTemplate;
+import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.HbUserInfo;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +24,17 @@ import java.util.List;
 /**
  * rasp下构建失败，暂时忽略
  */
-@Ignore
+//@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-hibernate.xml"})
 public class HibernateDaoTemplateTest {
 
     @Autowired
-    private DaoTemplate daoTemplate;
+    private JdbcDao jdbcDao;
 
     @Test
     public void findList() {
-
-        List<HbUserInfo> userInfos = daoTemplate.find(HbUserInfo.class);
-
-        System.out.println(userInfos);
+        List<HbUserInfo> userInfos = jdbcDao.find(HbUserInfo.class);
+        Assert.assertNotNull(userInfos);
     }
 }

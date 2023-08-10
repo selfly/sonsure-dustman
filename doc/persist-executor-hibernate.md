@@ -136,14 +136,19 @@
     <bean id="hibernatePersistExecutor" class="com.sonsure.dumper.test.persist.HibernatePersistExecutor">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
-    <bean id="defaultJdbcEngine" class="com.sonsure.dumper.core.config.DefaultJdbcEngineFactoryBean">
+
+    <bean id="jdbcEngineConfig" class="com.sonsure.dumper.core.config.JdbcEngineConfigImpl">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="persistExecutor" ref="hibernatePersistExecutor"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.DefaultDaoTemplateImpl">
-        <property name="defaultJdbcEngine" ref="defaultJdbcEngine"/>
+    <bean id="jdbcEngine" class="com.sonsure.dumper.core.config.JdbcEngineImpl">
+        <property name="jdbcEngineConfig" ref="jdbcEngineConfig"/>
+    </bean>
+
+    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.DaoTemplateImpl">
+        <property name="defaultJdbcEngine" ref="jdbcEngine"/>
     </bean>
     
 同样使用`jdbcDao`调用：

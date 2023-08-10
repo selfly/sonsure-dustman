@@ -13,6 +13,6 @@ package com.sonsure.dumper.core.persist;
  * @author liyd
  * 使用该基础JdbcDao，必须要注入defaultJdbcEngine
  */
-public class DefaultDaoTemplateImpl extends AbstractDaoTemplateImpl implements JdbcDao {
+public class DaoTemplateImpl extends AbstractDaoTemplateImpl implements JdbcDao {
 
 }
