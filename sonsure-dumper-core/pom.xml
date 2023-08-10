@@ -64,52 +64,11 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>Sonsure Dumper API</Bundle-Name>
                         <Import-Package>
-                            org.apache.commons.lang3,
-                            com.sonsure.commons.utils,
-                            com.sonsure.commons.bean,
-                            com.sonsure.commons.model,
-                            com.sonsure.commons.exception,
-                            com.sonsure.commons.spring,
-                            com.sonsure.commons.spring.scan,
-                            net.sf.jsqlparser.schema,
-                            net.sf.jsqlparser.expression,
-                            net.sf.jsqlparser.util.deparser,
-                            net.sf.jsqlparser.statement,
-                            net.sf.jsqlparser.statement.update,
-                            net.sf.jsqlparser.statement.delete,
-                            net.sf.jsqlparser.statement.insert,
-                            net.sf.jsqlparser.statement.select,
-                            net.sf.jsqlparser.expression.operators.relational,
-                            net.sf.jsqlparser.parser,
-                            org.slf4j;resolution:=optional,
-                            org.apache.ibatis.mapping;resolution:=optional,
-                            org.apache.ibatis.reflection;resolution:=optional,
-                            org.apache.ibatis.session;resolution:=optional,
-                            org.apache.ibatis.type;resolution:=optional,
-                            org.springframework.beans.factory;resolution:=optional
+                            !javax.*,
+                            !sun.*,
+                            !com.sun.*,
+                            *;resolution:=optional
                         </Import-Package>
-                        <Export-Package>
-                            com.sonsure.dumper.core.annotation,
-                            com.sonsure.dumper.core.command,
-                            com.sonsure.dumper.core.command.batch,
-                            com.sonsure.dumper.core.command.entity,
-                            com.sonsure.dumper.core.command.lambda,
-                            com.sonsure.dumper.core.command.mybatis,
-                            com.sonsure.dumper.core.command.named,
-                            com.sonsure.dumper.core.command.natives,
-                            com.sonsure.dumper.core.command.simple,
-                            com.sonsure.dumper.core.command.sql,
-                            com.sonsure.dumper.core.config,
-                            com.sonsure.dumper.core.datasource,
-                            com.sonsure.dumper.core.exception,
-                            com.sonsure.dumper.core.management,
-                            com.sonsure.dumper.core.mapping,
-                            com.sonsure.dumper.core.page,
-                            com.sonsure.dumper.core.persist,
-                            com.sonsure.dumper.core.convert,
-                            com.sonsure.dumper.core.interceptor
-                        </Export-Package>
-                        <Bundle-Activator></Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>
