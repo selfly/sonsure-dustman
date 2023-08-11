@@ -16,23 +16,25 @@ import com.sonsure.dumper.core.command.CommandType;
 /**
  * 持久化执行
  * <p>
- * Created by liyd on 17/4/11.
+ *
+ * @author liyd
+ * @date 17/4/11
  */
 public interface PersistExecutor {
 
     /**
      * 获取数据库方言
      *
-     * @return
+     * @return dialect
      */
     String getDialect();
 
     /**
      * 执行command
      *
-     * @param commandContext
-     * @param commandType
-     * @return
+     * @param commandContext the command context
+     * @param commandType    the command type
+     * @return object
      */
     Object execute(CommandContext commandContext, CommandType commandType);
 

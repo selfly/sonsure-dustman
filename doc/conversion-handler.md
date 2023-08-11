@@ -43,7 +43,6 @@ CommandConversionHandler的定义就一个方法：
 
     <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl">
         <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
-        <property name="globalJdbc" value="true"/>
     </bean>
 
 *注意：当执行自定义sql调用了`nativeCommand()`方法时，将不经过`commandConversionHandler`的转换。*

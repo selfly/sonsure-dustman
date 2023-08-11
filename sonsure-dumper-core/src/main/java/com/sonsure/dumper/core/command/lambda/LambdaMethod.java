@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.command.lambda;
 
+import com.sonsure.commons.spring.ReflectionUtils;
 import com.sonsure.commons.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import org.apache.commons.lang3.StringUtils;
@@ -25,12 +26,8 @@ public class LambdaMethod {
     private static final Field CAPTURING_CLASS_FIELD;
 
     static {
-        try {
-            CAPTURING_CLASS_FIELD = SerializedLambda.class.getDeclaredField("capturingClass");
-            CAPTURING_CLASS_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw new SonsureJdbcException("获取SerializedLambda capturingClass属性失败", e);
-        }
+        CAPTURING_CLASS_FIELD = ReflectionUtils.findField(SerializedLambda.class, "capturingClass");
+        ReflectionUtils.makeAccessible(CAPTURING_CLASS_FIELD);
     }
 
 
@@ -62,13 +59,9 @@ public class LambdaMethod {
     }
 
     private static SerializedLambda getSerializedLambda(Object lambda) {
-        try {
-            Method m = lambda.getClass().getDeclaredMethod("writeReplace");
-            m.setAccessible(true);
-            return (SerializedLambda) m.invoke(lambda);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Method writeReplace = ReflectionUtils.findMethod(lambda.getClass(), "writeReplace");
+        ReflectionUtils.makeAccessible(writeReplace);
+        return (SerializedLambda) ReflectionUtils.invokeMethod(writeReplace, lambda);
     }
 
     private static Method getMethod(SerializedLambda serializedLambda) {

@@ -26,7 +26,6 @@ import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.config.JdbcEngine;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -36,16 +35,11 @@ import java.util.Map;
  * @author liyd
  * @date 17/4/13
  */
-@SuppressWarnings("unchecked")
 public abstract class AbstractDaoTemplateImpl implements JdbcDao {
-
-    protected DataSource dataSource;
 
     protected JdbcEngine defaultJdbcEngine;
 
     protected Map<String, JdbcEngine> jdbcEngineMap;
-
-    protected boolean globalJdbc = false;
 
     @Override
     public DaoTemplate use(String name) {
@@ -215,22 +209,6 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
         return this.defaultJdbcEngine;
     }
 
-    public void enableGlobalJdbc() {
-        this.globalJdbc = true;
-        Jdbc.setDefaultJdbcEngine(this.defaultJdbcEngine);
-        if (this.jdbcEngineMap != null) {
-            Jdbc.addJdbcEngine(this.jdbcEngineMap);
-        }
-    }
-
-    public DataSource getDataSource() {
-        return dataSource != null ? dataSource : this.getDefaultJdbcEngine().getDataSource();
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     public void setDefaultJdbcEngine(JdbcEngine jdbcEngine) {
         this.defaultJdbcEngine = jdbcEngine;
     }
@@ -243,11 +221,4 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
         this.jdbcEngineMap = jdbcEngineMap;
     }
 
-    public boolean isGlobalJdbc() {
-        return globalJdbc;
-    }
-
-    public void setGlobalJdbc(boolean globalJdbc) {
-        this.globalJdbc = globalJdbc;
-    }
 }

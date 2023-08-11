@@ -30,7 +30,7 @@ public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
         List<CommandField> groupByFields = this.groupContext.getGroupByFields();
-        if (groupByFields == null || groupByFields.isEmpty()) {
+        if (groupByFields.isEmpty()) {
             return null;
         }
         StringBuilder sb = new StringBuilder(" group by ");

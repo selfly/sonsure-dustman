@@ -36,14 +36,6 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
 
     protected JdbcEngineConfig jdbcEngineConfig;
 
-    public AbstractPersistExecutor() {
-
-    }
-
-    public AbstractPersistExecutor(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
-    }
-
     @Override
     public String getDialect() {
         if (StringUtils.isBlank(dialect) || forceObtainDialect) {
@@ -228,12 +220,12 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      */
     protected abstract String doGetDialect();
 
-    public void setJdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
-    }
-
     public JdbcEngineConfig getJdbcEngineConfig() {
         return jdbcEngineConfig;
+    }
+
+    public void setJdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
+        this.jdbcEngineConfig = jdbcEngineConfig;
     }
 
     public void setDialect(String dialect) {

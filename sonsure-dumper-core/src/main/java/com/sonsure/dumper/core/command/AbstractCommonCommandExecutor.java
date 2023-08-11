@@ -42,7 +42,7 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
     @SuppressWarnings("unchecked")
     @Override
     public E nativeCommand() {
-        this.getCommandContextBuilder().forceNative();
+        this.getCommandContextBuilder().nativeCommand();
         return (E) this;
     }
 

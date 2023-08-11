@@ -13,7 +13,6 @@ import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.command.batch.BatchCommandContext;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
@@ -35,10 +34,9 @@ import java.util.Map;
  */
 public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
-    private JdbcOperations jdbcOperations;
+    private final JdbcOperations jdbcOperations;
 
-    public JdbcTemplatePersistExecutor(JdbcOperations jdbcOperations, JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public JdbcTemplatePersistExecutor(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
     }
 
@@ -137,10 +135,6 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
             ScriptUtils.executeSqlScript(connection, new ByteArrayResource(commandContext.getCommand().getBytes()));
             return null;
         });
-    }
-
-    public void setJdbcOperations(JdbcOperations jdbcOperations) {
-        this.jdbcOperations = jdbcOperations;
     }
 
     private static class InsertPreparedStatementCreator implements PreparedStatementCreator, PreparedStatementSetter, SqlProvider {

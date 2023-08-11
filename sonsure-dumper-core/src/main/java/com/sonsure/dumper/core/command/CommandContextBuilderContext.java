@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class CommandContextBuilderContext {
 
-    private boolean forceNative;
+    private boolean nativeCommand;
 
     private boolean namedParameter;
 
@@ -38,19 +38,19 @@ public class CommandContextBuilderContext {
      * @return the unique model class
      */
     public Class<?> getUniqueModelClass() {
-        final Set<Class<?>> modelClasses = this.getModelClasses();
-        if (modelClasses == null || modelClasses.size() != 1) {
+        final Set<Class<?>> mcs = this.getModelClasses();
+        if (mcs == null || mcs.size() != 1) {
             throw new SonsureJdbcException("当前执行业务不止一个Model Class");
         }
-        return modelClasses.iterator().next();
+        return mcs.iterator().next();
     }
 
-    public boolean isForceNative() {
-        return forceNative;
+    public boolean isNativeCommand() {
+        return nativeCommand;
     }
 
-    public void setForceNative(boolean forceNative) {
-        this.forceNative = forceNative;
+    public void setNativeCommand(boolean nativeCommand) {
+        this.nativeCommand = nativeCommand;
     }
 
     public boolean isNamedParameter() {

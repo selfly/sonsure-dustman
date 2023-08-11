@@ -48,8 +48,8 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
     /**
      * Native command.
      */
-    public void forceNative() {
-        commandContextBuilderContext.setForceNative(true);
+    public void nativeCommand() {
+        commandContextBuilderContext.setNativeCommand(true);
     }
 
     public void namedParameter() {
@@ -73,7 +73,7 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
             ((AbstractMappingHandler) mappingHandler).addClassMapping(this.commandContextBuilderContext.getModelClasses());
         }
 
-        if (!this.commandContextBuilderContext.isForceNative()) {
+        if (!this.commandContextBuilderContext.isNativeCommand()) {
             // todo 需要收集参数信息，待完成
             Map<String, Object> params = Collections.emptyMap();
             final String resolvedCommand = jdbcEngineConfig.getCommandConversionHandler().convert(commandContext.getCommand(), params);
@@ -218,7 +218,7 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
 
 
     protected String getFiledCommandName(CommandField commandField, JdbcEngineConfig jdbcEngineConfig) {
-        if (this.commandContextBuilderContext.isForceNative() && commandField.getType() == CommandField.Type.ENTITY_FIELD) {
+        if (this.commandContextBuilderContext.isNativeCommand() && commandField.getType() == CommandField.Type.ENTITY_FIELD) {
             final MappingHandler mappingHandler = jdbcEngineConfig.getMappingHandler();
             return mappingHandler.getColumn(commandField.getCls(), commandField.getFieldName());
         }
