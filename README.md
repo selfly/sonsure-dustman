@@ -94,10 +94,6 @@
     private JdbcDao jdbcDao;
     
     jdbcDao.get(User.class, 177);
-    
-如果开启了全局模式，可以直接使用Jdbc操作：
-
-    User user = Jdbc.get(User.class, 177);
 
 ## 相关文档
 

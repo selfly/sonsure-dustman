@@ -10,8 +10,16 @@
 package com.sonsure.dumper.springjdbc.persist;
 
 
+import com.sonsure.dumper.core.config.JdbcEngineImpl;
+import com.sonsure.dumper.core.convert.JdbcTypeConverter;
+import com.sonsure.dumper.core.convert.SqliteCompatibleLocalDateTimeConverter;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.AbstractDaoTemplateImpl;
+import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author liyd
@@ -21,15 +29,15 @@ public class SpringJdbcDaoTemplateImpl extends AbstractDaoTemplateImpl implement
 
     @Override
     public void afterPropertiesSet() throws Exception {
-//        if (defaultJdbcEngine == null) {
-//            if (dataSource == null) {
-//                throw new SonsureJdbcException("defaultJdbcEngine和dataSource不能同时为空");
-//            }
-//            JdbcTemplateEngineConfigImpl jdbcTemplateEngineConfig = new JdbcTemplateEngineConfigImpl();
-//            jdbcTemplateEngineConfig.setDataSource(getDataSource());
-//            final List<JdbcTypeConverter> jdbcTypeConverters = Collections.singletonList(new SqliteCompatibleLocalDateTimeConverter());
-//            jdbcTemplateEngineConfig.setJdbcTypeConverters(jdbcTypeConverters);
-//            defaultJdbcEngine = new JdbcEngineImpl(jdbcTemplateEngineConfig);
-//        }
+        if (defaultJdbcEngine == null) {
+            if (dataSource == null) {
+                throw new SonsureJdbcException("defaultJdbcEngine和dataSource不能同时为空");
+            }
+            JdbcTemplateEngineConfigImpl jdbcTemplateEngineConfig = new JdbcTemplateEngineConfigImpl();
+            jdbcTemplateEngineConfig.setDataSource(getDataSource());
+            final List<JdbcTypeConverter> jdbcTypeConverters = Collections.singletonList(new SqliteCompatibleLocalDateTimeConverter());
+            jdbcTemplateEngineConfig.setJdbcTypeConverters(jdbcTypeConverters);
+            defaultJdbcEngine = new JdbcEngineImpl(jdbcTemplateEngineConfig);
+        }
     }
 }

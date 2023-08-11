@@ -26,6 +26,7 @@ import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.config.JdbcEngine;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
+import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.Map;
  * @date 17/4/13
  */
 public abstract class AbstractDaoTemplateImpl implements JdbcDao {
+
+    protected DataSource dataSource;
 
     protected JdbcEngine defaultJdbcEngine;
 
@@ -207,6 +210,14 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
             throw new SonsureJdbcException("jdbcEngine不能为空");
         }
         return this.defaultJdbcEngine;
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public void setDefaultJdbcEngine(JdbcEngine jdbcEngine) {
