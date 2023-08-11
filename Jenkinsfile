@@ -13,7 +13,11 @@ pipeline {
                     if (env.GIT_PREVIOUS_SUCCESSFUL_COMMIT == env.GIT_COMMIT) {
                         echo 'no commit changes，skip build'
                     } else {
-                        sh 'mvn clean deploy -P sonsure'
+                        sh 'mvn clean deploy -P sonsure \
+                            sonar:sonar \
+                            -Dsonar.projectKey=sonsure-dumper \
+                            -Dsonar.host.url=http://192.168.50.2:9000 \
+                            -Dsonar.login=d521448620605d05e7fdb68ebda4130c4a5a19dd'
                     }
                 }
             }
