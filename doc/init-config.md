@@ -40,4 +40,3 @@
 - dataSource 数据源
 - defaultJdbcEngine 默认使用的JdbcEngine
 - jdbcEngineMap 多个JdbcEngine对象Map，多数据源时使用
-- globalJdbc 是否开启全局jdbc模式，默认false

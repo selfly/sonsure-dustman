@@ -30,17 +30,14 @@ import java.util.Map;
  */
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
-    protected String dialect;
-
-    protected boolean forceObtainDialect = false;
-
     protected JdbcEngineConfig jdbcEngineConfig;
+
+    protected String dialect;
 
     @Override
     public String getDialect() {
-        if (StringUtils.isBlank(dialect) || forceObtainDialect) {
+        if (StringUtils.isBlank(dialect)) {
             dialect = this.doGetDialect();
-            return dialect;
         }
         return dialect;
     }
@@ -231,12 +228,5 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
     public void setDialect(String dialect) {
         this.dialect = dialect;
     }
-
-    public boolean isForceObtainDialect() {
-        return forceObtainDialect;
-    }
-
-    public void setForceObtainDialect(boolean forceObtainDialect) {
-        this.forceObtainDialect = forceObtainDialect;
-    }
+    
 }
