@@ -11,6 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.commons.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Transient;
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.lambda.Function;
@@ -31,7 +32,6 @@ public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements
         super(jdbcEngineConfig);
         this.insertCommandContextBuilder = new InsertCommandContextBuilderImpl(new InsertCommandContextBuilderImpl.Context());
     }
-
 
     @Override
     public Insert into(Class<?> cls) {
@@ -72,8 +72,9 @@ public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements
         return getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected AbstractCommandContextBuilder getCommandContextBuilder() {
-        return this.insertCommandContextBuilder;
+    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
+        return (T) insertCommandContextBuilder;
     }
 }

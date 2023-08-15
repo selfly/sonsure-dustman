@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -20,7 +21,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
  * @author liyd
  * @date 17 /4/14
  */
-public class DeleteCommandContextBuilderImpl extends AbstractCommandContextBuilder {
+public class DeleteCommandContextBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private static final String COMMAND_OPEN = "delete from ";
 

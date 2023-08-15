@@ -1,5 +1,6 @@
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class OrderByCommandBuilderImpl extends AbstractCommandContextBuilder {
+public class OrderByCommandBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private final Context orderByContext;
 

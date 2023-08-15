@@ -13,7 +13,6 @@ package com.sonsure.dumper.core.command;
 import com.sonsure.commons.bean.BeanKit;
 import com.sonsure.commons.model.Page;
 import com.sonsure.commons.model.Pagination;
-import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -114,7 +113,7 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
      *
      * @return the command context builder
      */
-    protected abstract AbstractCommandContextBuilder getCommandContextBuilder();
+    protected abstract <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder();
 
     public JdbcEngineConfig getJdbcEngineConfig() {
         return jdbcEngineConfig;

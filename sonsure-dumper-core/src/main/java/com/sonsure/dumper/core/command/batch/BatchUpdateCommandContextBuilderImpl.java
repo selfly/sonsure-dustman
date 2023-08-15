@@ -9,9 +9,9 @@
 
 package com.sonsure.dumper.core.command.batch;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
-import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ import java.util.Collection;
  *
  * @author liyd
  */
-public class BatchUpdateCommandContextBuilderImpl extends AbstractCommandContextBuilder {
+public class BatchUpdateCommandContextBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private final Context batchBuilderContext;
 

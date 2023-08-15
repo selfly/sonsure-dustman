@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -22,7 +23,7 @@ import java.util.List;
  * @author liyd
  * @date 17/4/14
  */
-public class UpdateCommandContextBuilderImpl extends AbstractCommandContextBuilder {
+public class UpdateCommandContextBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private static final String COMMAND_OPEN = "update ";
 

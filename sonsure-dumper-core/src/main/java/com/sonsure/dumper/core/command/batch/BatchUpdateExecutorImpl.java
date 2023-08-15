@@ -9,10 +9,10 @@
 
 package com.sonsure.dumper.core.command.batch;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
-import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.Collection;
@@ -22,7 +22,6 @@ import java.util.Collection;
  *
  * @author liyd
  */
-@SuppressWarnings("rawtypes")
 public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<BatchUpdateExecutor> implements BatchUpdateExecutor {
 
     private final BatchUpdateCommandContextBuilderImpl batchUpdateCommandContextBuilder;
@@ -32,9 +31,10 @@ public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<Batch
         this.batchUpdateCommandContextBuilder = new BatchUpdateCommandContextBuilderImpl(new BatchUpdateCommandContextBuilderImpl.Context());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected AbstractCommandContextBuilder getCommandContextBuilder() {
-        return batchUpdateCommandContextBuilder;
+    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
+        return (T) batchUpdateCommandContextBuilder;
     }
 
     @Override

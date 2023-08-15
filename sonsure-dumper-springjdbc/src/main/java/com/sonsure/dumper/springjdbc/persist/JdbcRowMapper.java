@@ -107,19 +107,6 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
         initialize();
     }
 
-//    /**
-//     * Create a new {@code BeanPropertyRowMapper}.
-//     *
-//     * @param mappedClass         the class that each row should be mapped to
-//     * @param mappingHandler      the mapping handler
-//     * @param checkFullyPopulated whether we're strictly validating that
-//     *                            all bean properties have been mapped from corresponding database fields
-//     */
-//    public JdbcRowMapper(Class<T> mappedClass, MappingHandler mappingHandler, boolean checkFullyPopulated) {
-//        initialize(dialect,mappedClass, mappingHandler);
-//        this.checkFullyPopulated = checkFullyPopulated;
-//    }
-
     /**
      * Get the class that we are mapping to.
      */
@@ -153,14 +140,6 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
         this.primitivesDefaultedForNullValue = primitivesDefaultedForNullValue;
     }
 
-//    /**
-//     * Return whether we're defaulting Java primitives in the case of mapping a null value
-//     * from corresponding database fields.
-//     */
-//    public boolean isPrimitivesDefaultedForNullValue() {
-//        return this.primitivesDefaultedForNullValue;
-//    }
-
     /**
      * Initialize the mapping metadata for the given class.
      */
@@ -173,33 +152,6 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
             }
         }
     }
-//
-//    /**
-//     * Convert a name in camelCase to an underscored name in lower case.
-//     * Any upper case letters are converted to lower case with a preceding underscore.
-//     *
-//     * @param name the original name
-//     * @return the converted name
-//     * @see #lowerCaseName
-//     * @since 4.2
-//     */
-//    protected String underscoreName(String name) {
-//        if (!StringUtils.hasLength(name)) {
-//            return "";
-//        }
-//        StringBuilder result = new StringBuilder();
-//        result.append(lowerCaseName(name.substring(0, 1)));
-//        for (int i = 1; i < name.length(); i++) {
-//            String s = name.substring(i, i + 1);
-//            String slc = lowerCaseName(s);
-//            if (!s.equals(slc)) {
-//                result.append("_").append(slc);
-//            } else {
-//                result.append(s);
-//            }
-//        }
-//        return result.toString();
-//    }
 
     /**
      * Convert the given name to lower case.

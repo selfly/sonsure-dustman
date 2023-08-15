@@ -12,7 +12,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.commons.bean.BeanKit;
 import com.sonsure.commons.model.Page;
-import com.sonsure.commons.model.Pageable;
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.lambda.Function;
@@ -38,9 +38,10 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
         this.selectCommandContextBuilder = new SelectCommandContextBuilderImpl(new SelectCommandContextBuilderImpl.Context());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected AbstractCommandContextBuilder getCommandContextBuilder() {
-        return this.selectCommandContextBuilder;
+    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
+        return (T) selectCommandContextBuilder;
     }
 
     @Override
@@ -117,15 +118,10 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
         return this;
     }
 
+
     @Override
     public Select paginate(int pageNum, int pageSize) {
         this.selectCommandContextBuilder.paginate(pageNum, pageSize);
-        return this;
-    }
-
-    @Override
-    public Select paginate(Pageable pageable) {
-        this.selectCommandContextBuilder.paginate(pageable);
         return this;
     }
 
@@ -161,25 +157,12 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
         return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_SINGLE_RESULT);
     }
 
+
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> singleResult() {
         CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
         return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP);
-    }
-
-    @Override
-    public <T> T firstResult(Class<T> cls) {
-        this.paginate(1, 1).isCount(false);
-        Page<T> page = this.pageResult(cls);
-        return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
-    }
-
-    @Override
-    public Map<String, Object> firstResult() {
-        this.paginate(1, 1).isCount(false);
-        Page<Map<String, Object>> page = this.pageResult();
-        return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -198,13 +181,6 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
         return (List<E>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_ONE_COL_LIST);
     }
 
-    @Override
-    public <T> T oneColFirstResult(Class<T> clazz) {
-        this.paginate(1, 1).isCount(false);
-        Page<T> page = this.oneColPageResult(clazz);
-        return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
@@ -212,6 +188,7 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
         commandContext.setResultType(cls);
         return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_LIST);
     }
+
 
     @SuppressWarnings("unchecked")
     @Override

@@ -153,7 +153,6 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
         }
 
         commandContext.setCommand(command.toString());
-
         return commandContext;
     }
 

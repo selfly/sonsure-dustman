@@ -10,6 +10,8 @@
 package com.sonsure.dumper.core.command;
 
 
+import com.sonsure.commons.model.Pagination;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class CommandContext {
     /**
      * The Command parameters.
      */
-    private List<CommandParameter> commandParameters;
+    private final List<CommandParameter> commandParameters;
 
     /**
      * The Parameters.
@@ -61,6 +63,10 @@ public class CommandContext {
      * 主键值，pkValueByDb=false才有
      */
     private GenerateKey generateKey;
+
+    private Pagination pagination;
+
+    private boolean count;
 
     public CommandContext() {
         isNativeCommand = false;
@@ -139,5 +145,21 @@ public class CommandContext {
 
     public void setNamedParamNames(List<String> namedParamNames) {
         this.namedParamNames = namedParamNames;
+    }
+
+    public Pagination getPagination() {
+        return pagination;
+    }
+
+    public void setPagination(Pagination pagination) {
+        this.pagination = pagination;
+    }
+
+    public boolean isCount() {
+        return count;
+    }
+
+    public void setCount(boolean count) {
+        this.count = count;
     }
 }

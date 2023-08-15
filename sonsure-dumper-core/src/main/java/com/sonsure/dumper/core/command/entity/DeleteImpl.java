@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -29,9 +30,10 @@ public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> impleme
         this.deleteCommandContextBuilder = new DeleteCommandContextBuilderImpl(new DeleteCommandContextBuilderImpl.Context());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected AbstractCommandContextBuilder getCommandContextBuilder() {
-        return this.deleteCommandContextBuilder;
+    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
+        return (T) deleteCommandContextBuilder;
     }
 
     @Override

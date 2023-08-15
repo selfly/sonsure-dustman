@@ -1,12 +1,12 @@
 package com.sonsure.dumper.core.command;
 
 import com.sonsure.commons.model.Pageable;
-import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
+import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 /**
  * @author liyd
  */
-public abstract class QueryCommandContextBuilder extends AbstractCommandContextBuilder {
+public abstract class QueryCommandContextBuilder extends AbstractCommonCommandContextBuilder {
 
     protected QueryCommandContextBuilderContext queryCommandContextBuilderContext;
 
@@ -14,7 +14,6 @@ public abstract class QueryCommandContextBuilder extends AbstractCommandContextB
         super(queryCommandContextBuilderContext);
         this.queryCommandContextBuilderContext = queryCommandContextBuilderContext;
     }
-
 
     public void paginate(int pageNum, int pageSize) {
         this.queryCommandContextBuilderContext.paginate(pageNum, pageSize);
@@ -32,7 +31,11 @@ public abstract class QueryCommandContextBuilder extends AbstractCommandContextB
         this.queryCommandContextBuilderContext.setCount(count);
     }
 
-    public QueryCommandContextBuilderContext getQueryCommandContextBuilderContext() {
-        return queryCommandContextBuilderContext;
+    @Override
+    public CommandContext build(JdbcEngineConfig jdbcEngineConfig) {
+        CommandContext commandContext = super.build(jdbcEngineConfig);
+        commandContext.setPagination(this.queryCommandContextBuilderContext.getPagination());
+        commandContext.setCount(this.queryCommandContextBuilderContext.isCount());
+        return commandContext;
     }
 }

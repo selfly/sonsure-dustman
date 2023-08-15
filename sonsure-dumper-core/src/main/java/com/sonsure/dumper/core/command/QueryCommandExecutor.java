@@ -30,14 +30,6 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
     C paginate(int pageNum, int pageSize);
 
     /**
-     * 分页信息
-     *
-     * @param pageable the pageable
-     * @return select c
-     */
-    C paginate(Pageable pageable);
-
-    /**
      * 指定偏移量和页大小，返回所在页数据
      *
      * @param offset the offset
@@ -76,23 +68,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return t object
      */
-    Map<String,Object> singleResult();
-
-    /**
-     * 第一条结果
-     *
-     * @param <T> the type parameter
-     * @param cls the cls
-     * @return t
-     */
-    <T> T firstResult(Class<T> cls);
-
-    /**
-     * 第一条结果
-     *
-     * @return t object
-     */
-    Map<String,Object> firstResult();
+    Map<String, Object> singleResult();
 
     /**
      * 简单查询，返回单一的结果，例如Long、Integer、String等
@@ -113,15 +89,6 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
     <T> List<T> oneColList(Class<T> clazz);
 
     /**
-     * 简单查询，返回单一的结果，只取第一条
-     *
-     * @param <T>   the type parameter
-     * @param clazz the clazz
-     * @return t
-     */
-    <T> T oneColFirstResult(Class<T> clazz);
-
-    /**
      * 列表查询
      *
      * @param <T> the type parameter
@@ -135,7 +102,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return list
      */
-    List<Map<String,Object>> list();
+    List<Map<String, Object>> list();
 
     /**
      * 分页列表查询
@@ -151,7 +118,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return page
      */
-    Page<Map<String,Object>> pageResult();
+    Page<Map<String, Object>> pageResult();
 
     /**
      * singleColumnList分页查询
@@ -161,4 +128,53 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      * @return page list
      */
     <T> Page<T> oneColPageResult(Class<T> clazz);
+
+
+    /**
+     * 分页信息
+     *
+     * @param pageable the pageable
+     * @return select c
+     */
+    default C paginate(Pageable pageable) {
+        return this.paginate(pageable.getPageNum(), pageable.getPageSize());
+    }
+
+    /**
+     * 第一条结果
+     *
+     * @param <T> the type parameter
+     * @param cls the cls
+     * @return t
+     */
+    default <T> T firstResult(Class<T> cls) {
+        this.paginate(1, 1).isCount(false);
+        Page<T> page = this.pageResult(cls);
+        return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
+    }
+
+    /**
+     * 第一条结果
+     *
+     * @return t object
+     */
+    default Map<String, Object> firstResult() {
+        this.paginate(1, 1).isCount(false);
+        Page<Map<String, Object>> page = this.pageResult();
+        return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
+    }
+
+    /**
+     * 简单查询，返回单一的结果，只取第一条
+     *
+     * @param <T>   the type parameter
+     * @param clazz the clazz
+     * @return t
+     */
+    default <T> T oneColFirstResult(Class<T> clazz) {
+        Page<T> page = this.paginate(1, 1)
+                .isCount(false)
+                .oneColPageResult(clazz);
+        return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
+    }
 }

@@ -1,5 +1,6 @@
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.command.CommandParameter;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * @author liyd
  */
-public class ConditionCommandBuilderImpl extends AbstractCommandContextBuilder {
+public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private final Context conditionContext;
 

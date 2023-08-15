@@ -1,5 +1,6 @@
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class GroupCommandBuilderImpl extends AbstractCommandContextBuilder {
+public class GroupCommandBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private final Context groupContext;
 

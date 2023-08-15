@@ -9,12 +9,12 @@
 
 package com.sonsure.dumper.test.executor;
 
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
-import com.sonsure.dumper.core.command.entity.AbstractCommandContextBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
-public class CountCommandContextBuilder extends AbstractCommandContextBuilder {
+public class CountCommandContextBuilder extends AbstractCommonCommandContextBuilder {
 
     public CountCommandContextBuilder(CommandContextBuilderContext commandContextBuilderContext) {
         super(commandContextBuilderContext);

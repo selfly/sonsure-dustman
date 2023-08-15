@@ -12,6 +12,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.commons.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Transient;
+import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.lambda.Function;
@@ -41,9 +42,10 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
         return this.updateCommandContextBuilder.getConditionCommandBuilder();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected AbstractCommandContextBuilder getCommandContextBuilder() {
-        return null;
+    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
+        return (T) updateCommandContextBuilder;
     }
 
     @Override

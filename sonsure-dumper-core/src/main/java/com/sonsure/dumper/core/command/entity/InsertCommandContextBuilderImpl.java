@@ -10,10 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 
-import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandContextBuilderContext;
-import com.sonsure.dumper.core.command.CommandParameter;
-import com.sonsure.dumper.core.command.GenerateKey;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.management.CommandField;
 import com.sonsure.dumper.core.mapping.MappingHandler;
@@ -27,7 +24,7 @@ import java.util.List;
  * @author liyd
  * @date 17/4/14
  */
-public class InsertCommandContextBuilderImpl extends AbstractCommandContextBuilder {
+public class InsertCommandContextBuilderImpl extends AbstractCommonCommandContextBuilder {
 
     private static final String COMMAND_OPEN = "insert into ";
 

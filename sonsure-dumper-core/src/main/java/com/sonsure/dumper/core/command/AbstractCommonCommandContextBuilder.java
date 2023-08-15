@@ -7,12 +7,8 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.command.entity;
+package com.sonsure.dumper.core.command;
 
-import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.CommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContextBuilderContext;
-import com.sonsure.dumper.core.command.CommandParameter;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -33,11 +29,11 @@ import java.util.stream.Collectors;
  * @author liyd
  * @date 17 /4/12
  */
-public abstract class AbstractCommandContextBuilder implements CommandContextBuilder {
+public abstract class AbstractCommonCommandContextBuilder implements CommandContextBuilder {
 
     private final CommandContextBuilderContext commandContextBuilderContext;
 
-    public AbstractCommandContextBuilder(CommandContextBuilderContext commandContextBuilderContext) {
+    public AbstractCommonCommandContextBuilder(CommandContextBuilderContext commandContextBuilderContext) {
         this.commandContextBuilderContext = commandContextBuilderContext;
     }
 
@@ -128,7 +124,7 @@ public abstract class AbstractCommandContextBuilder implements CommandContextBui
      * @param analyseTableAlias the analyse table alias
      * @return the class field
      */
-    protected CommandField createCommandClassField(String name, boolean analyseTableAlias, CommandField.Type type, Class<?> cls) {
+    public CommandField createCommandClassField(String name, boolean analyseTableAlias, CommandField.Type type, Class<?> cls) {
         return new CommandField(name, analyseTableAlias, type, cls);
     }
 
