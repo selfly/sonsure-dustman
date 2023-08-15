@@ -12,6 +12,7 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.commons.model.Page;
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.UserInfo;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -53,10 +54,9 @@ public class PostgresJdbcTemplateDaoImplTest {
                 .paginate(1, 20)
                 .pageResult(UserInfo.class);
 
-        System.out.println(page.getPagination().getTotalItems());
-
+        Assert.assertTrue(page.getPagination().getTotalItems() > 0);
         for (UserInfo userInfo : page.getList()) {
-            System.out.println(userInfo.getUserInfoId());
+            Assert.assertNotNull(userInfo.getUserInfoId());
         }
     }
 

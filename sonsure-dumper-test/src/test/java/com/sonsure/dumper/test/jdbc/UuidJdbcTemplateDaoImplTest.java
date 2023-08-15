@@ -11,6 +11,7 @@ package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.TestUser;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,7 @@ public class UuidJdbcTemplateDaoImplTest {
         testUser.setUsername("liyd");
 
         String id = (String) daoTemplate.executeInsert(testUser);
-
-        System.out.println(id);
+        Assert.assertNotNull(id);
     }
 
 }

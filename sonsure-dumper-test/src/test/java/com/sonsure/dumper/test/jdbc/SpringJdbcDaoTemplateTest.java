@@ -1130,6 +1130,11 @@ public class SpringJdbcDaoTemplateTest {
                 .executeScript();
         resourceAsStream.close();
 
+        long count = this.daoTemplate.nativeExecutor()
+                .command("select count(*) from ss_user_message")
+                .nativeCommand()
+                .count();
+        Assert.assertEquals(0, count);
     }
 
     @Test
@@ -1204,7 +1209,7 @@ public class SpringJdbcDaoTemplateTest {
         daoTemplate.executeDelete(UserInfo.class);
         String sql = "INSERT INTO USER_INFO (PASSWORD, LOGIN_NAME, GMT_CREATE, USER_AGE, USER_INFO_ID) VALUES (:PASSWORD, :LOGIN_NAME, :GMT_CREATE, :USER_AGE, :USER_INFO_ID)";
         List<Map<String, Object>> userInfoList = new ArrayList<>();
-        for (int i = 1; i < 10000; i++) {
+        for (int i = 1; i <= 10000; i++) {
             Map<String, Object> map = new LinkedCaseInsensitiveMap<>();
             map.put("password", "123456-" + i);
             map.put("login_name", "name-" + i);
@@ -1226,6 +1231,13 @@ public class SpringJdbcDaoTemplateTest {
                     }
                 });
 
+        long count = this.daoTemplate.findCount(UserInfo.class);
+        Assert.assertTrue(count >= 10000);
+
+        long count1 = this.daoTemplate.selectFrom(UserInfo.class)
+                .where(UserInfo::getLoginName, "name-9999")
+                .count();
+        Assert.assertTrue(count1 > 0);
 
     }
 }

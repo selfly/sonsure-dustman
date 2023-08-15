@@ -9,9 +9,9 @@
 
 package com.sonsure.dumper.test.jdbc;
 
-import com.sonsure.commons.spring.Assert;
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.TestUser;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ public class OracleJdbcTemplateDaoImplTest {
 
         Long id = (Long) daoTemplate.executeInsert(testUser);
 
-        Assert.notNull(id);
+        Assert.assertNotNull(id);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class OracleJdbcTemplateDaoImplTest {
         final Long id = daoTemplate.select(TestUser::getTestUserId)
                 .from(TestUser.class)
                 .oneColFirstResult(Long.class);
-        Assert.notNull(id);
+        Assert.assertNotNull(id);
     }
 
 }
