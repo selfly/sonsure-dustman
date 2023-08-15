@@ -12,6 +12,7 @@ package com.sonsure.dumper.core.command.lambda;
 /**
  * 使用 Consumer 会有Result of 'xx.getXxx()' is ignored警告
  *
+ * @author liyd
  * @param <T>
  * @param <R>
  */

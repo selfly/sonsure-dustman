@@ -17,30 +17,19 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ColumnMapping {
 
-    private Column column;
+    private final Column column;
 
-    private String mappingName;
+    private final String mappingName;
+
+    public ColumnMapping(Column column, String mappingName) {
+        this.column = column;
+        this.mappingName = mappingName;
+    }
 
     public String getSmartMappingName() {
         if (StringUtils.isBlank(this.mappingName)) {
             return column.getColumnName();
         }
         return mappingName;
-    }
-
-    public Column getColumn() {
-        return column;
-    }
-
-    public void setColumn(Column column) {
-        this.column = column;
-    }
-
-    public String getMappingName() {
-        return mappingName;
-    }
-
-    public void setMappingName(String mappingName) {
-        this.mappingName = mappingName;
     }
 }

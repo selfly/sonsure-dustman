@@ -185,9 +185,7 @@ public class CommandMappingHandler {
             Map<String, Object> subMap = (Map<String, Object>) obj;
             mappingName = (String) subMap.get(column.getColumnName());
         }
-        ColumnMapping mappingColumn = new ColumnMapping();
-        mappingColumn.setColumn(column);
-        mappingColumn.setMappingName(mappingName);
+        ColumnMapping mappingColumn = new ColumnMapping(column, mappingName);
         mappingColumns.put(column, mappingColumn);
     }
 

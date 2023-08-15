@@ -116,6 +116,21 @@ public class SpringJdbcDaoTemplateTest {
         Assert.assertNull(user);
     }
 
+    @Test
+    public void jdbcDaoNamedDelete() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userInfoId", 39L);
+        int count = daoTemplate.deleteFrom(UserInfo.class)
+                .where()
+                .append("userInfoId = :userInfoId", params)
+                .namedParameter()
+                .execute();
+
+        Assert.assertEquals(1, count);
+        UserInfo user = daoTemplate.get(UserInfo.class, 39L);
+        Assert.assertNull(user);
+    }
+
 
     @Test
     public void jdbcDaoFind() {
@@ -547,6 +562,22 @@ public class SpringJdbcDaoTemplateTest {
                 .oneColPageResult(Long.class);
         Assert.assertEquals(10, page.getList().size());
         Assert.assertEquals(1L, (long) page.getList().get(0));
+    }
+
+    @Test
+    public void selectColumn() {
+        Page<UserInfo> userInfoPage = daoTemplate.select(UserInfo::getLoginName)
+                .from(UserInfo.class)
+                .paginate(1, 10)
+                .pageResult(UserInfo.class);
+        Assert.assertNotNull(userInfoPage.getList());
+        for (UserInfo userInfo : userInfoPage.getList()) {
+            Assert.assertNotNull(userInfo.getLoginName());
+            Assert.assertNull(userInfo.getPassword());
+            Assert.assertNull(userInfo.getUserInfoId());
+            Assert.assertNull(userInfo.getGmtCreate());
+            Assert.assertNull(userInfo.getUserAge());
+        }
     }
 
 

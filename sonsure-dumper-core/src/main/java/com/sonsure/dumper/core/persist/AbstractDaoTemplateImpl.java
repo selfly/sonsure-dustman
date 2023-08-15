@@ -184,10 +184,7 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
 
     @Override
     public void executeScript(String script) {
-        this.nativeExecutor()
-                .command(script)
-                .nativeCommand()
-                .executeScript();
+        this.nativeExecutor().command(script).nativeCommand().executeScript();
     }
 
     @Override

@@ -199,7 +199,7 @@ public interface DaoTemplate {
      * @param <E>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
-     * @return select
+     * @return select select
      */
     <E, R> Select select(Function<E, R> function);
 
@@ -231,7 +231,7 @@ public interface DaoTemplate {
      * @return update update
      */
     Update update();
-    
+
     /**
      * Batch update batch update executor.
      *
