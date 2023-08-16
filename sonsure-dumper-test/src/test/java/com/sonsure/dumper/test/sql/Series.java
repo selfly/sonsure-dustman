@@ -7,7 +7,13 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.model;
+package com.sonsure.dumper.test.sql;
 
-public class TestUser2 {
+public class Series {
+
+    /**
+     * 系列ID
+     */
+    private Long seriesId;
+
 }

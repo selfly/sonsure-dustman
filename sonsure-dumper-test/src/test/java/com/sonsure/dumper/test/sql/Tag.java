@@ -7,30 +7,28 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.model;
+package com.sonsure.dumper.test.sql;
 
 import java.util.Date;
 
-public class RelSeries {
+public class Tag {
 
     /**
-     * 主键id
+     * 标签id
      */
-    private Long relSeriesId;
+    private Long tagId;
 
     /**
-     * 内容id
+     * 标签名
      */
-    private Long contentId;
+    private String tagName;
 
-    /**
-     * 系列id
-     */
-    private Long seriesId;
+    private String tagType;
 
     /**
      * 创建时间
      */
     private Date gmtCreate;
+
 
 }

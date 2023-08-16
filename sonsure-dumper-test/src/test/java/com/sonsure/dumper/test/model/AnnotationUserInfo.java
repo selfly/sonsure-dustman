@@ -24,7 +24,7 @@ import java.util.Date;
  * Date: Wed Dec 24 16:46:48 CST 2014
  */
 @Entity("ktx_user_info")
-public class KUserInfo extends BaseEntity {
+public class AnnotationUserInfo extends BaseEntity {
 
     private static final long serialVersionUID = 8166785520231287816L;
 

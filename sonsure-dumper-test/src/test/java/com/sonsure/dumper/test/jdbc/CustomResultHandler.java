@@ -10,18 +10,18 @@
 package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.command.simple.ResultHandler;
-import com.sonsure.dumper.test.model.AuthCode;
+import com.sonsure.dumper.test.model.UidUser;
 
 import java.util.Map;
 
-public class CustomResultHandler implements ResultHandler<AuthCode> {
+public class CustomResultHandler implements ResultHandler<UidUser> {
 
     @Override
-    public AuthCode handle(Object object) {
+    public UidUser handle(Object object) {
         Map<String, Object> map = (Map<String, Object>) object;
-        AuthCode authCode = new AuthCode();
-        authCode.setCode((String) map.get("LOGIN_NAME"));
-        authCode.setName((String) map.get("PASSWORD"));
-        return authCode;
+        UidUser uidUser = new UidUser();
+        uidUser.setLoginName((String) map.get("LOGIN_NAME"));
+        uidUser.setPassword((String) map.get("PASSWORD"));
+        return uidUser;
     }
 }

@@ -12,9 +12,10 @@ package com.sonsure.dumper.core.mapping;
 /**
  * 默认名称处理handler
  * <p>
- * User: liyd
  * Date: 2/12/14
  * Time: 4:51 PM
+ *
+ * @author liyd
  */
 public class DefaultMappingHandler extends AbstractMappingHandler {
 
@@ -23,7 +24,7 @@ public class DefaultMappingHandler extends AbstractMappingHandler {
     }
 
     public DefaultMappingHandler(String modelPackages) {
-        super(modelPackages);
+        this(modelPackages, null);
     }
 
     public DefaultMappingHandler(String modelPackages, ClassLoader classLoader) {

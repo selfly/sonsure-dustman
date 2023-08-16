@@ -22,9 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 
 /**
- * rasp下构建失败，暂时忽略
+ * hibernate测试
  */
-//@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-hibernate.xml"})
 public class HibernateDaoTemplateTest {

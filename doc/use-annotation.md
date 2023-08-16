@@ -75,7 +75,7 @@
     int count = jdbcDao.executeUpdate(ku);
     
     //get
-    KUserInfo kUserInfo = jdbcDao.get(KUserInfo.class, id);
+    KUserInfo annotationUserInfo = jdbcDao.get(KUserInfo.class, id);
     
     //delete
     int count = jdbcDao.executeDelete(KUserInfo.class, id);

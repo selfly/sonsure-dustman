@@ -11,8 +11,7 @@ package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.core.persist.FlexibleDaoTemplate;
-import com.sonsure.dumper.core.persist.Jdbc;
-import com.sonsure.dumper.test.model.TestUser;
+import com.sonsure.dumper.test.model.OracleUser;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -75,23 +74,23 @@ public class MultiDsJdbcDaoTest {
     @Test
     public void oracleDsJdbcDaoTest() {
 
-        daoTemplate.use("oracle").executeDelete(TestUser.class);
+        daoTemplate.use("oracle").executeDelete(OracleUser.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
-            TestUser testUser = new TestUser();
-            testUser.setUsername("liyd");
+            OracleUser oracleUser = new OracleUser();
+            oracleUser.setUsername("liyd");
 
-            daoTemplate.use("oracle").executeInsert(testUser);
+            daoTemplate.use("oracle").executeInsert(oracleUser);
         }
-        long count = daoTemplate.use("oracle").findCount(TestUser.class);
+        long count = daoTemplate.use("oracle").findCount(OracleUser.class);
         Assert.assertEquals(count, 5);
     }
 
     @Test
     public void jdbcDefaultDsJdbcDaoTest() {
 
-        Jdbc.executeDelete(UserInfo.class);
+        daoTemplate.executeDelete(UserInfo.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -100,16 +99,16 @@ public class MultiDsJdbcDaoTest {
             user.setUserAge(i);
             user.setPassword("123456-" + i);
             user.setGmtCreate(new Date());
-            Jdbc.executeInsert(user);
+            daoTemplate.executeInsert(user);
         }
-        long count = Jdbc.findCount(UserInfo.class);
+        long count = daoTemplate.findCount(UserInfo.class);
         Assert.assertEquals(count, 5);
     }
 
     @Test
     public void jdbcMysqlDsJdbcDaoTest() {
 
-        Jdbc.use("mysql").executeDelete(UserInfo.class);
+        daoTemplate.use("mysql").executeDelete(UserInfo.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -118,25 +117,25 @@ public class MultiDsJdbcDaoTest {
             user.setUserAge(i);
             user.setPassword("123456-" + i);
             user.setGmtCreate(new Date());
-            Jdbc.use("mysql").executeInsert(user);
+            daoTemplate.use("mysql").executeInsert(user);
         }
-        long count = Jdbc.use("mysql").findCount(UserInfo.class);
+        long count = daoTemplate.use("mysql").findCount(UserInfo.class);
         Assert.assertEquals(count, 5);
     }
 
     @Test
     public void jdbcOracleDsJdbcDaoTest() {
 
-        Jdbc.use("oracle").executeDelete(TestUser.class);
+        daoTemplate.use("oracle").executeDelete(OracleUser.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
-            TestUser testUser = new TestUser();
-            testUser.setUsername("liyd");
+            OracleUser oracleUser = new OracleUser();
+            oracleUser.setUsername("liyd");
 
-            Jdbc.use("oracle").executeInsert(testUser);
+            daoTemplate.use("oracle").executeInsert(oracleUser);
         }
-        long count = Jdbc.use("oracle").findCount(TestUser.class);
+        long count = daoTemplate.use("oracle").findCount(OracleUser.class);
         Assert.assertEquals(count, 5);
     }
 
@@ -144,7 +143,7 @@ public class MultiDsJdbcDaoTest {
     public void use() {
 
         try {
-            daoTemplate.use("oracle").use("oracle").executeDelete(TestUser.class);
+            daoTemplate.use("oracle").use("oracle").executeDelete(OracleUser.class);
         } catch (UnsupportedOperationException e) {
             Assert.assertEquals("不支持的方法", e.getMessage());
         }

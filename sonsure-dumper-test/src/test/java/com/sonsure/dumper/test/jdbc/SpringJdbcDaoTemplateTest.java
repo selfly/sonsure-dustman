@@ -16,8 +16,7 @@ import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.JdbcDao;
-import com.sonsure.dumper.test.model.AuthCode;
-import com.sonsure.dumper.test.model.KUserInfo;
+import com.sonsure.dumper.test.model.AnnotationUserInfo;
 import com.sonsure.dumper.test.model.UidUser;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.Assert;
@@ -275,7 +274,7 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void insertForAnnotation() {
 
-        KUserInfo ku = new KUserInfo();
+        AnnotationUserInfo ku = new AnnotationUserInfo();
         ku.setLoginName("selfly");
         ku.setPassword("123456");
         ku.setUserAge(18);
@@ -284,9 +283,9 @@ public class SpringJdbcDaoTemplateTest {
 
         Long id = (Long) daoTemplate.executeInsert(ku);
 
-        KUserInfo kUserInfo = daoTemplate.get(KUserInfo.class, id);
-        Assert.assertEquals("selfly", kUserInfo.getLoginName());
-        Assert.assertEquals("123456", kUserInfo.getPassword());
+        AnnotationUserInfo annotationUserInfo = daoTemplate.get(AnnotationUserInfo.class, id);
+        Assert.assertEquals("selfly", annotationUserInfo.getLoginName());
+        Assert.assertEquals("123456", annotationUserInfo.getPassword());
     }
 
     @Test
@@ -611,9 +610,9 @@ public class SpringJdbcDaoTemplateTest {
 
     @Test
     public void selectForAnnotation() {
-        Page<KUserInfo> page = daoTemplate.selectFrom(KUserInfo.class)
+        Page<AnnotationUserInfo> page = daoTemplate.selectFrom(AnnotationUserInfo.class)
                 .paginate(1, 10)
-                .pageResult(KUserInfo.class);
+                .pageResult(AnnotationUserInfo.class);
         Assert.assertTrue(page.getList().size() > 0);
         Assert.assertNotNull(page.getList().get(0).getLoginName());
     }
@@ -726,22 +725,22 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void insertAnnotation() {
 
-        KUserInfo ku = new KUserInfo();
+        AnnotationUserInfo ku = new AnnotationUserInfo();
         ku.setLoginName("insertName");
         ku.setPassword("123456");
         ku.setUserAge(18);
         ku.setGmtCreate(new Date());
         Long id = (Long) daoTemplate.executeInsert(ku);
 
-        KUserInfo kUserInfo = daoTemplate.get(KUserInfo.class, id);
-        Assert.assertEquals(ku.getLoginName(), kUserInfo.getLoginName());
-        Assert.assertEquals(ku.getPassword(), kUserInfo.getPassword());
+        AnnotationUserInfo annotationUserInfo = daoTemplate.get(AnnotationUserInfo.class, id);
+        Assert.assertEquals(ku.getLoginName(), annotationUserInfo.getLoginName());
+        Assert.assertEquals(ku.getPassword(), annotationUserInfo.getPassword());
     }
 
     @Test
     public void updateAnnotation() {
 
-        KUserInfo ku = new KUserInfo();
+        AnnotationUserInfo ku = new AnnotationUserInfo();
         ku.setRowId(36L);
         ku.setLoginName("777777");
         ku.setPassword("787878");
@@ -753,11 +752,11 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void deleteAnnotation() {
 
-        KUserInfo ku = new KUserInfo();
+        AnnotationUserInfo ku = new AnnotationUserInfo();
         ku.setLoginName("liyd");
         Serializable id = (Serializable) daoTemplate.executeInsert(ku);
 
-        int count = daoTemplate.executeDelete(KUserInfo.class, id);
+        int count = daoTemplate.executeDelete(AnnotationUserInfo.class, id);
         Assert.assertEquals(1, count);
     }
 
@@ -999,15 +998,15 @@ public class SpringJdbcDaoTemplateTest {
 
     @Test
     public void nativeResultHandler() {
-        //这里只演示把结果转为AuthCode类
-        Page<AuthCode> page = daoTemplate.nativeExecutor()
+        //这里只演示把结果转为UidUser类
+        Page<UidUser> page = daoTemplate.nativeExecutor()
                 .command("select * from UserInfo order by userInfoId asc")
                 .paginate(2, 5)
                 .resultHandler(new CustomResultHandler())
-                .pageResult(AuthCode.class);
+                .pageResult(UidUser.class);
         Assert.assertEquals(5, page.getList().size());
-        Assert.assertEquals("name-6", page.getList().get(0).getCode());
-        Assert.assertEquals("name-10", page.getList().get(4).getCode());
+        Assert.assertEquals("name-6", page.getList().get(0).getLoginName());
+        Assert.assertEquals("name-10", page.getList().get(4).getLoginName());
     }
 
     @Test

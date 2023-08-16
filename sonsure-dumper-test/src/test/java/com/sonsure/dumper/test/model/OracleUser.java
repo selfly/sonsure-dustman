@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.model;
 
-public class TestUser {
+public class OracleUser {
 
     private String testUserId;
     private String username;
