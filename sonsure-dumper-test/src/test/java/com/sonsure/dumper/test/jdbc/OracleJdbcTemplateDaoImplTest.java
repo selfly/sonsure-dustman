@@ -43,7 +43,7 @@ public class OracleJdbcTemplateDaoImplTest {
 
     @Test
     public void oneCol() {
-        final Long id = daoTemplate.select(OracleUser::getTestUserId)
+        final Long id = daoTemplate.select(OracleUser::getOracleUserId)
                 .from(OracleUser.class)
                 .oneColFirstResult(Long.class);
         Assert.assertNotNull(id);

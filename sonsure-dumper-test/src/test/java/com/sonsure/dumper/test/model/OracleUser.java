@@ -11,15 +11,15 @@ package com.sonsure.dumper.test.model;
 
 public class OracleUser {
 
-    private String testUserId;
+    private String oracleUserId;
     private String username;
 
-    public String getTestUserId() {
-        return testUserId;
+    public String getOracleUserId() {
+        return oracleUserId;
     }
 
-    public void setTestUserId(String testUserId) {
-        this.testUserId = testUserId;
+    public void setOracleUserId(String oracleUserId) {
+        this.oracleUserId = oracleUserId;
     }
 
     public String getUsername() {
