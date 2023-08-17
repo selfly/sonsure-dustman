@@ -602,7 +602,7 @@ public class SpringJdbcDaoTemplateTest {
 
         List<Map<String, Object>> list1 = daoTemplate.select("t1.loginName as name1", "t2.loginName as name2").from(UserInfo.class, "t1", Account.class, "t2")
                 .where()
-                .append("t1.userInfoId = t2.account")
+                .append("t1.userInfoId = t2.accountId")
                 .list();
 
         Assert.assertNotNull(list1);
