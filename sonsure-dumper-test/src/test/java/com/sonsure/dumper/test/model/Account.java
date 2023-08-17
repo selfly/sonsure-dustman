@@ -15,11 +15,11 @@ import com.sonsure.commons.model.Pageable;
 /**
  * Created by liyd on 17/6/7.
  */
-public class UidUser extends Pageable {
+public class Account extends Pageable {
 
-	private static final long serialVersionUID = -188967944235979673L;
+    private static final long serialVersionUID = -188967944235979673L;
 
-	String uidUserId;
+    private Long accountId;
 
     String loginName;
 
@@ -27,12 +27,12 @@ public class UidUser extends Pageable {
 
     Integer userAge;
 
-    public String getUidUserId() {
-        return uidUserId;
+    public Long getAccountId() {
+        return accountId;
     }
 
-    public void setUidUserId(String uidUserId) {
-        this.uidUserId = uidUserId;
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
     }
 
     public String getLoginName() {

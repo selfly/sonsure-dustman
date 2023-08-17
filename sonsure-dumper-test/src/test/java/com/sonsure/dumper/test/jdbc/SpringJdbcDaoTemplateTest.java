@@ -16,8 +16,8 @@ import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.JdbcDao;
+import com.sonsure.dumper.test.model.Account;
 import com.sonsure.dumper.test.model.AnnotationUserInfo;
-import com.sonsure.dumper.test.model.UidUser;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.Assert;
 import org.junit.Before;
@@ -594,15 +594,15 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void singleResultObject2() {
 
-        List<Map<String, Object>> list = daoTemplate.select().from(UserInfo.class, "t1", UidUser.class, "t2")
-                .where("{{t1.userInfoId}}", "t2.uidUserId")
+        List<Map<String, Object>> list = daoTemplate.select().from(UserInfo.class, "t1", Account.class, "t2")
+                .where("{{t1.userInfoId}}", "t2.accountId")
                 .list();
 
         Assert.assertNotNull(list);
 
-        List<Map<String, Object>> list1 = daoTemplate.select("t1.loginName as name1", "t2.loginName as name2").from(UserInfo.class, "t1", UidUser.class, "t2")
+        List<Map<String, Object>> list1 = daoTemplate.select("t1.loginName as name1", "t2.loginName as name2").from(UserInfo.class, "t1", Account.class, "t2")
                 .where()
-                .append("t1.userInfoId = t2.uidUserId")
+                .append("t1.userInfoId = t2.account")
                 .list();
 
         Assert.assertNotNull(list1);
@@ -999,11 +999,11 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void nativeResultHandler() {
         //这里只演示把结果转为UidUser类
-        Page<UidUser> page = daoTemplate.nativeExecutor()
+        Page<Account> page = daoTemplate.nativeExecutor()
                 .command("select * from UserInfo order by userInfoId asc")
                 .paginate(2, 5)
                 .resultHandler(new CustomResultHandler())
-                .pageResult(UidUser.class);
+                .pageResult(Account.class);
         Assert.assertEquals(5, page.getList().size());
         Assert.assertEquals("name-6", page.getList().get(0).getLoginName());
         Assert.assertEquals("name-10", page.getList().get(4).getLoginName());

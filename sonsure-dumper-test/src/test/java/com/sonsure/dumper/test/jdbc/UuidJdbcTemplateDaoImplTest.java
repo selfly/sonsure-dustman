@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.persist.DaoTemplate;
-import com.sonsure.dumper.test.model.UidUser;
+import com.sonsure.dumper.test.model.UuidUser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,10 +32,10 @@ public class UuidJdbcTemplateDaoImplTest {
     @Test
     public void jdbcDaoInsert() {
 
-        UidUser uidUser = new UidUser();
-        uidUser.setLoginName("liyd");
-
-        String id = (String) daoTemplate.executeInsert(uidUser);
+        UuidUser user = new UuidUser();
+        user.setLoginName("liyd");
+        user.setPassword("123456");
+        String id = (String) daoTemplate.executeInsert(user);
         Assert.assertNotNull(id);
     }
 
