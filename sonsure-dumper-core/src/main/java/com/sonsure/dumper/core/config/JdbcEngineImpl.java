@@ -188,6 +188,11 @@ public class JdbcEngineImpl implements JdbcEngine {
         return this.delete().from(cls).execute();
     }
 
+    @Override
+    public String getDatabaseProduct() {
+        return this.getJdbcEngineConfig().getPersistExecutor().getDialect();
+    }
+
     public void setJdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
     }

@@ -280,4 +280,11 @@ public interface DaoTemplate {
      * @return t
      */
     <T extends CommandExecutor> T executor(Class<T> executor);
+
+    /**
+     * Gets database product.
+     *
+     * @return the database product
+     */
+    String getDatabaseProduct();
 }

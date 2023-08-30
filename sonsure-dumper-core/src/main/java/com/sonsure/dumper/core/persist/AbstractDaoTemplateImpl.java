@@ -202,6 +202,11 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
         return this.getDefaultJdbcEngine().createExecutor(executor);
     }
 
+    @Override
+    public String getDatabaseProduct() {
+        return this.getDefaultJdbcEngine().getDatabaseProduct();
+    }
+
     public JdbcEngine getDefaultJdbcEngine() {
         if (this.defaultJdbcEngine == null) {
             throw new SonsureJdbcException("jdbcEngine不能为空");

@@ -258,5 +258,10 @@ public interface JdbcEngine {
      */
     <T> T get(Class<T> cls, Serializable id);
 
-
+    /**
+     * Gets database product.
+     *
+     * @return the database product
+     */
+    String getDatabaseProduct();
 }
