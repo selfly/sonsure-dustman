@@ -38,7 +38,7 @@
             <value>${jdbcUrl}</value>
         </property>
         <property name="username">
-            <value>${username}</value>
+            <value>${jdbcUsername}</value>
         </property>
         <property name="password">
             <value>${password}</value>

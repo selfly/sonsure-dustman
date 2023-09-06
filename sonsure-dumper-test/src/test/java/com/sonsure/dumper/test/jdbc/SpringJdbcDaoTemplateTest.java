@@ -12,6 +12,7 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.commons.model.Page;
 import com.sonsure.commons.model.Pageable;
 import com.sonsure.commons.utils.FileIOUtils;
+import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -31,6 +32,8 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -46,9 +49,9 @@ public class SpringJdbcDaoTemplateTest {
 
     @Before
     public void before() {
-        //初始化测试数据
-        daoTemplate.deleteFrom(UserInfo.class)
-                .execute();
+
+        daoTemplate.executeDelete(UserInfo.class);
+        List<UserInfo> users = new ArrayList<>();
         for (int i = 1; i < 51; i++) {
             UserInfo user = new UserInfo();
             user.setUserInfoId((long) i);
@@ -57,18 +60,29 @@ public class SpringJdbcDaoTemplateTest {
             user.setUserAge(i);
             user.setGmtCreate(new Date());
 
-            daoTemplate.executeInsert(user);
+            users.add(user);
         }
-    }
 
+        String sql = "insert into UserInfo(userInfoId,loginName,password,userAge,gmtCreate) values(?,?,?,?,?)";
+        daoTemplate.executeBatchUpdate(sql, users, users.size(), new ParameterizedSetter<UserInfo>() {
+            @Override
+            public void setValues(PreparedStatement ps, List<String> paramNames, UserInfo argument) throws SQLException {
+                ps.setLong(1, argument.getUserInfoId());
+                ps.setString(2, argument.getLoginName());
+                ps.setString(3, argument.getPassword());
+                ps.setInt(4, argument.getUserAge());
+                ps.setObject(5, argument.getGmtCreate());
+            }
+        });
+    }
 
     @Test
     public void jdbcDaoGet() {
-        UserInfo user = daoTemplate.get(UserInfo.class, 30L);
+        UserInfo user = daoTemplate.get(UserInfo.class, 1L);
         Assert.assertNotNull(user);
-        Assert.assertEquals(30L, (long) user.getUserInfoId());
-        Assert.assertEquals("name-30", user.getLoginName());
-        Assert.assertEquals("123456-30", user.getPassword());
+        Assert.assertEquals(1L, (long) user.getUserInfoId());
+        Assert.assertEquals("name-1", user.getLoginName());
+        Assert.assertEquals("123456-1", user.getPassword());
     }
 
     @Test
@@ -92,16 +106,16 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void jdbcDaoUpdate() {
         UserInfo user = new UserInfo();
-        user.setUserInfoId(20L);
+        user.setUserInfoId(2L);
         user.setPassword("666666");
         user.setLoginName("666777");
         user.setGmtModify(new Date());
         int count = daoTemplate.executeUpdate(user);
         Assert.assertEquals(1, count);
 
-        UserInfo user1 = daoTemplate.get(UserInfo.class, 20L);
+        UserInfo user1 = daoTemplate.get(UserInfo.class, 2L);
         Assert.assertNotNull(user1);
-        Assert.assertEquals(20L, (long) user1.getUserInfoId());
+        Assert.assertEquals(2L, (long) user1.getUserInfoId());
         Assert.assertEquals("666777", user1.getLoginName());
         Assert.assertEquals("666666", user1.getPassword());
         Assert.assertNotNull(user1.getGmtModify());
@@ -109,16 +123,16 @@ public class SpringJdbcDaoTemplateTest {
 
     @Test
     public void jdbcDaoDelete() {
-        int count = daoTemplate.executeDelete(UserInfo.class, 38L);
+        int count = daoTemplate.executeDelete(UserInfo.class, 3L);
         Assert.assertEquals(1, count);
-        UserInfo user = daoTemplate.get(UserInfo.class, 38L);
+        UserInfo user = daoTemplate.get(UserInfo.class, 3L);
         Assert.assertNull(user);
     }
 
     @Test
     public void jdbcDaoNamedDelete() {
         Map<String, Object> params = new HashMap<>();
-        params.put("userInfoId", 39L);
+        params.put("userInfoId", 4L);
         int count = daoTemplate.deleteFrom(UserInfo.class)
                 .where()
                 .append("userInfoId = :userInfoId", params)
@@ -126,7 +140,7 @@ public class SpringJdbcDaoTemplateTest {
                 .execute();
 
         Assert.assertEquals(1, count);
-        UserInfo user = daoTemplate.get(UserInfo.class, 39L);
+        UserInfo user = daoTemplate.get(UserInfo.class, 4L);
         Assert.assertNull(user);
     }
 
@@ -135,7 +149,8 @@ public class SpringJdbcDaoTemplateTest {
     public void jdbcDaoFind() {
         List<UserInfo> users = daoTemplate.find(UserInfo.class);
         Assert.assertNotNull(users);
-        Assert.assertEquals(50, users.size());
+        long count = daoTemplate.findCount(UserInfo.class);
+        Assert.assertEquals(count, users.size());
     }
 
     @Test
@@ -764,13 +779,20 @@ public class SpringJdbcDaoTemplateTest {
     @Test
     public void updateNative() {
 
+        UserInfo user = new UserInfo();
+        user.setLoginName("name-native");
+        user.setPassword("123456-native");
+        user.setUserAge(17);
+        user.setGmtCreate(new Date());
+
+        Long id = (Long) daoTemplate.executeInsert(user);
         daoTemplate.update(UserInfo.class)
                 .set("{{userAge}}", "userAge+1")
-                .where("userInfoId", 17L)
+                .where("userInfoId", id)
                 .execute();
 
-        UserInfo user = daoTemplate.get(UserInfo.class, 17L);
-        Assert.assertEquals(18, (int) user.getUserAge());
+        UserInfo user2 = daoTemplate.get(UserInfo.class, id);
+        Assert.assertEquals(18, (int) user2.getUserAge());
     }
 
     @Test
