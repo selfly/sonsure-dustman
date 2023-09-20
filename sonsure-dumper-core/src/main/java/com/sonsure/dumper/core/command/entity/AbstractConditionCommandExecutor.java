@@ -152,12 +152,16 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
             count++;
         }
         //防止属性全为null的情况
+        int whereFieldSize = fieldList.size();
         if (!fieldList.isEmpty()) {
             this.getConditionCommandBuilder().addWhereField(wholeLogicalOperator, null, null, null, null);
             this.begin();
             this.getConditionCommandBuilder().addWhereFields(fieldList);
             this.end();
+
+            whereFieldSize += 3;
         }
+        this.getConditionCommandBuilder().setLastWhereFieldSize(whereFieldSize);
         return (T) this;
     }
 
@@ -275,6 +279,14 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     @Override
     public T append(String segment, Map<String, Object> params) {
         this.getConditionCommandBuilder().addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        return (T) this;
+    }
+
+    @Override
+    public T with(boolean with) {
+        if (!with) {
+            this.getConditionCommandBuilder().removeLastWhereFields();
+        }
         return (T) this;
     }
 }

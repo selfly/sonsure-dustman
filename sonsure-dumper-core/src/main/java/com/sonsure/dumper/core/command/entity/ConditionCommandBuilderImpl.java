@@ -41,6 +41,14 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
         this.conditionContext.addWhereFields(commandFields);
     }
 
+    public void setLastWhereFieldSize(int size) {
+        this.conditionContext.setLastFieldSize(size);
+    }
+
+    public void removeLastWhereFields() {
+        this.conditionContext.removeLastWhereFields();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
@@ -172,6 +180,8 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
 
         private final List<CommandField> whereFields;
 
+        private int lastFieldSize = 1;
+
         public Context() {
             this.whereFields = new ArrayList<>();
         }
@@ -186,6 +196,16 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
 
         public List<CommandField> getWhereFields() {
             return whereFields;
+        }
+
+        public void removeLastWhereFields() {
+            for (int i = this.lastFieldSize; i > 0; i--) {
+                this.getWhereFields().remove(this.getWhereFields().size() - 1);
+            }
+        }
+
+        public void setLastFieldSize(int size) {
+            this.lastFieldSize = size;
         }
     }
 

@@ -342,4 +342,11 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      */
     C append(String segment, Map<String, Object> params);
 
+    /**
+     * 如果传入false，上一个条件将被删除
+     *
+     * @param with the with
+     * @return the c
+     */
+    C with(boolean with);
 }
