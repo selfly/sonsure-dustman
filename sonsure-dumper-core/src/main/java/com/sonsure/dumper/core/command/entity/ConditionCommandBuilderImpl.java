@@ -49,6 +49,14 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
         this.conditionContext.removeLastWhereFields();
     }
 
+    public void setIf(boolean iff) {
+        this.conditionContext.setIfCondition(iff);
+    }
+
+    public boolean isIf() {
+        return this.conditionContext.isIfCondition();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
@@ -180,6 +188,8 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
 
         private final List<CommandField> whereFields;
 
+        private boolean ifCondition = true;
+
         private int lastFieldSize = 1;
 
         public Context() {
@@ -202,6 +212,14 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
             for (int i = this.lastFieldSize; i > 0; i--) {
                 this.getWhereFields().remove(this.getWhereFields().size() - 1);
             }
+        }
+
+        public boolean isIfCondition() {
+            return ifCondition;
+        }
+
+        public void setIfCondition(boolean condition) {
+            this.ifCondition = condition;
         }
 
         public void setLastFieldSize(int size) {

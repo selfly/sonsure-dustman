@@ -36,12 +36,16 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
         super(jdbcEngineConfig);
     }
 
+    /**
+     * Gets condition command builder.
+     *
+     * @return the condition command builder
+     */
     protected abstract ConditionCommandBuilderImpl getConditionCommandBuilder();
 
     @Override
     public T where() {
-        this.getConditionCommandBuilder().addWhereField("where", null, null, null, null);
-        return (T) this;
+        return this.addWhereField("where", null, null, null, null);
     }
 
     @Override
@@ -72,15 +76,15 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
-    public T where(String field, String operator, Object... values) {
-        this.getConditionCommandBuilder().addWhereField("where", field, operator, values, null);
+    public <E, R> T where(Function<E, R> function, String operator, Object... values) {
+        String field = LambdaMethod.getField(function);
+        this.where(field, operator, values);
         return (T) this;
     }
 
     @Override
-    public <E, R> T where(Function<E, R> function, String operator, Object... values) {
-        String field = LambdaMethod.getField(function);
-        this.where(field, operator, values);
+    public T where(String field, String operator, Object... values) {
+        this.addWhereField("where", field, operator, values, null);
         return (T) this;
     }
 
@@ -110,15 +114,15 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
-    public T condition(String field, String operator, Object... values) {
-        this.getConditionCommandBuilder().addWhereField(null, field, operator, values, null);
+    public <E, R> T condition(Function<E, R> function, String operator, Object... values) {
+        String field = LambdaMethod.getField(function);
+        this.condition(field, operator, values);
         return (T) this;
     }
 
     @Override
-    public <E, R> T condition(Function<E, R> function, String operator, Object... values) {
-        String field = LambdaMethod.getField(function);
-        this.condition(field, operator, values);
+    public T condition(String field, String operator, Object... values) {
+        this.addWhereField(null, field, operator, values, null);
         return (T) this;
     }
 
@@ -135,6 +139,10 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     @Override
     public T conditionEntity(Object entity, String wholeLogicalOperator, String fieldLogicalOperator) {
 
+        if (!this.getConditionCommandBuilder().isIf()) {
+            iff(true);
+            return (T) this;
+        }
         Map<String, Object> beanPropMap = ClassUtils.getSelfBeanPropMap(entity, Transient.class);
 
         int count = 1;
@@ -167,7 +175,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T and() {
-        this.getConditionCommandBuilder().addWhereField("and", null, null, null, null);
+        this.addWhereField("and", null, null, null, null);
         return (T) this;
     }
 
@@ -199,12 +207,6 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
-    public T and(String field, String operator, Object... values) {
-        this.getConditionCommandBuilder().addWhereField("and", field, operator, values, null);
-        return (T) this;
-    }
-
-    @Override
     public <E, R> T and(Function<E, R> function, String operator, Object... values) {
         String field = LambdaMethod.getField(function);
         this.and(field, operator, values);
@@ -212,8 +214,14 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
+    public T and(String field, String operator, Object... values) {
+        this.addWhereField("and", field, operator, values, null);
+        return (T) this;
+    }
+
+    @Override
     public T or() {
-        this.getConditionCommandBuilder().addWhereField("or", null, null, null, null);
+        this.addWhereField("or", null, null, null, null);
         return (T) this;
     }
 
@@ -243,12 +251,6 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
-    public T or(String field, String operator, Object... values) {
-        this.getConditionCommandBuilder().addWhereField("or", field, operator, values, null);
-        return (T) this;
-    }
-
-    @Override
     public <E, R> T or(Function<E, R> function, String operator, Object... values) {
         String field = LambdaMethod.getField(function);
         this.or(field, operator, values);
@@ -256,14 +258,20 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
+    public T or(String field, String operator, Object... values) {
+        this.addWhereField("or", field, operator, values, null);
+        return (T) this;
+    }
+
+    @Override
     public T begin() {
-        this.getConditionCommandBuilder().addWhereField("(", null, null, null, null);
+        this.addWhereField("(", null, null, null, null);
         return (T) this;
     }
 
     @Override
     public T end() {
-        this.getConditionCommandBuilder().addWhereField(")", null, null, null, null);
+        this.addWhereField(")", null, null, null, null);
         return (T) this;
     }
 
@@ -272,13 +280,19 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
         if (this.getConditionCommandBuilder().getCommandContextBuilderContext().isNamedParameter()) {
             throw new SonsureJdbcException("Named Parameter 方式不能使用数组传参");
         }
-        this.getConditionCommandBuilder().addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        this.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
         return (T) this;
     }
 
     @Override
     public T append(String segment, Map<String, Object> params) {
-        this.getConditionCommandBuilder().addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        this.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
+        return (T) this;
+    }
+
+    @Override
+    public T iff(boolean iff) {
+        this.getConditionCommandBuilder().setIf(iff);
         return (T) this;
     }
 
@@ -287,6 +301,14 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
         if (!with) {
             this.getConditionCommandBuilder().removeLastWhereFields();
         }
+        return (T) this;
+    }
+
+    private T addWhereField(String logicalOperator, String name, String fieldOperator, Object value, CommandField.Type type) {
+        if (this.getConditionCommandBuilder().isIf()) {
+            this.getConditionCommandBuilder().addWhereField(logicalOperator, name, fieldOperator, value, type);
+        }
+        iff(true);
         return (T) this;
     }
 }
