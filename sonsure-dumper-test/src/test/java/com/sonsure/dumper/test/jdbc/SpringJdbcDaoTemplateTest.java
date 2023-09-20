@@ -1329,6 +1329,20 @@ public class SpringJdbcDaoTemplateTest {
                 .iff(user.getPassword() != null).conditionEntity(user)
                 .count();
         Assert.assertEquals(51, count3);
+
+        long count4 = this.daoTemplate.selectFrom(UserInfo.class)
+                .where()
+                .iff(user.getPassword() != null).conditionEntity(user)
+                .condition(UserInfo::getLoginName, "name-5")
+                .count();
+        Assert.assertEquals(1, count4);
+
+        long count5 = this.daoTemplate.selectFrom(UserInfo.class)
+                .where()
+                .iff(addUser.getUserAge() != null).condition(UserInfo::getUserAge, addUser.getUserAge())
+                .and(UserInfo::getPassword, addUser.getPassword())
+                .count();
+        Assert.assertEquals(1, count5);
     }
 
     @Test
