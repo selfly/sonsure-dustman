@@ -9,8 +9,7 @@
 
 package com.sonsure.dumper.core.page;
 
-
-import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.common.model.Pagination;
 
 /**
  * Created by liyd on 16/6/8.
@@ -20,15 +19,15 @@ public interface PageHandler {
     /**
      * 是否支持当前数据库的分页
      *
-     * @param dialect
-     * @return
+     * @param dialect the dialect
+     * @return boolean
      */
     boolean support(String dialect);
 
     /**
      * 根据查询语句获取count语句
      *
-     * @param command
+     * @param command the command
      * @param dialect the dialect
      * @return count command
      */

@@ -9,8 +9,8 @@
 
 package com.sonsure.dumper.core.command.lambda;
 
-import com.sonsure.commons.spring.ReflectionUtils;
-import com.sonsure.commons.utils.NameUtils;
+import com.sonsure.dumper.common.spring.ReflectionUtils;
+import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import org.apache.commons.lang3.StringUtils;
 

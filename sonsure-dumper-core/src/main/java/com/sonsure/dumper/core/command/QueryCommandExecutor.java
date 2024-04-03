@@ -9,8 +9,8 @@
 
 package com.sonsure.dumper.core.command;
 
-import com.sonsure.commons.model.Page;
-import com.sonsure.commons.model.Pageable;
+import com.sonsure.dumper.common.model.Page;
+import com.sonsure.dumper.common.model.Pageable;
 
 import java.util.List;
 import java.util.Map;

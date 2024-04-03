@@ -43,6 +43,7 @@
         <module>sonsure-dumper-core</module>
         <module>sonsure-dumper-springjdbc</module>
         <module>sonsure-dumper-test</module>
+        <module>sonsure-dumper-common</module>
     </modules>
 
     <properties>
@@ -53,11 +54,14 @@
         <sonsure-common.version>4.1.2</sonsure-common.version>
         <aspectjweaver.version>1.8.13</aspectjweaver.version>
         <spring.version>5.3.29</spring.version>
+        <slf4j-api.version>1.7.30</slf4j-api.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
         <commons.dbcp.version>1.4</commons.dbcp.version>
         <slf4j.version>2.0.5</slf4j.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <jsqlparser.version>4.5</jsqlparser.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <mysql.version>8.0.16</mysql.version>
         <junit.version>4.13.1</junit.version>
         <mybatis.version>3.5.7</mybatis.version>
@@ -65,17 +69,28 @@
         <javax.persistence-api.version>2.2</javax.persistence-api.version>
         <postgresql.version>42.5.4</postgresql.version>
         <hibernate-core.version>5.6.15.Final</hibernate-core.version>
+        <lombok.version>1.18.10</lombok.version>
 
         <!-- Sonar -->
         <aggregate.report.dir>sonsure-dumper-test/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+        <dom4j.version>2.1.4</dom4j.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.sonsure</groupId>
-                <artifactId>sonsure-commons</artifactId>
-                <version>${sonsure-common.version}</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -91,6 +106,16 @@
                 <groupId>com.github.jsqlparser</groupId>
                 <artifactId>jsqlparser</artifactId>
                 <version>${jsqlparser.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>${dom4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mybatis</groupId>

@@ -9,8 +9,7 @@
 
 package com.sonsure.dumper.core.persist;
 
-
-import com.sonsure.commons.utils.UUIDUtils;
+import com.sonsure.dumper.common.utils.UUIDUtils;
 
 /**
  * Created by liyd on 16/8/25.

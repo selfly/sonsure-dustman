@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.command.simple;
 
 
-import com.sonsure.commons.bean.BeanKit;
+import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class DefaultResultHandler<E> implements ResultHandler<E> {
 
-    protected static final List<Class> SINGLE_VALUE_CLASSES = new ArrayList<>();
+    protected static final List<Class<?>> SINGLE_VALUE_CLASSES = new ArrayList<>();
 
     static {
         SINGLE_VALUE_CLASSES.add(String.class);
@@ -33,21 +33,22 @@ public class DefaultResultHandler<E> implements ResultHandler<E> {
         SINGLE_VALUE_CLASSES.add(Character.class);
     }
 
-    private Class<E> clazz;
+    private final Class<E> clazz;
 
     private DefaultResultHandler(Class<E> mappedClass) {
         this.clazz = mappedClass;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E handle(Object object) {
         if (object instanceof Map) {
-            Map map = (Map) object;
+            Map<String, ?> map = (Map<String, ?>) object;
             if (SINGLE_VALUE_CLASSES.contains(this.clazz)) {
                 this.checkSingleValueMapSize(map);
                 return (E) map.values().iterator().next();
             } else {
-                return (E) BeanKit.mapToBean(map, clazz, '_');
+                return BeanKit.mapToBean(map, clazz, '_');
             }
         } else {
             return (E) object;
@@ -55,10 +56,10 @@ public class DefaultResultHandler<E> implements ResultHandler<E> {
     }
 
     public static <E> ResultHandler<E> newInstance(Class<E> mappedClass) {
-        return new DefaultResultHandler<E>(mappedClass);
+        return new DefaultResultHandler<>(mappedClass);
     }
 
-    private void checkSingleValueMapSize(Map map) {
+    private void checkSingleValueMapSize(Map<String, ?> map) {
         if (map.size() > 1) {
             throw new SonsureJdbcException("返回的结果列数大于1，无法转换成单一值类型:" + this.clazz);
         }

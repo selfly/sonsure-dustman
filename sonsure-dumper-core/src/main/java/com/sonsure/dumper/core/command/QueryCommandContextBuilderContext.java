@@ -1,15 +1,21 @@
 package com.sonsure.dumper.core.command;
 
-import com.sonsure.commons.model.Pageable;
-import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.common.model.Pageable;
+import com.sonsure.dumper.common.model.Pagination;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
+ * The type Query command context builder context.
+ *
  * @author liyd
  */
+@Getter
 public class QueryCommandContextBuilderContext extends CommandContextBuilderContext {
 
     private Pagination pagination;
 
+    @Setter
     private boolean count = true;
 
 
@@ -34,10 +40,6 @@ public class QueryCommandContextBuilderContext extends CommandContextBuilderCont
         this.paginate(pageable.getPageNum(), pageable.getPageSize());
     }
 
-    public void setCount(boolean count) {
-        this.count = count;
-    }
-
     /**
      * Limit.
      *
@@ -48,14 +50,6 @@ public class QueryCommandContextBuilderContext extends CommandContextBuilderCont
         this.pagination = new Pagination();
         pagination.setPageSize(size);
         pagination.setOffset(offset);
-    }
-
-    public Pagination getPagination() {
-        return pagination;
-    }
-
-    public boolean isCount() {
-        return count;
     }
 
 }

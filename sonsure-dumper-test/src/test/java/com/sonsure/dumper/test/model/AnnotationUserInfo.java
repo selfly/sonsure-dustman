@@ -9,11 +9,13 @@
 
 package com.sonsure.dumper.test.model;
 
-import com.sonsure.commons.model.BaseEntity;
+import com.sonsure.dumper.common.model.BaseEntity;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
 import com.sonsure.dumper.core.annotation.Transient;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -23,6 +25,8 @@ import java.util.Date;
  * UserInfo: liyd
  * Date: Wed Dec 24 16:46:48 CST 2014
  */
+@Setter
+@Getter
 @Entity("ktx_user_info")
 public class AnnotationUserInfo extends BaseEntity {
 
@@ -69,59 +73,4 @@ public class AnnotationUserInfo extends BaseEntity {
     private String testName;
 
 
-    public Long getRowId() {
-        return rowId;
-    }
-
-    public void setRowId(Long rowId) {
-        this.rowId = rowId;
-    }
-
-    public String getLoginName() {
-        return loginName;
-    }
-
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Integer getUserAge() {
-        return userAge;
-    }
-
-    public void setUserAge(Integer userAge) {
-        this.userAge = userAge;
-    }
-
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
-    public Date getGmtModify() {
-        return gmtModify;
-    }
-
-    public void setGmtModify(Date gmtModify) {
-        this.gmtModify = gmtModify;
-    }
-
-    public String getTestName() {
-        return testName;
-    }
-
-    public void setTestName(String testName) {
-        this.testName = testName;
-    }
 }

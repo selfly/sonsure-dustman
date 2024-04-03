@@ -10,9 +10,9 @@
 package com.sonsure.dumper.core.command;
 
 
-import com.sonsure.commons.bean.BeanKit;
-import com.sonsure.commons.model.Page;
-import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.common.bean.BeanKit;
+import com.sonsure.dumper.common.model.Page;
+import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;

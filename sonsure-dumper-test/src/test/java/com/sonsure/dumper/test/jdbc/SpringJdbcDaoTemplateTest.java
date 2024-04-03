@@ -9,9 +9,9 @@
 
 package com.sonsure.dumper.test.jdbc;
 
-import com.sonsure.commons.model.Page;
-import com.sonsure.commons.model.Pageable;
-import com.sonsure.commons.utils.FileIOUtils;
+import com.sonsure.dumper.common.model.Page;
+import com.sonsure.dumper.common.model.Pageable;
+import com.sonsure.dumper.common.utils.FileIOUtils;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.lambda.Function;
@@ -628,7 +628,7 @@ public class SpringJdbcDaoTemplateTest {
         Page<AnnotationUserInfo> page = daoTemplate.selectFrom(AnnotationUserInfo.class)
                 .paginate(1, 10)
                 .pageResult(AnnotationUserInfo.class);
-        Assert.assertTrue(page.getList().size() > 0);
+        Assert.assertFalse(page.getList().isEmpty());
         Assert.assertNotNull(page.getList().get(0).getLoginName());
     }
 

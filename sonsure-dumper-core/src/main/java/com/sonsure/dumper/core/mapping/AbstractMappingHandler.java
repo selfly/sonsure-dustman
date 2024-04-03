@@ -9,8 +9,8 @@
 
 package com.sonsure.dumper.core.mapping;
 
-import com.sonsure.commons.spring.scan.ClassPathBeanScanner;
-import com.sonsure.commons.utils.NameUtils;
+import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
+import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.ModelClassCache;
 import com.sonsure.dumper.core.management.ModelClassMeta;

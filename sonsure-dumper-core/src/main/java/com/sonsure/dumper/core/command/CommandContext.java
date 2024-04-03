@@ -9,8 +9,9 @@
 
 package com.sonsure.dumper.core.command;
 
-
-import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.common.model.Pagination;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
  * @author liyd
  * @date 17 /4/12
  */
+@Getter
+@Setter
 public class CommandContext {
 
     /**
@@ -87,79 +90,4 @@ public class CommandContext {
         this.addCommandParameter(new CommandParameter(name, value));
     }
 
-    public List<Object> getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(List<Object> parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public void setCommand(String command) {
-        this.command = command;
-    }
-
-    public Class<?> getResultType() {
-        return resultType;
-    }
-
-    public void setResultType(Class<?> resultType) {
-        this.resultType = resultType;
-    }
-
-    public GenerateKey getGenerateKey() {
-        return generateKey;
-    }
-
-    public void setGenerateKey(GenerateKey generateKey) {
-        this.generateKey = generateKey;
-    }
-
-    public boolean isNativeCommand() {
-        return isNativeCommand;
-    }
-
-    public void setNativeCommand(boolean nativeCommand) {
-        isNativeCommand = nativeCommand;
-    }
-
-    public boolean isNamedParameter() {
-        return isNamedParameter;
-    }
-
-    public void setNamedParameter(boolean namedParameter) {
-        isNamedParameter = namedParameter;
-    }
-
-    public List<CommandParameter> getCommandParameters() {
-        return commandParameters;
-    }
-
-    public List<String> getNamedParamNames() {
-        return namedParamNames;
-    }
-
-    public void setNamedParamNames(List<String> namedParamNames) {
-        this.namedParamNames = namedParamNames;
-    }
-
-    public Pagination getPagination() {
-        return pagination;
-    }
-
-    public void setPagination(Pagination pagination) {
-        this.pagination = pagination;
-    }
-
-    public boolean isCount() {
-        return count;
-    }
-
-    public void setCount(boolean count) {
-        this.count = count;
-    }
 }

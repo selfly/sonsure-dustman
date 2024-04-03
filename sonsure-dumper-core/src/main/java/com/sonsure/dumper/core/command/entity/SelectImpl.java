@@ -10,8 +10,8 @@
 package com.sonsure.dumper.core.command.entity;
 
 
-import com.sonsure.commons.bean.BeanKit;
-import com.sonsure.commons.model.Page;
+import com.sonsure.dumper.common.bean.BeanKit;
+import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;

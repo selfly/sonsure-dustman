@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.commons.utils.ClassUtils;
+import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;

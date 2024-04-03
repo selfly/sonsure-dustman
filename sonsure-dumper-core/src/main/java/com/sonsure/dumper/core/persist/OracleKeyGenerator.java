@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.persist;
 
 
-import com.sonsure.commons.utils.NameUtils;
+import com.sonsure.dumper.common.utils.NameUtils;
 
 /**
  * Created by liyd on 16/8/25.

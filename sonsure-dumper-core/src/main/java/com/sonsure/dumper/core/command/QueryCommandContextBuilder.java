@@ -1,6 +1,6 @@
 package com.sonsure.dumper.core.command;
 
-import com.sonsure.commons.model.Pageable;
+import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 /**

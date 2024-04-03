@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.model;
 
 
-import com.sonsure.commons.model.BaseEntity;
+import com.sonsure.dumper.common.model.BaseEntity;
 
 import java.util.Date;
 

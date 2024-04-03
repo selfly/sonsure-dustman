@@ -9,8 +9,7 @@
 
 package com.sonsure.dumper.core.exception;
 
-
-import com.sonsure.commons.exception.SonsureException;
+import com.sonsure.dumper.common.exception.SonsureException;
 
 /**
  * Created by liyd on 17/4/11.

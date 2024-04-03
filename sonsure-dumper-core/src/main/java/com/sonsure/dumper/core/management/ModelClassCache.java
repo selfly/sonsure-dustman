@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.management;
 
-import com.sonsure.commons.utils.ClassUtils;
+import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;

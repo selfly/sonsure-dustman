@@ -9,24 +9,14 @@
 
 package com.sonsure.dumper.test.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class OracleUser {
 
     private String oracleUserId;
     private String username;
 
-    public String getOracleUserId() {
-        return oracleUserId;
-    }
-
-    public void setOracleUserId(String oracleUserId) {
-        this.oracleUserId = oracleUserId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 }

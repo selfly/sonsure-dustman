@@ -9,9 +9,8 @@
 
 package com.sonsure.dumper.core.config;
 
-
-import com.sonsure.commons.model.Page;
-import com.sonsure.commons.model.Pageable;
+import com.sonsure.dumper.common.model.Page;
+import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;

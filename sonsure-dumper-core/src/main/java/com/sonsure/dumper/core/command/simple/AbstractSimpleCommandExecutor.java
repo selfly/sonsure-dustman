@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.command.simple;
 
-import com.sonsure.commons.model.Page;
+import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.management.BeanParameter;

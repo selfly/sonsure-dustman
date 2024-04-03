@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.page;
 
-import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.config.DatabaseDialect;
 
 /**

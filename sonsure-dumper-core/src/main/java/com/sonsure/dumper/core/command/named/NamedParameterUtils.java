@@ -16,7 +16,7 @@
 
 package com.sonsure.dumper.core.command.named;
 
-import com.sonsure.commons.spring.Assert;
+import com.sonsure.dumper.common.spring.Assert;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
 import java.util.*;

@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.sql;
 
-import com.sonsure.commons.model.Pageable;
+import com.sonsure.dumper.common.model.Pageable;
 
 public class User extends Pageable {
 

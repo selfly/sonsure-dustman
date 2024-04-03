@@ -9,8 +9,10 @@
 
 package com.sonsure.dumper.core.page;
 
-import com.sonsure.commons.model.Pagination;
+import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,8 @@ public class NegotiatingPageHandler implements PageHandler {
 
     protected List<PageHandler> defaultPageHandlers;
 
+    @Getter
+    @Setter
     protected List<PageHandler> pageHandlers;
 
     public NegotiatingPageHandler() {
@@ -54,8 +58,8 @@ public class NegotiatingPageHandler implements PageHandler {
     /**
      * 根据dialect获取对应的pageHandler
      *
-     * @param dialect
-     * @return
+     * @param dialect the dialect
+     * @return page handler
      */
     protected PageHandler getPageHandler(String dialect) {
         if (pageHandlers != null) {
@@ -73,11 +77,4 @@ public class NegotiatingPageHandler implements PageHandler {
         throw new SonsureJdbcException("当前数据库dialect:" + dialect + "没有适配的PageHandler");
     }
 
-    public void setPageHandlers(List<PageHandler> pageHandlers) {
-        this.pageHandlers = pageHandlers;
-    }
-
-    public List<PageHandler> getPageHandlers() {
-        return pageHandlers;
-    }
 }
