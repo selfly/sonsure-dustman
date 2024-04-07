@@ -12,22 +12,9 @@ package com.sonsure.dumper.test.sql;
 import java.util.Date;
 
 public class Tag {
-
-    /**
-     * 标签id
-     */
     private Long tagId;
-
-    /**
-     * 标签名
-     */
     private String tagName;
-
     private String tagType;
-
-    /**
-     * 创建时间
-     */
     private Date gmtCreate;
 
 

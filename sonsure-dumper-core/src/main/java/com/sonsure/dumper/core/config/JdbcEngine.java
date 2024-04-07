@@ -133,7 +133,7 @@ public interface JdbcEngine {
      * 查询记录数
      *
      * @param cls the cls
-     * @return long long
+     * @return long
      */
     long findCount(Class<?> cls);
 

@@ -24,6 +24,7 @@ import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.config.JdbcEngine;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import lombok.Setter;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
@@ -35,6 +36,7 @@ import java.util.Map;
  * @author liyd
  * @date 17/4/13
  */
+@Setter
 public abstract class AbstractDaoTemplateImpl implements JdbcDao {
 
     protected DataSource dataSource;
@@ -217,20 +219,8 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
         return dataSource;
     }
 
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public void setDefaultJdbcEngine(JdbcEngine jdbcEngine) {
-        this.defaultJdbcEngine = jdbcEngine;
-    }
-
     public Map<String, JdbcEngine> getJdbcEngineMap() {
         return jdbcEngineMap;
-    }
-
-    public void setJdbcEngineMap(Map<String, JdbcEngine> jdbcEngineMap) {
-        this.jdbcEngineMap = jdbcEngineMap;
     }
 
 }

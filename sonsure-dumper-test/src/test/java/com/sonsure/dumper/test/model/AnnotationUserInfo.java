@@ -27,7 +27,7 @@ import java.util.Date;
  */
 @Setter
 @Getter
-@Entity("ktx_user_info")
+@Entity("sm_user_info")
 public class AnnotationUserInfo extends BaseEntity {
 
     private static final long serialVersionUID = 8166785520231287816L;

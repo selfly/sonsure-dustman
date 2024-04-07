@@ -15,9 +15,10 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.ModelClassCache;
 import com.sonsure.dumper.core.management.ModelClassMeta;
 import com.sonsure.dumper.core.management.ModelFieldMeta;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author liyd
  */
+@Slf4j
 public abstract class AbstractMappingHandler implements MappingHandler {
-
-    protected static final Logger LOG = LoggerFactory.getLogger(MappingHandler.class);
 
     /**
      * value需要native内容前后包围符号
@@ -44,16 +44,21 @@ public abstract class AbstractMappingHandler implements MappingHandler {
     /**
      * class不存在时是否失败 (抛出异常)
      */
+    @Setter
+    @Getter
     protected boolean failOnMissingClass;
 
     /**
      * 表前缀定义, 如 com.sonsure 开头的class表名统一加ss_  com.sonsure.User -> ss_user
      */
-    protected Map<String, String> tablePreFixMap;
+    @Getter
+    @Setter
+    protected Map<String, String> tablePrefixMap;
 
     /**
      * The Class loader.
      */
+    @Getter
     protected ClassLoader classLoader;
 
     /**
@@ -69,25 +74,25 @@ public abstract class AbstractMappingHandler implements MappingHandler {
     /**
      * 类名称映射
      */
+    @Getter
     protected Map<String, Class<?>> classMapping;
 
     /**
      * 自定义类名称映射
      */
+    @Getter
+    @Setter
     protected Map<String, Class<?>> customClassMapping;
-
-    public AbstractMappingHandler(String modelPackages) {
-        this(modelPackages, null);
-    }
 
     public AbstractMappingHandler(String modelPackages, ClassLoader classLoader) {
         this.failOnMissingClass = true;
         loadedClass = new ConcurrentHashMap<>();
         classMapping = new ConcurrentHashMap<>();
         customClassMapping = new ConcurrentHashMap<>();
+        tablePrefixMap = new ConcurrentHashMap<>();
         this.modelPackages = modelPackages;
         this.classLoader = classLoader == null ? getClass().getClassLoader() : classLoader;
-        this.init();
+        this.scanClassMapping();
     }
 
     public void addClassMapping(Class<?> clazz) {
@@ -109,6 +114,12 @@ public abstract class AbstractMappingHandler implements MappingHandler {
         }
     }
 
+    public void addTablePrefix(String prefix, String... packages) {
+        for (String aPackage : packages) {
+            this.tablePrefixMap.put(aPackage, prefix);
+        }
+    }
+
     @Override
     public String getTable(String className, Map<String, Object> params) {
         Class<?> tableClass = this.getTableClass(className);
@@ -126,16 +137,16 @@ public abstract class AbstractMappingHandler implements MappingHandler {
 
         ModelClassMeta classMeta = ModelClassCache.getClassMeta(entityClass);
         Object annotation = classMeta.getAnnotation();
-        String tableName = null;
+        String tableName;
         if (annotation != null) {
             tableName = ModelClassCache.getTableAnnotationName(annotation);
         } else {
-            if (tablePreFixMap == null) {
+            if (tablePrefixMap == null) {
                 //默认Java属性的骆驼命名法转换回数据库下划线“_”分隔的格式
                 tableName = NameUtils.getUnderlineName(entityClass.getSimpleName());
             } else {
                 String tablePreFix = "";
-                for (Map.Entry<String, String> entry : tablePreFixMap.entrySet()) {
+                for (Map.Entry<String, String> entry : tablePrefixMap.entrySet()) {
                     if (StringUtils.startsWith(entityClass.getName(), entry.getKey())) {
                         tablePreFix = entry.getValue();
                         break;
@@ -195,32 +206,6 @@ public abstract class AbstractMappingHandler implements MappingHandler {
         return NameUtils.getCamelName(columnName);
     }
 
-    /**
-     * 初始化类，容忍多次初始化无不良后果，并不需要严格的线程安全，
-     */
-    protected void init() {
-
-        if (StringUtils.isBlank(this.modelPackages)) {
-            return;
-        }
-        String[] pks = StringUtils.split(modelPackages, ",");
-        for (String pk : pks) {
-            List<String> classes = ClassPathBeanScanner.scanClasses(pk, getClassLoader());
-            for (String clazz : classes) {
-
-                int index = StringUtils.lastIndexOf(clazz, ".");
-                String simpleName = StringUtils.substring(clazz, index + 1);
-
-                if (classMapping.containsKey(simpleName)) {
-                    LOG.warn("短类名相同，使用时请自定义短类名或使用完整类名:class1:{},class2:{}", classMapping.get(simpleName), clazz);
-                } else {
-                    Class<?> aClass = this.loadClass(clazz);
-                    classMapping.put(simpleName, aClass);
-                }
-            }
-        }
-    }
-
     protected Class<?> getTableClass(String className) {
 
         if (StringUtils.isBlank(className)) {
@@ -243,11 +228,37 @@ public abstract class AbstractMappingHandler implements MappingHandler {
         if (clazz == null && !classMapping.isEmpty()) {
             clazz = classMapping.get(className);
         }
-        if (clazz == null && failOnMissingClass) {
+        if (clazz == null && this.isFailOnMissingClass()) {
             throw new SonsureJdbcException("没有找到对应的class:" + className);
         }
 
         return clazz;
+    }
+
+    /**
+     * 初始化类，容忍多次初始化无不良后果，并不需要严格的线程安全，
+     */
+    protected void scanClassMapping() {
+
+        if (StringUtils.isBlank(this.modelPackages)) {
+            return;
+        }
+        String[] pks = StringUtils.split(modelPackages, ",");
+        for (String pk : pks) {
+            List<String> classes = ClassPathBeanScanner.scanClasses(pk, getClassLoader());
+            for (String clazz : classes) {
+
+                int index = StringUtils.lastIndexOf(clazz, ".");
+                String simpleName = StringUtils.substring(clazz, index + 1);
+
+                if (classMapping.containsKey(simpleName)) {
+                    log.warn("短类名相同，使用时请自定义短类名或使用完整类名:class1:{},class2:{}", classMapping.get(simpleName), clazz);
+                } else {
+                    Class<?> aClass = this.loadClass(clazz);
+                    classMapping.put(simpleName, aClass);
+                }
+            }
+        }
     }
 
     protected Class<?> loadClass(String className) {
@@ -258,39 +269,4 @@ public abstract class AbstractMappingHandler implements MappingHandler {
         }
     }
 
-    public boolean isFailOnMissingClass() {
-        return failOnMissingClass;
-    }
-
-    public void setFailOnMissingClass(boolean failOnMissingClass) {
-        this.failOnMissingClass = failOnMissingClass;
-    }
-
-    public ClassLoader getClassLoader() {
-        return classLoader;
-    }
-
-    public String getModelPackages() {
-        return modelPackages;
-    }
-
-    public Map<String, Class<?>> getClassMapping() {
-        return classMapping;
-    }
-
-    public Map<String, Class<?>> getCustomClassMapping() {
-        return customClassMapping;
-    }
-
-    public void setCustomClassMapping(Map<String, Class<?>> customClassMapping) {
-        this.customClassMapping = customClassMapping;
-    }
-
-    public Map<String, String> getTablePreFixMap() {
-        return tablePreFixMap;
-    }
-
-    public void setTablePreFixMap(Map<String, String> tablePreFixMap) {
-        this.tablePreFixMap = tablePreFixMap;
-    }
 }

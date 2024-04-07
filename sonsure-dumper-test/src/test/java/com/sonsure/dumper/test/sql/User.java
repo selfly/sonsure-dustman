@@ -12,16 +12,9 @@ package com.sonsure.dumper.test.sql;
 import com.sonsure.dumper.common.model.Pageable;
 
 public class User extends Pageable {
-
-
-    /**
-     * 用户ID
-     */
+    
     private Long userId;
 
-    /**
-     * 登录名
-     */
     private String loginName;
 
 }

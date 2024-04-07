@@ -18,9 +18,6 @@ public class RelSeries {
     
     private Long seriesId;
 
-    /**
-     * 内容id
-     */
     private Long contentId;
 
 }

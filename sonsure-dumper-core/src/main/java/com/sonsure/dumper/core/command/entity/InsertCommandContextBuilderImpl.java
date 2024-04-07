@@ -95,16 +95,16 @@ public class InsertCommandContextBuilderImpl extends AbstractCommonCommandContex
             if (keyGenerator != null) {
                 Object generateKeyValue = keyGenerator.generateKeyValue(modelClass);
                 generateKey.setValue(generateKeyValue);
-                boolean isParam = true;
+                boolean pkIsParamName = true;
                 if (generateKeyValue instanceof String) {
-                    isParam = !(StringUtils.startsWith((String) generateKeyValue, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(((String) generateKeyValue), KeyGenerator.NATIVE_CLOSE_TOKEN));
+                    pkIsParamName = !(StringUtils.startsWith((String) generateKeyValue, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(((String) generateKeyValue), KeyGenerator.NATIVE_CLOSE_TOKEN));
                 }
-                generateKey.setParameter(isParam);
+                generateKey.setPkIsParamName(pkIsParamName);
                 //设置主键值，insert之后返回用
                 commandContext.setGenerateKey(generateKey);
                 //传参
                 command.append(pkField).append(",");
-                if (isParam) {
+                if (pkIsParamName) {
                     final String placeholder = this.createParameterPlaceholder(pkField, this.insertContext.isNamedParameter());
                     argsCommand.append(placeholder).append(",");
                     commandContext.addCommandParameter(pkField, generateKeyValue);

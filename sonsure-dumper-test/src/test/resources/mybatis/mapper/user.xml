@@ -17,15 +17,15 @@
     </select>
 
     <select id="getUserSql" parameterType="java.util.Map" resultType="java.util.HashMap">
-        SELECT * FROM user_info WHERE user_info_id = #{id} and login_name = #{loginName}
+        SELECT * FROM sd_user_info WHERE user_info_id = #{id} and login_name = #{loginName}
     </select>
 
     <select id="getUser2" parameterType="java.util.Map" resultType="java.util.HashMap">
-        SELECT * FROM user_info WHERE user_info_id = #{user.userInfoId} and login_name = #{user.loginName}
+        SELECT * FROM sd_user_info WHERE user_info_id = #{user.userInfoId} and login_name = #{user.loginName}
     </select>
 
     <select id="queryUserList">
-        SELECT * FROM user_info
+        SELECT * FROM sd_user_info
         <where>
             <foreach collection="names" item="name" separator="or">
                 login_name = #{name}
@@ -34,7 +34,7 @@
     </select>
 
     <update id="updateUser">
-        update user_info set login_name = #{loginName} where user_info_id = #{userInfoId}
+        update sd_user_info set login_name = #{loginName} where user_info_id = #{userInfoId}
     </update>
 
 

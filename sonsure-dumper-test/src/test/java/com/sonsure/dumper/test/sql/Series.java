@@ -11,9 +11,6 @@ package com.sonsure.dumper.test.sql;
 
 public class Series {
 
-    /**
-     * 系列ID
-     */
     private Long seriesId;
 
 }

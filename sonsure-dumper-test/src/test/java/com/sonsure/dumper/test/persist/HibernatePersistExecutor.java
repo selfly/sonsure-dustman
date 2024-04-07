@@ -12,6 +12,7 @@ package com.sonsure.dumper.test.persist;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.batch.BatchCommandContext;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
+import lombok.Setter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jdbc.ReturningWork;
@@ -25,6 +26,7 @@ import java.util.Map;
 /**
  * Created by liyd on 17/4/12.
  */
+@Setter
 public class HibernatePersistExecutor extends AbstractPersistExecutor {
 
     private SessionFactory sessionFactory;
@@ -110,7 +112,4 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
         return null;
     }
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 }

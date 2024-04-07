@@ -14,12 +14,14 @@ import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.command.batch.BatchCommandContext;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.lang.NonNull;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -51,12 +53,8 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     @Override
     public Object insert(final CommandContext commandContext) {
         final GenerateKey generateKey = commandContext.getGenerateKey();
-        //数据库生成 或没有设置主键值 处理
-        if (generateKey.isParameter()) {
-            jdbcOperations.update(commandContext.getCommand(), commandContext.getParameters().toArray());
-            //显示指定了主键，可能为null
-            return generateKey.getValue();
-        } else {
+        //数据库自增 或设置主键值 处理
+        if (!generateKey.isPkIsParamName() && StringUtils.isNotBlank(generateKey.getColumn())) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcOperations.update(new InsertPreparedStatementCreator(commandContext, generateKey), keyHolder);
             Map<String, Object> keys = keyHolder.getKeys();
@@ -70,6 +68,10 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
                 return ((Number) obj).longValue();
             }
             return obj;
+        } else {
+            jdbcOperations.update(commandContext.getCommand(), commandContext.getParameters().toArray());
+            //显示指定了主键，可能为null
+            return generateKey.getValue();
         }
     }
 
@@ -149,6 +151,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
         }
 
         @Override
+        @NonNull
         public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
             PreparedStatement ps = con.prepareStatement(commandContext.getCommand(), new String[]{generateKey.getColumn()});
             setValues(ps);
@@ -156,7 +159,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
         }
 
         @Override
-        public void setValues(PreparedStatement ps) throws SQLException {
+        public void setValues(@NonNull PreparedStatement ps) throws SQLException {
             ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(commandContext.getParameters()
                     .toArray());
             pss.setValues(ps);

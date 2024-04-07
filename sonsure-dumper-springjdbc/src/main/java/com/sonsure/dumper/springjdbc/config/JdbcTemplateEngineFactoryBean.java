@@ -28,8 +28,4 @@ public class JdbcTemplateEngineFactoryBean extends JdbcTemplateEngineConfigImpl 
         return JdbcEngine.class;
     }
 
-    @Override
-    public boolean isSingleton() {
-        return true;
-    }
 }

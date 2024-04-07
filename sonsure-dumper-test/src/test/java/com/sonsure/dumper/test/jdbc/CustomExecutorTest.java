@@ -12,24 +12,22 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.executor.CountCommandExecutor;
 import com.sonsure.dumper.test.model.UserInfo;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Date;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-executor.xml"})
 public class CustomExecutorTest {
 
     @Autowired
     protected DaoTemplate daoTemplate;
 
-    @Before
+    @BeforeEach
     public void before() {
         //初始化测试数据
         daoTemplate.deleteFrom(UserInfo.class)
@@ -51,6 +49,6 @@ public class CustomExecutorTest {
                 .clazz(UserInfo.class)
                 .getCount();
 
-        Assert.assertTrue(count > 0);
+        Assertions.assertTrue(count > 0);
     }
 }

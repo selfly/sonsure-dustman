@@ -15,8 +15,8 @@ import com.sonsure.dumper.common.enums.DynamicEnumItem;
 import com.sonsure.dumper.test.enums.ActiveStatusEnum;
 import com.sonsure.dumper.test.enums.MenuStatusEnum;
 import com.sonsure.dumper.test.enums.MenuTypeEnum;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -38,23 +38,23 @@ public class BeanKitTest {
         menu.setGmtModify(new Date());
 
         MenuVo menuVo = BeanKit.copyProperties(new MenuVo(), menu);
-        Assert.assertEquals(menu.getMenuId(), menuVo.getMenuId());
-        Assert.assertEquals(menu.getMenuCode(), menuVo.getMenuCode());
-        Assert.assertEquals(menu.getMenuTitle(), menuVo.getMenuTitle());
-        Assert.assertEquals(menu.getItsRoute(), menuVo.getItsRoute());
-        Assert.assertEquals(menu.getMenuType(), menuVo.getMenuType().getCode());
-        Assert.assertEquals(menu.getOrderNo(), menuVo.getOrderNo());
-        Assert.assertEquals(menu.getStatus(), menuVo.getStatus().getCode());
-        Assert.assertEquals(menu.getActiveStatus(), menuVo.getActiveStatus().getCode());
-        Assert.assertEquals(menu.getGmtCreate(), menuVo.getGmtCreate());
-        Assert.assertEquals(menu.getGmtModify(), menuVo.getGmtModify());
+        Assertions.assertEquals(menu.getMenuId(), menuVo.getMenuId());
+        Assertions.assertEquals(menu.getMenuCode(), menuVo.getMenuCode());
+        Assertions.assertEquals(menu.getMenuTitle(), menuVo.getMenuTitle());
+        Assertions.assertEquals(menu.getItsRoute(), menuVo.getItsRoute());
+        Assertions.assertEquals(menu.getMenuType(), menuVo.getMenuType().getCode());
+        Assertions.assertEquals(menu.getOrderNo(), menuVo.getOrderNo());
+        Assertions.assertEquals(menu.getStatus(), menuVo.getStatus().getCode());
+        Assertions.assertEquals(menu.getActiveStatus(), menuVo.getActiveStatus().getCode());
+        Assertions.assertEquals(menu.getGmtCreate(), menuVo.getGmtCreate());
+        Assertions.assertEquals(menu.getGmtModify(), menuVo.getGmtModify());
 
         DynamicEnumHelper.addEnumItem(ActiveStatusEnum.class, DynamicEnumItem.of("5", "激活"));
 
         menu.setActiveStatus("5");
         MenuVo menuVo2 = BeanKit.copyProperties(new MenuVo(), menu);
-        Assert.assertEquals(menuVo2.getActiveStatus().getCode(), "5");
-        Assert.assertEquals(menuVo2.getActiveStatus().getDesc(), "激活");
+        Assertions.assertEquals(menuVo2.getActiveStatus().getCode(), "5");
+        Assertions.assertEquals(menuVo2.getActiveStatus().getDesc(), "激活");
     }
 
 }

@@ -12,19 +12,17 @@ package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.HbUserInfo;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
 /**
  * hibernate测试
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-hibernate.xml"})
 public class HibernateDaoTemplateTest {
 
@@ -34,6 +32,6 @@ public class HibernateDaoTemplateTest {
     @Test
     public void findList() {
         List<HbUserInfo> userInfos = jdbcDao.find(HbUserInfo.class);
-        Assert.assertNotNull(userInfos);
+        Assertions.assertNotNull(userInfos);
     }
 }

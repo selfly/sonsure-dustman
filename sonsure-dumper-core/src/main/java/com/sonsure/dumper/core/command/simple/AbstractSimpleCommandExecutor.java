@@ -172,7 +172,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     public void insert() {
         CommandContext commandContext = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
         GenerateKey generateKey = new GenerateKey();
-        generateKey.setParameter(false);
+        generateKey.setPkIsParamName(false);
         commandContext.setGenerateKey(generateKey);
         getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
     }
@@ -186,7 +186,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         GenerateKey generateKey = new GenerateKey();
         generateKey.setClazz(clazz);
         generateKey.setColumn(pkColumn);
-        generateKey.setParameter(false);
+        generateKey.setPkIsParamName(false);
         commandContext.setGenerateKey(generateKey);
         return (Long) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
     }

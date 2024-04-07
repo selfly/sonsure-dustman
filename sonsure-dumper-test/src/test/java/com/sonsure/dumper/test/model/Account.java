@@ -25,10 +25,12 @@ public class Account extends Pageable {
 
     private Long accountId;
 
-    String loginName;
+    private String loginName;
 
-    String password;
+    private String accountName;
 
-    Integer userAge;
+    private String password;
+
+    private Integer userAge;
 
 }

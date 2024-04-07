@@ -9,6 +9,11 @@
 
 package com.sonsure.dumper.core.command;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class GenerateKey {
 
     private Class<?> clazz;
@@ -18,39 +23,9 @@ public class GenerateKey {
     private Object value;
 
     /**
-     * 主键值是否有数据库生成
+     * 主键是否是参数名称
+     * 例如oracle主键传的是序列名称，非值
      */
-    private boolean isParameter;
+    private boolean pkIsParamName;
 
-    public Class<?> getClazz() {
-        return clazz;
-    }
-
-    public void setClazz(Class<?> clazz) {
-        this.clazz = clazz;
-    }
-
-    public String getColumn() {
-        return column;
-    }
-
-    public void setColumn(String column) {
-        this.column = column;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public boolean isParameter() {
-        return isParameter;
-    }
-
-    public void setParameter(boolean parameter) {
-        isParameter = parameter;
-    }
 }

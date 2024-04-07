@@ -12,29 +12,26 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.UserInfo;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Date;
 
 /**
  * 限于环境，postgres不参与构建
  */
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
+//@Ignore
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-postgres.xml"})
 public class PostgresJdbcTemplateDaoImplTest {
 
     @Autowired
     private DaoTemplate daoTemplate;
 
-    @Before
+    @BeforeEach
     public void before() {
         for (int i = 1; i < 51; i++) {
             UserInfo user = new UserInfo();
@@ -54,9 +51,9 @@ public class PostgresJdbcTemplateDaoImplTest {
                 .paginate(1, 20)
                 .pageResult(UserInfo.class);
 
-        Assert.assertTrue(page.getPagination().getTotalItems() > 0);
+        Assertions.assertTrue(page.getPagination().getTotalItems() > 0);
         for (UserInfo userInfo : page.getList()) {
-            Assert.assertNotNull(userInfo.getUserInfoId());
+            Assertions.assertNotNull(userInfo.getUserInfoId());
         }
     }
 

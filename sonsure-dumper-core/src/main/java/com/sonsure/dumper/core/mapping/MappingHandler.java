@@ -68,9 +68,9 @@ public interface MappingHandler {
     /**
      * 根据列获取属性
      *
-     * @param clazz
-     * @param columnName
-     * @return
+     * @param clazz      the clazz
+     * @param columnName the column name
+     * @return field
      */
     String getField(Class<?> clazz, String columnName);
 }

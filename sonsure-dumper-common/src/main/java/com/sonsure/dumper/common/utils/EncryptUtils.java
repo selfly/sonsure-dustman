@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class EncryptUtils {
 
-    private static Pattern BCRYPT_PATTERN = Pattern
+    private static final Pattern BCRYPT_PATTERN = Pattern
             .compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
 
     /**

@@ -13,6 +13,7 @@ import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandParameter;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandContextBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -40,6 +41,9 @@ public class MybatisCommandContextBuilderImpl extends AbstractSimpleCommandConte
         CommandContext commandContext = new CommandContext();
 
         SqlSessionFactory sqlSessionFactory = jdbcEngineConfig.getMybatisSqlSessionFactory();
+        if (sqlSessionFactory == null) {
+            throw new SonsureJdbcException("使用Mybatis请先设置MybatisSqlSessionFactory");
+        }
         MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(getSimpleContext().getCommand());
         Configuration configuration = sqlSessionFactory.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();

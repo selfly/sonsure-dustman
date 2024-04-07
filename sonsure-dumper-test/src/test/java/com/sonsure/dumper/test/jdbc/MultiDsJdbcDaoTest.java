@@ -13,13 +13,10 @@ import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.core.persist.FlexibleDaoTemplate;
 import com.sonsure.dumper.test.model.OracleUser;
 import com.sonsure.dumper.test.model.UserInfo;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.util.Date;
@@ -27,8 +24,8 @@ import java.util.Date;
 /**
  * 限于环境，不参与构建
  */
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
+//@Ignore
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-multi-ds.xml"})
 public class MultiDsJdbcDaoTest {
 
@@ -50,7 +47,7 @@ public class MultiDsJdbcDaoTest {
             daoTemplate.executeInsert(user);
         }
         long count = daoTemplate.findCount(UserInfo.class);
-        Assert.assertEquals(count, 5);
+        Assertions.assertEquals(count, 5);
     }
 
     @Test
@@ -68,7 +65,7 @@ public class MultiDsJdbcDaoTest {
             daoTemplate.use("mysql").executeInsert(user);
         }
         long count = daoTemplate.use("mysql").findCount(UserInfo.class);
-        Assert.assertEquals(count, 5);
+        Assertions.assertEquals(count, 5);
     }
 
     @Test
@@ -84,7 +81,7 @@ public class MultiDsJdbcDaoTest {
             daoTemplate.use("oracle").executeInsert(oracleUser);
         }
         long count = daoTemplate.use("oracle").findCount(OracleUser.class);
-        Assert.assertEquals(count, 5);
+        Assertions.assertEquals(count, 5);
     }
 
     @Test
@@ -102,7 +99,7 @@ public class MultiDsJdbcDaoTest {
             daoTemplate.executeInsert(user);
         }
         long count = daoTemplate.findCount(UserInfo.class);
-        Assert.assertEquals(count, 5);
+        Assertions.assertEquals(count, 5);
     }
 
     @Test
@@ -120,7 +117,7 @@ public class MultiDsJdbcDaoTest {
             daoTemplate.use("mysql").executeInsert(user);
         }
         long count = daoTemplate.use("mysql").findCount(UserInfo.class);
-        Assert.assertEquals(count, 5);
+        Assertions.assertEquals(count, 5);
     }
 
     @Test
@@ -136,7 +133,7 @@ public class MultiDsJdbcDaoTest {
             daoTemplate.use("oracle").executeInsert(oracleUser);
         }
         long count = daoTemplate.use("oracle").findCount(OracleUser.class);
-        Assert.assertEquals(count, 5);
+        Assertions.assertEquals(count, 5);
     }
 
     @Test
@@ -145,7 +142,7 @@ public class MultiDsJdbcDaoTest {
         try {
             daoTemplate.use("oracle").use("oracle").executeDelete(OracleUser.class);
         } catch (UnsupportedOperationException e) {
-            Assert.assertEquals("不支持的方法", e.getMessage());
+            Assertions.assertEquals("不支持的方法", e.getMessage());
         }
     }
 
@@ -153,6 +150,6 @@ public class MultiDsJdbcDaoTest {
     public void getDataSource() {
 
         DataSource dataSource = ((FlexibleDaoTemplate) daoTemplate.use("oracle")).getDefaultJdbcEngine().getDataSource();
-        Assert.assertNotNull(dataSource);
+        Assertions.assertNotNull(dataSource);
     }
 }

@@ -6,7 +6,6 @@
  *
  * Designed By Selfly Lee (selfly@live.com)
  */
-
 package com.sonsure.dumper.core.persist;
 
 import com.sonsure.dumper.core.config.JdbcEngine;

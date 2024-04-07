@@ -11,19 +11,16 @@ package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.OracleUser;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * 限于环境，oracle不参与构建
  */
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
+//@Ignore
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-oracle.xml"})
 public class OracleJdbcTemplateDaoImplTest {
 
@@ -38,7 +35,7 @@ public class OracleJdbcTemplateDaoImplTest {
 
         Long id = (Long) daoTemplate.executeInsert(oracleUser);
 
-        Assert.assertNotNull(id);
+        Assertions.assertNotNull(id);
     }
 
     @Test
@@ -46,7 +43,7 @@ public class OracleJdbcTemplateDaoImplTest {
         final Long id = daoTemplate.select(OracleUser::getOracleUserId)
                 .from(OracleUser.class)
                 .oneColFirstResult(Long.class);
-        Assert.assertNotNull(id);
+        Assertions.assertNotNull(id);
     }
 
 }
