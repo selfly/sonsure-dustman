@@ -80,9 +80,9 @@
 
 表前缀定义，很多时候不同的项目或模块拥有不同的表前缀，但映射的实体类不会有前缀。例如`ss_user`表对应实体类为`User`.
 
-    Map<String, String> tablePreFixMap = new LinkedHashMap<>();
-    tablePreFixMap.put("com.sonsure", "ss_");
-    mappingHandler.setTablePreFixMap(tablePreFixMap);
+    Map<String, String> tablePrefixMap = new LinkedHashMap<>();
+    tablePrefixMap.put("com.sonsure", "ss_");
+    mappingHandler.setTablePrefixMap(tablePrefixMap);
     
 以上配置将在处理`com.sonsure`包下的所有实体类名转换时，自动添加`ss_`前缀。
 
