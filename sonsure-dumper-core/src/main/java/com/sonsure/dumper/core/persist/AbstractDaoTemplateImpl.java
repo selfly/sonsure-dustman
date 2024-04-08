@@ -139,6 +139,13 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
     }
 
     @Override
+    public <M> Select<M> selectFrom(Class<M> cls, String tableAlias) {
+        Select<M> select = this.selectFrom(cls);
+        select.tableAlias(tableAlias);
+        return select;
+    }
+
+    @Override
     public Insert insert() {
         return this.getDefaultJdbcEngine().insert();
     }

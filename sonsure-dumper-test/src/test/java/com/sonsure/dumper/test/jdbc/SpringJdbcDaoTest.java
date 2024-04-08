@@ -475,7 +475,7 @@ public class SpringJdbcDaoTest {
 
     @Test
     public void select13() {
-        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
+        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class, "t1")
                 .where("t1.userInfoId", new Object[]{11L, 12L, 13L})
                 .and("t1.loginName", new Object[]{"name-11", "name-12", "name-13"})
                 .and()

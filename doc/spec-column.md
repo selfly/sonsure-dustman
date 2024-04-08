@@ -38,7 +38,7 @@
 表别名单表也可使用不过意义不大。
 以下查询，from两张表并使用了表别名及列别名。
 
-    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
+    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class,"t1")
             .from(Account.class, "t2")
             .addColumn("t1.loginName as name1", "t2.loginName as name2")
             .where()
