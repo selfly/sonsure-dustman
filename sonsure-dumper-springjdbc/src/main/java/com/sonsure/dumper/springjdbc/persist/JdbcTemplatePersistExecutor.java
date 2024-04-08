@@ -54,7 +54,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     public Object insert(final CommandContext commandContext) {
         final GenerateKey generateKey = commandContext.getGenerateKey();
         //数据库自增 或设置主键值 处理
-        if (!generateKey.isPkIsParamName() && StringUtils.isNotBlank(generateKey.getColumn())) {
+        if (!generateKey.isPkIsParamVal() && StringUtils.isNotBlank(generateKey.getColumn())) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcOperations.update(new InsertPreparedStatementCreator(commandContext, generateKey), keyHolder);
             Map<String, Object> keys = keyHolder.getKeys();

@@ -9,23 +9,25 @@
 
 package com.sonsure.dumper.test.jdbc;
 
-import com.sonsure.dumper.core.persist.DaoTemplate;
+import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.OracleUser;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * 限于环境，oracle不参与构建
  */
-//@Ignore
-//@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext-oracle.xml"})
+@Disabled
+@SpringBootTest
 public class OracleJdbcTemplateDaoImplTest {
 
     @Autowired
-    protected DaoTemplate daoTemplate;
+    @Qualifier("oracleJdbcDao")
+    protected JdbcDao jdbcDao;
 
     @Test
     public void jdbcDaoInsert() {
@@ -33,16 +35,8 @@ public class OracleJdbcTemplateDaoImplTest {
         OracleUser oracleUser = new OracleUser();
         oracleUser.setUsername("liyd");
 
-        Long id = (Long) daoTemplate.executeInsert(oracleUser);
+        Long id = (Long) jdbcDao.executeInsert(oracleUser);
 
-        Assertions.assertNotNull(id);
-    }
-
-    @Test
-    public void oneCol() {
-        final Long id = daoTemplate.select(OracleUser::getOracleUserId)
-                .from(OracleUser.class)
-                .oneColFirstResult(Long.class);
         Assertions.assertNotNull(id);
     }
 

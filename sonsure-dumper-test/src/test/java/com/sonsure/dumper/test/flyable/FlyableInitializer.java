@@ -4,9 +4,7 @@ import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.flyable.FlyableExecutor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
 
-@Component
 public class FlyableInitializer implements InitializingBean, Ordered {
 
     private final JdbcDao jdbcDao;

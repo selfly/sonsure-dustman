@@ -23,9 +23,9 @@ public class GenerateKey {
     private Object value;
 
     /**
-     * 主键是否是参数名称
+     * 主键是否是参数
      * 例如oracle主键传的是序列名称，非值
      */
-    private boolean pkIsParamName;
+    private boolean pkIsParamVal;
 
 }

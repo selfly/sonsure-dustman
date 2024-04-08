@@ -1,0 +1,12 @@
+server:
+  port: 8001
+  tomcat:
+    uri-encoding: utf-8
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:oracle:thin:@192.168.50.51:49161:xe
+    username: system
+    password: oracle
+    driver-class-name: oracle.jdbc.OracleDriver

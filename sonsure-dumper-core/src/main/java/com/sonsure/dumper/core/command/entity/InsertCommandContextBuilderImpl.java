@@ -15,6 +15,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.management.CommandField;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -95,16 +96,16 @@ public class InsertCommandContextBuilderImpl extends AbstractCommonCommandContex
             if (keyGenerator != null) {
                 Object generateKeyValue = keyGenerator.generateKeyValue(modelClass);
                 generateKey.setValue(generateKeyValue);
-                boolean pkIsParamName = true;
+                boolean pkIsParamVal = true;
                 if (generateKeyValue instanceof String) {
-                    pkIsParamName = !(StringUtils.startsWith((String) generateKeyValue, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(((String) generateKeyValue), KeyGenerator.NATIVE_CLOSE_TOKEN));
+                    pkIsParamVal = !this.isNativeValue((String) generateKeyValue);
                 }
-                generateKey.setPkIsParamName(pkIsParamName);
+                generateKey.setPkIsParamVal(pkIsParamVal);
                 //设置主键值，insert之后返回用
                 commandContext.setGenerateKey(generateKey);
                 //传参
                 command.append(pkField).append(",");
-                if (pkIsParamName) {
+                if (pkIsParamVal) {
                     final String placeholder = this.createParameterPlaceholder(pkField, this.insertContext.isNamedParameter());
                     argsCommand.append(placeholder).append(",");
                     commandContext.addCommandParameter(pkField, generateKeyValue);
@@ -122,6 +123,11 @@ public class InsertCommandContextBuilderImpl extends AbstractCommonCommandContex
         return commandContext;
     }
 
+    private boolean isNativeValue(String value) {
+        return StringUtils.startsWith(value, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(value, KeyGenerator.NATIVE_CLOSE_TOKEN);
+    }
+
+    @Getter
     public static class Context extends CommandContextBuilderContext {
 
         private final List<CommandField> insertFields;
@@ -134,8 +140,5 @@ public class InsertCommandContextBuilderImpl extends AbstractCommonCommandContex
             this.insertFields.add(commandField);
         }
 
-        public List<CommandField> getInsertFields() {
-            return insertFields;
-        }
     }
 }

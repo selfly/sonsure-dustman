@@ -20,8 +20,10 @@ import com.sonsure.dumper.test.model.Account;
 import com.sonsure.dumper.test.model.AnnotationUserInfo;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.util.LinkedCaseInsensitiveMap;
@@ -37,9 +39,10 @@ import java.util.*;
 public class SpringJdbcDaoTest {
 
     @Autowired
+    @Qualifier("mysqlJdbcDao")
     protected JdbcDao jdbcDao;
 
-//    @BeforeEach
+    @BeforeEach
     public void before() {
 
         jdbcDao.executeDelete(UserInfo.class);
