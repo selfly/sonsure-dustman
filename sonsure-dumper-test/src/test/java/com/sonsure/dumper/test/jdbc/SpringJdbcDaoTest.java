@@ -372,11 +372,11 @@ public class SpringJdbcDaoTest {
     public void select3() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
-                .addColumn("user_Info_Id", "password")
+                .addColumn("userInfoId", "password")
                 .addColumn(UserInfo::getLoginName)
                 //同时指定以白名单为准
                 .dropColumn("password")
-                .where("user_Age", "<=", 10)
+                .where("userAge", "<=", 10)
                 .list();
         Assertions.assertNotNull(list);
         Assertions.assertEquals(10, list.size());
@@ -394,7 +394,7 @@ public class SpringJdbcDaoTest {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
                 .dropColumn("password")
-                .where("user_Age", "<=", 10)
+                .where("userAge", "<=", 10)
                 .list();
         Assertions.assertNotNull(list);
         Assertions.assertEquals(10, list.size());

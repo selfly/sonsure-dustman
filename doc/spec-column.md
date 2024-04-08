@@ -7,9 +7,9 @@
 以下查询只返回user_Info_Id、password、loginName：
 
     List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
-    .addColumn("user_Info_Id", "password")
+    .addColumn("userInfoId", "password")
     .addColumn(UserInfo::getLoginName)
-    .where("user_Age", "<=", 10)
+    .where("userAge", "<=", 10)
     .list();
 
 ## 排除返回列
@@ -18,7 +18,7 @@
 
     List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
     .dropColumn("password")
-    .where("user_Age", "<=", 10)
+    .where("userAge", "<=", 10)
     .list();
 
 两个方法均可多次调用。
@@ -27,7 +27,7 @@
 
 ## 其它用法
 
-本质上指定一个查询的列，所以也可通过变通的方法完成某些操作，比如以下查询：
+本质上是指定一个查询的列，所以也可通过变通的方式完成某些操作，比如以下查询：
 
     Long maxId = jdbcDao.selectFrom(UserInfo.class)
     .addColumn("max(userInfoId) maxid")
