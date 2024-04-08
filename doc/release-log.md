@@ -2,6 +2,16 @@
 
 从4.2.1版本开始
 
+## 4.3.0 20240408
+
+- commons工具包合并
+- 增加flyable模块
+- Select增加类级别泛型支持
+- include、exclude更改为addColumn、dropColumn
+- 修复在h2下的自增主键报错问题
+- 测试模块集成spring boot管理依赖版本
+- 部分代码优化
+
 ## 4.2.1 20221105
 
 - 更新JSqlParser版本为4.5 [I5Z2X1](https://gitee.com/selfly/sonsure-dumper/issues/I5Z2X1)

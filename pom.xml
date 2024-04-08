@@ -16,7 +16,7 @@
     <groupId>com.sonsure</groupId>
     <artifactId>sonsure-dumper</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.1</version>
+    <version>4.3.0</version>
 
     <name>sonsure-dumper</name>
     <description>Java Jdbc Framework.</description>
@@ -53,19 +53,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <spring-boot.version>2.7.18</spring-boot.version>
-        <sonsure-common.version>4.1.2</sonsure-common.version>
-        <aspectjweaver.version>1.8.13</aspectjweaver.version>
-        <spring.version>5.3.29</spring.version>
-        <slf4j-api.version>1.7.30</slf4j-api.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
-        <commons-dbutils.version>1.7</commons-dbutils.version>
-        <commons.dbcp.version>1.4</commons.dbcp.version>
-        <slf4j.version>2.0.5</slf4j.version>
-        <commons-collections.version>3.2.1</commons-collections.version>
         <jsqlparser.version>4.5</jsqlparser.version>
-        <snakeyaml.version>2.2</snakeyaml.version>
         <mysql.version>8.0.16</mysql.version>
-        <junit.version>4.13.1</junit.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mybatis-spring.version>2.0.6</mybatis-spring.version>
         <javax.persistence-api.version>2.2</javax.persistence-api.version>
@@ -119,89 +108,6 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
-
-<!--            <dependency>-->
-<!--                <groupId>org.apache.commons</groupId>-->
-<!--                <artifactId>commons-lang3</artifactId>-->
-<!--                <version>${commons-lang3.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-jdbc</artifactId>-->
-<!--                <version>${spring.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>javax.persistence</groupId>-->
-<!--                <artifactId>javax.persistence-api</artifactId>-->
-<!--                <version>${javax.persistence-api.version}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>org.yaml</groupId>-->
-<!--                <artifactId>snakeyaml</artifactId>-->
-<!--                <version>${snakeyaml.version}</version>-->
-<!--            </dependency>-->
-
-
-
-<!--            <dependency>-->
-<!--                <groupId>org.aspectj</groupId>-->
-<!--                <artifactId>aspectjweaver</artifactId>-->
-<!--                <version>${aspectjweaver.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>commons-dbcp</groupId>-->
-<!--                <artifactId>commons-dbcp</artifactId>-->
-<!--                <version>${commons.dbcp.version}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>org.postgresql</groupId>-->
-<!--                <artifactId>postgresql</artifactId>-->
-<!--                <version>${postgresql.version}</version>-->
-<!--                <scope>test</scope>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-aop</artifactId>-->
-<!--                <version>${spring.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-orm</artifactId>-->
-<!--                <version>${spring.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-context-support</artifactId>-->
-<!--                <version>${spring.version}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-test</artifactId>-->
-<!--                <version>${spring.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.hibernate</groupId>-->
-<!--                <artifactId>hibernate-core</artifactId>-->
-<!--                <version>${hibernate-core.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.slf4j</groupId>-->
-<!--                <artifactId>slf4j-api</artifactId>-->
-<!--                <version>${slf4j.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.slf4j</groupId>-->
-<!--                <artifactId>slf4j-log4j12</artifactId>-->
-<!--                <version>${slf4j.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>junit</groupId>-->
-<!--                <artifactId>junit</artifactId>-->
-<!--                <version>${junit.version}</version>-->
-<!--            </dependency>-->
 
         </dependencies>
     </dependencyManagement>
@@ -309,7 +215,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>3.2.2</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
