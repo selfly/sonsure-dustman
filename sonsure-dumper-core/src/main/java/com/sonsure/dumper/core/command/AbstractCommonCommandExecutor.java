@@ -16,6 +16,7 @@ import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.List;
  * @author liyd
  * @date 17 /4/19
  */
+@Getter
 public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecutor<E>> implements CommonCommandExecutor<E> {
 
     /**
@@ -114,10 +116,6 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
      * @return the command context builder
      */
     protected abstract <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder();
-
-    public JdbcEngineConfig getJdbcEngineConfig() {
-        return jdbcEngineConfig;
-    }
 
     protected interface PageQueryHandler<T> {
 

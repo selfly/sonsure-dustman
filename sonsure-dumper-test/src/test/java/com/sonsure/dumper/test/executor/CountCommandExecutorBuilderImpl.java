@@ -16,14 +16,9 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 public class CountCommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 
     @Override
-    public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-        return commandExecutorClass == CountCommandExecutor.class;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
+    public <T extends CommandExecutor, M> T build(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig) {
         CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcEngineConfig);
+        //noinspection unchecked
         return (T) commandExecutor;
     }
 }

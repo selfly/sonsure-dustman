@@ -11,6 +11,7 @@ package com.sonsure.dumper.core.config;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,40 +19,29 @@ import java.util.List;
 /**
  * @author liyd
  */
+@Setter
 public class CommandExecutorFactoryImpl implements CommandExecutorFactory {
-
-    protected List<CommandExecutorBuilder> defaultCommandExecutorBuilders;
 
     protected List<CommandExecutorBuilder> commandExecutorBuilders;
 
     public CommandExecutorFactoryImpl() {
-        defaultCommandExecutorBuilders = new ArrayList<>();
-        defaultCommandExecutorBuilders.add(new CommandExecutorBuilderImpl());
+        commandExecutorBuilders = new ArrayList<>();
+        commandExecutorBuilders.add(new CommandExecutorBuilderImpl());
     }
 
     @Override
-    public <T extends CommandExecutor> T getCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-        CommandExecutorBuilder commandExecutorBuilder = this.getCommandExecutorBuilder(commandExecutorClass, jdbcEngineConfig);
-        return commandExecutorBuilder.build(commandExecutorClass, jdbcEngineConfig);
-    }
-
-    protected CommandExecutorBuilder getCommandExecutorBuilder(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-        if (this.commandExecutorBuilders != null) {
-            for (CommandExecutorBuilder ceb : this.commandExecutorBuilders) {
-                if (ceb.support(commandExecutorClass, jdbcEngineConfig)) {
-                    return ceb;
-                }
-            }
-        }
-        for (CommandExecutorBuilder ceb : this.defaultCommandExecutorBuilders) {
-            if (ceb.support(commandExecutorClass, jdbcEngineConfig)) {
-                return ceb;
+    public <T extends CommandExecutor, M> T getCommandExecutor(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig) {
+        for (CommandExecutorBuilder commandExecutorBuilder : this.commandExecutorBuilders) {
+            T executor = commandExecutorBuilder.build(commandExecutorClass, modelClass, jdbcEngineConfig);
+            if (executor != null) {
+                return executor;
             }
         }
         throw new SonsureJdbcException(String.format("没有找到对应的CommandExecutorBuilder,commandExecutorClass:%s", commandExecutorClass.getName()));
     }
 
-    public void setCommandExecutorBuilders(List<CommandExecutorBuilder> commandExecutorBuilders) {
-        this.commandExecutorBuilders = commandExecutorBuilders;
+    public void addCommandExecutorBuilder(CommandExecutorBuilder commandExecutorBuilder) {
+        this.commandExecutorBuilders.add(commandExecutorBuilder);
     }
+
 }

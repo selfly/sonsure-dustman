@@ -68,7 +68,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return t object
      */
-    Map<String, Object> singleResult();
+    Map<String, Object> singleMapResult();
 
     /**
      * 简单查询，返回单一的结果，例如Long、Integer、String等
@@ -102,7 +102,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return list
      */
-    List<Map<String, Object>> list();
+    List<Map<String, Object>> listMaps();
 
     /**
      * 分页列表查询
@@ -118,7 +118,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return page
      */
-    Page<Map<String, Object>> pageResult();
+    Page<Map<String, Object>> pageMapResult();
 
     /**
      * singleColumnList分页查询
@@ -158,9 +158,9 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      *
      * @return t object
      */
-    default Map<String, Object> firstResult() {
+    default Map<String, Object> firstMapResult() {
         this.paginate(1, 1).isCount(false);
-        Page<Map<String, Object>> page = this.pageResult();
+        Page<Map<String, Object>> page = this.pageMapResult();
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
 

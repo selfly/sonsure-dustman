@@ -18,9 +18,7 @@ import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.PersistExecutor;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -29,13 +27,18 @@ import java.util.Map;
  * @author liyd
  * @date 17/4/12
  */
-public class SelectImpl extends AbstractConditionCommandExecutor<Select> implements Select {
+public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> implements Select<M> {
+
+    private final Class<M> cls;
 
     private final SelectCommandContextBuilderImpl selectCommandContextBuilder;
 
-    public SelectImpl(JdbcEngineConfig jdbcEngineConfig) {
+    public SelectImpl(JdbcEngineConfig jdbcEngineConfig, Class<M> cls) {
         super(jdbcEngineConfig);
+        this.cls = cls;
         this.selectCommandContextBuilder = new SelectCommandContextBuilderImpl(new SelectCommandContextBuilderImpl.Context());
+        this.selectCommandContextBuilder.addFromClass(cls);
+        this.selectCommandContextBuilder.addModelClass(cls);
     }
 
     @SuppressWarnings("unchecked")
@@ -50,89 +53,96 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
     }
 
     @Override
-    public Select select(String... fields) {
+    public Select<M> tableAlias(String alias) {
+        this.selectCommandContextBuilder.tableAlias(alias);
+        return this;
+    }
+
+    @Override
+    public Select<M> from(Class<?> cls, String alias) {
+        this.selectCommandContextBuilder.addFromClass(cls, alias);
+        return this;
+    }
+
+    @Override
+    public Select<M> addColumn(String... fields) {
         this.selectCommandContextBuilder.addSelectFields(fields);
         return this;
     }
 
     @Override
-    public Select from(Class<?> cls) {
-        this.selectCommandContextBuilder.addFromClass(cls);
-        this.selectCommandContextBuilder.addModelClass(cls);
+    public final <E, R> Select<M> addColumn(Function<E, R> function) {
+        String[] fields = LambdaMethod.getFields(function);
+        this.addColumn(fields);
         return this;
     }
 
     @Override
-    public Select from(Class<?> cls, String alias, Object... clsAndAlias) {
-        this.selectCommandContextBuilder.addFromClass(cls, alias);
-        if (ArrayUtils.isNotEmpty(clsAndAlias)) {
-            if (ArrayUtils.getLength(clsAndAlias) % 2 != 0) {
-                throw new SonsureJdbcException("指定多表必须一个class一个别名对应");
-            }
-            for (int i = 0; i < clsAndAlias.length; i++) {
-                Object clazz = clsAndAlias[i];
-                Object aliasName = clsAndAlias[++i];
-                if (!(clazz instanceof Class) || !(aliasName instanceof String)) {
-                    throw new SonsureJdbcException("指定多表必须一个class(Class类型)一个别名(String类型)对应");
-                }
-                selectCommandContextBuilder.addFromClass(((Class<?>) clazz), ((String) aliasName));
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public Select exclude(String... fields) {
+    public Select<M> dropColumn(String... fields) {
         this.selectCommandContextBuilder.addExcludeFields(fields);
         return this;
     }
 
     @Override
-    public Select groupBy(String... fields) {
+    public <E, R> Select<M> dropColumn(Function<E, R> function) {
+        String[] fields = LambdaMethod.getFields(function);
+        this.dropColumn(fields);
+        return this;
+    }
+
+    @Override
+    public Select<M> groupBy(String... fields) {
         this.selectCommandContextBuilder.addGroupByField(fields);
         return this;
     }
 
     @Override
-    public Select orderBy(String... fields) {
+    public <E, R> Select<M> groupBy(Function<E, R> function) {
+        String[] fields = LambdaMethod.getFields(function);
+        this.groupBy(fields);
+        return this;
+    }
+
+    @Override
+    public Select<M> orderBy(String... fields) {
         this.selectCommandContextBuilder.addOrderByField(fields);
         return this;
     }
 
     @Override
-    public <E, R> Select orderBy(Function<E, R> function) {
+    public <E, R> Select<M> orderBy(Function<E, R> function) {
         String[] fields = LambdaMethod.getFields(function);
         this.orderBy(fields);
         return this;
     }
 
     @Override
-    public Select asc() {
+    public Select<M> asc() {
         this.selectCommandContextBuilder.asc();
         return this;
     }
 
     @Override
-    public Select desc() {
+    public Select<M> desc() {
         this.selectCommandContextBuilder.desc();
         return this;
     }
 
 
     @Override
-    public Select paginate(int pageNum, int pageSize) {
+    public Select<M> paginate(int pageNum, int pageSize) {
         this.selectCommandContextBuilder.paginate(pageNum, pageSize);
         return this;
     }
 
     @Override
-    public Select limit(int offset, int size) {
+    public Select<M> limit(int offset, int size) {
         this.selectCommandContextBuilder.limit(offset, size);
         return this;
     }
 
     @Override
-    public Select isCount(boolean isCount) {
+    public Select<M> isCount(boolean isCount) {
         this.selectCommandContextBuilder.setCount(isCount);
         return this;
     }
@@ -160,7 +170,7 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String, Object> singleResult() {
+    public Map<String, Object> singleMapResult() {
         CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
         return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP);
     }
@@ -192,7 +202,7 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Map<String, Object>> list() {
+    public List<Map<String, Object>> listMaps() {
         CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
         return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP_LIST);
     }
@@ -208,7 +218,7 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    public Page<Map<String, Object>> pageResult() {
+    public Page<Map<String, Object>> pageMapResult() {
         SelectCommandContextBuilderImpl.Context selectContext = this.selectCommandContextBuilder.getSelectContext();
         CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
         return this.doPageResult(commandContext, selectContext.getPagination(), selectContext.isCount(), commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_MAP_LIST));
@@ -223,4 +233,23 @@ public class SelectImpl extends AbstractConditionCommandExecutor<Select> impleme
         return this.doPageResult(commandContext, selectContext.getPagination(), selectContext.isCount(), commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_ONE_COL_LIST));
     }
 
+    @Override
+    public M singleResult() {
+        return this.singleResult(this.cls);
+    }
+
+    @Override
+    public M firstResult() {
+        return this.firstResult(this.cls);
+    }
+
+    @Override
+    public List<M> list() {
+        return this.list(cls);
+    }
+
+    @Override
+    public Page<M> pageResult() {
+        return this.pageResult(cls);
+    }
 }

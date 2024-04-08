@@ -72,6 +72,10 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
         this.addFromClass(cls, null);
     }
 
+    public void tableAlias(String alias) {
+        this.selectContext.tableAlias(alias);
+    }
+
     public void addFromClass(Class<?> cls, String aliasName) {
         this.selectContext.addFromClass(this.createCommandClass(cls, aliasName));
     }
@@ -176,6 +180,10 @@ public class SelectCommandContextBuilderImpl extends QueryCommandContextBuilder 
 
         public void addSelectField(CommandField commandField) {
             getSelectFields().add(commandField);
+        }
+
+        public void tableAlias(String alias) {
+            getFromClasses().get(getFromClasses().size() - 1).setAliasName(alias);
         }
 
         public void addFromClass(CommandClass commandClass) {

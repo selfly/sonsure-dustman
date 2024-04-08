@@ -18,12 +18,11 @@ import com.sonsure.dumper.core.command.entity.Delete;
 import com.sonsure.dumper.core.command.entity.Insert;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.entity.Update;
-import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.config.JdbcEngine;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import lombok.Getter;
 import lombok.Setter;
 
 import javax.sql.DataSource;
@@ -39,10 +38,12 @@ import java.util.Map;
 @Setter
 public abstract class AbstractDaoTemplateImpl implements JdbcDao {
 
+    @Getter
     protected DataSource dataSource;
 
     protected JdbcEngine defaultJdbcEngine;
 
+    @Getter
     protected Map<String, JdbcEngine> jdbcEngineMap;
 
     @Override
@@ -89,12 +90,12 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
 
     @Override
     public <T> T singleResult(T entity) {
-        return (T) this.getDefaultJdbcEngine().singleResult(entity);
+        return this.getDefaultJdbcEngine().singleResult(entity);
     }
 
     @Override
     public <T> T firstResult(T entity) {
-        return (T) this.getDefaultJdbcEngine().firstResult(entity);
+        return this.getDefaultJdbcEngine().firstResult(entity);
     }
 
     @Override
@@ -133,24 +134,8 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
     }
 
     @Override
-    public Select selectFrom(Class<?> cls) {
+    public <M> Select<M> selectFrom(Class<M> cls) {
         return this.getDefaultJdbcEngine().selectFrom(cls);
-    }
-
-    @Override
-    public Select select() {
-        return this.getDefaultJdbcEngine().select();
-    }
-
-    @Override
-    public Select select(String... fields) {
-        return this.getDefaultJdbcEngine().select(fields);
-    }
-
-    @Override
-    public <E, R> Select select(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
-        return this.select(fields);
     }
 
     @Override
@@ -190,17 +175,17 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
 
     @Override
     public NativeExecutor nativeExecutor() {
-        return this.getDefaultJdbcEngine().createExecutor(NativeExecutor.class);
+        return this.getDefaultJdbcEngine().createExecutor(NativeExecutor.class, null);
     }
 
     @Override
     public MybatisExecutor myBatisExecutor() {
-        return this.getDefaultJdbcEngine().createExecutor(MybatisExecutor.class);
+        return this.getDefaultJdbcEngine().createExecutor(MybatisExecutor.class, null);
     }
 
     @Override
     public <T extends CommandExecutor> T executor(Class<T> executor) {
-        return this.getDefaultJdbcEngine().createExecutor(executor);
+        return this.getDefaultJdbcEngine().createExecutor(executor, null);
     }
 
     @Override
@@ -213,14 +198,6 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
             throw new SonsureJdbcException("jdbcEngine不能为空");
         }
         return this.defaultJdbcEngine;
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    public Map<String, JdbcEngine> getJdbcEngineMap() {
-        return jdbcEngineMap;
     }
 
 }

@@ -18,7 +18,6 @@ import com.sonsure.dumper.core.command.entity.Delete;
 import com.sonsure.dumper.core.command.entity.Insert;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.entity.Update;
-import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
 
@@ -172,35 +171,11 @@ public interface DaoTemplate {
     /**
      * 创建select对象
      *
+     * @param <M> the type parameter
      * @param cls the cls
-     * @return select
-     */
-    Select selectFrom(Class<?> cls);
-
-    /**
-     * 创建select对象
-     *
      * @return select select
      */
-    Select select();
-
-    /**
-     * 创建select对象
-     *
-     * @param fields the fields
-     * @return select select
-     */
-    Select select(String... fields);
-
-    /**
-     * 创建select对象
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @return select select
-     */
-    <E, R> Select select(Function<E, R> function);
+    <M> Select<M> selectFrom(Class<M> cls);
 
     /**
      * 创建insert对象

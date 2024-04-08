@@ -17,23 +17,14 @@ import com.sonsure.dumper.core.command.CommandExecutor;
 public interface CommandExecutorBuilder {
 
     /**
-     * 是否支持
-     *
-     * @param commandExecutorClass the command executor class
-     * @param param                the param
-     * @param jdbcEngineConfig     the jdbc engine config
-     * @return boolean
-     */
-    boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig);
-
-    /**
      * 构建CommandExecutor
      *
      * @param <T>                  the type parameter
+     * @param <M>                  the type parameter
      * @param commandExecutorClass the command executor class
-     * @param param                the param
+     * @param modelClass           the model class
      * @param jdbcEngineConfig     the jdbc engine config
      * @return command executor
      */
-    <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig);
+    <T extends CommandExecutor, M> T build(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig);
 }

@@ -50,10 +50,12 @@ public interface JdbcEngine {
      * 创建执行器
      *
      * @param <T>                  the type parameter
+     * @param <M>                  the type parameter
      * @param commandExecutorClass 执行器class
-     * @return t
+     * @param modelClass           the model class
+     * @return t t
      */
-    <T extends CommandExecutor> T createExecutor(Class<T> commandExecutorClass);
+    <T extends CommandExecutor, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass);
 
     /**
      * insert对象
@@ -83,16 +85,17 @@ public interface JdbcEngine {
      *
      * @return select
      */
-    Select select();
+    <M> Select<M> selectFrom(Class<M> cls);
 
     /**
-     * select对象
+     * 直接get对象
      *
-     * @param fields the fields
-     * @return select select
+     * @param <T> the type parameter
+     * @param cls the cls
+     * @param id  the id
+     * @return t
      */
-    Select select(String... fields);
-
+    <T> T get(Class<T> cls, Serializable id);
 
     /**
      * 查询所有列表
@@ -237,25 +240,6 @@ public interface JdbcEngine {
      * @return int
      */
     int executeDelete(Class<?> cls);
-
-    /**
-     * 创建select后指定from
-     *
-     * @param cls the cls
-     * @return select
-     */
-    Select selectFrom(Class<?> cls);
-
-
-    /**
-     * 直接get对象
-     *
-     * @param <T> the type parameter
-     * @param cls the cls
-     * @param id  the id
-     * @return t
-     */
-    <T> T get(Class<T> cls, Serializable id);
 
     /**
      * Gets database product.

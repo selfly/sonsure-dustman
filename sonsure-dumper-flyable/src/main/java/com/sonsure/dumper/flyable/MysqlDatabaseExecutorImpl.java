@@ -33,7 +33,7 @@ public class MysqlDatabaseExecutorImpl extends AbstractDatabaseExecutor {
                 .command("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?")
                 .parameters(flyableHistory)
                 .nativeCommand()
-                .singleResult();
+                .singleMapResult();
         return map != null && !map.isEmpty();
     }
 }

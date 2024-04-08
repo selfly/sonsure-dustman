@@ -17,11 +17,6 @@ import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutorImpl;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutorImpl;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
-
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The type Command executor builder.
@@ -30,32 +25,25 @@ import java.util.Map;
  */
 public class CommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 
-    protected Map<Class<? extends CommandExecutor>, Class<? extends CommandExecutor>> commandExecutorClassMap = new HashMap<>();
-
-    public CommandExecutorBuilderImpl() {
-        commandExecutorClassMap.put(Insert.class, InsertImpl.class);
-        commandExecutorClassMap.put(Select.class, SelectImpl.class);
-        commandExecutorClassMap.put(Update.class, UpdateImpl.class);
-        commandExecutorClassMap.put(Delete.class, DeleteImpl.class);
-        commandExecutorClassMap.put(NativeExecutor.class, NativeExecutorImpl.class);
-        commandExecutorClassMap.put(MybatisExecutor.class, MybatisExecutorImpl.class);
-        commandExecutorClassMap.put(BatchUpdateExecutor.class, BatchUpdateExecutorImpl.class);
-    }
-
-    @Override
-    public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-        return commandExecutorClassMap.containsKey(commandExecutorClass);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-        try {
-            Class<? extends CommandExecutor> implClass = commandExecutorClassMap.get(commandExecutorClass);
-            Constructor<? extends CommandExecutor> constructor = implClass.getDeclaredConstructor(JdbcEngineConfig.class);
-            return (T) constructor.newInstance(jdbcEngineConfig);
-        } catch (Exception e) {
-            throw new SonsureJdbcException("创建CommandExecutor失败", e);
+    public <T extends CommandExecutor, M> T build(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig) {
+        if (Insert.class == commandExecutorClass) {
+            return (T) new InsertImpl(jdbcEngineConfig);
+        } else if (Select.class == commandExecutorClass) {
+            return (T) new SelectImpl<>(jdbcEngineConfig, modelClass);
+        } else if (Update.class == commandExecutorClass) {
+            return (T) new UpdateImpl(jdbcEngineConfig);
+        } else if (Delete.class == commandExecutorClass) {
+            return (T) new DeleteImpl(jdbcEngineConfig);
+        } else if (NativeExecutor.class == commandExecutorClass) {
+            return (T) new NativeExecutorImpl(jdbcEngineConfig);
+        } else if (MybatisExecutor.class == commandExecutorClass) {
+            return (T) new MybatisExecutorImpl(jdbcEngineConfig);
+        } else if (BatchUpdateExecutor.class == commandExecutorClass) {
+            return (T) new BatchUpdateExecutorImpl(jdbcEngineConfig);
+        } else {
+            return null;
         }
     }
 }

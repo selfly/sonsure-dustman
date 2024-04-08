@@ -32,18 +32,15 @@ import java.util.List;
  */
 public class JdbcEngineImpl implements JdbcEngine {
 
-    private JdbcEngineConfig jdbcEngineConfig;
-
-    public JdbcEngineImpl() {
-    }
+    private final JdbcEngineConfig jdbcEngineConfig;
 
     public JdbcEngineImpl(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
     }
 
     @Override
-    public <T extends CommandExecutor> T createExecutor(Class<T> commandExecutorClass) {
-        return this.jdbcEngineConfig.getCommandExecutorFactory().getCommandExecutor(commandExecutorClass, this.jdbcEngineConfig);
+    public <T extends CommandExecutor, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass) {
+        return this.jdbcEngineConfig.getCommandExecutorFactory().getCommandExecutor(commandExecutorClass, modelClass, this.jdbcEngineConfig);
     }
 
     @Override
@@ -57,20 +54,9 @@ public class JdbcEngineImpl implements JdbcEngine {
     }
 
     @Override
-    public Select select() {
-        return this.createExecutor(Select.class);
-    }
-
-    @Override
-    public Select select(String... fields) {
-        Select select = this.createExecutor(Select.class);
-        select.select(fields);
-        return select;
-    }
-
-    @Override
-    public Select selectFrom(Class<?> cls) {
-        return this.select().from(cls);
+    public <M> Select<M> selectFrom(Class<M> cls) {
+        //noinspection unchecked
+        return this.createExecutor(Select.class, cls);
     }
 
     @Override
@@ -123,7 +109,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public Insert insert() {
-        return this.createExecutor(Insert.class);
+        return this.createExecutor(Insert.class, null);
     }
 
     @Override
@@ -138,7 +124,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public Update update() {
-        return this.createExecutor(Update.class);
+        return this.createExecutor(Update.class, null);
     }
 
     @Override
@@ -153,7 +139,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public BatchUpdateExecutor batchUpdate() {
-        return this.createExecutor(BatchUpdateExecutor.class);
+        return this.createExecutor(BatchUpdateExecutor.class, null);
     }
 
     @Override
@@ -163,7 +149,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public Delete delete() {
-        return this.createExecutor(Delete.class);
+        return this.createExecutor(Delete.class, null);
     }
 
     @Override
@@ -192,7 +178,4 @@ public class JdbcEngineImpl implements JdbcEngine {
         return this.getJdbcEngineConfig().getPersistExecutor().getDialect();
     }
 
-    public void setJdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
-    }
 }

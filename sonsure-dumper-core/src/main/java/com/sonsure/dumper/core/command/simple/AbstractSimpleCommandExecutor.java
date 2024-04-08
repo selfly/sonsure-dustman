@@ -93,7 +93,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     }
 
     @Override
-    public Map<String, Object> singleResult() {
+    public Map<String, Object> singleMapResult() {
         CommandContext commandContext = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
         return (Map<String, Object>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP);
     }
@@ -106,7 +106,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     }
 
     @Override
-    public List<Map<String, Object>> list() {
+    public List<Map<String, Object>> listMaps() {
         CommandContext commandContext = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
         return (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP_LIST);
     }
@@ -145,12 +145,12 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     @Override
     public <T> Page<T> pageResult(Class<T> cls) {
-        Page<Map<String, Object>> page = this.pageResult();
+        Page<Map<String, Object>> page = this.pageMapResult();
         return this.handleResult(page, getResultHandler(cls));
     }
 
     @Override
-    public Page<Map<String, Object>> pageResult() {
+    public Page<Map<String, Object>> pageMapResult() {
         CommandContext commandContext = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
         Page<Map<String, Object>> page = this.doPageResult(commandContext, commandContext.getPagination(), commandContext.isCount(), commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_MAP_LIST));
         Page<Map<String, Object>> resultPage = new Page<>(page.getPagination());

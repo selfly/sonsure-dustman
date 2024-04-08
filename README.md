@@ -48,13 +48,12 @@
             .execute();
     
     //SQL: select user_age, count(*) num from user_info group by user_age order by num desc limit 0,10
-    Page<Object> page = jdbcDao.select("userAge,count(*) Num")
-            .from(UserInfo.class)
+    Page<Object> page = jdbcDao.selectFrom(UserInfo.class).addColumn("userAge,count(*) Num")
             .groupBy(UserInfo::getUserAge()) //4.0版开始属性推荐使用lambda方式，防止拼错
             .orderBy("Num").desc()
             .paginate(1, 10)
             .isCount(false)
-            .pageResult();
+            .pageMapResult();
  
 ## 特点
 
@@ -103,6 +102,7 @@
 - [初始化配置](doc/init-config.md)  
 - [基本增删改查](doc/basic-crud.md)  
 - [Insert|Update|Delete|Select用法](doc/executor-crud.md)
+- [指定查询列及表别名使用](doc/spec-column.md)
 - [拼接sql片断](doc/append-sql.md)
 - [不传参{{ }}符号的使用](doc/not-param.md)
 - [注解的使用](doc/use-annotation.md)

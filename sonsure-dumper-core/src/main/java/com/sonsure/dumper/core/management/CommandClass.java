@@ -9,9 +9,14 @@
 
 package com.sonsure.dumper.core.management;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author liyd
  */
+@Setter
+@Getter
 public class CommandClass {
 
     /**
@@ -33,19 +38,4 @@ public class CommandClass {
         this.aliasName = aliasName;
     }
 
-    public Class<?> getCls() {
-        return cls;
-    }
-
-    public void setCls(Class<?> cls) {
-        this.cls = cls;
-    }
-
-    public String getAliasName() {
-        return aliasName;
-    }
-
-    public void setAliasName(String aliasName) {
-        this.aliasName = aliasName;
-    }
 }
