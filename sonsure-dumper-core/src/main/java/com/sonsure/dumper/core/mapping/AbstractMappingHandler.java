@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author liyd
  */
 @Slf4j
-public abstract class AbstractMappingHandler implements MappingHandler {
+public abstract class AbstractMappingHandler implements MappingHandler, TablePrefixSupportHandler {
 
     /**
      * value需要native内容前后包围符号
@@ -145,13 +145,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
                 //默认Java属性的骆驼命名法转换回数据库下划线“_”分隔的格式
                 tableName = NameUtils.getUnderlineName(entityClass.getSimpleName());
             } else {
-                String tablePreFix = "";
-                for (Map.Entry<String, String> entry : tablePrefixMap.entrySet()) {
-                    if (StringUtils.startsWith(entityClass.getName(), entry.getKey())) {
-                        tablePreFix = entry.getValue();
-                        break;
-                    }
-                }
+                String tablePreFix = this.getTablePrefix(entityClass.getName());
                 tableName = tablePreFix + NameUtils.getUnderlineName(entityClass.getSimpleName());
             }
         }
@@ -204,6 +198,16 @@ public abstract class AbstractMappingHandler implements MappingHandler {
             return mappedFieldMeta.getName();
         }
         return NameUtils.getCamelName(columnName);
+    }
+
+    @Override
+    public String getTablePrefix(String classPackage) {
+        for (Map.Entry<String, String> entry : tablePrefixMap.entrySet()) {
+            if (StringUtils.startsWith(classPackage, entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return "";
     }
 
     protected Class<?> getTableClass(String className) {

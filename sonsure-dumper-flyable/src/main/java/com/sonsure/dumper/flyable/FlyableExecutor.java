@@ -1,6 +1,9 @@
 package com.sonsure.dumper.flyable;
 
 import com.sonsure.dumper.common.utils.VersionUtils;
+import com.sonsure.dumper.core.mapping.MappingHandler;
+import com.sonsure.dumper.core.mapping.TablePrefixSupportHandler;
+import com.sonsure.dumper.core.persist.AbstractDaoTemplateImpl;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.exception.FlyableException;
 import lombok.Getter;
@@ -31,18 +34,17 @@ public class FlyableExecutor {
 
     @Setter
     @Getter
-    private String flyablePrefix;
+    private String flyablePrefix = "";
 
     public FlyableExecutor(JdbcDao jdbcDao) {
         this.jdbcDao = jdbcDao;
-        this.flyablePrefix = "";
+        this.setFlyablePrefixWithJdbcDao();
         this.groupExecutionOrder = new ArrayList<>(8);
         this.groupExecutionOrder.add(FLYABLE_GROUP);
         this.databaseExecutors = new ArrayList<>(16);
         this.databaseExecutors.add(new MysqlDatabaseExecutorImpl());
         this.databaseExecutors.add(new H2DatabaseExecutorImpl());
     }
-
 
     public void migrate() {
         String databaseProduct = this.getDatabaseProduct();
@@ -60,6 +62,16 @@ public class FlyableExecutor {
         //未指定顺序的初始化
         for (Map.Entry<String, List<MigrationResource>> entry : map.entrySet()) {
             this.updateMigrate(entry.getValue(), entry.getKey(), true, databaseExecutor);
+        }
+    }
+
+    protected void setFlyablePrefixWithJdbcDao() {
+        if (!(jdbcDao instanceof AbstractDaoTemplateImpl)) {
+            return;
+        }
+        MappingHandler mappingHandler = ((AbstractDaoTemplateImpl) jdbcDao).getDefaultJdbcEngine().getJdbcEngineConfig().getMappingHandler();
+        if (mappingHandler instanceof TablePrefixSupportHandler) {
+            this.flyablePrefix = ((TablePrefixSupportHandler) mappingHandler).getTablePrefix(FlyableHistory.class.getName());
         }
     }
 
