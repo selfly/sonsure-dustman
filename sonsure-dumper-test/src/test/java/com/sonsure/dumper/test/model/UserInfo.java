@@ -10,11 +10,8 @@
 package com.sonsure.dumper.test.model;
 
 
-import com.sonsure.dumper.common.model.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 /**
  * 用户
@@ -24,7 +21,7 @@ import java.util.Date;
  */
 @Setter
 @Getter
-public class UserInfo extends BaseEntity {
+public class UserInfo extends BaseUser {
 
     private static final long serialVersionUID = 8166785520231287816L;
 
@@ -47,16 +44,6 @@ public class UserInfo extends BaseEntity {
      * 年龄
      */
     private Integer userAge;
-
-    /**
-     * 创建时间
-     */
-    private Date gmtCreate;
-
-    /**
-     * 修改时间
-     */
-    private Date gmtModify;
 
 
 }

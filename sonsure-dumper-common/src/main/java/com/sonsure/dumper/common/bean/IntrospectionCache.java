@@ -98,11 +98,7 @@ public class IntrospectionCache {
 
         IntrospectionCache introspectionCache;
 
-        Map<Class<?>, Object> map = classCache.get(beanClass);
-        if (map == null) {
-            map = new HashMap<>();
-            classCache.put(beanClass, map);
-        }
+        Map<Class<?>, Object> map = classCache.computeIfAbsent(beanClass, k -> new HashMap<>());
         //未指定stopClass时使用自身做为key，使用Object.class会和stopClass=Object.class冲突
         //例如第一次未指定stopClass默认到了Object.class，第二次到自身如果该类未继承任何类就是stopClass=Object.class，
         //命中了第一次的缓存从而会有object类中的属性而出错

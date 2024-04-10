@@ -111,7 +111,8 @@ public class ModelClassCache {
     /**
      * 初始化实体类缓存
      *
-     * @param clazz
+     * @param clazz the clazz
+     * @return the model class meta
      */
     private static ModelClassMeta initCache(Class<?> clazz) {
 
@@ -120,7 +121,7 @@ public class ModelClassCache {
         Object table = getEntityAnnotation(clazz);
         modelClassMeta.setAnnotation(table);
 
-        Field[] beanFields = ClassUtils.getSelfFields(clazz);
+        Field[] beanFields = ClassUtils.getSelfOrBaseFields(clazz);
         for (Field field : beanFields) {
 
             if (Modifier.isStatic(field.getModifiers()) || getFieldTransientAnnotation(field) != null) {

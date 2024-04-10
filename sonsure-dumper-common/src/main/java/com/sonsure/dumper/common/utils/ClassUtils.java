@@ -13,6 +13,7 @@ import com.sonsure.dumper.common.bean.BeanFieldCache;
 import com.sonsure.dumper.common.bean.IntrospectionCache;
 import com.sonsure.dumper.common.exception.SonsureBeanException;
 import com.sonsure.dumper.common.exception.SonsureException;
+import com.sonsure.dumper.common.model.BaseProperties;
 import org.apache.commons.lang3.BooleanUtils;
 
 import java.beans.PropertyDescriptor;
@@ -90,9 +91,9 @@ public class ClassUtils {
      * @param beanClass the bean class
      * @return the fields
      */
-    public static Field[] getSelfFields(Class<?> beanClass) {
-
-        return getBeanFields(beanClass, beanClass.getSuperclass());
+    public static Field[] getSelfOrBaseFields(Class<?> beanClass) {
+        Class<?> stopBaseClass = getStopBaseClass(beanClass);
+        return getBeanFields(beanClass, stopBaseClass);
     }
 
     /**
@@ -215,16 +216,34 @@ public class ClassUtils {
     }
 
     /**
+     * Gets stop base class.
+     *
+     * @param cls the cls
+     * @return the stop base class
+     */
+    public static Class<?> getStopBaseClass(Class<?> cls) {
+        Class<?> stopClass = cls.getSuperclass();
+        while (stopClass.getAnnotation(BaseProperties.class) != null) {
+            stopClass = stopClass.getSuperclass();
+        }
+        return stopClass;
+    }
+
+    /**
      * Gets bean prop map.
      *
      * @param object           the object
      * @param ignoreAnnotation the ignore annotation
-     * @param onlySelf         the only self
+     * @param onlySelfOrBase   the only self or base
      * @return the bean prop map
      */
-    public static Map<String, Object> getBeanPropMap(Object object, Class<? extends Annotation> ignoreAnnotation, boolean onlySelf) {
-        Map<String, Object> propMap = new HashMap<String, Object>();
-        PropertyDescriptor[] propertyDescriptors = onlySelf ? getSelfPropertyDescriptors(object.getClass()) : getPropertyDescriptors(object.getClass());
+    public static Map<String, Object> getBeanPropMap(Object object, Class<? extends Annotation> ignoreAnnotation, boolean onlySelfOrBase) {
+        Class<?> stopClass = null;
+        if (onlySelfOrBase) {
+            stopClass = getStopBaseClass(object.getClass());
+        }
+        Map<String, Object> propMap = new HashMap<>();
+        PropertyDescriptor[] propertyDescriptors = getPropertyDescriptors(object.getClass(), stopClass);
         if (propertyDescriptors == null) {
             return propMap;
         }
