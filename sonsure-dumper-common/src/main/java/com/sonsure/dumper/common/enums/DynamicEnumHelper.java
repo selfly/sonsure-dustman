@@ -45,6 +45,18 @@ public class DynamicEnumHelper {
     }
 
     /**
+     * Gets dynamic enum item by code.
+     *
+     * @param enumCls the enum cls
+     * @param code    the code
+     * @return the dynamic enum item by code
+     */
+    public static <T extends BaseDynamicEnum> DynamicEnum<T> getDynamicEnumItemByCode(Class<T> enumCls, String code) {
+        //noinspection unchecked
+        return (DynamicEnum<T>) getEnumItemByCode(enumCls, code);
+    }
+
+    /**
      * Put enum.
      *
      * @param enumType the enum type
