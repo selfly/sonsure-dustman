@@ -35,7 +35,7 @@ public class DynamicEnumHelper {
      * @param code    the code
      * @return the enum item
      */
-    public static DynamicEnumItem getEnumItemByCode(Class<? extends BaseDynamicEnum> enumCls, String code) {
+    public static DynamicEnumItem getEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code) {
         for (Map.Entry<BaseDynamicEnum, DynamicEnumItem> entry : computeIfAbsentWithClass(enumCls).entrySet()) {
             if (entry.getKey().getCode().equals(code)) {
                 return entry.getValue();
@@ -47,13 +47,14 @@ public class DynamicEnumHelper {
     /**
      * Gets dynamic enum item by code.
      *
+     * @param <T>     the type parameter
      * @param enumCls the enum cls
      * @param code    the code
      * @return the dynamic enum item by code
      */
-    public static <T extends BaseDynamicEnum> DynamicEnum<T> getDynamicEnumItemByCode(Class<T> enumCls, String code) {
+    public static <T extends BaseDynamicEnum> DynamicEnum<T> getGenericEnumItem(Class<T> enumCls, String code) {
         //noinspection unchecked
-        return (DynamicEnum<T>) getEnumItemByCode(enumCls, code);
+        return (DynamicEnum<T>) getEnumItem(enumCls, code);
     }
 
     /**

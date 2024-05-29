@@ -358,7 +358,7 @@ public class ClassUtils {
     /**
      * 设置method访问权限
      *
-     * @param method
+     * @param method the method
      */
     public static void methodAccessible(Method method) {
         if (!Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
@@ -369,10 +369,11 @@ public class ClassUtils {
     /**
      * 初始化实例
      *
+     * @param <T>   the type parameter
      * @param clazz the clazz
-     * @return object
+     * @return object t
      */
-    public static Object newInstance(Class<?> clazz) {
+    public static <T> T newInstance(Class<T> clazz) {
         try {
             return clazz.newInstance();
         } catch (Exception e) {

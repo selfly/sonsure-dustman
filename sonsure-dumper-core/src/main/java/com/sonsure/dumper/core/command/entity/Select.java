@@ -11,6 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 
 import com.sonsure.dumper.common.model.Page;
+import com.sonsure.dumper.core.command.OrderByType;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
 import com.sonsure.dumper.core.command.lambda.Function;
 
@@ -104,6 +105,15 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     Select<M> orderBy(String... fields);
 
     /**
+     * Order by select.
+     *
+     * @param type   the type
+     * @param fields the fields
+     * @return the select
+     */
+    Select<M> orderBy(OrderByType type, String... fields);
+
+    /**
      * 属性条件
      *
      * @param <E>      the type parameter
@@ -112,6 +122,17 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * @return select
      */
     <E, R> Select<M> orderBy(Function<E, R> function);
+
+    /**
+     * Order by select.
+     *
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param type     the type
+     * @param function the function
+     * @return the select
+     */
+    <E, R> Select<M> orderBy(OrderByType type, Function<E, R> function);
 
     /**
      * asc排序

@@ -38,7 +38,7 @@ public class EnumTest {
             Assertions.assertEquals(values[i].getDesc(), enumValues.get(i).getDesc());
         }
 
-        DynamicEnumItem enumItem = DynamicEnumHelper.getEnumItemByCode(UserTypeEnum.class, "2");
+        DynamicEnumItem enumItem = DynamicEnumHelper.getEnumItem(UserTypeEnum.class, "2");
         Assertions.assertEquals("2", enumItem.getCode());
         Assertions.assertEquals("用户", enumItem.getDesc());
 
