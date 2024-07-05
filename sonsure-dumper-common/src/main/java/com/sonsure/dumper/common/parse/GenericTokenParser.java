@@ -9,9 +9,12 @@
 
 package com.sonsure.dumper.common.parse;
 
+import lombok.Getter;
+
 /**
  * Created by liyd on 2015-11-24.
  */
+@Getter
 public class GenericTokenParser {
 
     private final String openToken;
@@ -37,6 +40,15 @@ public class GenericTokenParser {
                     offset = start + openToken.length();
                 } else {
                     int end = text.indexOf(closeToken, start);
+
+                    //处理嵌套对应
+                    int thisStart = start + openToken.length();
+                    int thisEnd = end;
+                    while ((thisStart = text.indexOf(openToken, thisStart)) != -1 && thisStart < thisEnd) {
+                        thisStart += openToken.length();
+                        end = text.indexOf(closeToken, end + closeToken.length());
+                    }
+
                     if (end == -1) {
                         builder.append(src, offset, src.length - offset);
                         offset = src.length;
@@ -44,7 +56,7 @@ public class GenericTokenParser {
                         builder.append(src, offset, start - offset);
                         offset = start + openToken.length();
                         String content = new String(src, offset, end - offset);
-                        builder.append(handler.handleToken(content));
+                        builder.append(handler.handleToken(content, this));
                         offset = end + closeToken.length();
                     }
                 }
@@ -56,5 +68,6 @@ public class GenericTokenParser {
         }
         return builder.toString();
     }
+
 }
 

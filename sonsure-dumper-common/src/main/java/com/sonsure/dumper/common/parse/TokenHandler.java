@@ -20,5 +20,5 @@ public interface TokenHandler {
      * @param content the content
      * @return the string
      */
-    String handleToken(String content);
+    String handleToken(String content, GenericTokenParser parser);
 }

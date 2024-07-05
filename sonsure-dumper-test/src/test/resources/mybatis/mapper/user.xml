@@ -21,7 +21,13 @@
     </select>
 
     <select id="getUser2" parameterType="java.util.Map" resultType="java.util.HashMap">
+        <bind name="pattern" value="'%' + keyword + '%'" />
         SELECT * FROM sd_user_info WHERE user_info_id = #{user.userInfoId} and login_name = #{user.loginName}
+        <where>
+            <if test="keyword != null">
+                menu_code like "%" + keyword + "%" or menu_title like "%" + keyword + "%" or menu_path like "%" + keyword + "%"
+            </if>
+        </where>
     </select>
 
     <select id="queryUserList">
