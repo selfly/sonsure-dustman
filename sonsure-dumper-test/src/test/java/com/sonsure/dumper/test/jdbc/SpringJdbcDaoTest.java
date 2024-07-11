@@ -1288,10 +1288,10 @@ public class SpringJdbcDaoTest {
                     }
                 });
 
-        long count = this.jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findCount(UserInfo.class);
         Assertions.assertTrue(count >= 10000);
 
-        long count1 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count1 = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getLoginName, "name-9999")
                 .count();
         Assertions.assertTrue(count1 > 0);
@@ -1307,15 +1307,15 @@ public class SpringJdbcDaoTest {
         addUser.setPassword("123456-a");
         addUser.setUserAge(18);
         addUser.setGmtCreate(new Date());
-        this.jdbcDao.executeInsert(addUser);
+        jdbcDao.executeInsert(addUser);
 
-        long count = this.jdbcDao.selectFrom(UserInfo.class)
+        long count = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getLoginName, "name-1")
                 .and(UserInfo::getPassword, "123456-1")
                 .count();
         Assertions.assertEquals(1, count);
 
-        long count1 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count1 = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getLoginName, "name-1")
                 .iff(false).and(UserInfo::getPassword, "123456-1")
                 .count();
@@ -1323,26 +1323,26 @@ public class SpringJdbcDaoTest {
 
         UserInfo user = new UserInfo();
         user.setLoginName("name-1");
-        long count2 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count2 = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .conditionEntity(user)
                 .count();
         Assertions.assertEquals(2, count2);
 
-        long count3 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count3 = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .iff(user.getPassword() != null).conditionEntity(user)
                 .count();
         Assertions.assertEquals(51, count3);
 
-        long count4 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count4 = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .iff(user.getPassword() != null).conditionEntity(user)
                 .condition(UserInfo::getLoginName, "name-5")
                 .count();
         Assertions.assertEquals(1, count4);
 
-        long count5 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count5 = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .iff(addUser.getUserAge() != null).condition(UserInfo::getUserAge, addUser.getUserAge())
                 .and(UserInfo::getPassword, addUser.getPassword())
@@ -1358,15 +1358,15 @@ public class SpringJdbcDaoTest {
         addUser.setPassword("123456-a");
         addUser.setUserAge(18);
         addUser.setGmtCreate(new Date());
-        this.jdbcDao.executeInsert(addUser);
+        jdbcDao.executeInsert(addUser);
 
-        long count = this.jdbcDao.selectFrom(UserInfo.class)
+        long count = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getLoginName, "name-1")
                 .and(UserInfo::getPassword, "123456-1")
                 .count();
         Assertions.assertEquals(1, count);
 
-        long count1 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count1 = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getLoginName, "name-1")
                 .and(UserInfo::getPassword, "123456-1").with(false)
                 .count();
@@ -1374,13 +1374,13 @@ public class SpringJdbcDaoTest {
 
         UserInfo user = new UserInfo();
         user.setLoginName("name-1");
-        long count2 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count2 = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .conditionEntity(user)
                 .count();
         Assertions.assertEquals(2, count2);
 
-        long count3 = this.jdbcDao.selectFrom(UserInfo.class)
+        long count3 = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .conditionEntity(user).with(user.getPassword() != null)
                 .count();
