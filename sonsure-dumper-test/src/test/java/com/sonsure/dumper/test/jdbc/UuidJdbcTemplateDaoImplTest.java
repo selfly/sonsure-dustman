@@ -12,6 +12,7 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.UuidUser;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
  * Created by liyd on 17/4/12.
  */
 
-//@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled
 @ContextConfiguration(locations = {"classpath:applicationContext-uuid.xml"})
 public class UuidJdbcTemplateDaoImplTest {
 

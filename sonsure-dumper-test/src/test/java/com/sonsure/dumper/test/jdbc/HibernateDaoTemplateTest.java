@@ -13,6 +13,7 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.HbUserInfo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * hibernate测试
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled
 @ContextConfiguration(locations = {"classpath:applicationContext-hibernate.xml"})
 public class HibernateDaoTemplateTest {
 

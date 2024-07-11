@@ -14,6 +14,7 @@ import com.sonsure.dumper.core.persist.DaoTemplate;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,8 +24,7 @@ import java.util.Date;
 /**
  * 限于环境，postgres不参与构建
  */
-//@Ignore
-//@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled
 @ContextConfiguration(locations = {"classpath:applicationContext-postgres.xml"})
 public class PostgresJdbcTemplateDaoImplTest {
 

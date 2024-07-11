@@ -14,6 +14,7 @@ import com.sonsure.dumper.core.persist.FlexibleDaoTemplate;
 import com.sonsure.dumper.test.model.OracleUser;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,8 +25,7 @@ import java.util.Date;
 /**
  * 限于环境，不参与构建
  */
-//@Ignore
-//@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled
 @ContextConfiguration(locations = {"classpath:applicationContext-multi-ds.xml"})
 public class MultiDsJdbcDaoTest {
 

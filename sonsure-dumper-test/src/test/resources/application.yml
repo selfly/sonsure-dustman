@@ -6,6 +6,6 @@ spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:h2:~/dumper;mode=mysql;database_to_lower=true
+    url: jdbc:h2:${user.dir}/dumper;mode=mysql;database_to_lower=true
     driver-class-name: org.h2.Driver
     username: sa
