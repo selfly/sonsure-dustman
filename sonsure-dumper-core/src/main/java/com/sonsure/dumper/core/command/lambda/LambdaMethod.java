@@ -15,7 +15,6 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.invoke.SerializedLambda;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -23,17 +22,9 @@ import java.lang.reflect.Method;
  */
 public class LambdaMethod {
 
-    private static final Field CAPTURING_CLASS_FIELD;
-
-    static {
-        CAPTURING_CLASS_FIELD = ReflectionUtils.findField(SerializedLambda.class, "capturingClass");
-        ReflectionUtils.makeAccessible(CAPTURING_CLASS_FIELD);
-    }
-
-
     public static <T, R> String getField(Function<T, R> lambda) {
-        Method method = createMethod(lambda);
-        return getMethodField(method);
+        SerializedLambda invoke = getSerializedLambda(lambda);
+        return methodToField(invoke.getImplMethodName());
     }
 
     @SafeVarargs
@@ -45,33 +36,23 @@ public class LambdaMethod {
         return fields;
     }
 
-    public static String getMethodField(Method getter) {
-        String name = getter.getName();
-        if (!StringUtils.startsWith(name, "get")) {
-            throw new SonsureJdbcException("只能是JavaBean的get方法");
-        }
-        return NameUtils.getFirstLowerName(StringUtils.substring(name, 3));
-    }
-
-    public static <T, R> Method createMethod(Function<T, R> lambda) {
-        SerializedLambda serializedLambda = getSerializedLambda(lambda);
-        return getMethod(serializedLambda);
-    }
-
     private static SerializedLambda getSerializedLambda(Object lambda) {
         Method writeReplace = ReflectionUtils.findMethod(lambda.getClass(), "writeReplace");
         ReflectionUtils.makeAccessible(writeReplace);
         return (SerializedLambda) ReflectionUtils.invokeMethod(writeReplace, lambda);
     }
 
-    private static Method getMethod(SerializedLambda serializedLambda) {
-        String className = StringUtils.replace(serializedLambda.getImplClass(), "/", ".");
-        try {
-            final Class<?> clazz = (Class<?>) CAPTURING_CLASS_FIELD.get(serializedLambda);
-            ClassLoader classLoader = clazz != null && clazz.getClassLoader() != null ? clazz.getClassLoader() : Thread.currentThread().getContextClassLoader();
-            return classLoader.loadClass(className).getDeclaredMethod(serializedLambda.getImplMethodName());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public static String methodToField(String name) {
+        if (name.startsWith("is")) {
+            name = StringUtils.substring(name, 2);
+        } else if (name.startsWith("get")) {
+            name = StringUtils.substring(name, 3);
+        } else {
+            throw new SonsureJdbcException("只能是JavaBean的get方法");
         }
+        if (StringUtils.isNotBlank(name)) {
+            name = NameUtils.getFirstLowerName(name);
+        }
+        return name;
     }
 }

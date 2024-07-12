@@ -21,7 +21,6 @@ import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -36,9 +35,11 @@ import java.util.*;
 @SpringBootTest
 public class SpringJdbcDaoTest {
 
-    @Autowired
-    @Qualifier("mysqlJdbcDao")
     protected JdbcDao jdbcDao;
+
+    public SpringJdbcDaoTest(@Qualifier("mysqlJdbcDao")JdbcDao jdbcDao) {
+        this.jdbcDao = jdbcDao;
+    }
 
     @BeforeEach
     public void before() {
@@ -1307,6 +1308,8 @@ public class SpringJdbcDaoTest {
         addUser.setPassword("123456-a");
         addUser.setUserAge(18);
         addUser.setGmtCreate(new Date());
+
+        System.out.println("jdbcDao:" + jdbcDao);
         jdbcDao.executeInsert(addUser);
 
         long count = jdbcDao.selectFrom(UserInfo.class)
