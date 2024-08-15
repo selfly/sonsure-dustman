@@ -4,6 +4,7 @@ import com.sonsure.dumper.common.parse.GenericTokenParser;
 import com.sonsure.dumper.common.spring.Resource;
 import com.sonsure.dumper.common.utils.EncryptUtils;
 import com.sonsure.dumper.common.utils.FileIOUtils;
+import com.sonsure.dumper.common.utils.TextUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,7 @@ public class MigrationResource {
 
     private byte[] resourceBytes;
 
-    private Map<String, String> variables;
+    private final Map<String, String> variables;
 
     public MigrationResource(Resource resource) {
         this.resource = resource;
@@ -60,7 +61,8 @@ public class MigrationResource {
     private void init(Resource rs) {
         try (InputStream is = rs.getInputStream()) {
             this.resourceBytes = FileIOUtils.toByteArray(is);
-            this.checksum = EncryptUtils.getMD5(this.resourceBytes);
+            String minify = TextUtils.minify(new String(this.resourceBytes));
+            this.checksum = EncryptUtils.getMD5(minify);
         }
     }
 
@@ -71,7 +73,7 @@ public class MigrationResource {
     public String getResourceContent(Charset charset) {
         String text = new String(this.resourceBytes, charset);
         if (!this.variables.isEmpty()) {
-            GenericTokenParser parser = new GenericTokenParser("${", "}", (content,tokenParser) -> variables.get(content));
+            GenericTokenParser parser = new GenericTokenParser("${", "}", (content, tokenParser) -> variables.get(content));
             text = parser.parse(text);
         }
         return text;

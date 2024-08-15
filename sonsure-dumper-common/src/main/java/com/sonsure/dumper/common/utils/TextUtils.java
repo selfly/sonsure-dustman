@@ -19,9 +19,25 @@ import java.io.UnsupportedEncodingException;
  * 字符文本操作
  * 太多的StringUtils了，命名为TextUtils
  * <p/>
- * Created by liyd on 2015-8-14.
+ *
+ * @author liyd
+ * @date 2015-8-14
  */
 public class TextUtils {
+
+    public static String minify(String text) {
+        StringBuilder sb = new StringBuilder();
+        char pre = ' ';
+        for (char c : text.toCharArray()) {
+            if (!Character.isWhitespace(c)) {
+                sb.append(c);
+            } else if (!Character.isWhitespace(pre)) {
+                sb.append(' ');
+            }
+            pre = c;
+        }
+        return sb.toString();
+    }
 
     /**
      * 转换特殊符号
