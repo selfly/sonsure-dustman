@@ -1,20 +1,26 @@
 package com.sonsure.dumper.common.enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
  * @author selfly
  */
 @Getter
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class DynamicEnumItem extends DynamicEnum<BaseDynamicEnum> {
 
-    private final String code;
+    private String code;
 
     @Setter
     private String desc;
+
+    private DynamicEnumItem(String code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
     public static DynamicEnumItem of(String code, String desc) {
         return new DynamicEnumItem(code, desc);
