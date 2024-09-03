@@ -21,10 +21,10 @@ public interface BaseDynamicEnum extends BaseEnum {
      * Put enum.
      *
      * @param code the code
-     * @param desc the desc
+     * @param name the name
      */
-    default void putEnum(String code, String desc) {
-        putEnum(DynamicEnumItem.of(code, desc));
+    default void putEnum(String code, String name) {
+        putEnum(DynamicEnumItem.of(code, name));
     }
 
     /**
@@ -61,8 +61,8 @@ public interface BaseDynamicEnum extends BaseEnum {
      * @return the desc
      */
     @Override
-    default String getDesc() {
-        return getEnumItem().getDesc();
+    default String getName() {
+        return getEnumItem().getName();
     }
 
 }

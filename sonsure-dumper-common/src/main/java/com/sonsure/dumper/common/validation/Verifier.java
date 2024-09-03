@@ -278,7 +278,7 @@ public final class Verifier {
     public Verifier error(BaseEnum baseEnum) {
         ValidatorElement lastValidationElement = getLastValidationElement();
         lastValidationElement.setErrorCode(baseEnum.getCode());
-        lastValidationElement.setErrorMsg(baseEnum.getDesc());
+        lastValidationElement.setErrorMsg(baseEnum.getName());
         return this;
     }
 

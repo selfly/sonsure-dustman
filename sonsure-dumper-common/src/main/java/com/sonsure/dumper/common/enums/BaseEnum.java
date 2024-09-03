@@ -15,6 +15,7 @@ package com.sonsure.dumper.common.enums;
  * User: liyd
  * Date: 14-1-13
  * Time: 下午4:13
+ * @author selfly
  */
 public interface BaseEnum {
 
@@ -26,9 +27,9 @@ public interface BaseEnum {
     String getCode();
 
     /**
-     * 获取枚举描述
+     * 获取枚举名称
      *
      * @return desc
      */
-    String getDesc();
+    String getName();
 }

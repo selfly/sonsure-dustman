@@ -48,7 +48,7 @@ public class SonsureException extends RuntimeException {
      * @param e the e
      */
     public SonsureException(BaseEnum e) {
-        this(e.getCode(), e.getDesc());
+        this(e.getCode(), e.getName());
     }
 
     public SonsureException(String message, Throwable e) {
@@ -56,7 +56,7 @@ public class SonsureException extends RuntimeException {
     }
 
     public SonsureException(BaseEnum baseEnum, Throwable e) {
-        this(baseEnum.getCode(), baseEnum.getDesc(), e);
+        this(baseEnum.getCode(), baseEnum.getName(), e);
     }
 
     /**

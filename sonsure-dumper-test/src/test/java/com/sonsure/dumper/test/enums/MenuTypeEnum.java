@@ -15,6 +15,6 @@ public enum MenuTypeEnum implements BaseEnum {
     NAV("3", "导航菜单");
 
     private final String code;
-    private final String desc;
+    private final String name;
 
 }

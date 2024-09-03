@@ -24,23 +24,23 @@ public class EnumTest {
         UserTypeEnum[] values = UserTypeEnum.values();
         Assertions.assertEquals(3, values.length);
         Assertions.assertEquals("1", values[0].getCode());
-        Assertions.assertEquals("管理员", values[0].getDesc());
+        Assertions.assertEquals("管理员", values[0].getName());
         Assertions.assertEquals("2", values[1].getCode());
-        Assertions.assertEquals("用户", values[1].getDesc());
+        Assertions.assertEquals("用户", values[1].getName());
         Assertions.assertEquals("3", values[2].getCode());
-        Assertions.assertEquals("会员", values[2].getDesc());
+        Assertions.assertEquals("会员", values[2].getName());
 
         List<DynamicEnumItem> enumValues = DynamicEnumHelper.getEnumItems(UserTypeEnum.class);
         Assertions.assertEquals(values.length, enumValues.size());
         Assertions.assertEquals(enumValues.size(), values.length);
         for (int i = 0; i < enumValues.size(); i++) {
             Assertions.assertEquals(values[i].getCode(), enumValues.get(i).getCode());
-            Assertions.assertEquals(values[i].getDesc(), enumValues.get(i).getDesc());
+            Assertions.assertEquals(values[i].getName(), enumValues.get(i).getName());
         }
 
         DynamicEnumItem enumItem = DynamicEnumHelper.getEnumItem(UserTypeEnum.class, "2");
         Assertions.assertEquals("2", enumItem.getCode());
-        Assertions.assertEquals("用户", enumItem.getDesc());
+        Assertions.assertEquals("用户", enumItem.getName());
 
         DynamicEnumHelper.addEnumItem(UserTypeEnum.class, DynamicEnumItem.of("4", "商家"));
         DynamicEnumHelper.addEnumItem(UserTypeEnum.class, DynamicEnumItem.of("5", "店员"));
@@ -48,15 +48,15 @@ public class EnumTest {
         List<DynamicEnumItem> newEnumItems = DynamicEnumHelper.getEnumItems(UserTypeEnum.class);
         Assertions.assertEquals(newEnumItems.size(), 5);
         Assertions.assertEquals(newEnumItems.get(0).getCode(), "1");
-        Assertions.assertEquals(newEnumItems.get(0).getDesc(), "管理员");
+        Assertions.assertEquals(newEnumItems.get(0).getName(), "管理员");
         Assertions.assertEquals(newEnumItems.get(1).getCode(), "2");
-        Assertions.assertEquals(newEnumItems.get(1).getDesc(), "用户");
+        Assertions.assertEquals(newEnumItems.get(1).getName(), "用户");
         Assertions.assertEquals(newEnumItems.get(2).getCode(), "3");
-        Assertions.assertEquals(newEnumItems.get(2).getDesc(), "会员");
+        Assertions.assertEquals(newEnumItems.get(2).getName(), "会员");
         Assertions.assertEquals(newEnumItems.get(3).getCode(), "4");
-        Assertions.assertEquals(newEnumItems.get(3).getDesc(), "商家");
+        Assertions.assertEquals(newEnumItems.get(3).getName(), "商家");
         Assertions.assertEquals(newEnumItems.get(4).getCode(), "5");
-        Assertions.assertEquals(newEnumItems.get(4).getDesc(), "店员");
+        Assertions.assertEquals(newEnumItems.get(4).getName(), "店员");
 
         DynamicEnumHelper.removeEnumItem(UserTypeEnum.class, "4");
 
@@ -66,13 +66,13 @@ public class EnumTest {
         DynamicEnumHelper.updateEnumDesc(UserTypeEnum.class, "3", "特殊用户");
 
         Assertions.assertEquals(removedEnumItems.get(0).getCode(), "1");
-        Assertions.assertEquals(removedEnumItems.get(0).getDesc(), "管理员");
+        Assertions.assertEquals(removedEnumItems.get(0).getName(), "管理员");
         Assertions.assertEquals(removedEnumItems.get(1).getCode(), "2");
-        Assertions.assertEquals(removedEnumItems.get(1).getDesc(), "用户");
+        Assertions.assertEquals(removedEnumItems.get(1).getName(), "用户");
         Assertions.assertEquals(removedEnumItems.get(2).getCode(), "3");
-        Assertions.assertEquals(removedEnumItems.get(2).getDesc(), "特殊用户");
+        Assertions.assertEquals(removedEnumItems.get(2).getName(), "特殊用户");
         Assertions.assertEquals(removedEnumItems.get(3).getCode(), "5");
-        Assertions.assertEquals(removedEnumItems.get(3).getDesc(), "店员");
+        Assertions.assertEquals(removedEnumItems.get(3).getName(), "店员");
     }
 
     @Test

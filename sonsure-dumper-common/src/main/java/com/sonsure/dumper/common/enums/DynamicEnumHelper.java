@@ -106,14 +106,14 @@ public class DynamicEnumHelper {
      *
      * @param enumCls the enum cls
      * @param code    the code
-     * @param desc    the desc
+     * @param name    the name
      */
-    public static void updateEnumDesc(Class<? extends BaseDynamicEnum> enumCls, String code, String desc) {
+    public static void updateEnumDesc(Class<? extends BaseDynamicEnum> enumCls, String code, String name) {
         List<DynamicEnumItem> enumItems = getEnumItems(enumCls);
         boolean notExists = true;
         for (DynamicEnumItem enumItem : enumItems) {
             if (enumItem.getCode().equals(code)) {
-                enumItem.setDesc(desc);
+                enumItem.setName(name);
                 notExists = false;
             }
         }

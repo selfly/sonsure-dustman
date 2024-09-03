@@ -13,17 +13,27 @@ import lombok.Setter;
 public class DynamicEnumItem extends DynamicEnum<BaseDynamicEnum> {
 
     private String code;
+    private String name;
+    private Object value;
+    private String description;
 
-    @Setter
-    private String desc;
-
-    private DynamicEnumItem(String code, String desc) {
+    private DynamicEnumItem(String code, String name, Object value, String description) {
         this.code = code;
-        this.desc = desc;
+        this.name = name;
+        this.value = value;
+        this.description = description;
     }
 
-    public static DynamicEnumItem of(String code, String desc) {
-        return new DynamicEnumItem(code, desc);
+    public static DynamicEnumItem of(String code, String name) {
+        return of(code, name, null, null);
+    }
+
+    public static DynamicEnumItem of(String code, String name, Object value) {
+        return of(code, name, value, null);
+    }
+
+    public static DynamicEnumItem of(String code, String name, Object value, String description) {
+        return new DynamicEnumItem(code, name, value, description);
     }
 
 

@@ -54,7 +54,7 @@ public class BeanKitTest {
         menu.setActiveStatus("5");
         MenuVo menuVo2 = BeanKit.copyProperties(new MenuVo(), menu);
         Assertions.assertEquals(menuVo2.getActiveStatus().getCode(), "5");
-        Assertions.assertEquals(menuVo2.getActiveStatus().getDesc(), "激活");
+        Assertions.assertEquals(menuVo2.getActiveStatus().getName(), "激活");
     }
 
 }

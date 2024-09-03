@@ -2,6 +2,9 @@ package com.sonsure.dumper.common.enums;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * @author selfly
+ */
 public class EnumHelper {
 
     /**
