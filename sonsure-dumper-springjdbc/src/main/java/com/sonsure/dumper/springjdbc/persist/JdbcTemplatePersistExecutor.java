@@ -14,7 +14,6 @@ import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.command.batch.BatchCommandContext;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.*;
@@ -54,20 +53,23 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     public Object insert(final CommandContext commandContext) {
         final GenerateKey generateKey = commandContext.getGenerateKey();
         //数据库自增 或设置主键值 处理
-        if (!generateKey.isPkIsParamVal() && StringUtils.isNotBlank(generateKey.getColumn())) {
+        if (!generateKey.isPkIsParamVal()) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcOperations.update(new InsertPreparedStatementCreator(commandContext, generateKey), keyHolder);
             Map<String, Object> keys = keyHolder.getKeys();
-            //显示指定主键时为null，只有一个主键列，多个不支持
-            if (keys == null) {
+            //显示指定主键时为null
+            if (keys == null || keys.isEmpty()) {
                 return null;
+            } else if (keys.size() == 1) {
+                Object obj = keys.values().iterator().next();
+                //Spring 5 return BigInteger
+                if (obj instanceof Number) {
+                    return ((Number) obj).longValue();
+                }
+                return obj;
+            } else {
+                return keys;
             }
-            Object obj = keys.values().iterator().next();
-            //Spring 5 return BigInteger
-            if (obj instanceof Number) {
-                return ((Number) obj).longValue();
-            }
-            return obj;
         } else {
             jdbcOperations.update(commandContext.getCommand(), commandContext.getParameters().toArray());
             //显示指定了主键，可能为null
@@ -153,7 +155,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
         @Override
         @NonNull
         public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-            PreparedStatement ps = con.prepareStatement(commandContext.getCommand(), new String[]{generateKey.getColumn()});
+            PreparedStatement ps = generateKey.getColumn() == null ? con.prepareStatement(commandContext.getCommand(), PreparedStatement.RETURN_GENERATED_KEYS) : con.prepareStatement(commandContext.getCommand(), new String[]{generateKey.getColumn()});
             setValues(ps);
             return ps;
         }

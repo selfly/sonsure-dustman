@@ -37,7 +37,7 @@ public class SpringJdbcDaoTest {
 
     protected JdbcDao jdbcDao;
 
-    public SpringJdbcDaoTest(@Qualifier("mysqlJdbcDao")JdbcDao jdbcDao) {
+    public SpringJdbcDaoTest(@Qualifier("mysqlJdbcDao") JdbcDao jdbcDao) {
         this.jdbcDao = jdbcDao;
     }
 
@@ -993,6 +993,34 @@ public class SpringJdbcDaoTest {
                 .parameters("100user", "123321", 18)
                 .insert(UserInfo.class);
 
+        UserInfo userInfo = jdbcDao.get(UserInfo.class, id);
+        Assertions.assertEquals("100user", userInfo.getLoginName());
+        Assertions.assertEquals("123321", userInfo.getPassword());
+        Assertions.assertEquals(18, (int) userInfo.getUserAge());
+    }
+
+    @Test
+    public void nativeInsertNativeCommandNotPkColumn() {
+        Serializable id =
+                jdbcDao.nativeExecutor()
+                        .command("insert into sd_user_info (login_name,password,user_age) values(?,?,?)")
+                        .parameters("100user", "123321", 18)
+                        .nativeCommand()
+                        .insert();
+        UserInfo userInfo = jdbcDao.get(UserInfo.class, id);
+        Assertions.assertEquals("100user", userInfo.getLoginName());
+        Assertions.assertEquals("123321", userInfo.getPassword());
+        Assertions.assertEquals(18, (int) userInfo.getUserAge());
+    }
+
+    @Test
+    public void nativeInsertNativeCommandPkValue() {
+        Serializable id =
+                jdbcDao.nativeExecutor()
+                        .command("insert into sd_user_info (user_info_id,login_name,password,user_age) values(?,?,?,?)")
+                        .parameters(-1,"100user", "123321", 18)
+                        .nativeCommand()
+                        .insert();
         UserInfo userInfo = jdbcDao.get(UserInfo.class, id);
         Assertions.assertEquals("100user", userInfo.getLoginName());
         Assertions.assertEquals("123321", userInfo.getPassword());

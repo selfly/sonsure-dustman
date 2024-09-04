@@ -169,12 +169,12 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     }
 
     @Override
-    public void insert() {
+    public Serializable insert() {
         CommandContext commandContext = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
         GenerateKey generateKey = new GenerateKey();
         generateKey.setPkIsParamVal(false);
         commandContext.setGenerateKey(generateKey);
-        getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
+        return (Serializable) getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
     }
 
     @Override
@@ -188,7 +188,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         generateKey.setColumn(pkColumn);
         generateKey.setPkIsParamVal(false);
         commandContext.setGenerateKey(generateKey);
-        return (Long) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
+        return (Serializable) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.INSERT);
     }
 
     @Override

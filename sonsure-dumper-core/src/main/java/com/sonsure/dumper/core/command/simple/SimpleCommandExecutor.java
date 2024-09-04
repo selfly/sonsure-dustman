@@ -70,7 +70,7 @@ public interface SimpleCommandExecutor<T extends SimpleCommandExecutor<T>> exten
     /**
      * 插入
      */
-    void insert();
+    Serializable insert();
 
     /**
      * 插入 返回主键
