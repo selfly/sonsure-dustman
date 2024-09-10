@@ -58,6 +58,22 @@ public class DynamicEnumHelper {
     }
 
     /**
+     * Exists enum item boolean.
+     *
+     * @param enumCls the enum cls
+     * @param code    the code
+     * @return the boolean
+     */
+    public static boolean existsEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code) {
+        for (Map.Entry<BaseDynamicEnum, DynamicEnumItem> entry : computeIfAbsentWithClass(enumCls).entrySet()) {
+            if (entry.getKey().getCode().equals(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Put enum.
      *
      * @param enumType the enum type
