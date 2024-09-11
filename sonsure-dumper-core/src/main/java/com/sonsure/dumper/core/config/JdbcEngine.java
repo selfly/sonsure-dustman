@@ -83,7 +83,9 @@ public interface JdbcEngine {
     /**
      * select对象
      *
-     * @return select
+     * @param <M> the type parameter
+     * @param cls the cls
+     * @return select select
      */
     <M> Select<M> selectFrom(Class<M> cls);
 

@@ -21,6 +21,7 @@ import com.sonsure.dumper.core.command.entity.Update;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
 
+import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -264,6 +265,13 @@ public interface DaoTemplate {
      * @return t
      */
     <T extends CommandExecutor> T executor(Class<T> executor);
+
+    /**
+     * Gets data source.
+     *
+     * @return the data source
+     */
+    DataSource getDataSource();
 
     /**
      * Gets database product.

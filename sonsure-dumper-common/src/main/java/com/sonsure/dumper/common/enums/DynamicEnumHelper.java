@@ -36,12 +36,27 @@ public class DynamicEnumHelper {
      * @return the enum item
      */
     public static DynamicEnumItem getEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code) {
+        return getEnumItem(enumCls, code, true);
+    }
+
+    /**
+     * Gets enum item.
+     *
+     * @param enumCls  the enum cls
+     * @param code     the code
+     * @param required the required
+     * @return the enum item
+     */
+    public static DynamicEnumItem getEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code, boolean required) {
         for (Map.Entry<BaseDynamicEnum, DynamicEnumItem> entry : computeIfAbsentWithClass(enumCls).entrySet()) {
             if (entry.getKey().getCode().equals(code)) {
                 return entry.getValue();
             }
         }
-        throw new SonsureCommonsException("枚举不存在:" + code);
+        if (required) {
+            throw new SonsureCommonsException("枚举不存在:" + code);
+        }
+        return null;
     }
 
     /**
@@ -53,8 +68,21 @@ public class DynamicEnumHelper {
      * @return the dynamic enum item by code
      */
     public static <T extends BaseDynamicEnum> DynamicEnum<T> getGenericEnumItem(Class<T> enumCls, String code) {
+        return getGenericEnumItem(enumCls, code, true);
+    }
+
+    /**
+     * Gets generic enum item.
+     *
+     * @param <T>      the type parameter
+     * @param enumCls  the enum cls
+     * @param code     the code
+     * @param required the required
+     * @return the generic enum item
+     */
+    public static <T extends BaseDynamicEnum> DynamicEnum<T> getGenericEnumItem(Class<T> enumCls, String code, boolean required) {
         //noinspection unchecked
-        return (DynamicEnum<T>) getEnumItem(enumCls, code);
+        return (DynamicEnum<T>) getEnumItem(enumCls, code, required);
     }
 
     /**
@@ -65,12 +93,7 @@ public class DynamicEnumHelper {
      * @return the boolean
      */
     public static boolean existsEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code) {
-        for (Map.Entry<BaseDynamicEnum, DynamicEnumItem> entry : computeIfAbsentWithClass(enumCls).entrySet()) {
-            if (entry.getKey().getCode().equals(code)) {
-                return true;
-            }
-        }
-        return false;
+        return getEnumItem(enumCls, code, false) != null;
     }
 
     /**

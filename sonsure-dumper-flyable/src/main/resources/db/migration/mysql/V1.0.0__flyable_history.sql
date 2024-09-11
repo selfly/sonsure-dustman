@@ -2,7 +2,6 @@ CREATE TABLE `${flyablePrefix}flyable_history` (
     `flyable_history_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
     `migration_group` varchar(64) NOT NULL COMMENT '分组',
     `version` varchar(64) NOT NULL COMMENT '版本',
-    `type` varchar(12) NOT NULL COMMENT '类型;1:SQL',
     `description` varchar(256) NOT NULL COMMENT '说明',
     `script` varchar(256) NOT NULL COMMENT '脚本',
     `checksum` varchar(32) NOT NULL COMMENT 'checksum',

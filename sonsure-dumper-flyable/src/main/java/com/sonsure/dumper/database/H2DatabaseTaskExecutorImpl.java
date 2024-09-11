@@ -1,4 +1,4 @@
-package com.sonsure.dumper.flyable;
+package com.sonsure.dumper.database;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -6,10 +6,11 @@ import org.apache.commons.lang3.StringUtils;
  * @author selfly
  * 使用mysql模式
  */
-public class H2DatabaseExecutorImpl extends MysqlDatabaseExecutorImpl {
+public class H2DatabaseTaskExecutorImpl extends MysqlDatabaseTaskExecutorImpl {
 
     @Override
     public boolean support(String databaseProduct) {
         return StringUtils.containsIgnoreCase(databaseProduct, "h2");
     }
+
 }

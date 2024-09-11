@@ -1,8 +1,9 @@
-package com.sonsure.dumper.flyable;
+package com.sonsure.dumper.database;
 
 import com.sonsure.dumper.core.persist.JdbcDao;
+import lombok.SneakyThrows;
 
-import java.util.List;
+import java.sql.Connection;
 
 /**
  * @author selfly
@@ -18,26 +19,18 @@ public interface DatabaseExecutor {
     boolean support(String databaseProduct);
 
     /**
-     * Gets resources.
-     *
-     * @return the resources
-     */
-    List<MigrationResource> getMigrationResources();
-
-    /**
      * Table exists boolean.
      *
      * @param jdbcDao        the jdbc dao
      * @param flyableHistory the flyable history
      * @return the boolean
      */
-    boolean existFlyableHistory(JdbcDao jdbcDao, String flyableHistory);
+    @SneakyThrows
+    default boolean existFlyableHistoryTable(JdbcDao jdbcDao, String flyableHistory) {
+        try (Connection conn = jdbcDao.getDataSource().getConnection()) {
+            return conn.getMetaData()
+                    .getTables(null, null, flyableHistory, new String[]{"TABLE"}).next();
+        }
+    }
 
-    /**
-     * Execute script.
-     *
-     * @param jdbcDao  the jdbc dao
-     * @param resource the resource
-     */
-    void executeResource(JdbcDao jdbcDao, MigrationResource resource);
 }

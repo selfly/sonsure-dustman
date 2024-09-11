@@ -2,6 +2,9 @@ package com.sonsure.dumper.exception;
 
 import com.sonsure.dumper.common.exception.SonsureException;
 
+/**
+ * @author selfly
+ */
 public class FlyableException extends SonsureException {
 
     public FlyableException(String message) {

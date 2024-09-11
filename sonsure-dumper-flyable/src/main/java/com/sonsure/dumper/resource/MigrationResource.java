@@ -1,4 +1,4 @@
-package com.sonsure.dumper.flyable;
+package com.sonsure.dumper.resource;
 
 import com.sonsure.dumper.common.parse.GenericTokenParser;
 import com.sonsure.dumper.common.spring.Resource;

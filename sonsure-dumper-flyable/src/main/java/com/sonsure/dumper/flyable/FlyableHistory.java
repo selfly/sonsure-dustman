@@ -12,12 +12,9 @@ import java.time.LocalDateTime;
 @Setter
 public class FlyableHistory {
 
-    public static final String TYPE_SQL = "SQL";
-
     private Long flyableHistoryId;
     private String migrationGroup;
     private String version;
-    private String type;
     private String description;
     private String script;
     private String checksum;

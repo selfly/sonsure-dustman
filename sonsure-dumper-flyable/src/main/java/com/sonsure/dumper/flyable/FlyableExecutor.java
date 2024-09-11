@@ -5,7 +5,12 @@ import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.mapping.TablePrefixSupportHandler;
 import com.sonsure.dumper.core.persist.AbstractDaoTemplateImpl;
 import com.sonsure.dumper.core.persist.JdbcDao;
+import com.sonsure.dumper.database.DatabaseExecutor;
+import com.sonsure.dumper.database.DatabaseExecutorResolver;
 import com.sonsure.dumper.exception.FlyableException;
+import com.sonsure.dumper.resource.ClassPathMigrationResourcePatternResolver;
+import com.sonsure.dumper.resource.MigrationResource;
+import com.sonsure.dumper.resource.MigrationResourceResolver;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author selfly
+ */
 @Slf4j
+@Setter
+@Getter
 public class FlyableExecutor {
 
     private static final String FLYABLE_HISTORY = "flyable_history";
@@ -27,41 +37,47 @@ public class FlyableExecutor {
     public static final String FLYABLE_PREFIX_VAR = "flyablePrefix";
 
     private final JdbcDao jdbcDao;
-
-    private final List<String> groupExecutionOrder;
-
-    private final List<DatabaseExecutor> databaseExecutors;
-
-    @Setter
-    @Getter
     private String flyablePrefix = "";
+    private final MigrationResourceResolver migrationResourceResolver = new ClassPathMigrationResourcePatternResolver();
+    private final DatabaseExecutorResolver databaseExecutorResolver = new DatabaseExecutorResolver();
+    private final List<MigrationTask> migrationTasks = new ArrayList<>(8);
 
     public FlyableExecutor(JdbcDao jdbcDao) {
         this.jdbcDao = jdbcDao;
         this.setFlyablePrefixWithJdbcDao();
-        this.groupExecutionOrder = new ArrayList<>(8);
-        this.groupExecutionOrder.add(FLYABLE_GROUP);
-        this.databaseExecutors = new ArrayList<>(16);
-        this.databaseExecutors.add(new MysqlDatabaseExecutorImpl());
-        this.databaseExecutors.add(new H2DatabaseExecutorImpl());
+    }
+
+    public void registerDatabaseExecutor(DatabaseExecutor databaseExecutor) {
+        this.databaseExecutorResolver.registerDatabaseExecutor(databaseExecutor);
+    }
+
+    public void registerMigrationTask(MigrationTaskExecutor migrationTaskExecutor, String... executionGroupOrder) {
+        this.migrationTasks.add(new MigrationTask(migrationTaskExecutor.getResourcePattern(), migrationTaskExecutor, executionGroupOrder));
     }
 
     public void migrate() {
-        String databaseProduct = this.getDatabaseProduct();
-        DatabaseExecutor databaseExecutor = this.getDatabaseExecutor(databaseProduct);
-        List<MigrationResource> migrationResources = databaseExecutor.getMigrationResources();
-        Map<String, List<MigrationResource>> map = migrationResources.stream().collect(Collectors.groupingBy(MigrationResource::getGroup));
-        boolean flyableHistoryInitialized = databaseExecutor.existFlyableHistory(jdbcDao, this.getFlyablePrefix() + FLYABLE_HISTORY);
-        //指定顺序的初始化
-        for (String group : this.groupExecutionOrder) {
-            List<MigrationResource> platformResources = map.remove(group);
-            this.updateMigrate(platformResources, group, flyableHistoryInitialized, databaseExecutor);
-            //执行过一次之后，肯定为true
-            flyableHistoryInitialized = true;
+        if (this.migrationTasks.isEmpty()) {
+            this.registerDefaultDatabaseMigrationTask();
         }
-        //未指定顺序的初始化
-        for (Map.Entry<String, List<MigrationResource>> entry : map.entrySet()) {
-            this.updateMigrate(entry.getValue(), entry.getKey(), true, databaseExecutor);
+        DatabaseExecutor databaseExecutor = this.getDatabaseExecutor();
+        boolean flyableHistoryInitialized = databaseExecutor.existFlyableHistoryTable(jdbcDao, this.getFlyablePrefix() + FLYABLE_HISTORY);
+        for (MigrationTask migrationTask : this.migrationTasks) {
+            List<MigrationResource> migrationResources = this.migrationResourceResolver.resolveMigrationResources(migrationTask.getResourcePattern());
+            Map<String, List<MigrationResource>> map = migrationResources.stream().collect(Collectors.groupingBy(MigrationResource::getGroup));
+            //指定顺序的初始化
+            for (String group : migrationTask.getGroupOrder()) {
+                List<MigrationResource> groupResources = map.remove(group);
+                if (groupResources == null) {
+                    continue;
+                }
+                this.updateMigrate(groupResources, group, flyableHistoryInitialized, migrationTask.getMigrationTaskExecutor());
+                //执行过一次之后，肯定为true
+                flyableHistoryInitialized = true;
+            }
+            //未指定顺序的初始化
+            for (Map.Entry<String, List<MigrationResource>> entry : map.entrySet()) {
+                this.updateMigrate(entry.getValue(), entry.getKey(), true, migrationTask.getMigrationTaskExecutor());
+            }
         }
     }
 
@@ -79,8 +95,8 @@ public class FlyableExecutor {
         return jdbcDao.getDatabaseProduct();
     }
 
-    protected void updateMigrate(List<MigrationResource> resources, String migrationGroup, boolean flyableHistoryInitialized, DatabaseExecutor databaseExecutor) {
-        String installedVersion = "0.0.0";
+    protected void updateMigrate(List<MigrationResource> resources, String migrationGroup, boolean flyableHistoryInitialized, MigrationTaskExecutor migrationTaskExecutor) {
+        String installedLatestVersion = "0.0.0";
         Map<String, String> checksumMap = new HashMap<>(16);
         if (flyableHistoryInitialized) {
             List<FlyableHistory> list = jdbcDao.selectFrom(FlyableHistory.class)
@@ -92,14 +108,14 @@ public class FlyableExecutor {
                 if (BooleanUtils.isFalse(flyableHistory.getSuccess())) {
                     throw new FlyableException("Execution failures have been recorded. :" + flyableHistory.getScript());
                 }
-                installedVersion = flyableHistory.getVersion();
+                installedLatestVersion = flyableHistory.getVersion();
                 Map<String, String> collect = list.stream().collect(Collectors.toMap(FlyableHistory::getScript, FlyableHistory::getChecksum));
                 checksumMap.putAll(collect);
             }
         }
         resources.sort((o1, o2) -> VersionUtils.compareVersion(o1.getVersion(), o2.getVersion()));
         for (MigrationResource resource : resources) {
-            if (VersionUtils.compareVersion(resource.getVersion(), installedVersion) <= 0) {
+            if (VersionUtils.compareVersion(resource.getVersion(), installedLatestVersion) <= 0) {
                 log.info("Installed script:{}", resource.getFilename());
                 if (!this.verifyChecksum(resource, checksumMap)) {
                     log.info("The script changed after installation :{}", resource.getFilename());
@@ -111,7 +127,6 @@ public class FlyableExecutor {
             FlyableHistory flyableHistory = new FlyableHistory();
             flyableHistory.setMigrationGroup(migrationGroup);
             flyableHistory.setVersion(resource.getVersion());
-            flyableHistory.setType(FlyableHistory.TYPE_SQL);
             flyableHistory.setDescription(resource.getDescription());
             flyableHistory.setScript(resource.getFilename());
             flyableHistory.setChecksum(resource.getChecksum());
@@ -122,10 +137,11 @@ public class FlyableExecutor {
                 if (FLYABLE_GROUP.equals(migrationGroup)) {
                     resource.addVariable(FLYABLE_PREFIX_VAR, this.getFlyablePrefix());
                 }
-                databaseExecutor.executeResource(jdbcDao, resource);
+                migrationTaskExecutor.executeResource(jdbcDao, resource);
                 long end = System.currentTimeMillis();
                 flyableHistory.setExecutionTime(end - begin);
             } catch (Exception e) {
+                log.error("执行 Migration Task 失败:", e);
                 flyableHistory.setSuccess(false);
                 jdbcDao.executeInsert(flyableHistory);
                 throw new FlyableException(e);
@@ -143,12 +159,16 @@ public class FlyableExecutor {
         return StringUtils.equals(checksum, resource.getChecksum());
     }
 
-    protected DatabaseExecutor getDatabaseExecutor(String databaseProduct) {
-        for (DatabaseExecutor databaseExecutor : databaseExecutors) {
-            if (databaseExecutor.support(databaseProduct)) {
-                return databaseExecutor;
-            }
+    public void registerDefaultDatabaseMigrationTask() {
+        DatabaseExecutor databaseExecutor = this.getDatabaseExecutor();
+        if (databaseExecutor instanceof MigrationTaskExecutor) {
+            MigrationTaskExecutor migrationTaskExecutor = (MigrationTaskExecutor) databaseExecutor;
+            this.registerMigrationTask(migrationTaskExecutor, FLYABLE_GROUP);
         }
-        throw new FlyableException("不支持的DatabaseExecutor");
+    }
+
+    private DatabaseExecutor getDatabaseExecutor() {
+        String databaseProduct = this.getDatabaseProduct();
+        return this.databaseExecutorResolver.resolveDatabaseExecutor(databaseProduct);
     }
 }

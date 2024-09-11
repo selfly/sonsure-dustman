@@ -38,7 +38,6 @@ import java.util.Map;
 @Setter
 public abstract class AbstractDaoTemplateImpl implements JdbcDao {
 
-    @Getter
     protected DataSource dataSource;
 
     protected JdbcEngine defaultJdbcEngine;
@@ -193,6 +192,14 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
     @Override
     public <T extends CommandExecutor> T executor(Class<T> executor) {
         return this.getDefaultJdbcEngine().createExecutor(executor, null);
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        if (this.dataSource != null) {
+            return this.dataSource;
+        }
+        return this.getDefaultJdbcEngine().getDataSource();
     }
 
     @Override
