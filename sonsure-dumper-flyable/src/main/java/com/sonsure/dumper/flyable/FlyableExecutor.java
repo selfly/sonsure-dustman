@@ -38,6 +38,7 @@ public class FlyableExecutor {
 
     private final JdbcDao jdbcDao;
     private String flyablePrefix = "";
+    private boolean enableChecksum = true;
     private final MigrationResourceResolver migrationResourceResolver = new ClassPathMigrationResourcePatternResolver();
     private final DatabaseExecutorResolver databaseExecutorResolver = new DatabaseExecutorResolver();
     private final List<MigrationTask> migrationTasks = new ArrayList<>(8);
@@ -152,6 +153,9 @@ public class FlyableExecutor {
     }
 
     protected boolean verifyChecksum(MigrationResource resource, Map<String, String> checksumMap) {
+        if (!this.enableChecksum) {
+            return true;
+        }
         String checksum = checksumMap.get(resource.getFilename());
         if (checksum == null) {
             return true;
