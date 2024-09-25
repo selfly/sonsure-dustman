@@ -25,7 +25,7 @@ public class DynamicEnumHelper {
     static DynamicEnumItem getEnumItem(BaseDynamicEnum enumType) {
         return Optional.ofNullable(computeIfAbsentWithClass(enumType.getEnumClass()))
                 .map(v -> v.get(enumType))
-                .orElseThrow(() -> new SonsureCommonsException("枚举不存在:" + enumType.getCode()));
+                .orElseThrow(() -> new SonsureCommonsException("枚举不存在,class:" + enumType.getClass() + ",code:" + enumType.getCode()));
     }
 
     /**
@@ -54,7 +54,7 @@ public class DynamicEnumHelper {
             }
         }
         if (required) {
-            throw new SonsureCommonsException("枚举不存在:" + code);
+            throw new SonsureCommonsException("枚举不存在,class:" + enumCls.getName() + ",code:" + code);
         }
         return null;
     }
