@@ -297,10 +297,9 @@ public class BeanKitInst {
      * @param consumer  the consumer
      * @return t r
      */
-    @SuppressWarnings("unchecked")
     public <T extends Map<String, ?>, R> R mapToBean(T srcMap, Class<R> beanClass, Character delimiter, BiConsumer<T, R> consumer) {
 
-        R bean = (R) ClassUtils.newInstance(beanClass);
+        R bean = ClassUtils.newInstance(beanClass);
         for (Map.Entry<String, ?> entry : srcMap.entrySet()) {
 
             Object value = entry.getValue();
