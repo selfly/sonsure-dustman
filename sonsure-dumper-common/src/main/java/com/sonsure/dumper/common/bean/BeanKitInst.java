@@ -319,15 +319,13 @@ public class BeanKitInst {
             if (targetPd == null || (writeMethod = targetPd.getWriteMethod()) == null) {
                 continue;
             }
-            Class<?> targetGenericClass = ClassUtils.getGenericClass(targetPd.getPropertyType());
+            Class<?> targetGenericClass = ClassUtils.getBasicTypeClass(targetPd.getPropertyType());
             if (!targetGenericClass.isInstance(value)) {
                 //自定义转换
                 value = typeConvert(targetPd, value);
             }
             if (targetGenericClass.isInstance(value)) {
                 ClassUtils.invokeMethod(writeMethod, bean, value);
-            } else {
-                logger.debug("属性类型不一致,忽略 name:{}", targetPd.getName());
             }
             if (consumer != null) {
                 consumer.accept(srcMap, bean);
@@ -573,7 +571,7 @@ public class BeanKitInst {
                     continue;
                 }
                 //自定义转换
-                Class<?> targetGenericClass = ClassUtils.getGenericClass(targetPd.getPropertyType());
+                Class<?> targetGenericClass = ClassUtils.getBasicTypeClass(targetPd.getPropertyType());
                 if (!targetGenericClass.isInstance(value)) {
                     value = typeConvert(targetPd, value);
                 }

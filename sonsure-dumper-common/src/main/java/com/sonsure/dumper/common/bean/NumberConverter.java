@@ -30,14 +30,14 @@ public class NumberConverter implements TypeConverter {
 
     @Override
     public boolean supportTargetType(Class<?> targetType) {
-        return SUPPORT_CLASSES.contains(ClassUtils.getGenericClass(targetType));
+        return SUPPORT_CLASSES.contains(ClassUtils.getBasicTypeClass(targetType));
     }
 
     @Override
     public Object convert(PropertyDescriptor targetPd, Object value) {
         //只做最常见的几种转换
         final Number number = (Number) value;
-        Class<?> targetClass = ClassUtils.getGenericClass(targetPd.getPropertyType());
+        Class<?> targetClass = ClassUtils.getBasicTypeClass(targetPd.getPropertyType());
         if (Byte.class.equals(targetClass)) {
             return number.byteValue();
         } else if (Short.class.equals(targetClass)) {

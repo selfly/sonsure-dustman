@@ -17,13 +17,21 @@ import com.sonsure.dumper.common.model.BaseProperties;
 import org.apache.commons.lang3.BooleanUtils;
 
 import java.beans.PropertyDescriptor;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
+import java.sql.Timestamp;
+import java.time.*;
+import java.time.chrono.Chronology;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * 类辅助
@@ -411,7 +419,7 @@ public class ClassUtils {
         }
     }
 
-    public static Class<?> getGenericClass(Class<?> cls) {
+    public static Class<?> getBasicTypeClass(Class<?> cls) {
         if (byte.class.equals(cls)) {
             return Byte.class;
         } else if (short.class.equals(cls)) {
@@ -431,6 +439,56 @@ public class ClassUtils {
         } else {
             return cls;
         }
+    }
+
+    public static boolean isJavaBeanType(Class<?> clazz) {
+        return !isPrimitiveOrWrapper(clazz) && !isCommonNonBeanType(clazz);
+    }
+
+    public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
+        return clazz.isPrimitive() ||
+                clazz.equals(Integer.class) ||
+                clazz.equals(Double.class) ||
+                clazz.equals(Long.class) ||
+                clazz.equals(Float.class) ||
+                clazz.equals(Boolean.class) ||
+                clazz.equals(Character.class) ||
+                clazz.equals(Short.class) ||
+                clazz.equals(Byte.class);
+    }
+
+    public static boolean isCommonNonBeanType(Class<?> clazz) {
+        return clazz.equals(String.class) ||
+                clazz.equals(LocalDateTime.class) ||
+                clazz.equals(LocalDate.class) ||
+                clazz.equals(LocalTime.class) ||
+                clazz.equals(Timestamp.class) ||
+                clazz.equals(Date.class) ||
+                clazz.equals(UUID.class) ||
+                clazz.equals(BigDecimal.class) ||
+                clazz.equals(BigInteger.class) ||
+                clazz.equals(Path.class) ||
+                clazz.equals(File.class) ||
+                clazz.equals(InputStream.class) ||
+                clazz.equals(OutputStream.class) ||
+                clazz.equals(Reader.class) ||
+                clazz.equals(Writer.class) ||
+                clazz.equals(URL.class) ||
+                clazz.equals(URI.class) ||
+                clazz.equals(Currency.class) ||
+                clazz.equals(Locale.class) ||
+                clazz.equals(TimeZone.class) ||
+                clazz.equals(Duration.class) ||
+                clazz.equals(Period.class) ||
+                clazz.equals(ZoneId.class) ||
+                clazz.equals(ZoneOffset.class) ||
+                clazz.equals(ChronoUnit.class) ||
+                clazz.equals(Chronology.class) ||
+                clazz.equals(Month.class) ||
+                clazz.equals(MonthDay.class) ||
+                clazz.equals(Year.class) ||
+                clazz.equals(YearMonth.class) ||
+                clazz.equals(DayOfWeek.class);
     }
 
     private static void getSuperTypes(Class<?> cls, List<Class<?>> superTypes) {
