@@ -5,8 +5,8 @@ import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.mapping.TablePrefixSupportHandler;
 import com.sonsure.dumper.core.persist.AbstractDaoTemplateImpl;
 import com.sonsure.dumper.core.persist.JdbcDao;
-import com.sonsure.dumper.database.DatabaseExecutor;
-import com.sonsure.dumper.database.DatabaseExecutorResolver;
+import com.sonsure.dumper.database.DatabaseMigrationTaskExecutor;
+import com.sonsure.dumper.database.DatabaseMigrationTaskExecutorResolver;
 import com.sonsure.dumper.exception.FlyableException;
 import com.sonsure.dumper.resource.ClassPathMigrationResourcePatternResolver;
 import com.sonsure.dumper.resource.MigrationResource;
@@ -40,7 +40,7 @@ public class FlyableExecutor {
     private String flyablePrefix = "";
     private boolean enableChecksum = true;
     private final MigrationResourceResolver migrationResourceResolver = new ClassPathMigrationResourcePatternResolver();
-    private final DatabaseExecutorResolver databaseExecutorResolver = new DatabaseExecutorResolver();
+    private final DatabaseMigrationTaskExecutorResolver databaseMigrationTaskExecutorResolver = new DatabaseMigrationTaskExecutorResolver();
     private final List<MigrationTask> migrationTasks = new ArrayList<>(8);
 
     public FlyableExecutor(JdbcDao jdbcDao) {
@@ -48,8 +48,8 @@ public class FlyableExecutor {
         this.setFlyablePrefixWithJdbcDao();
     }
 
-    public void registerDatabaseExecutor(DatabaseExecutor databaseExecutor) {
-        this.databaseExecutorResolver.registerDatabaseExecutor(databaseExecutor);
+    public void registerDatabaseMigrationTask(DatabaseMigrationTaskExecutor databaseMigrationTaskExecutor) {
+        this.databaseMigrationTaskExecutorResolver.registerDatabaseExecutor(databaseMigrationTaskExecutor);
     }
 
     public void registerMigrationTask(MigrationTaskExecutor migrationTaskExecutor, String... executionGroupOrder) {
@@ -60,8 +60,8 @@ public class FlyableExecutor {
         if (this.migrationTasks.isEmpty()) {
             this.registerDefaultDatabaseMigrationTask();
         }
-        DatabaseExecutor databaseExecutor = this.getDatabaseExecutor();
-        boolean flyableHistoryInitialized = databaseExecutor.existFlyableHistoryTable(jdbcDao, this.getFlyablePrefix() + FLYABLE_HISTORY);
+        DatabaseMigrationTaskExecutor databaseMigrationTaskExecutor = this.getDatabaseMigrationTaskExecutor();
+        boolean flyableHistoryInitialized = databaseMigrationTaskExecutor.existFlyableHistoryTable(jdbcDao, this.getFlyablePrefix() + FLYABLE_HISTORY);
         for (MigrationTask migrationTask : this.migrationTasks) {
             List<MigrationResource> migrationResources = this.migrationResourceResolver.resolveMigrationResources(migrationTask.getResourcePattern());
             Map<String, List<MigrationResource>> map = migrationResources.stream().collect(Collectors.groupingBy(MigrationResource::getGroup));
@@ -164,15 +164,12 @@ public class FlyableExecutor {
     }
 
     public void registerDefaultDatabaseMigrationTask() {
-        DatabaseExecutor databaseExecutor = this.getDatabaseExecutor();
-        if (databaseExecutor instanceof MigrationTaskExecutor) {
-            MigrationTaskExecutor migrationTaskExecutor = (MigrationTaskExecutor) databaseExecutor;
-            this.registerMigrationTask(migrationTaskExecutor, FLYABLE_GROUP);
-        }
+        DatabaseMigrationTaskExecutor databaseMigrationTaskExecutor = this.getDatabaseMigrationTaskExecutor();
+        this.registerMigrationTask(databaseMigrationTaskExecutor, FLYABLE_GROUP);
     }
 
-    private DatabaseExecutor getDatabaseExecutor() {
+    private DatabaseMigrationTaskExecutor getDatabaseMigrationTaskExecutor() {
         String databaseProduct = this.getDatabaseProduct();
-        return this.databaseExecutorResolver.resolveDatabaseExecutor(databaseProduct);
+        return this.databaseMigrationTaskExecutorResolver.resolveDatabaseExecutor(databaseProduct);
     }
 }

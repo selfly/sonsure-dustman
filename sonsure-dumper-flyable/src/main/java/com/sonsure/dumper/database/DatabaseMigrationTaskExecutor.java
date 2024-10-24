@@ -1,14 +1,17 @@
 package com.sonsure.dumper.database;
 
 import com.sonsure.dumper.core.persist.JdbcDao;
+import com.sonsure.dumper.flyable.MigrationTaskExecutor;
+import com.sonsure.dumper.resource.MigrationResource;
 import lombok.SneakyThrows;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 
 /**
  * @author selfly
  */
-public interface DatabaseExecutor {
+public interface DatabaseMigrationTaskExecutor extends MigrationTaskExecutor {
 
     /**
      * Support boolean.
@@ -31,6 +34,17 @@ public interface DatabaseExecutor {
             return conn.getMetaData()
                     .getTables(null, null, flyableHistory, new String[]{"TABLE"}).next();
         }
+    }
+
+    /**
+     * Execute resource.
+     *
+     * @param jdbcDao  the jdbc dao
+     * @param resource the resource
+     */
+    @Override
+    default void executeResource(JdbcDao jdbcDao, MigrationResource resource) {
+        jdbcDao.executeScript(resource.getResourceContent(StandardCharsets.UTF_8));
     }
 
 }

@@ -3,8 +3,6 @@ package com.sonsure.dumper.flyable;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.resource.MigrationResource;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * @author selfly
  */
@@ -18,12 +16,10 @@ public interface MigrationTaskExecutor {
     String getResourcePattern();
 
     /**
-     * Execute script.
+     * Execute resource.
      *
      * @param jdbcDao  the jdbc dao
      * @param resource the resource
      */
-    default void executeResource(JdbcDao jdbcDao, MigrationResource resource){
-        jdbcDao.executeScript(resource.getResourceContent(StandardCharsets.UTF_8));
-    }
+    void executeResource(JdbcDao jdbcDao, MigrationResource resource);
 }
