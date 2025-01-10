@@ -10,6 +10,7 @@
 package com.sonsure.dumper.common.validation;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author liyd
@@ -17,17 +18,19 @@ import java.util.Collection;
  */
 public class NotEmptyValidator implements Validator {
 
-    private static final String[] NOT_EMPTY = {PREFIX + "not.empty", "不能为空"};
+    private static final String NOT_EMPTY = PREFIX + "not.empty";
 
     @Override
-    public ValidatorResult validate(Object obj, String validateName) {
+    public ValidatorResult validate(Object obj, String message) {
         ValidatorResult validatorResult = new ValidatorResult(false);
         if (obj == null) {
-            return validatorResult;
-        }
-        if (obj instanceof Collection) {
+            validatorResult.setSuccess(false);
+        } else if (obj instanceof Collection) {
             Collection<?> cts = (Collection<?>) obj;
             validatorResult.setSuccess(!cts.isEmpty());
+        } else if (obj instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) obj;
+            validatorResult.setSuccess(!map.isEmpty());
         } else if (obj.getClass().isArray()) {
             validatorResult.setSuccess(((Object[]) obj).length > 0);
         } else if (obj instanceof String) {
@@ -35,8 +38,10 @@ public class NotEmptyValidator implements Validator {
         } else {
             throw new UnsupportedOperationException("不支持的参数类型");
         }
-        validatorResult.setCode(NOT_EMPTY[0]);
-        validatorResult.setMessage(validateName + NOT_EMPTY[1]);
+        if (!validatorResult.isSuccess()) {
+            validatorResult.setCode(NOT_EMPTY);
+            validatorResult.setMessage(message);
+        }
         return validatorResult;
     }
 }

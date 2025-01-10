@@ -27,68 +27,64 @@ public class NumberValidator implements Validator {
     /**
      * 表示大于
      */
-    public static final String[] GT = {PREFIX + "number.must.gt", "{0}必须大于{1}"};
+    public static final String GT = PREFIX + "number.must.gt";
 
     /**
      * 表示小于
      */
-    public static final String[] LT = {PREFIX + "number.must.lt", "{0}必须小于{1}"};
+    public static final String LT = PREFIX + "number.must.lt";
 
     /**
      * 表示大于等于
      */
-    public static final String[] GT_EQ = {PREFIX + "number.must.gt.eq", "{0}必须大于等于{1}"};
+    public static final String GT_EQ = PREFIX + "number.must.gt.eq";
 
     /**
      * 表示小于等于
      */
-    public static final String[] LT_EQ = {PREFIX + "number.must.lt.eq", "{0}必须小于等于{1}"};
+    public static final String LT_EQ = PREFIX + "number.must.lt.eq";
 
     /**
      * 表示等于
      */
-    public static final String[] EQ = {PREFIX + "number.must.eq", "{0}必须等于{1}"};
+    public static final String EQ = PREFIX + "number.must.eq";
 
-    private final String type;
+    private final String code;
 
-    public NumberValidator(String type) {
-        this.type = type;
+    public NumberValidator(String code) {
+        this.code = code;
     }
 
     @Override
-    public ValidatorResult validate(Object value, String validateName) {
+    public ValidatorResult validate(Object value, String message) {
         Object[] values = (Object[]) value;
         BigDecimal val = new BigDecimal(String.valueOf(values[0]));
         BigDecimal expectVal = new BigDecimal(String.valueOf(values[1]));
         int i = val.compareTo(expectVal);
         ValidatorResult result = new ValidatorResult(false);
-        if (StringUtils.equals(type, GT[0])) {
+        String resultMsg;
+        if (StringUtils.equals(code, GT)) {
             result.setSuccess(i > 0);
-            result.setCode(GT[0]);
-            result.setMessage(MessageFormat.format(GT[1], validateName, expectVal));
-            return result;
-        } else if (StringUtils.equals(type, LT[0])) {
+            resultMsg = MessageFormat.format(message, expectVal);
+        } else if (StringUtils.equals(code, LT)) {
             result.setSuccess(i < 0);
-            result.setCode(LT[0]);
-            result.setMessage(MessageFormat.format(LT[1], validateName, expectVal));
-            return result;
-        } else if (StringUtils.equals(type, GT_EQ[0])) {
+            resultMsg = MessageFormat.format(message, expectVal);
+        } else if (StringUtils.equals(code, GT_EQ)) {
             result.setSuccess(i >= 0);
-            result.setCode(GT_EQ[0]);
-            result.setMessage(MessageFormat.format(GT_EQ[1], validateName, expectVal));
-            return result;
-        } else if (StringUtils.equals(type, LT_EQ[0])) {
+            resultMsg = MessageFormat.format(message, expectVal);
+        } else if (StringUtils.equals(code, LT_EQ)) {
             result.setSuccess(i <= 0);
-            result.setCode(LT_EQ[0]);
-            result.setMessage(MessageFormat.format(LT_EQ[1], validateName, expectVal));
-            return result;
-        } else if (StringUtils.equals(type, EQ[0])) {
+            resultMsg = MessageFormat.format(message, expectVal);
+        } else if (StringUtils.equals(code, EQ)) {
             result.setSuccess(i == 0);
-            result.setCode(EQ[0]);
-            result.setMessage(MessageFormat.format(EQ[1], validateName, expectVal));
-            return result;
+            resultMsg = MessageFormat.format(message, expectVal);
         } else {
             throw new ValidationException("不支持的数字对比操作");
         }
+        if (!result.isSuccess()) {
+            result.setCode(code);
+            result.setMessage(resultMsg);
+        }
+        return result;
     }
 }

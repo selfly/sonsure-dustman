@@ -20,81 +20,72 @@ import java.text.MessageFormat;
  */
 public class StringValidator implements Validator {
 
-    public static final String[] NOT_BLANK = {PREFIX + "not.blank", "不能为空"};
+    public static final String NOT_BLANK = PREFIX + "not.blank";
 
-    public static final String[] NOT_EMPTY = {PREFIX + "not.empty", "不能为空"};
+    public static final String NOT_EMPTY = PREFIX + "not.empty";
 
-    public static final String[] MUST_EQ = {PREFIX + "must.eq", "必须相同"};
+    public static final String MUST_EQ = PREFIX + "must.eq";
 
-    public static final String[] MUST_EQ_IGNORE_CASE = {PREFIX + "must.eq.ignore.case", "必须相同"};
+    public static final String MUST_EQ_IGNORE_CASE = PREFIX + "must.eq.ignore.case";
 
-    public static final String[] NOT_EQ = {PREFIX + "not.eq", "{0}不能等于{1}"};
+    public static final String NOT_EQ = PREFIX + "not.eq";
 
-    public static final String[] MIN_LENGTH = {PREFIX + "min.length", "{0}允许最小长度为{1}"};
+    public static final String NOT_EQ_IGNORE_CASE = PREFIX + "not.eq.ignore.case";
 
-    public static final String[] MAX_LENGTH = {PREFIX + "max.length", "{0}允许最大长度为{1}"};
+    public static final String MIN_LENGTH = PREFIX + "min.length";
 
-    public static final String[] EQ_LENGTH = {PREFIX + "eq.length", "{0}长度必须为{1}"};
+    public static final String MAX_LENGTH = PREFIX + "max.length";
+
+    public static final String EQ_LENGTH = PREFIX + "eq.length";
 
 
-    private final String type;
+    private final String code;
 
-    public StringValidator(String type) {
-        this.type = type;
+    public StringValidator(String code) {
+        this.code = code;
     }
 
     @Override
-    public ValidatorResult validate(Object value, String validateName) {
+    public ValidatorResult validate(Object value, String message) {
 
         ValidatorResult validatorResult = new ValidatorResult(true);
-        if (StringUtils.equals(type, NOT_BLANK[0])) {
+        String resultMsg = message;
+        if (StringUtils.equals(code, NOT_BLANK)) {
             validatorResult.setSuccess(StringUtils.isNotBlank((String) value));
-            validatorResult.setCode(NOT_BLANK[0]);
-            validatorResult.setMessage(validateName + NOT_BLANK[1]);
-            return validatorResult;
-        } else if (StringUtils.equals(type, NOT_EMPTY[0])) {
+        } else if (StringUtils.equals(code, NOT_EMPTY)) {
             validatorResult.setSuccess(StringUtils.isNotEmpty((String) value));
-            validatorResult.setCode(NOT_EMPTY[0]);
-            validatorResult.setMessage(validateName + NOT_EMPTY[1]);
-            return validatorResult;
-        } else if (StringUtils.equals(type, MUST_EQ[0])) {
+        } else if (StringUtils.equals(code, MUST_EQ)) {
             Object[] values = (Object[]) value;
             validatorResult.setSuccess(StringUtils.equals((String) values[0], (String) values[1]));
-            validatorResult.setCode(MUST_EQ[0]);
-            validatorResult.setMessage(validateName + MUST_EQ[1]);
-            return validatorResult;
-        } else if (StringUtils.equals(type, MUST_EQ_IGNORE_CASE[0])) {
+        } else if (StringUtils.equals(code, MUST_EQ_IGNORE_CASE)) {
             Object[] values = (Object[]) value;
             validatorResult.setSuccess(StringUtils.equalsIgnoreCase((String) values[0], (String) values[1]));
-            validatorResult.setCode(MUST_EQ_IGNORE_CASE[0]);
-            validatorResult.setMessage(validateName + MUST_EQ_IGNORE_CASE[1]);
-            return validatorResult;
-        } else if (StringUtils.equals(type, MIN_LENGTH[0])) {
+        } else if (StringUtils.equals(code, MIN_LENGTH)) {
             Object[] values = (Object[]) value;
             validatorResult.setSuccess(StringUtils.length((String) values[0]) >= (Integer) values[1]);
-            validatorResult.setCode(MIN_LENGTH[0]);
-            validatorResult.setMessage(MessageFormat.format(MIN_LENGTH[1], validateName, values[1]));
-            return validatorResult;
-        } else if (StringUtils.equals(type, MAX_LENGTH[0])) {
+            resultMsg = MessageFormat.format(message, values[1]);
+        } else if (StringUtils.equals(code, MAX_LENGTH)) {
             Object[] values = (Object[]) value;
             validatorResult.setSuccess(StringUtils.length((String) values[0]) <= (Integer) values[1]);
-            validatorResult.setCode(MAX_LENGTH[0]);
-            validatorResult.setMessage(MessageFormat.format(MAX_LENGTH[1], validateName, values[1]));
-            return validatorResult;
-        } else if (StringUtils.equals(type, EQ_LENGTH[0])) {
+            resultMsg = MessageFormat.format(message, values[1]);
+        } else if (StringUtils.equals(code, EQ_LENGTH)) {
             Object[] values = (Object[]) value;
             validatorResult.setSuccess(StringUtils.length((String) values[0]) == (Integer) values[1]);
-            validatorResult.setCode(EQ_LENGTH[0]);
-            validatorResult.setMessage(MessageFormat.format(EQ_LENGTH[1], validateName, values[1]));
-            return validatorResult;
-        } else if (StringUtils.equals(type, NOT_EQ[0])) {
+            resultMsg = MessageFormat.format(message, values[1]);
+        } else if (StringUtils.equals(code, NOT_EQ)) {
             Object[] values = (Object[]) value;
             validatorResult.setSuccess(!StringUtils.equals((String) values[0], (String) values[1]));
-            validatorResult.setCode(NOT_EQ[0]);
-            validatorResult.setMessage(MessageFormat.format(NOT_EQ[1], validateName, values[1]));
-            return validatorResult;
+            resultMsg = MessageFormat.format(message, values[1]);
+        } else if (StringUtils.equals(code, NOT_EQ_IGNORE_CASE)) {
+            Object[] values = (Object[]) value;
+            validatorResult.setSuccess(!StringUtils.equalsIgnoreCase((String) values[0], (String) values[1]));
         } else {
             throw new ValidationException("不支持的校验");
         }
+        if (!validatorResult.isSuccess()) {
+            validatorResult.setCode(code);
+            validatorResult.setMessage(resultMsg);
+        }
+        return validatorResult;
     }
 }

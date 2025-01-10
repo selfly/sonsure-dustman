@@ -9,7 +9,6 @@
 
 package com.sonsure.dumper.common.validation;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 
 /**
@@ -18,20 +17,21 @@ import java.util.Collection;
  */
 public class CollectionEachNotNullValidator implements Validator {
 
-    public static final String[] COLLECTION_EACH_NOT_NULL = {PREFIX + "collection.each.not.null", "{0}的每个元素都不能为空"};
+    private static final String COLLECTION_EACH_NOT_NULL = PREFIX + "collection.each.not.null";
 
     @Override
-    public ValidatorResult validate(Object value, String validateName) {
+    public ValidatorResult validate(Object value, String message) {
         ValidatorResult validatorResult = new ValidatorResult(false);
         if (value == null) {
+            validatorResult.setMessage(message);
             return validatorResult;
         }
         Collection<?> collection = (Collection<?>) value;
         for (Object obj : collection) {
             if (obj == null) {
                 validatorResult.setSuccess(false);
-                validatorResult.setCode(COLLECTION_EACH_NOT_NULL[0]);
-                validatorResult.setMessage(MessageFormat.format(COLLECTION_EACH_NOT_NULL[1], validateName));
+                validatorResult.setCode(COLLECTION_EACH_NOT_NULL);
+                validatorResult.setMessage(message);
                 return validatorResult;
             }
         }

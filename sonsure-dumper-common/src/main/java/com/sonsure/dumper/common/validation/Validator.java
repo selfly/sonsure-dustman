@@ -21,8 +21,8 @@ public interface Validator {
      * 值校验
      *
      * @param value the value
-     * @param validateName the validate name
-     * @return boolean boolean
+     * @param message the message
+     * @return the validator result
      */
-    ValidatorResult validate(Object value, String validateName);
+    ValidatorResult validate(Object value, String message);
 }

@@ -21,51 +21,47 @@ import java.util.Collection;
  */
 public class CollectionValidator implements Validator {
 
-    public static final String[] MUST_EMPTY = {PREFIX + "collection.must.empty", "必须为空"};
-    public static final String[] MIN_SIZE = {PREFIX + "collection.min.size", "允许最小大小为{0}"};
-    public static final String[] MAX_SIZE = {PREFIX + "collection.max.size", "允许最大大小为{0}"};
-    public static final String[] EQ_SIZE = {PREFIX + "collection.eq.size", "大小必须为{0}"};
+    public static final String IS_EMPTY = PREFIX + "collection.el.empty";
+    public static final String MIN_SIZE = PREFIX + "collection.min.size";
+    public static final String MAX_SIZE = PREFIX + "collection.max.size";
+    public static final String EQ_SIZE = PREFIX + "collection.eq.size";
 
-    private final String type;
+    private final String code;
 
-    public CollectionValidator(String type) {
-        this.type = type;
+    public CollectionValidator(String code) {
+        this.code = code;
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public ValidatorResult validate(Object value, String validateName) {
+    public ValidatorResult validate(Object value, String message) {
 
         ValidatorResult validatorResult = new ValidatorResult(false);
-        if (StringUtils.equals(type, MUST_EMPTY[0])) {
+        String resultMsg = message;
+        if (StringUtils.equals(code, IS_EMPTY)) {
             validatorResult.setSuccess(value == null || ((Collection) value).isEmpty());
-            validatorResult.setCode(MUST_EMPTY[0]);
-            validatorResult.setMessage(MUST_EMPTY[1]);
-            return validatorResult;
-        } else if (StringUtils.equals(type, MIN_SIZE[0])) {
+        } else if (StringUtils.equals(code, MIN_SIZE)) {
             Object[] values = (Object[]) value;
             Collection collection = (Collection) values[0];
             validatorResult.setSuccess(collection != null && collection.size() >= (Integer) values[1]);
-            validatorResult.setCode(MIN_SIZE[0]);
-            validatorResult.setMessage(MessageFormat.format(MIN_SIZE[1], values[1]));
-            return validatorResult;
-        } else if (StringUtils.equals(type, MAX_SIZE[0])) {
+            resultMsg = MessageFormat.format(message, values[1]);
+        } else if (StringUtils.equals(code, MAX_SIZE)) {
             Object[] values = (Object[]) value;
             Collection collection = (Collection) values[0];
             validatorResult.setSuccess(collection == null || collection.size() <= (Integer) values[1]);
-            validatorResult.setCode(MAX_SIZE[0]);
-            validatorResult.setMessage(MessageFormat.format(MAX_SIZE[1], values[1]));
-            return validatorResult;
-        } else if (StringUtils.equals(type, EQ_SIZE[0])) {
+            resultMsg = MessageFormat.format(message, values[1]);
+        } else if (StringUtils.equals(code, EQ_SIZE)) {
             Object[] values = (Object[]) value;
             Collection collection = (Collection) values[0];
             validatorResult.setSuccess(collection != null && collection.size() == ((Integer) values[1]));
-            validatorResult.setCode(EQ_SIZE[0]);
-            validatorResult.setMessage(MessageFormat.format(EQ_SIZE[1], values[1]));
-            return validatorResult;
+            resultMsg = MessageFormat.format(message, values[1]);
         } else {
-
             throw new ValidationException("不支持的集合操作");
         }
+        if (!validatorResult.isSuccess()) {
+            validatorResult.setCode(code);
+            validatorResult.setMessage(resultMsg);
+        }
+        return validatorResult;
     }
 }

@@ -15,13 +15,15 @@ package com.sonsure.dumper.common.validation;
  */
 public class NotNullValidator implements Validator {
 
-    private static final String[] NOT_NULL = {PREFIX + "not.null", "不能为空"};
+    private static final String NOT_NULL = PREFIX + "not.null";
 
     @Override
-    public ValidatorResult validate(Object obj, String validateName) {
+    public ValidatorResult validate(Object obj, String message) {
         ValidatorResult validatorResult = new ValidatorResult(obj != null);
-        validatorResult.setCode(NOT_NULL[0]);
-        validatorResult.setMessage(validateName + NOT_NULL[1]);
+        if (!validatorResult.isSuccess()) {
+            validatorResult.setCode(NOT_NULL);
+            validatorResult.setMessage(message);
+        }
         return validatorResult;
     }
 }
