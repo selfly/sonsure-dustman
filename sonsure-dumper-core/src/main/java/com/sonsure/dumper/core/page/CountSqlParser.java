@@ -169,7 +169,7 @@ public class CountSqlParser {
      * @return
      */
     public String getSmartCountSql(String sql) {
-        return getSmartCountSql(sql, "0");
+        return getSmartCountSql(sql, "*");
     }
 
     /**
