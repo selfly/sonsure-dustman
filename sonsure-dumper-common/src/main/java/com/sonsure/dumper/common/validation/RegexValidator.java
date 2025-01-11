@@ -11,20 +11,18 @@ package com.sonsure.dumper.common.validation;
 
 /**
  * @author liyd
- * @date 17/1/24
+ * @since 17/1/24
  */
 public class RegexValidator implements Validator {
 
-    private static final String REGEX = PREFIX + "regex.error";
+    private static final String ERROR_CODE = PREFIX + "regex.error";
 
     @Override
-    public ValidatorResult validate(Object value, String message) {
+    public ValidatorResult validate(Object value, String message, Object[] msgArgs) {
         String[] values = (String[]) value;
         ValidatorResult result = new ValidatorResult(values[0].matches(values[1]));
-        if (!result.isSuccess()) {
-            result.setCode(REGEX);
-            result.setMessage(message);
-        }
+        result.resolveError(ERROR_CODE, message, msgArgs);
         return result;
     }
+
 }

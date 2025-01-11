@@ -9,17 +9,17 @@
 
 package com.sonsure.dumper.common.validation;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 内部使用的验证结果包含的错误
  *
  * @author selfly
  */
+@Getter
+@Setter
 public class ValidationError {
-
-    /**
-     * 错误字段名字
-     */
-    private String name;
 
     /**
      * 错误码
@@ -38,44 +38,8 @@ public class ValidationError {
 
     @Override
     public String toString() {
-        return "ValidationError{" + "name=" + name + ", errorCode=" + errorCode + ", errorMsg=" + errorMsg
-               + ", invalidValue=" + invalidValue + "}";
-    }
-
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public ValidationError setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
-        return this;
-    }
-
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    public ValidationError setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ValidationError setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public Object getInvalidValue() {
-        return invalidValue;
-    }
-
-    public ValidationError setInvalidValue(Object invalidValue) {
-        this.invalidValue = invalidValue;
-        return this;
+        return "ValidationError{ errorCode=" + errorCode + ", errorMsg=" + errorMsg
+               + ", invalidValue=" + invalidValue + " }";
     }
 
 }

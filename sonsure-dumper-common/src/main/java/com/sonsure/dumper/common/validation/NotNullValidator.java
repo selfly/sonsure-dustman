@@ -11,19 +11,17 @@ package com.sonsure.dumper.common.validation;
 
 /**
  * @author liyd
- * @date 17/1/23
+ * @since 17/1/23
  */
 public class NotNullValidator implements Validator {
 
-    private static final String NOT_NULL = PREFIX + "not.null";
+    private static final String ERROR_CODE = PREFIX + "not.null";
 
     @Override
-    public ValidatorResult validate(Object obj, String message) {
-        ValidatorResult validatorResult = new ValidatorResult(obj != null);
-        if (!validatorResult.isSuccess()) {
-            validatorResult.setCode(NOT_NULL);
-            validatorResult.setMessage(message);
-        }
+    public ValidatorResult validate(Object value, String message, Object[] msgArgs) {
+        ValidatorResult validatorResult = new ValidatorResult(value != null);
+        validatorResult.resolveError(ERROR_CODE, message, msgArgs);
         return validatorResult;
     }
+
 }

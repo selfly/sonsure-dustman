@@ -13,30 +13,28 @@ import java.util.Collection;
 
 /**
  * @author liyd
- * @date 17/1/24
+ * @since  17/1/24
  */
 public class CollectionEachNotNullValidator implements Validator {
 
-    private static final String COLLECTION_EACH_NOT_NULL = PREFIX + "collection.each.not.null";
+    private static final String ERROR_CODE = PREFIX + "each.el.not.null";
 
     @Override
-    public ValidatorResult validate(Object value, String message) {
+    public ValidatorResult validate(Object value, String message, Object[] msgArgs) {
         ValidatorResult validatorResult = new ValidatorResult(false);
         if (value == null) {
-            validatorResult.setCode(COLLECTION_EACH_NOT_NULL);
-            validatorResult.setMessage(message);
+            validatorResult.resolveError(ERROR_CODE, message, msgArgs);
             return validatorResult;
         }
         Collection<?> collection = (Collection<?>) value;
         for (Object obj : collection) {
             if (obj == null) {
-                validatorResult.setSuccess(false);
-                validatorResult.setCode(COLLECTION_EACH_NOT_NULL);
-                validatorResult.setMessage(message);
+                validatorResult.resolveError(ERROR_CODE, message, msgArgs);
                 return validatorResult;
             }
         }
         validatorResult.setSuccess(true);
         return validatorResult;
     }
+
 }

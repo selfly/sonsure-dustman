@@ -14,34 +14,30 @@ import java.util.Map;
 
 /**
  * @author liyd
- * @date 17/1/23
+ * @since  17/1/23
  */
 public class NotEmptyValidator implements Validator {
 
-    private static final String NOT_EMPTY = PREFIX + "not.empty";
+    private static final String ERROR_CODE = PREFIX + "not.empty";
 
     @Override
-    public ValidatorResult validate(Object obj, String message) {
+    public ValidatorResult validate(Object value, String message, Object[] msgArgs) {
         ValidatorResult validatorResult = new ValidatorResult(false);
-        if (obj == null) {
+        if (value == null) {
             validatorResult.setSuccess(false);
-        } else if (obj instanceof Collection) {
-            Collection<?> cts = (Collection<?>) obj;
+        } else if (value instanceof Collection) {
+            Collection<?> cts = (Collection<?>) value;
             validatorResult.setSuccess(!cts.isEmpty());
-        } else if (obj instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) obj;
+        } else if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
             validatorResult.setSuccess(!map.isEmpty());
-        } else if (obj.getClass().isArray()) {
-            validatorResult.setSuccess(((Object[]) obj).length > 0);
-        } else if (obj instanceof String) {
-            validatorResult.setSuccess(!((String) obj).isEmpty());
+        } else if (value.getClass().isArray()) {
+            validatorResult.setSuccess(((Object[]) value).length > 0);
         } else {
             throw new UnsupportedOperationException("不支持的参数类型");
         }
-        if (!validatorResult.isSuccess()) {
-            validatorResult.setCode(NOT_EMPTY);
-            validatorResult.setMessage(message);
-        }
+        validatorResult.resolveError(ERROR_CODE, message, msgArgs);
         return validatorResult;
     }
+
 }

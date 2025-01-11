@@ -10,12 +10,16 @@
 package com.sonsure.dumper.common.validation;
 
 import com.sonsure.dumper.common.utils.UUIDUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author liyd
- * @since  17/1/23
+ * @since 17/1/23
  */
+@Getter
+@Setter
 public class ValidatorElement {
 
     private static final String PREFIX = "ss.";
@@ -28,12 +32,17 @@ public class ValidatorElement {
     /**
      * 待验证对象
      */
-    private Object validateValue;
+    private Object value;
 
     /**
-     * 校验对象的名称 一般中文备注名 非属性名
+     * 指定的校验信息
      */
-    private String validateName;
+    private String message;
+
+    /**
+     * 消息需要格式化时的参数
+     */
+    private Object[] messageArgs;
 
     /**
      * 指定的错误码
@@ -48,18 +57,23 @@ public class ValidatorElement {
     /**
      * create
      *
-     * @param validateValue 待验证对象
-     * @param validateName  the validate name
-     * @param validator     验证器
+     * @param value     the value
+     * @param message  the message
+     * @param validator 验证器
      */
-    public ValidatorElement(Object validateValue, String validateName, Validator validator) {
-        this.validateValue = validateValue;
-        this.validateName = validateName;
+    public ValidatorElement(Object value, String message, Validator validator) {
+        this(value, message, null, validator);
+    }
+
+    public ValidatorElement(Object value, String message, Object[] msgArgs, Validator validator) {
+        this.value = value;
+        this.message = message;
+        this.messageArgs = msgArgs;
         this.validator = validator;
     }
 
     public ValidatorResult validate() {
-        ValidatorResult result = this.getValidator().validate(this.validateValue, this.validateName);
+        ValidatorResult result = this.getValidator().validate(this.getValue(), this.getMessage(), this.getMessageArgs());
         ValidatorResult theResult = new ValidatorResult(result.isSuccess());
         if (!result.isSuccess()) {
             //为空，自动生成一个唯一code
@@ -79,31 +93,4 @@ public class ValidatorElement {
         return theResult;
     }
 
-    public Validator getValidator() {
-        return validator;
-    }
-
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
-
-    public Object getValidateValue() {
-        return validateValue;
-    }
-
-    public String getValidateName() {
-        return validateName;
-    }
-
-    public void setValidateName(String validateName) {
-        this.validateName = validateName;
-    }
-
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-    }
 }

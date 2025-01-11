@@ -11,7 +11,7 @@ package com.sonsure.dumper.common.validation;
 
 /**
  * @author liyd
- * @date 17/1/23
+ * @since 17/1/23
  */
 public interface Validator {
 
@@ -22,7 +22,8 @@ public interface Validator {
      *
      * @param value the value
      * @param message the message
+     * @param msgArgs the msg args
      * @return the validator result
      */
-    ValidatorResult validate(Object value, String message);
+    ValidatorResult validate(Object value, String message, Object[] msgArgs);
 }

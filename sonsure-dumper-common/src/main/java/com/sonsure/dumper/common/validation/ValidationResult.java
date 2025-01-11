@@ -9,6 +9,9 @@
 
 package com.sonsure.dumper.common.validation;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +25,13 @@ public class ValidationResult {
     /**
      * 是否成功
      */
+    @Setter
     private boolean isSuccess;
 
     /**
      * 验证错误
      */
+    @Getter
     private List<ValidationError> errors;
 
     public ValidationResult(boolean isSuccess) {
@@ -35,10 +40,6 @@ public class ValidationResult {
 
     public boolean isSuccess() {
         return isSuccess;
-    }
-
-    public void setIsSuccess(boolean isSuccess) {
-        this.isSuccess = isSuccess;
     }
 
     /**
@@ -53,7 +54,4 @@ public class ValidationResult {
         errors.add(error);
     }
 
-    public List<ValidationError> getErrors() {
-        return errors;
-    }
 }

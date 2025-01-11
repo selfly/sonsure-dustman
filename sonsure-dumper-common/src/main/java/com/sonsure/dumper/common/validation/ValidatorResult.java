@@ -9,9 +9,18 @@
 
 package com.sonsure.dumper.common.validation;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.text.MessageFormat;
+
 /**
+ * The type Validator result.
+ *
  * @author liyd
  */
+@Setter
+@Getter
 public class ValidatorResult {
 
     private boolean success;
@@ -24,27 +33,14 @@ public class ValidatorResult {
         this.success = success;
     }
 
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
+    public void resolveError(String code, String message, Object... args) {
+        if (this.success) {
+            return;
+        }
         this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
+        if (args != null) {
+            message = MessageFormat.format(message, args);
+        }
         this.message = message;
     }
 }

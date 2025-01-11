@@ -9,13 +9,15 @@
 
 package com.sonsure.dumper.common.validation;
 
+import java.text.MessageFormat;
+
 /**
  * @author liyd
- * @date 17/3/19
+ * @since 17/3/19
  */
 public class BooleanValidator implements Validator {
 
-    private static final String BOOLEAN = PREFIX + "not.eq.boolean";
+    private static final String ERROR_CODE = PREFIX + "not.eq.boolean";
 
     private final boolean expectVal;
 
@@ -24,14 +26,14 @@ public class BooleanValidator implements Validator {
     }
 
     @Override
-    public ValidatorResult validate(Object value, String message) {
+    public ValidatorResult validate(Object value, String message, Object[] msgArgs) {
         ValidatorResult validatorResult = new ValidatorResult(false);
         if ((Boolean) value == expectVal) {
             validatorResult.setSuccess(true);
         } else {
-            validatorResult.setCode(BOOLEAN);
-            validatorResult.setMessage(message);
+            validatorResult.resolveError(ERROR_CODE, message, msgArgs);
         }
         return validatorResult;
     }
+
 }
