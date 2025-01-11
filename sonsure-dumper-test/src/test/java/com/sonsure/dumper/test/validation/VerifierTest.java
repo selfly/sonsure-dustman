@@ -9,7 +9,6 @@ import com.sonsure.dumper.test.model.ValidationModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.groups.Default;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,17 +30,17 @@ public class VerifierTest {
 //    }
 
     @Test
-    public void isNotNull() {
+    public void notNull() {
         String message = "值不能为空";
-        Verifier.init().isNotNull(VAL_STR, message).validate();
+        Verifier.init().notNull(VAL_STR, message).validate();
         Exception exception = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotNull(VAL_NULL, message).validate();
+            Verifier.init().notNull(VAL_NULL, message).validate();
         });
         Assertions.assertEquals(message, exception.getMessage());
     }
 
     @Test
-    public void isNotEmpty() {
+    public void notEmpty() {
         ArrayList<Object> list = new ArrayList<>();
         list.add(1);
         Map<String, Object> map = new HashMap<>();
@@ -50,121 +49,121 @@ public class VerifierTest {
         ArrayList<Object> emptyList = new ArrayList<>();
         Map<String, Object> emptyMap = new HashMap<>();
         String message = "对象不能为空";
-        Verifier.init().isNotEmpty(list, message)
-                .isNotEmpty(map, message)
-                .isNotEmpty(new Object[]{1, 2}, message)
-                .isNotEmpty("aa", message)
+        Verifier.init().notEmpty(list, message)
+                .notEmpty(map, message)
+                .notEmpty(new Object[]{1, 2}, message)
+                .notEmpty("aa", message)
                 .validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotEmpty(VAL_NULL, message).validate();
+            Verifier.init().notEmpty(VAL_NULL, message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotEmpty(emptyList, message).validate();
+            Verifier.init().notEmpty(emptyList, message).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
 
         Exception ex3 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotEmpty(emptyMap, message).validate();
+            Verifier.init().notEmpty(emptyMap, message).validate();
         });
         Assertions.assertEquals(message, ex3.getMessage());
     }
 
     @Test
-    public void isNotBlank() {
+    public void notBlank() {
         String message = "值不能为空";
-        Verifier.init().isNotBlank("aaa", message).validate();
+        Verifier.init().notBlank("aaa", message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotBlank(null, message).validate();
+            Verifier.init().notBlank(null, message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotBlank("", message).validate();
+            Verifier.init().notBlank("", message).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
 
         Exception ex3 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotBlank("   ", message).validate();
+            Verifier.init().notBlank("   ", message).validate();
         });
         Assertions.assertEquals(message, ex3.getMessage());
     }
 
     @Test
-    public void isMinLength() {
+    public void minLength() {
         String message = "最小长度必须大于{0}";
         int minLength = 2;
-        Verifier.init().isMinLength("aaa", minLength, message).validate();
+        Verifier.init().minLength("aaa", minLength, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isMinLength(null, minLength, message).validate();
+            Verifier.init().minLength(null, minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isMinLength("a", minLength, message).validate();
+            Verifier.init().minLength("a", minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex2.getMessage());
     }
 
     @Test
-    public void isMaxLength() {
+    public void maxLength() {
         String message = "最大长度必须小于{0}";
         int minLength = 5;
-        Verifier.init().isMaxLength("aaa", minLength, message).validate();
-        Verifier.init().isMaxLength(null, minLength, message).validate();
+        Verifier.init().maxLength("aaa", minLength, message).validate();
+        Verifier.init().maxLength(null, minLength, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isMaxLength("aaaaaaa", minLength, message).validate();
+            Verifier.init().maxLength("aaaaaaa", minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex1.getMessage());
     }
 
     @Test
-    public void isArrMinLength() {
+    public void minArrLength() {
         String message = "最小长度必须大于{0}";
         int minLength = 2;
         Object[] arr1 = new Object[]{1, 2, 3};
         Object[] arr2 = new Object[]{1};
-        Verifier.init().isArrMinLength(arr1, minLength, message).validate();
+        Verifier.init().minArrLength(arr1, minLength, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isArrMinLength(null, minLength, message).validate();
+            Verifier.init().minArrLength(null, minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isArrMinLength(arr2, minLength, message).validate();
+            Verifier.init().minArrLength(arr2, minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex2.getMessage());
     }
 
     @Test
-    public void isArrMaxLength() {
+    public void maxArrLength() {
         String message = "最大长度必须小于{0}";
         int minLength = 5;
         Object[] arr1 = new Object[]{1, 2, 3};
         Object[] arr2 = new Object[]{1, 2, 3, 4, 5, 6, 7};
-        Verifier.init().isArrMaxLength(arr1, minLength, message).validate();
-        Verifier.init().isArrMaxLength(null, minLength, message).validate();
+        Verifier.init().maxArrLength(arr1, minLength, message).validate();
+        Verifier.init().maxArrLength(null, minLength, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isArrMaxLength(arr2, minLength, message).validate();
+            Verifier.init().maxArrLength(arr2, minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex1.getMessage());
     }
 
     @Test
-    public void isEqLength() {
+    public void eqLength() {
         String message = "长度必须等于{0}";
         int minLength = 5;
-        Verifier.init().isEqLength("aaaaa", minLength, message).validate();
+        Verifier.init().eqLength("aaaaa", minLength, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEqLength("aaaaaaa", minLength, message).validate();
+            Verifier.init().eqLength("aaaaaaa", minLength, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minLength), ex1.getMessage());
     }
@@ -206,195 +205,195 @@ public class VerifierTest {
     }
 
     @Test
-    public void isMinSize() {
+    public void minSize() {
         String message = "最小个数必须大于{0}";
         int minSize = 2;
         ArrayList<Object> list = new ArrayList<>();
         list.add(11);
         list.add(22);
-        Verifier.init().isMinSize(list, minSize, message).validate();
+        Verifier.init().minSize(list, minSize, message).validate();
 
         list.clear();
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isMinSize(list, minSize, message).validate();
+            Verifier.init().minSize(list, minSize, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, minSize), ex1.getMessage());
     }
 
     @Test
-    public void isMaxSize() {
+    public void maxSize() {
         String message = "最大个数必须小于等于{0}";
         int maxSize = 2;
         ArrayList<Object> list = new ArrayList<>();
         list.add(11);
         list.add(22);
-        Verifier.init().isMaxSize(list, maxSize, message).validate();
+        Verifier.init().maxSize(list, maxSize, message).validate();
 
         list.add(33);
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isMaxSize(list, maxSize, message).validate();
+            Verifier.init().maxSize(list, maxSize, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, maxSize), ex1.getMessage());
     }
 
     @Test
-    public void isEqSize() {
+    public void eqSize() {
         String message = "个数必须等于{0}";
         int size = 2;
         ArrayList<Object> list = new ArrayList<>();
         list.add(11);
         list.add(22);
-        Verifier.init().isEqSize(list, size, message).validate();
+        Verifier.init().eqSize(list, size, message).validate();
 
         list.add(33);
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEqSize(list, size, message).validate();
+            Verifier.init().eqSize(list, size, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, size), ex1.getMessage());
 
         list.clear();
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEqSize(list, size, message).validate();
+            Verifier.init().eqSize(list, size, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, size), ex2.getMessage());
     }
 
     @Test
-    public void isEq() {
+    public void eq() {
         String message = "值必须相等";
-        Verifier.init().isEq("aa", "aa", message).validate();
-        Verifier.init().isEq(12345, 12345, message).validate();
+        Verifier.init().eq("aa", "aa", message).validate();
+        Verifier.init().eq(12345, 12345, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEq("aa", "bb", message).validate();
+            Verifier.init().eq("aa", "bb", message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEq(12345, 12346, message).validate();
+            Verifier.init().eq(12345, 12346, message).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
     }
 
     @Test
-    public void isNotEq() {
+    public void notEq() {
         String message = "值必须不相等";
-        Verifier.init().isNotEq("aa", "aa1", message).validate();
+        Verifier.init().notEq("aa", "aa1", message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotEq("aa", "aa", message).validate();
+            Verifier.init().notEq("aa", "aa", message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
     }
 
     @Test
-    public void isEqIgnoreCase() {
+    public void eqIgnoreCase() {
         String message = "值必须相等,忽略大小写";
-        Verifier.init().isEqIgnoreCase("aa", "aa", message).validate();
-        Verifier.init().isEqIgnoreCase("aa", "AA", message).validate();
+        Verifier.init().eqIgnoreCase("aa", "aa", message).validate();
+        Verifier.init().eqIgnoreCase("aa", "AA", message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEqIgnoreCase("aa", "aa1", message).validate();
+            Verifier.init().eqIgnoreCase("aa", "aa1", message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
     }
 
     @Test
-    public void isNotEqIgnoreCase() {
+    public void notEqIgnoreCase() {
         String message = "值必须不相等,忽略大小写";
-        Verifier.init().isNotEqIgnoreCase("aa", "aaa", message).validate();
+        Verifier.init().notEqIgnoreCase("aa", "aaa", message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isNotEqIgnoreCase("aa", "AA", message).validate();
+            Verifier.init().notEqIgnoreCase("aa", "AA", message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
     }
 
     @Test
-    public void isGtThan() {
+    public void gtThan() {
         String message = "值必须大于{0}";
-        Verifier.init().isGtThan(5, 4, message).validate();
+        Verifier.init().gtThan(5, 4, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isGtThan(5, 5, message).validate();
+            Verifier.init().gtThan(5, 5, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, 5), ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isGtThan(5, 8, message).validate();
+            Verifier.init().gtThan(5, 8, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, 8), ex2.getMessage());
     }
 
     @Test
-    public void isGtEq() {
+    public void gtEq() {
         String message = "值必须大于等于{0}";
-        Verifier.init().isGtEq(5, 4, message).validate();
-        Verifier.init().isGtEq(5, 5, message).validate();
+        Verifier.init().gtEq(5, 4, message).validate();
+        Verifier.init().gtEq(5, 5, message).validate();
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isGtEq(5, 8, message).validate();
+            Verifier.init().gtEq(5, 8, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, 8), ex2.getMessage());
     }
 
     @Test
-    public void isLtThan() {
+    public void ltThan() {
         String message = "值必须小于{0}";
-        Verifier.init().isLtThan(5, 6, message).validate();
+        Verifier.init().ltThan(5, 6, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isLtThan(5, 5, message).validate();
+            Verifier.init().ltThan(5, 5, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, 5), ex1.getMessage());
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isLtThan(5, 4, message).validate();
+            Verifier.init().ltThan(5, 4, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, 4), ex2.getMessage());
     }
 
     @Test
-    public void isLtEq() {
+    public void ltEq() {
         String message = "值必须小于等于{0}";
-        Verifier.init().isLtEq(5, 6, message).validate();
-        Verifier.init().isLtEq(5, 5, message).validate();
+        Verifier.init().ltEq(5, 6, message).validate();
+        Verifier.init().ltEq(5, 5, message).validate();
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isLtEq(5, 4, message).validate();
+            Verifier.init().ltEq(5, 4, message).validate();
         });
         Assertions.assertEquals(MessageFormat.format(message, 4), ex2.getMessage());
     }
 
     @Test
-    public void isEachNotNull() {
+    public void eachElNotNull() {
         String message = "不能有null元素";
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEachNotNull(null, message).validate();
+            Verifier.init().eachElNotNull(null, message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
 
         ArrayList<Object> list = new ArrayList<>();
         list.add(111);
-        Verifier.init().isEachNotNull(list, message).validate();
+        Verifier.init().eachElNotNull(list, message).validate();
 
         list.add(null);
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEachNotNull(list, message).validate();
+            Verifier.init().eachElNotNull(list, message).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
     }
 
 
     @Test
-    public void isRegexMatch() {
+    public void regexMatch() {
         String message = "只能包含数字";
         String regex = "^\\d+$";
-        Verifier.init().isRegexMatch("123456", regex, message).validate();
+        Verifier.init().regexMatch("123456", regex, message).validate();
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isRegexMatch("a123456", regex, message).validate();
+            Verifier.init().regexMatch("a123456", regex, message).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
 
@@ -404,10 +403,10 @@ public class VerifierTest {
     @Test
     public void with() {
         String message = "值必须等于";
-        Verifier.init().isEq("aa", "bb", message).with(false).validate();
+        Verifier.init().eq("aa", "bb", message).with(false).validate();
 
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEq("aa", "bb", message).with(true).validate();
+            Verifier.init().eq("aa", "bb", message).with(true).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
     }
@@ -417,7 +416,7 @@ public class VerifierTest {
         String message = "值必须相等";
         String errorCode = "val.eq.result";
         ValidationException ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEq("aa", "bb", message).errorCode(errorCode).validate();
+            Verifier.init().eq("aa", "bb", message).errorCode(errorCode).validate();
         });
         Assertions.assertEquals(errorCode, ex2.getResultCode());
     }
@@ -427,7 +426,7 @@ public class VerifierTest {
         String message = "值必须相等";
         String errorMsg = "两个值必须相等";
         ValidationException ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().isEq("aa", "bb", message).errorMessage(errorMsg).validate();
+            Verifier.init().eq("aa", "bb", message).errorMessage(errorMsg).validate();
         });
         Assertions.assertEquals(errorMsg, ex2.getResultMsg());
     }
@@ -435,7 +434,7 @@ public class VerifierTest {
     @Test
     public void result() {
         String message = "值必须相等";
-        ValidationResult result = Verifier.init().isEq("aa", "bb", message).result();
+        ValidationResult result = Verifier.init().eq("aa", "bb", message).result();
         List<ValidationError> errors = result.getErrors();
         Assertions.assertEquals(1, errors.size());
         Assertions.assertEquals(message, errors.iterator().next().getErrorMsg());
