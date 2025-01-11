@@ -2,11 +2,14 @@ package com.sonsure.dumper.test.validation;
 
 import com.sonsure.dumper.common.exception.ValidationException;
 import com.sonsure.dumper.common.validation.ValidationError;
+import com.sonsure.dumper.common.validation.ValidationGroup;
 import com.sonsure.dumper.common.validation.ValidationResult;
 import com.sonsure.dumper.common.validation.Verifier;
+import com.sonsure.dumper.test.model.ValidationModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.validation.groups.Default;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +52,8 @@ public class VerifierTest {
         String message = "对象不能为空";
         Verifier.init().isNotEmpty(list, message)
                 .isNotEmpty(map, message)
+                .isNotEmpty(new Object[]{1, 2}, message)
+                .isNotEmpty("aa", message)
                 .validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
@@ -167,6 +172,7 @@ public class VerifierTest {
     @Test
     public void isEmpty() {
         String message = "不能为空";
+        Verifier.init().isEmpty(null, message).validate();
         ArrayList<Object> list = new ArrayList<>();
         Verifier.init().isEmpty(list, message).validate();
 
@@ -363,6 +369,12 @@ public class VerifierTest {
     @Test
     public void isEachNotNull() {
         String message = "不能有null元素";
+
+        Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
+            Verifier.init().isEachNotNull(null, message).validate();
+        });
+        Assertions.assertEquals(message, ex1.getMessage());
+
         ArrayList<Object> list = new ArrayList<>();
         list.add(111);
         Verifier.init().isEachNotNull(list, message).validate();
@@ -429,4 +441,19 @@ public class VerifierTest {
         Assertions.assertEquals(message, errors.iterator().next().getErrorMsg());
     }
 
+    @Test
+    public void validate() {
+        ValidationModel validationModel = new ValidationModel();
+        List<String> validate = Verifier.validate(validationModel, false, ValidationGroup.defaults(), ValidationGroup.Update.class);
+        Assertions.assertEquals(4, validate.size());
+
+        validationModel.setPassword("123456");
+        List<String> validate1 = Verifier.validate(validationModel, false);
+        Assertions.assertEquals(2, validate1.size());
+
+        Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
+            Verifier.validate(validationModel, ValidationGroup.Update.class);
+        });
+        Assertions.assertEquals("id不能为空", ex1.getMessage());
+    }
 }

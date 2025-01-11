@@ -13,13 +13,15 @@ package com.sonsure.dumper.common.validation;
 import com.sonsure.dumper.common.exception.ValidationException;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.*;
 
 /**
  * @author liyd
- * @date 17/1/23
+ * @since 17/1/23
  */
 public final class Verifier {
 
@@ -30,6 +32,14 @@ public final class Verifier {
 
     public Verifier() {
         validatorElements = new ArrayList<>();
+    }
+
+    public static <T> List<String> validate(T t, Class<?>... groups) {
+        return JsrValidator.validate(t, groups);
+    }
+
+    public static <T> List<String> validate(T t, boolean throwsExp, Class<?>... groups) {
+        return JsrValidator.validate(t, throwsExp, groups);
     }
 
     public static void assertNotNull(Object obj, String message) {

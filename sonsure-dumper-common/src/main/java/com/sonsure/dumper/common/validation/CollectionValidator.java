@@ -17,7 +17,7 @@ import java.util.Collection;
 
 /**
  * @author liyd
- * @date 17/3/12
+ * @since 17/3/12
  */
 public class CollectionValidator implements Validator {
 
@@ -39,29 +39,31 @@ public class CollectionValidator implements Validator {
         ValidatorResult validatorResult = new ValidatorResult(false);
         String resultMsg = message;
         if (StringUtils.equals(code, IS_EMPTY)) {
-            validatorResult.setSuccess(value == null || ((Collection) value).isEmpty());
+            validatorResult.setSuccess(this.isEmpty((Collection) value));
         } else if (StringUtils.equals(code, MIN_SIZE)) {
             Object[] values = (Object[]) value;
             Collection collection = (Collection) values[0];
-            validatorResult.setSuccess(collection != null && collection.size() >= (Integer) values[1]);
+            validatorResult.setSuccess(!this.isEmpty(collection) && collection.size() >= (Integer) values[1]);
             resultMsg = MessageFormat.format(message, values[1]);
         } else if (StringUtils.equals(code, MAX_SIZE)) {
             Object[] values = (Object[]) value;
             Collection collection = (Collection) values[0];
-            validatorResult.setSuccess(collection == null || collection.size() <= (Integer) values[1]);
+            validatorResult.setSuccess(this.isEmpty(collection) || collection.size() <= (Integer) values[1]);
             resultMsg = MessageFormat.format(message, values[1]);
         } else if (StringUtils.equals(code, EQ_SIZE)) {
             Object[] values = (Object[]) value;
             Collection collection = (Collection) values[0];
-            validatorResult.setSuccess(collection != null && collection.size() == ((Integer) values[1]));
+            validatorResult.setSuccess(!this.isEmpty(collection) && collection.size() == ((Integer) values[1]));
             resultMsg = MessageFormat.format(message, values[1]);
-        } else {
-            throw new ValidationException("不支持的集合操作");
         }
         if (!validatorResult.isSuccess()) {
             validatorResult.setCode(code);
             validatorResult.setMessage(resultMsg);
         }
         return validatorResult;
+    }
+
+    private boolean isEmpty(Collection<?> value) {
+        return value == null || value.isEmpty();
     }
 }

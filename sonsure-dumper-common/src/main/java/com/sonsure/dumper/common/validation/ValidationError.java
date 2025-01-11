@@ -12,7 +12,7 @@ package com.sonsure.dumper.common.validation;
 /**
  * 内部使用的验证结果包含的错误
  *
- * @author zhangxu
+ * @author selfly
  */
 public class ValidationError {
 

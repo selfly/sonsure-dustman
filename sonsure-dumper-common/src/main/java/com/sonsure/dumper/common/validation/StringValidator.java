@@ -16,7 +16,7 @@ import java.text.MessageFormat;
 
 /**
  * @author liyd
- * @date 17/2/13
+ * @since  17/2/13
  */
 public class StringValidator implements Validator {
 

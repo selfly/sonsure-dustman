@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author liyd
- * @date 17/1/23
+ * @since  17/1/23
  */
 public class ValidatorElement {
 

@@ -23,6 +23,7 @@ public class CollectionEachNotNullValidator implements Validator {
     public ValidatorResult validate(Object value, String message) {
         ValidatorResult validatorResult = new ValidatorResult(false);
         if (value == null) {
+            validatorResult.setCode(COLLECTION_EACH_NOT_NULL);
             validatorResult.setMessage(message);
             return validatorResult;
         }
