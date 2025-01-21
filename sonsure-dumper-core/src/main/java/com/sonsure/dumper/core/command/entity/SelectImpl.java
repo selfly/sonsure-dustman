@@ -15,7 +15,7 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
 import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandType;
-import com.sonsure.dumper.core.command.OrderByType;
+import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -111,9 +111,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public Select<M> orderBy(OrderByType type, String... fields) {
+    public Select<M> orderBy(String fields, OrderBy type) {
         this.orderBy(fields);
-        if (type == OrderByType.ASC) {
+        if (type == OrderBy.ASC) {
             this.asc();
         } else {
             this.desc();
@@ -129,9 +129,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public <E, R> Select<M> orderBy(OrderByType type, Function<E, R> function) {
+    public <E, R> Select<M> orderBy(Function<E, R> function, OrderBy type) {
         String[] fields = LambdaMethod.getFields(function);
-        this.orderBy(type, fields);
+        this.orderBy(fields[0], type);
         return this;
     }
 
