@@ -5,6 +5,8 @@ import com.sonsure.dumper.common.validation.ValidationError;
 import com.sonsure.dumper.common.validation.ValidationGroup;
 import com.sonsure.dumper.common.validation.ValidationResult;
 import com.sonsure.dumper.common.validation.Verifier;
+import com.sonsure.dumper.core.command.lambda.LambdaMethod;
+import com.sonsure.dumper.test.model.UserInfo;
 import com.sonsure.dumper.test.model.ValidationModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -77,23 +79,23 @@ public class VerifierTest {
     }
 
     @Test
-    public void thanFalse() {
+    public void expectFalse() {
         String message = "必须为false";
-        Verifier.init().thanFalse(false, message).validate();
+        Verifier.init().expectFalse(false, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().thanFalse(true, message).validate();
+            Verifier.init().expectFalse(true, message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
     }
 
     @Test
-    public void thanTrue() {
+    public void expectTrue() {
         String message = "必须为true";
-        Verifier.init().thanTrue(true, message).validate();
+        Verifier.init().expectTrue(true, message).validate();
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().thanTrue(false, message).validate();
+            Verifier.init().expectTrue(false, message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
     }
@@ -187,5 +189,13 @@ public class VerifierTest {
             Verifier.jsrValidate(validationModel, ValidationGroup.Update.class);
         });
         Assertions.assertEquals("id不能为空", ex1.getMessage());
+    }
+
+    @Test
+    public void lambda() {
+        String field = LambdaMethod.getField(UserInfo::getUserInfoId);
+        System.out.println(field);
+
+        Assertions.assertEquals("aa", field);
     }
 }

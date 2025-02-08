@@ -12,7 +12,9 @@ package com.sonsure.dumper.common.validation;
 
 import com.sonsure.dumper.common.exception.ValidationException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author liyd
@@ -65,13 +67,13 @@ public final class Verifier {
         return this;
     }
 
-    public Verifier thanTrue(boolean value, String message, Object... args) {
+    public Verifier expectTrue(boolean value, String message, Object... args) {
         ValidatorElement validatorElement = new ValidatorElement(value, message, args, new BooleanValidator(true));
         validatorElements.add(validatorElement);
         return this;
     }
 
-    public Verifier thanFalse(boolean value, String message, Object... args) {
+    public Verifier expectFalse(boolean value, String message, Object... args) {
         ValidatorElement validatorElement = new ValidatorElement(value, message, args, new BooleanValidator(false));
         validatorElements.add(validatorElement);
         return this;
