@@ -9,8 +9,8 @@
 
 package com.sonsure.dumper.test.executor;
 
-import com.sonsure.dumper.core.command.CommandContext;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
@@ -19,11 +19,11 @@ public class CountCommandExecutorImpl implements CountCommandExecutor {
 
     private JdbcEngineConfig jdbcEngineConfig;
 
-    private CountCommandContextBuilder countCommandContextBuilder;
+    private CountCommandDetailsBuilder countCommandContextBuilder;
 
     public CountCommandExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
-        this.countCommandContextBuilder = new CountCommandContextBuilder(new CommandContextBuilderContext());
+        this.countCommandContextBuilder = new CountCommandDetailsBuilder(new CommandContextBuilderContext());
     }
 
     @Override
@@ -34,10 +34,10 @@ public class CountCommandExecutorImpl implements CountCommandExecutor {
 
     @Override
     public long getCount() {
-        CommandContext commandContext = this.countCommandContextBuilder.build(this.jdbcEngineConfig);
+        CommandDetails commandDetails = this.countCommandContextBuilder.build(this.jdbcEngineConfig);
         PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
-        commandContext.setResultType(Long.class);
-        Object result = persistExecutor.execute(commandContext, CommandType.QUERY_ONE_COL);
+        commandDetails.setResultType(Long.class);
+        Object result = persistExecutor.execute(commandDetails, CommandType.QUERY_ONE_COL);
         return (Long) result;
     }
 

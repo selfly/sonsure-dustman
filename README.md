@@ -84,7 +84,7 @@
     
 声明Bean，更多参数详见相关配置文档：
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
     

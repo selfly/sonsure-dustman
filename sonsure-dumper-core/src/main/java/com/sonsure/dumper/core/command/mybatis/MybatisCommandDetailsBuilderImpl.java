@@ -9,9 +9,9 @@
 
 package com.sonsure.dumper.core.command.mybatis;
 
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandParameter;
-import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandContextBuilder;
+import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import org.apache.ibatis.mapping.BoundSql;
@@ -28,17 +28,17 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class MybatisCommandContextBuilderImpl extends AbstractSimpleCommandContextBuilder {
+public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder {
 
 
-    public MybatisCommandContextBuilderImpl(Context simpleContext) {
+    public MybatisCommandDetailsBuilderImpl(Context simpleContext) {
         super(simpleContext);
     }
 
     @Override
-    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
 
-        CommandContext commandContext = new CommandContext();
+        CommandDetails commandDetails = new CommandDetails();
 
         SqlSessionFactory sqlSessionFactory = jdbcEngineConfig.getMybatisSqlSessionFactory();
         if (sqlSessionFactory == null) {
@@ -66,12 +66,12 @@ public class MybatisCommandContextBuilderImpl extends AbstractSimpleCommandConte
                         MetaObject metaObject = configuration.newMetaObject(parameterObject);
                         value = metaObject.getValue(propertyName);
                     }
-                    commandContext.addCommandParameter(new CommandParameter(propertyName, value));
+                    commandDetails.addCommandParameter(new CommandParameter(propertyName, value));
                 }
             }
         }
-        commandContext.setCommand(boundSql.getSql());
+        commandDetails.setCommand(boundSql.getSql());
         getSimpleContext().setNamedParameter(false);
-        return commandContext;
+        return commandDetails;
     }
 }

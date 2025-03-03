@@ -4,7 +4,7 @@
 
 如果使用默认配置，只需要声明以下bean，传入`dataSource`即可：
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
@@ -17,7 +17,7 @@
         <property name="commandCase" value="lower"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
         <property name="jdbcEngine" ref="jdbcTemplateEngine"/>
     </bean>
     

@@ -25,7 +25,7 @@ import java.util.List;
  */
 @Disabled
 @ContextConfiguration(locations = {"classpath:applicationContext-hibernate.xml"})
-public class HibernateDaoTemplateTest {
+public class HibernateJdbcDaoTest {
 
     @Autowired
     private JdbcDao jdbcDao;

@@ -12,8 +12,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.lambda.Function;
@@ -32,224 +31,172 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     private final Class<M> cls;
 
-    private final SelectCommandContextBuilderImpl selectCommandContextBuilder;
-
     public SelectImpl(JdbcEngineConfig jdbcEngineConfig, Class<M> cls) {
         super(jdbcEngineConfig);
         this.cls = cls;
-        this.selectCommandContextBuilder = new SelectCommandContextBuilderImpl(new SelectCommandContextBuilderImpl.Context());
-        this.selectCommandContextBuilder.addFromClass(cls);
-        this.selectCommandContextBuilder.addModelClass(cls);
+        this.getCommandDetailsBuilder().from(cls);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
-        return (T) selectCommandContextBuilder;
-    }
+//    @Override
+//    public Select<M> tableAlias(String alias) {
+//        this.selectCommandContextBuilder.tableAlias(alias);
+//        return this;
+//    }
 
-    @Override
-    protected ConditionCommandBuilderImpl getConditionCommandBuilder() {
-        return this.selectCommandContextBuilder.getConditionCommandBuilder();
-    }
-
-    @Override
-    public Select<M> tableAlias(String alias) {
-        this.selectCommandContextBuilder.tableAlias(alias);
-        return this;
-    }
-
-    @Override
-    public Select<M> from(Class<?> cls, String alias) {
-        this.selectCommandContextBuilder.addFromClass(cls, alias);
-        return this;
-    }
+//    @Override
+//    public Select<M> from(Class<?> cls, String alias) {
+//        this.selectCommandContextBuilder.addFromClass(cls, alias);
+//        return this;
+//    }
 
     @Override
     public Select<M> addColumn(String... fields) {
-        this.selectCommandContextBuilder.addSelectFields(fields);
+        this.getCommandDetailsBuilder().addSelectFields(fields);
         return this;
     }
 
     @Override
     public final <E, R> Select<M> addColumn(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
-        this.addColumn(fields);
+        this.getCommandDetailsBuilder().addSelectFields(function);
         return this;
     }
 
     @Override
     public Select<M> dropColumn(String... fields) {
-        this.selectCommandContextBuilder.addExcludeFields(fields);
+        this.getCommandDetailsBuilder().dropSelectFields(fields);
         return this;
     }
 
     @Override
     public <E, R> Select<M> dropColumn(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
-        this.dropColumn(fields);
+        this.getCommandDetailsBuilder().dropSelectFields(function);
         return this;
     }
 
     @Override
     public Select<M> groupBy(String... fields) {
-        this.selectCommandContextBuilder.addGroupByField(fields);
+        this.getCommandDetailsBuilder().groupBy(fields);
         return this;
     }
 
     @Override
     public <E, R> Select<M> groupBy(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
-        this.groupBy(fields);
+        this.getCommandDetailsBuilder().groupBy(function);
         return this;
     }
 
     @Override
-    public Select<M> orderBy(String... fields) {
-        this.selectCommandContextBuilder.addOrderByField(fields);
+    public Select<M> orderBy(String field, OrderBy orderBy) {
+        this.getCommandDetailsBuilder().orderBy(field, orderBy);
         return this;
     }
 
     @Override
-    public Select<M> orderBy(String fields, OrderBy type) {
-        this.orderBy(fields);
-        if (type == OrderBy.ASC) {
-            this.asc();
-        } else {
-            this.desc();
-        }
+    public <E, R> Select<M> orderBy(Function<E, R> function, OrderBy orderBy) {
+        String field = LambdaMethod.getField(function);
+        this.orderBy(field, orderBy);
         return this;
     }
-
-    @Override
-    public <E, R> Select<M> orderBy(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
-        this.orderBy(fields);
-        return this;
-    }
-
-    @Override
-    public <E, R> Select<M> orderBy(Function<E, R> function, OrderBy type) {
-        String[] fields = LambdaMethod.getFields(function);
-        this.orderBy(fields[0], type);
-        return this;
-    }
-
-    @Override
-    public Select<M> asc() {
-        this.selectCommandContextBuilder.asc();
-        return this;
-    }
-
-    @Override
-    public Select<M> desc() {
-        this.selectCommandContextBuilder.desc();
-        return this;
-    }
-
 
     @Override
     public Select<M> paginate(int pageNum, int pageSize) {
-        this.selectCommandContextBuilder.paginate(pageNum, pageSize);
+        this.getCommandDetailsBuilder().paginate(pageNum, pageSize);
         return this;
     }
 
     @Override
     public Select<M> limit(int offset, int size) {
-        this.selectCommandContextBuilder.limit(offset, size);
+        this.getCommandDetailsBuilder().limit(offset, size);
         return this;
     }
 
     @Override
-    public Select<M> isCount(boolean isCount) {
-        this.selectCommandContextBuilder.setCount(isCount);
+    public Select<M> disableCount() {
+        this.getCommandDetailsBuilder().disableCountQuery();
         return this;
     }
 
     @Override
     public long count() {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
         PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
-        String countCommand = this.jdbcEngineConfig.getPageHandler().getCountCommand(commandContext.getCommand(), persistExecutor.getDialect());
-        CommandContext countCommandContext = BeanKit.copyProperties(new CommandContext(), commandContext);
-        countCommandContext.setCommand(countCommand);
-        countCommandContext.setResultType(Long.class);
-        Object result = persistExecutor.execute(countCommandContext, CommandType.QUERY_ONE_COL);
+        String countCommand = this.jdbcEngineConfig.getPageHandler().getCountCommand(commandDetails.getCommand(), persistExecutor.getDialect());
+        CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
+        countCommandDetails.setCommand(countCommand);
+        countCommandDetails.setResultType(Long.class);
+        Object result = persistExecutor.execute(countCommandDetails, CommandType.QUERY_ONE_COL);
         return (Long) result;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(Class<T> cls) {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        commandContext.setResultType(cls);
-        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_SINGLE_RESULT);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setResultType(cls);
+        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_SINGLE_RESULT);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> singleMapResult() {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E> E oneColResult(Class<E> clazz) {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        commandContext.setResultType(clazz);
-        return (E) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_ONE_COL);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setResultType(clazz);
+        return (E) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E> List<E> oneColList(Class<E> clazz) {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        commandContext.setResultType(clazz);
-        return (List<E>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_ONE_COL_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setResultType(clazz);
+        return (List<E>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL_LIST);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        commandContext.setResultType(cls);
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setResultType(cls);
+        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_LIST);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Map<String, Object>> listMaps() {
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.QUERY_FOR_MAP_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP_LIST);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> pageResult(Class<T> cls) {
-        SelectCommandContextBuilderImpl.Context selectContext = this.selectCommandContextBuilder.getSelectContext();
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        commandContext.setResultType(cls);
-        return this.doPageResult(commandContext, selectContext.getPagination(), selectContext.isCount(), commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_LIST));
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setResultType(cls);
+        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_LIST));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Page<Map<String, Object>> pageMapResult() {
-        SelectCommandContextBuilderImpl.Context selectContext = this.selectCommandContextBuilder.getSelectContext();
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        return this.doPageResult(commandContext, selectContext.getPagination(), selectContext.isCount(), commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_MAP_LIST));
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        return this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_MAP_LIST));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> oneColPageResult(Class<T> clazz) {
-        SelectCommandContextBuilderImpl.Context selectContext = this.selectCommandContextBuilder.getSelectContext();
-        CommandContext commandContext = this.selectCommandContextBuilder.build(getJdbcEngineConfig());
-        commandContext.setResultType(clazz);
-        return this.doPageResult(commandContext, selectContext.getPagination(), selectContext.isCount(), commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_ONE_COL_LIST));
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setResultType(clazz);
+        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_ONE_COL_LIST));
     }
 
     @Override

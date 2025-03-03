@@ -1,6 +1,8 @@
 package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,13 +12,15 @@ import java.util.Set;
  *
  * @author liyd
  */
+@Getter
+@Setter
 public class CommandContextBuilderContext {
 
     private boolean nativeCommand;
 
     private boolean namedParameter;
 
-    private final Set<Class<?>> modelClasses;
+    private final Set<ModelClassDetails> modelMetadata;
 
     /**
      * where group orderBy 等context为true
@@ -24,12 +28,12 @@ public class CommandContextBuilderContext {
     private boolean subBuilderContext;
 
     public CommandContextBuilderContext() {
-        this.modelClasses = new HashSet<>();
+        this.modelMetadata = new HashSet<>(4);
         this.subBuilderContext = false;
     }
 
-    public void addModelClass(Class<?> cls) {
-        this.modelClasses.add(cls);
+    public void addModelClass(ModelClassDetails modelClassDetails) {
+        this.modelMetadata.add(modelClassDetails);
     }
 
     /**
@@ -37,39 +41,12 @@ public class CommandContextBuilderContext {
      *
      * @return the unique model class
      */
-    public Class<?> getUniqueModelClass() {
-        final Set<Class<?>> mcs = this.getModelClasses();
+    public ModelClassDetails getUniqueModelClass() {
+        final Set<ModelClassDetails> mcs = this.getModelMetadata();
         if (mcs == null || mcs.size() != 1) {
             throw new SonsureJdbcException("当前执行业务不止一个Model Class");
         }
         return mcs.iterator().next();
     }
 
-    public boolean isNativeCommand() {
-        return nativeCommand;
-    }
-
-    public void setNativeCommand(boolean nativeCommand) {
-        this.nativeCommand = nativeCommand;
-    }
-
-    public boolean isNamedParameter() {
-        return namedParameter;
-    }
-
-    public void setNamedParameter(boolean namedParameter) {
-        this.namedParameter = namedParameter;
-    }
-
-    public Set<Class<?>> getModelClasses() {
-        return modelClasses;
-    }
-
-    public boolean isSubBuilderContext() {
-        return subBuilderContext;
-    }
-
-    public void setSubBuilderContext(boolean subBuilderContext) {
-        this.subBuilderContext = subBuilderContext;
-    }
 }

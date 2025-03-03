@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 import java.util.Map;
@@ -24,157 +25,54 @@ import java.util.Map;
 public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>> extends EntityCommandExecutor<C> {
 
     /**
-     * where 关键字
+     * where 属性条件
      *
-     * @return c
+     * @param field       the field
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
      */
-    C where();
+    C where(String field, SqlOperator sqlOperator, Object value);
 
     /**
      * where 属性条件
      *
-     * @param field the field
-     * @param value the value
-     * @return c
+     * @param <E>         the type parameter
+     * @param <R>         the type parameter
+     * @param function    the function
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
      */
-    C where(String field, Object value);
+    <E, R> C where(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
     /**
-     * where 属性条件
+     * Where c.
      *
      * @param <E>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
      * @param value    the value
-     * @return c
+     * @return the c
      */
     <E, R> C where(Function<E, R> function, Object value);
 
     /**
-     * where 属性条件
+     * Where c.
      *
      * @param field the field
      * @param value the value
-     * @return c
+     * @return the c
      */
-    C where(String field, Object[] value);
-
-    /**
-     * where 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C where(Function<E, R> function, Object[] value);
-
-    /**
-     * where 属性条件，指定操作符
-     *
-     * @param field    the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    C where(String field, String operator, Object... values);
-
-    /**
-     * where 属性条件，指定操作符
-     *
-     * @param function the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    <E, R> C where(Function<E, R> function, String operator, Object... values);
-
-    /**
-     * 属性条件
-     *
-     * @param field the field
-     * @param value the value
-     * @return c
-     */
-    C condition(String field, Object value);
-
-    /**
-     * 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C condition(Function<E, R> function, Object value);
-
-    /**
-     * 属性条件
-     *
-     * @param field the field
-     * @param value the value
-     * @return c
-     */
-    C condition(String field, Object[] value);
-
-    /**
-     * 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C condition(Function<E, R> function, Object[] value);
-
-    /**
-     * 属性条件，指定操作符
-     *
-     * @param field    the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    C condition(String field, String operator, Object... values);
-
-    /**
-     * 属性条件，指定操作符
-     *
-     * @param function the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    <E, R> C condition(Function<E, R> function, String operator, Object... values);
+    C where(String field, Object value);
 
     /**
      * 实体属性条件
      *
-     * @param entity the entity
-     * @return c
+     * @param obj the obj
+     * @return c c
      */
-    C conditionEntity(Object entity);
-
-    /**
-     * and 属性where条件
-     *
-     * @param entity the entity
-     * @return c
-     */
-    C andConditionEntity(Object entity);
-
-    /**
-     * 拼装entity属性条件
-     *
-     * @param entity               the entity
-     * @param wholeLogicalOperator 全局操作符
-     * @param fieldLogicalOperator 属性操作符
-     * @return c
-     */
-    C conditionEntity(Object entity, String wholeLogicalOperator, String fieldLogicalOperator);
+    C whereForObject(Object obj);
 
     /**
      * and
@@ -184,145 +82,11 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
     C and();
 
     /**
-     * and 属性条件
-     *
-     * @param field the field
-     * @param value the value
-     * @return c
-     */
-    C and(String field, Object value);
-
-    /**
-     * and 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C and(Function<E, R> function, Object value);
-
-    /**
-     * and 属性条件
-     *
-     * @param field the field
-     * @param value the value
-     * @return c
-     */
-    C and(String field, Object[] value);
-
-    /**
-     * and 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C and(Function<E, R> function, Object[] value);
-
-    /**
-     * and 属性条件 指定操作符
-     *
-     * @param field    the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    C and(String field, String operator, Object... values);
-
-    /**
-     * and 属性条件 指定操作符
-     *
-     * @param function the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    <E, R> C and(Function<E, R> function, String operator, Object... values);
-
-    /**
      * or
      *
      * @return c
      */
     C or();
-
-    /**
-     * or 属性条件
-     *
-     * @param field the field
-     * @param value the value
-     * @return c
-     */
-    C or(String field, Object value);
-
-    /**
-     * or 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C or(Function<E, R> function, Object value);
-
-    /**
-     * or 属性条件
-     *
-     * @param field the field
-     * @param value the value
-     * @return c
-     */
-    C or(String field, Object[] value);
-
-    /**
-     * or 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return c
-     */
-    <E, R> C or(Function<E, R> function, Object[] value);
-
-    /**
-     * or 属性条件 指定操作符
-     *
-     * @param field    the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    C or(String field, String operator, Object... values);
-
-    /**
-     * or 属性条件 指定操作符
-     *
-     * @param function the field
-     * @param operator the operator
-     * @param values   the values
-     * @return c
-     */
-    <E, R> C or(Function<E, R> function, String operator, Object... values);
-
-    /**
-     * 括号开始
-     *
-     * @return c
-     */
-    C begin();
-
-    /**
-     * 括号结束
-     *
-     * @return c
-     */
-    C end();
 
     /**
      * append sql片断
@@ -343,7 +107,7 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
     C append(String segment, Map<String, Object> params);
 
     /**
-     * Iff c.
+     * 如果传入false，下一个条件将不构建
      *
      * @param iff the iff
      * @return the c

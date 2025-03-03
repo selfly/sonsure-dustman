@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.command.natives;
 
 
-import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandContextBuilder;
+import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandExecutor;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -25,10 +25,10 @@ public class NativeExecutorImpl extends AbstractSimpleCommandExecutor<NativeExec
 
     private static final String DEFAULT_NATIVE_PARAM_PREFIX = "nativeParam";
 
-    private NativeCommandContextBuilderImpl nativeCommandContextBuilder;
+    private NativeCommandDetailsBuilderImpl nativeCommandContextBuilder;
 
     public NativeExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig, new NativeCommandContextBuilderImpl(new AbstractSimpleCommandContextBuilder.Context()));
+        super(jdbcEngineConfig, new NativeCommandDetailsBuilderImpl(new AbstractSimpleCommandDetailsBuilder.Context()));
     }
 
     @Override

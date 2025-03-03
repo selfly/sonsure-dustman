@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.jdbc;
 
-import com.sonsure.dumper.core.persist.DaoTemplate;
+import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.executor.CountCommandExecutor;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
@@ -28,12 +28,12 @@ import java.util.Date;
 public class CustomExecutorTest {
 
     @Autowired
-    protected DaoTemplate daoTemplate;
+    protected JdbcDao jdbcDao;
 
     @BeforeEach
     public void before() {
         //初始化测试数据
-        daoTemplate.deleteFrom(UserInfo.class)
+        jdbcDao.deleteFrom(UserInfo.class)
                 .execute();
         UserInfo user = new UserInfo();
         user.setUserInfoId(10000L);
@@ -42,13 +42,13 @@ public class CustomExecutorTest {
         user.setUserAge(18);
         user.setGmtCreate(new Date());
 
-        daoTemplate.executeInsert(user);
+        jdbcDao.executeInsert(user);
     }
 
     @Test
     public void countExecutorTest() {
 
-        long count = daoTemplate.executor(CountCommandExecutor.class)
+        long count = jdbcDao.executor(CountCommandExecutor.class)
                 .clazz(UserInfo.class)
                 .getCount();
 

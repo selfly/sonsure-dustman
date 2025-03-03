@@ -18,11 +18,11 @@
         /**
          * 执行command
          *
-         * @param commandContext
+         * @param commandDetails
          * @param commandType
          * @return
          */
-        Object execute(CommandContext commandContext, CommandType commandType);
+        Object execute(CommandContext commandDetails, CommandType commandType);
     }
     
 `getDialect`方法是获取数据库方言，特定实现甚至可以是固定或静态配置，就不多讲了。
@@ -36,28 +36,28 @@
         //......
     
         @Override
-        public Object execute(CommandContext commandContext, CommandType commandType) {
+        public Object execute(CommandContext commandDetails, CommandType commandType) {
             switch (commandType) {
                 case INSERT:
-                    return this.insert(commandContext);
+                    return this.insert(commandDetails);
                 case QUERY_FOR_LIST:
-                    return this.queryForList(commandContext);
+                    return this.queryForList(commandDetails);
                 case QUERY_SINGLE_RESULT:
-                    return this.querySingleResult(commandContext);
+                    return this.querySingleResult(commandDetails);
                 case QUERY_FOR_MAP:
-                    return this.queryForMap(commandContext);
+                    return this.queryForMap(commandDetails);
                 case QUERY_FOR_MAP_LIST:
-                    return this.queryForMapList(commandContext);
+                    return this.queryForMapList(commandDetails);
                 case QUERY_ONE_COL:
-                    return this.queryOneCol(commandContext);
+                    return this.queryOneCol(commandDetails);
                 case QUERY_ONE_COL_LIST:
-                    return this.queryOneColList(commandContext);
+                    return this.queryOneColList(commandDetails);
                 case UPDATE:
-                    return this.update(commandContext);
+                    return this.update(commandDetails);
                 case DELETE:
-                    return this.delete(commandContext);
+                    return this.delete(commandDetails);
                 case EXECUTE:
-                    return this.doExecute(commandContext);
+                    return this.doExecute(commandDetails);
                 default:
                     throw new SonsureJdbcException("不支持的CommandType:" + commandType);
             }
@@ -97,10 +97,10 @@
         }
     
         @Override
-        public List<?> queryForList(CommandContext commandContext) {
+        public List<?> queryForList(CommandContext commandDetails) {
             Session session = sessionFactory.openSession();
-            NativeQuery<?> nativeQuery = session.createNativeQuery(commandContext.getCommand(), commandContext.getResultType());
-            List<Object> parameters = commandContext.getParameters();
+            NativeQuery<?> nativeQuery = session.createNativeQuery(commandDetails.getCommand(), commandDetails.getResultType());
+            List<Object> parameters = commandDetails.getParameters();
             for (int i = 0; i < parameters.size(); i++) {
                 nativeQuery.setParameter(i + 1, parameters.get(i));
             }
@@ -147,7 +147,7 @@
         <property name="jdbcEngineConfig" ref="jdbcEngineConfig"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.DaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.JdbcDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcEngine"/>
     </bean>
     

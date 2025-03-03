@@ -1,7 +1,7 @@
 package com.sonsure.dumper.core.command.simple;
 
+import com.sonsure.dumper.core.command.AbstractQueryCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandParameter;
-import com.sonsure.dumper.core.command.QueryCommandContextBuilder;
 import com.sonsure.dumper.core.command.QueryCommandContextBuilderContext;
 
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 /**
  * @author selfly
  */
-public abstract class AbstractSimpleCommandContextBuilder extends QueryCommandContextBuilder {
+public abstract class AbstractSimpleCommandDetailsBuilder extends AbstractQueryCommandDetailsBuilder {
 
     protected final Context simpleContext;
 
-    public AbstractSimpleCommandContextBuilder(Context simpleContext) {
+    public AbstractSimpleCommandDetailsBuilder(Context simpleContext) {
         super(simpleContext);
         this.simpleContext = simpleContext;
     }

@@ -711,7 +711,7 @@ public class SpringJdbcDaoTest {
         user.setPassword("abc");
         //没有设置where条件，将更新所有
         jdbcDao.update(UserInfo.class)
-                .setForEntity(user)
+                .setForObject(user)
                 .execute();
 
         UserInfo user1 = jdbcDao.get(UserInfo.class, 17L);
@@ -725,7 +725,7 @@ public class SpringJdbcDaoTest {
         UserInfo user = new UserInfo();
         user.setUserInfoId(17L);
         jdbcDao.update(UserInfo.class)
-                .setForEntityWhereId(user)
+                .setForObjectWherePk(user)
                 .updateNull()
                 .execute();
 
@@ -746,7 +746,7 @@ public class SpringJdbcDaoTest {
             user.setPassword("abc");
             //没有设置where条件，将更新所有
             jdbcDao.update(UserInfo.class)
-                    .setForEntityWhereId(user)
+                    .setForObjectWherePk(user)
                     .execute();
         } catch (Exception e) {
             Assertions.assertEquals("主键属性值不能为空:userInfoId", e.getMessage());
@@ -1252,7 +1252,7 @@ public class SpringJdbcDaoTest {
 
 
         final long end = System.currentTimeMillis();
-        System.out.println("daoTemplate插入耗时:" + (end - begin));
+        System.out.println("jdbcDao插入耗时:" + (end - begin));
         Assertions.assertEquals(userInfoList.size(), jdbcDao.findCount(UserInfo.class));
 
     }
@@ -1284,7 +1284,7 @@ public class SpringJdbcDaoTest {
         });
 
         final long end1 = System.currentTimeMillis();
-        System.out.println("daoTemplate插入耗时:" + (end1 - begin1));
+        System.out.println("jdbcDao插入耗时:" + (end1 - begin1));
         Assertions.assertEquals(userInfoList.size(), jdbcDao.findCount(UserInfo.class));
 
     }

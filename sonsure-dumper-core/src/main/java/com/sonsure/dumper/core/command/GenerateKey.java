@@ -12,11 +12,12 @@ package com.sonsure.dumper.core.command;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author selfly
+ */
 @Getter
 @Setter
 public class GenerateKey {
-
-    private Class<?> clazz;
 
     private String column;
 

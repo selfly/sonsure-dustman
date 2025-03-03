@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.jdbc;
 
-import com.sonsure.dumper.core.persist.DaoTemplate;
+import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.UuidUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 public class UuidJdbcTemplateDaoImplTest {
 
     @Autowired
-    protected DaoTemplate daoTemplate;
+    protected JdbcDao jdbcDao;
 
     @Test
     public void jdbcDaoInsert() {
@@ -34,7 +34,7 @@ public class UuidJdbcTemplateDaoImplTest {
         UuidUser user = new UuidUser();
         user.setLoginName("liyd");
         user.setPassword("123456");
-        String id = (String) daoTemplate.executeInsert(user);
+        String id = (String) jdbcDao.executeInsert(user);
         Assertions.assertNotNull(id);
     }
 

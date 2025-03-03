@@ -36,7 +36,7 @@ import java.util.Map;
  * @date 17/4/13
  */
 @Setter
-public abstract class AbstractDaoTemplateImpl implements JdbcDao {
+public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     protected DataSource dataSource;
 
@@ -46,7 +46,7 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
     protected Map<String, JdbcEngine> jdbcEngineMap;
 
     @Override
-    public DaoTemplate use(String name) {
+    public JdbcDao use(String name) {
         if (jdbcEngineMap == null) {
             throw new SonsureJdbcException("使用多数据源模式请先初始化jdbcEngineMap属性");
         }
@@ -54,7 +54,7 @@ public abstract class AbstractDaoTemplateImpl implements JdbcDao {
         if (jdbcEngine == null) {
             throw new SonsureJdbcException("指定的数据源操作对象不存在");
         }
-        return new FlexibleDaoTemplate(jdbcEngine);
+        return new FlexibleJdbcDaoImpl(jdbcEngine);
     }
 
     @Override

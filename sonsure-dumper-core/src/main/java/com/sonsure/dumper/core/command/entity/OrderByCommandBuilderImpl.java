@@ -1,8 +1,8 @@
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.CommandField;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class OrderByCommandBuilderImpl extends AbstractCommonCommandContextBuilder {
+public class OrderByCommandBuilderImpl extends AbstractCommonCommandDetailsBuilder {
 
     private final Context orderByContext;
 
@@ -39,7 +39,7 @@ public class OrderByCommandBuilderImpl extends AbstractCommonCommandContextBuild
     }
 
     @Override
-    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
 
         List<CommandField> orderByFields = this.orderByContext.getOrderByFields();
         if (orderByFields == null || orderByFields.isEmpty()) {
@@ -53,9 +53,9 @@ public class OrderByCommandBuilderImpl extends AbstractCommonCommandContextBuild
         }
         sb.deleteCharAt(sb.length() - 1);
 
-        CommandContext commandContext = this.createCommandContext();
-        commandContext.setCommand(sb.toString());
-        return commandContext;
+        CommandDetails commandDetails = this.createCommandContext();
+        commandDetails.setCommand(sb.toString());
+        return commandDetails;
     }
 
     public static class Context extends CommandContextBuilderContext {

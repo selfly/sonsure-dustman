@@ -9,9 +9,9 @@
 
 package com.sonsure.dumper.core.command.batch;
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.Collection;
@@ -21,11 +21,11 @@ import java.util.Collection;
  *
  * @author liyd
  */
-public class BatchUpdateCommandContextBuilderImpl extends AbstractCommonCommandContextBuilder {
+public class BatchUpdateCommandDetailsBuilderImpl extends AbstractCommonCommandDetailsBuilder {
 
     private final Context batchBuilderContext;
 
-    public BatchUpdateCommandContextBuilderImpl(Context batchBuilderContext) {
+    public BatchUpdateCommandDetailsBuilderImpl(Context batchBuilderContext) {
         super(batchBuilderContext);
         this.batchBuilderContext = batchBuilderContext;
     }
@@ -48,8 +48,8 @@ public class BatchUpdateCommandContextBuilderImpl extends AbstractCommonCommandC
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
-        BatchCommandContext batchCommandContext = new BatchCommandContext();
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
+        BatchCommandDetails batchCommandContext = new BatchCommandDetails();
         batchCommandContext.setCommand(this.batchBuilderContext.getCommand());
         batchCommandContext.setBatchData(this.batchBuilderContext.getBatchData());
         batchCommandContext.setBatchSize(this.batchBuilderContext.getBatchSize());

@@ -60,7 +60,7 @@
         map.put("USER_INFO_ID", (long) i);
         userInfoList.add(map);
     }
-    daoTemplate.batchUpdate()
+    jdbcDao.batchUpdate()
             .nativeCommand()
             .namedParameter()
             .execute(sql, userInfoList, userInfoList.size(), (ps, names, map) -> {

@@ -20,8 +20,8 @@ public interface Update extends ConditionCommandExecutor<Update> {
     /**
      * 指定表
      *
-     * @param cls
-     * @return
+     * @param cls the cls
+     * @return update
      */
     Update table(Class<?> cls);
 
@@ -37,40 +37,41 @@ public interface Update extends ConditionCommandExecutor<Update> {
     /**
      * 设置属性值
      *
-     * @param function
-     * @param value
-     * @param <E>
-     * @return
+     * @param <E>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return update
      */
     <E, R> Update set(Function<E, R> function, Object value);
 
     /**
      * 根据实体类设置属性,主键设置成where条件
      *
-     * @param entity
-     * @return
+     * @param object the object
+     * @return for object where id
      */
-    Update setForEntityWhereId(Object entity);
+    Update setForObjectWherePk(Object object);
 
     /**
      * 根据实体类设置属性
      *
-     * @param entity
-     * @return
+     * @param object the object
+     * @return for object
      */
-    Update setForEntity(Object entity);
+    Update setForObject(Object object);
 
     /**
      * 更新null值
      *
-     * @return
+     * @return update
      */
     Update updateNull();
 
     /**
      * 执行
      *
-     * @return
+     * @return int
      */
     int execute();
 }

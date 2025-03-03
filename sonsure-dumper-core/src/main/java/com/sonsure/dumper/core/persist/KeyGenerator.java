@@ -10,7 +10,9 @@
 package com.sonsure.dumper.core.persist;
 
 /**
- * Created by liyd on 17/4/12.
+ *
+ * @author liyd
+ * @date 17/4/12
  */
 public interface KeyGenerator {
 

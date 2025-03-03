@@ -9,9 +9,14 @@
 
 package com.sonsure.dumper.core.management;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author liyd
  */
+@Setter
+@Getter
 public class BeanParameter {
 
     private Object bean;
@@ -23,11 +28,4 @@ public class BeanParameter {
         this.bean = bean;
     }
 
-    public Object getBean() {
-        return bean;
-    }
-
-    public void setBean(Object bean) {
-        this.bean = bean;
-    }
 }

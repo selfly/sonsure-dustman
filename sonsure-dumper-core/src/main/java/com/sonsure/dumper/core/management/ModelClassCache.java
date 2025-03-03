@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+/**
+ * @author selfly
+ */
 public class ModelClassCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModelClassCache.class);

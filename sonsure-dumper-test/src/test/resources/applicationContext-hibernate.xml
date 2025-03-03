@@ -95,7 +95,7 @@
         <property name="jdbcEngineConfig" ref="jdbcEngineConfig"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.DaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.JdbcDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcEngine"/>
     </bean>
 

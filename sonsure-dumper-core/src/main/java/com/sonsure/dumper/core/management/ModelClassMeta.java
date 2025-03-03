@@ -12,9 +12,12 @@ package com.sonsure.dumper.core.management;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * @author selfly
+ */
 public class ModelClassMeta {
 
     /**
@@ -30,17 +33,17 @@ public class ModelClassMeta {
     /**
      * 本身field列表，一般顺向使用，如组装sql
      */
-    private Map<String, ModelFieldMeta> modelFieldMetas;
+    private final Map<String, ModelFieldMeta> modelFieldMetas;
 
     /**
      * 映射的field列表，包含了modelFieldMetas中的，及注解等field名称不对应的信息
      * 一般逆向使用，如查询结果集到Model的处理
      */
-    private Map<String, ModelFieldMeta> mappedFieldMetas;
+    private final Map<String, ModelFieldMeta> mappedFieldMetas;
 
     public ModelClassMeta() {
-        modelFieldMetas = new HashMap<>();
-        mappedFieldMetas = new HashMap<>();
+        modelFieldMetas = new LinkedHashMap<>(16);
+        mappedFieldMetas = new LinkedHashMap<>(16);
     }
 
     public void addModelFieldMeta(ModelFieldMeta modelFieldMeta) {

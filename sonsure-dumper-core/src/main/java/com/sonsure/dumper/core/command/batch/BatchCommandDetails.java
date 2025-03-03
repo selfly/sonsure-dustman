@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.command.batch;
 
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 
 import java.util.Collection;
 
@@ -18,7 +18,7 @@ import java.util.Collection;
  *
  * @author liyd
  */
-public class BatchCommandContext<T> extends CommandContext {
+public class BatchCommandDetails<T> extends CommandDetails {
 
     /**
      * The Batch data.

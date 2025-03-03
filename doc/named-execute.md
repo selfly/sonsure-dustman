@@ -17,7 +17,7 @@ sql使用named书写方式并传参，类似于`NamedParameterJdbcTemplate`执�
 
     String sql = "update User_Info set login_Name = :loginName where user_Info_Id in (:userInfoId) or user_info_id in (:userInfoId2)";
 
-    int count = daoTemplate.nativeExecutor()
+    int count = jdbcDao.nativeExecutor()
             .namedParameter()
             .nativeCommand()
             .command(sql)

@@ -10,8 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
@@ -23,34 +22,20 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
  */
 public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> implements Delete {
 
-    private final DeleteCommandContextBuilderImpl deleteCommandContextBuilder;
-
     public DeleteImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.deleteCommandContextBuilder = new DeleteCommandContextBuilderImpl(new DeleteCommandContextBuilderImpl.Context());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
-        return (T) deleteCommandContextBuilder;
-    }
-
-    @Override
-    protected ConditionCommandBuilderImpl getConditionCommandBuilder() {
-        return this.deleteCommandContextBuilder.getConditionCommandBuilder();
     }
 
     @Override
     public Delete from(Class<?> cls) {
-        deleteCommandContextBuilder.addModelClass(cls);
+        this.getCommandDetailsBuilder().deleteFrom(cls);
         return this;
     }
 
     @Override
     public int execute() {
-        CommandContext commandContext = this.getCommandContextBuilder().build(getJdbcEngineConfig());
-        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.DELETE);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.DELETE);
     }
 
 }

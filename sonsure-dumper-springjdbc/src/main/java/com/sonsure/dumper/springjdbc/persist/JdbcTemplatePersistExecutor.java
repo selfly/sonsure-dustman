@@ -9,9 +9,9 @@
 
 package com.sonsure.dumper.springjdbc.persist;
 
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.GenerateKey;
-import com.sonsure.dumper.core.command.batch.BatchCommandContext;
+import com.sonsure.dumper.core.command.batch.BatchCommandDetails;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import org.springframework.core.io.ByteArrayResource;
@@ -50,12 +50,12 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     }
 
     @Override
-    public Object insert(final CommandContext commandContext) {
-        final GenerateKey generateKey = commandContext.getGenerateKey();
+    public Object insert(final CommandDetails commandDetails) {
+        final GenerateKey generateKey = commandDetails.getGenerateKey();
         //数据库自增 或设置主键值 处理
         if (!generateKey.isPkIsParamVal()) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcOperations.update(new InsertPreparedStatementCreator(commandContext, generateKey), keyHolder);
+            jdbcOperations.update(new InsertPreparedStatementCreator(commandDetails, generateKey), keyHolder);
             Map<String, Object> keys = keyHolder.getKeys();
             //显示指定主键时为null
             if (keys == null || keys.isEmpty()) {
@@ -71,105 +71,105 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
                 return keys;
             }
         } else {
-            jdbcOperations.update(commandContext.getCommand(), commandContext.getParameters().toArray());
+            jdbcOperations.update(commandDetails.getCommand(), commandDetails.getParameters().toArray());
             //显示指定了主键，可能为null
             return generateKey.getValue();
         }
     }
 
     @Override
-    public List<?> queryForList(CommandContext commandContext) {
-        return jdbcOperations.query(commandContext.getCommand(), commandContext.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandContext.getResultType()));
+    public List<?> queryForList(CommandDetails commandDetails) {
+        return jdbcOperations.query(commandDetails.getCommand(), commandDetails.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
     }
 
     @Override
-    public Object querySingleResult(CommandContext commandContext) {
+    public Object querySingleResult(CommandDetails commandDetails) {
         //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<?> list = jdbcOperations.query(commandContext.getCommand(), commandContext.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandContext.getResultType()));
+        List<?> list = jdbcOperations.query(commandDetails.getCommand(), commandDetails.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
         return DataAccessUtils.singleResult(list);
     }
 
     @Override
-    public Map<String, Object> queryForMap(CommandContext commandContext) {
+    public Map<String, Object> queryForMap(CommandDetails commandDetails) {
         //直接queryForMap没有记录时会抛出异常，采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<Map<String, Object>> maps = jdbcOperations.queryForList(commandContext.getCommand(), commandContext.getParameters().toArray());
+        List<Map<String, Object>> maps = jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getParameters().toArray());
         return DataAccessUtils.singleResult(maps);
     }
 
     @Override
-    public List<Map<String, Object>> queryForMapList(CommandContext commandContext) {
-        return jdbcOperations.queryForList(commandContext.getCommand(), commandContext.getParameters().toArray());
+    public List<Map<String, Object>> queryForMapList(CommandDetails commandDetails) {
+        return jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getParameters().toArray());
     }
 
     @Override
-    public Object queryOneCol(CommandContext commandContext) {
-        return jdbcOperations.queryForObject(commandContext.getCommand(), commandContext.getParameters().toArray(), commandContext.getResultType());
+    public Object queryOneCol(CommandDetails commandDetails) {
+        return jdbcOperations.queryForObject(commandDetails.getCommand(), commandDetails.getParameters().toArray(), commandDetails.getResultType());
     }
 
     @Override
-    public List<?> queryOneColList(CommandContext commandContext) {
-        return jdbcOperations.queryForList(commandContext.getCommand(), commandContext.getResultType(), commandContext.getParameters().toArray());
+    public List<?> queryOneColList(CommandDetails commandDetails) {
+        return jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getResultType(), commandDetails.getParameters().toArray());
     }
 
     @Override
-    public int update(CommandContext commandContext) {
-        return jdbcOperations.update(commandContext.getCommand(), commandContext.getParameters().toArray());
+    public int update(CommandDetails commandDetails) {
+        return jdbcOperations.update(commandDetails.getCommand(), commandDetails.getParameters().toArray());
     }
 
     @Override
-    protected <T> Object batchUpdate(BatchCommandContext<T> commandContext) {
+    protected <T> Object batchUpdate(BatchCommandDetails<T> commandContext) {
         final ParameterizedSetter<T> parameterizedSetter = commandContext.getParameterizedSetter();
         return jdbcOperations.batchUpdate(commandContext.getCommand(), commandContext.getBatchData(), commandContext.getBatchSize(), (ps, argument) -> parameterizedSetter.setValues(ps, commandContext.getNamedParamNames(), argument));
     }
 
     @Override
-    public int delete(CommandContext commandContext) {
-        return jdbcOperations.update(commandContext.getCommand(), commandContext.getParameters().toArray());
+    public int delete(CommandDetails commandDetails) {
+        return jdbcOperations.update(commandDetails.getCommand(), commandDetails.getParameters().toArray());
     }
 
     @Override
-    public Object doExecute(CommandContext commandContext) {
-        jdbcOperations.execute(commandContext.getCommand());
+    public Object doExecute(CommandDetails commandDetails) {
+        jdbcOperations.execute(commandDetails.getCommand());
         return true;
     }
 
     @Override
-    protected Object doExecuteScript(CommandContext commandContext) {
+    protected Object doExecuteScript(CommandDetails commandDetails) {
         return jdbcOperations.execute((ConnectionCallback<Void>) connection -> {
-            ScriptUtils.executeSqlScript(connection, new ByteArrayResource(commandContext.getCommand().getBytes()));
+            ScriptUtils.executeSqlScript(connection, new ByteArrayResource(commandDetails.getCommand().getBytes()));
             return null;
         });
     }
 
     private static class InsertPreparedStatementCreator implements PreparedStatementCreator, PreparedStatementSetter, SqlProvider {
 
-        private final CommandContext commandContext;
+        private final CommandDetails commandDetails;
 
         private final GenerateKey generateKey;
 
-        public InsertPreparedStatementCreator(CommandContext commandContext, GenerateKey generateKey) {
-            this.commandContext = commandContext;
+        public InsertPreparedStatementCreator(CommandDetails commandDetails, GenerateKey generateKey) {
+            this.commandDetails = commandDetails;
             this.generateKey = generateKey;
         }
 
         @Override
         @NonNull
         public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-            PreparedStatement ps = generateKey.getColumn() == null ? con.prepareStatement(commandContext.getCommand(), PreparedStatement.RETURN_GENERATED_KEYS) : con.prepareStatement(commandContext.getCommand(), new String[]{generateKey.getColumn()});
+            PreparedStatement ps = generateKey.getColumn() == null ? con.prepareStatement(commandDetails.getCommand(), PreparedStatement.RETURN_GENERATED_KEYS) : con.prepareStatement(commandDetails.getCommand(), new String[]{generateKey.getColumn()});
             setValues(ps);
             return ps;
         }
 
         @Override
         public void setValues(@NonNull PreparedStatement ps) throws SQLException {
-            ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(commandContext.getParameters()
+            ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(commandDetails.getParameters()
                     .toArray());
             pss.setValues(ps);
         }
 
         @Override
         public String getSql() {
-            return commandContext.getCommand();
+            return commandDetails.getCommand();
         }
     }
 }

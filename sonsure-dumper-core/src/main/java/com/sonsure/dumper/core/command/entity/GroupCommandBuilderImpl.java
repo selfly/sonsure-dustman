@@ -1,8 +1,8 @@
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.management.CommandField;
 
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class GroupCommandBuilderImpl extends AbstractCommonCommandContextBuilder {
+public class GroupCommandBuilderImpl extends AbstractCommonCommandDetailsBuilder {
 
     private final Context groupContext;
 
@@ -29,7 +29,7 @@ public class GroupCommandBuilderImpl extends AbstractCommonCommandContextBuilder
     }
 
     @Override
-    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
         List<CommandField> groupByFields = this.groupContext.getGroupByFields();
         if (groupByFields.isEmpty()) {
             return null;
@@ -41,9 +41,9 @@ public class GroupCommandBuilderImpl extends AbstractCommonCommandContextBuilder
             sb.append(aliasField).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
-        CommandContext commandContext = this.createCommandContext();
-        commandContext.setCommand(sb.toString());
-        return commandContext;
+        CommandDetails commandDetails = this.createCommandContext();
+        commandDetails.setCommand(sb.toString());
+        return commandDetails;
     }
 
     public static class Context extends CommandContextBuilderContext {

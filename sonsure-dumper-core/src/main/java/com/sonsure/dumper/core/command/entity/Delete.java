@@ -19,15 +19,15 @@ public interface Delete extends ConditionCommandExecutor<Delete> {
     /**
      * 指定表
      *
-     * @param cls
-     * @return
+     * @param cls the cls
+     * @return delete
      */
     Delete from(Class<?> cls);
 
     /**
      * 执行
      *
-     * @return
+     * @return int
      */
     int execute();
 }

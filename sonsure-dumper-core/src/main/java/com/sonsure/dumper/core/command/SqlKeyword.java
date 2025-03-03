@@ -9,31 +9,26 @@
 
 package com.sonsure.dumper.core.command;
 
-public enum Comparison {
+import lombok.Getter;
 
-    EQ("="),
+/**
+ * @author selfly
+ */
 
-    NEQ("!="),
+@Getter
+public enum SqlKeyword {
 
-    GT(">"),
+    /**
+     * Eq comparison.
+     */
+    IS("is"),
 
-    GTE(">="),
-
-    LT("<"),
-
-    LTE("<="),
-
-    IN("in"),
-
-    NOT_IN("not in");
+  ;
 
     private final String code;
 
-    Comparison(String code) {
+    SqlKeyword(String code) {
         this.code = code;
     }
 
-    public String getCode() {
-        return this.code;
-    }
 }

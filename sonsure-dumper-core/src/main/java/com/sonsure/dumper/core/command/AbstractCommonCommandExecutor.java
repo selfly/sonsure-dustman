@@ -17,6 +17,7 @@ import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,50 +30,55 @@ import java.util.List;
  * @date 17 /4/19
  */
 @Getter
+@Setter
 public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecutor<E>> implements CommonCommandExecutor<E> {
 
     /**
      * The Jdbc engine config.
      */
-    protected JdbcEngineConfig jdbcEngineConfig;
+    protected final JdbcEngineConfig jdbcEngineConfig;
+
+    protected CommandDetailsBuilder commandDetailsBuilder;
 
     public AbstractCommonCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
+        this.commandDetailsBuilder = new CommandDetailsBuilderImpl(jdbcEngineConfig);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public E nativeCommand() {
-        this.getCommandContextBuilder().nativeCommand();
+        this.getCommandDetailsBuilder().forceNative();
         return (E) this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public E namedParameter() {
-        this.getCommandContextBuilder().namedParameter();
+        this.getCommandDetailsBuilder().namedParameter();
         return (E) this;
     }
 
-    protected <T> Page<T> doPageResult(CommandContext commandContext, Pagination pagination, boolean isCount, PageQueryHandler<T> pageQueryHandler) {
+    protected <T> Page<T> doPageResult(CommandDetails commandDetails, PageQueryHandler<T> pageQueryHandler) {
+        Pagination pagination = commandDetails.getPagination();
         if (pagination == null) {
             throw new SonsureJdbcException("查询分页列表请设置分页信息");
         }
         String dialect = getJdbcEngineConfig().getPersistExecutor().getDialect();
         long count = Long.MAX_VALUE;
-        if (isCount) {
-            String countCommand = getJdbcEngineConfig().getPageHandler().getCountCommand(commandContext.getCommand(), dialect);
-            CommandContext countCommandContext = BeanKit.copyProperties(new CommandContext(), commandContext);
-            countCommandContext.setCommand(countCommand);
-            countCommandContext.setResultType(Long.class);
-            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countCommandContext, CommandType.QUERY_ONE_COL);
+        if (!commandDetails.isDisableCount()) {
+            String countCommand = getJdbcEngineConfig().getPageHandler().getCountCommand(commandDetails.getCommand(), dialect);
+            CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
+            countCommandDetails.setCommand(countCommand);
+            countCommandDetails.setResultType(Long.class);
+            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countCommandDetails, CommandType.QUERY_ONE_COL);
             count = (Long) result;
         }
         pagination.setTotalItems((int) count);
-        String pageCommand = getJdbcEngineConfig().getPageHandler().getPageCommand(commandContext.getCommand(), pagination, dialect);
-        CommandContext pageCommandContext = BeanKit.copyProperties(new CommandContext(), commandContext);
-        pageCommandContext.setCommand(pageCommand);
-        List<T> list = pageQueryHandler.queryList(pageCommandContext);
+        String pageCommand = getJdbcEngineConfig().getPageHandler().getPageCommand(commandDetails.getCommand(), pagination, dialect);
+        CommandDetails pageCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
+        pageCommandDetails.setCommand(pageCommand);
+        List<T> list = pageQueryHandler.queryList(pageCommandDetails);
 
         return new Page<>(list, pagination);
     }
@@ -110,21 +116,14 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
         return newPage;
     }
 
-    /**
-     * Gets command context builder.
-     *
-     * @return the command context builder
-     */
-    protected abstract <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder();
-
     protected interface PageQueryHandler<T> {
 
         /**
          * Query list.
          *
-         * @param commandContext the command context
+         * @param commandDetails the command context
          * @return the list
          */
-        List<T> queryList(CommandContext commandContext);
+        List<T> queryList(CommandDetails commandDetails);
     }
 }

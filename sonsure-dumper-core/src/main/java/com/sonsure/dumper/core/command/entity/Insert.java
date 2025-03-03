@@ -47,12 +47,12 @@ public interface Insert extends EntityCommandExecutor<Insert> {
     <E, R> Insert set(Function<E, R> function, Object value);
 
     /**
-     * 根据实体类设置属性
+     * 根据对象设置属性
      *
-     * @param entity the entity
-     * @return insert
+     * @param obj the obj
+     * @return insert insert
      */
-    Insert forEntity(Object entity);
+    Insert setForObject(Object obj);
 
     /**
      * 执行

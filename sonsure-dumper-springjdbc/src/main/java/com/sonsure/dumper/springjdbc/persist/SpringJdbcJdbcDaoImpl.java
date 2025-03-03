@@ -14,7 +14,7 @@ import com.sonsure.dumper.core.config.JdbcEngineImpl;
 import com.sonsure.dumper.core.convert.JdbcTypeConverter;
 import com.sonsure.dumper.core.convert.SqliteCompatibleLocalDateTimeConverter;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.persist.AbstractDaoTemplateImpl;
+import com.sonsure.dumper.core.persist.AbstractJdbcDaoImpl;
 import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -25,7 +25,7 @@ import java.util.List;
  * @author liyd
  * @date 17/4/12
  */
-public class SpringJdbcDaoTemplateImpl extends AbstractDaoTemplateImpl implements InitializingBean {
+public class SpringJdbcJdbcDaoImpl extends AbstractJdbcDaoImpl implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {

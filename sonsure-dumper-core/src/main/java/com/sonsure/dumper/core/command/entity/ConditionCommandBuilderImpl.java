@@ -1,12 +1,14 @@
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandContextBuilderContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandParameter;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.CommandField;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,7 +19,7 @@ import java.util.Map;
 /**
  * @author liyd
  */
-public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBuilder {
+public class ConditionCommandBuilderImpl extends AbstractCommonCommandDetailsBuilder {
 
     private final Context conditionContext;
 
@@ -59,7 +61,7 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
 
     @SuppressWarnings("unchecked")
     @Override
-    public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
         final boolean isNamedParameter = this.conditionContext.isNamedParameter();
         List<CommandField> whereFields = this.conditionContext.getWhereFields();
         if (whereFields.isEmpty()) {
@@ -129,10 +131,10 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
         if (whereCommand.length() < 8) {
             whereCommand.delete(0, whereCommand.length());
         }
-        CommandContext commandContext = new CommandContext();
-        commandContext.setCommand(whereCommand.toString());
-        commandContext.addCommandParameters(commandParameters);
-        return commandContext;
+        CommandDetails commandDetails = new CommandDetails();
+        commandDetails.setCommand(whereCommand.toString());
+        commandDetails.addCommandParameters(commandParameters);
+        return commandDetails;
 
     }
 
@@ -186,10 +188,14 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
 
     public static class Context extends CommandContextBuilderContext {
 
+        @Getter
         private final List<CommandField> whereFields;
 
+        @Setter
+        @Getter
         private boolean ifCondition = true;
 
+        @Setter
         private int lastFieldSize = 1;
 
         public Context() {
@@ -204,27 +210,12 @@ public class ConditionCommandBuilderImpl extends AbstractCommonCommandContextBui
             this.getWhereFields().addAll(commandFields);
         }
 
-        public List<CommandField> getWhereFields() {
-            return whereFields;
-        }
-
         public void removeLastWhereFields() {
             for (int i = this.lastFieldSize; i > 0; i--) {
                 this.getWhereFields().remove(this.getWhereFields().size() - 1);
             }
         }
 
-        public boolean isIfCondition() {
-            return ifCondition;
-        }
-
-        public void setIfCondition(boolean condition) {
-            this.ifCondition = condition;
-        }
-
-        public void setLastFieldSize(int size) {
-            this.lastFieldSize = size;
-        }
     }
 
 }

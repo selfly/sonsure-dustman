@@ -62,10 +62,10 @@ CountCommandExecutor 类代码：
     
         @Override
         public long getCount() {
-            CommandContext commandContext = this.commandContextBuilder.build(this.countExecutorContext, this.jdbcEngineConfig);
+            CommandContext commandDetails = this.commandContextBuilder.build(this.countExecutorContext, this.jdbcEngineConfig);
             PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
-            commandContext.setResultType(Long.class);
-            Object result = persistExecutor.execute(commandContext, CommandType.QUERY_ONE_COL);
+            commandDetails.setResultType(Long.class);
+            Object result = persistExecutor.execute(commandDetails, CommandType.QUERY_ONE_COL);
             return (Long) result;
         }
     
@@ -102,9 +102,9 @@ CountCommandContextBuilder 代码：
         @Override
         public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
             Class<?> clazz = this.getCommandContextBuilderContext().getUniqueModelClass();
-            CommandContext commandContext = new CommandContext();
-            commandContext.setCommand("select count(*) from " + clazz.getSimpleName());
-            return commandContext;
+            CommandContext commandDetails = new CommandContext();
+            commandDetails.setCommand("select count(*) from " + clazz.getSimpleName());
+            return commandDetails;
         }
     }
     
@@ -125,7 +125,7 @@ CountCommandContextBuilder 代码：
         <property name="commandExecutorFactory" ref="commandExecutorFactory"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
     </bean>
     

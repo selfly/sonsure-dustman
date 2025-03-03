@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.persist.DaoTemplate;
+import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ import java.util.Date;
 public class PostgresJdbcTemplateDaoImplTest {
 
     @Autowired
-    private DaoTemplate daoTemplate;
+    private JdbcDao jdbcDao;
 
     @BeforeEach
     public void before() {
@@ -39,14 +39,14 @@ public class PostgresJdbcTemplateDaoImplTest {
             user.setPassword("123456-" + i);
             user.setUserAge(i);
             user.setGmtCreate(new Date());
-            daoTemplate.executeInsert(user);
+            jdbcDao.executeInsert(user);
         }
     }
 
     @Test
     public void findPage() {
 
-        Page<UserInfo> page = daoTemplate.selectFrom(UserInfo.class)
+        Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
                 .orderBy("userInfoId").asc()
                 .paginate(1, 20)
                 .pageResult(UserInfo.class);

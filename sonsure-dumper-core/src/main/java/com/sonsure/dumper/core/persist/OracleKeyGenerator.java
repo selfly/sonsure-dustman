@@ -13,7 +13,9 @@ package com.sonsure.dumper.core.persist;
 import com.sonsure.dumper.common.utils.NameUtils;
 
 /**
- * Created by liyd on 16/8/25.
+ *
+ * @author liyd
+ * @date 16/8/25
  */
 public class OracleKeyGenerator implements KeyGenerator {
 

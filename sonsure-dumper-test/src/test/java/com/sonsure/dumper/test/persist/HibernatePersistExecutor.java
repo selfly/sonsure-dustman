@@ -9,8 +9,8 @@
 
 package com.sonsure.dumper.test.persist;
 
-import com.sonsure.dumper.core.command.CommandContext;
-import com.sonsure.dumper.core.command.batch.BatchCommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.batch.BatchCommandDetails;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import lombok.Setter;
 import org.hibernate.Session;
@@ -45,15 +45,15 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
     }
 
     @Override
-    public Object insert(final CommandContext commandContext) {
+    public Object insert(final CommandDetails commandDetails) {
         return null;
     }
 
     @Override
-    public List<?> queryForList(CommandContext commandContext) {
+    public List<?> queryForList(CommandDetails commandDetails) {
         Session session = sessionFactory.openSession();
-        NativeQuery<?> nativeQuery = session.createNativeQuery(commandContext.getCommand(), commandContext.getResultType());
-        List<Object> parameters = commandContext.getParameters();
+        NativeQuery<?> nativeQuery = session.createNativeQuery(commandDetails.getCommand(), commandDetails.getResultType());
+        List<Object> parameters = commandDetails.getParameters();
         for (int i = 0; i < parameters.size(); i++) {
             nativeQuery.setParameter(i + 1, parameters.get(i));
         }
@@ -63,52 +63,52 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
     }
 
     @Override
-    public Object querySingleResult(CommandContext commandContext) {
+    public Object querySingleResult(CommandDetails commandDetails) {
         return null;
     }
 
     @Override
-    public Map<String, Object> queryForMap(CommandContext commandContext) {
+    public Map<String, Object> queryForMap(CommandDetails commandDetails) {
         return null;
     }
 
     @Override
-    public List<Map<String, Object>> queryForMapList(CommandContext commandContext) {
+    public List<Map<String, Object>> queryForMapList(CommandDetails commandDetails) {
         return null;
     }
 
     @Override
-    public Object queryOneCol(CommandContext commandContext) {
+    public Object queryOneCol(CommandDetails commandDetails) {
         return null;
     }
 
     @Override
-    public List<?> queryOneColList(CommandContext commandContext) {
+    public List<?> queryOneColList(CommandDetails commandDetails) {
         return null;
     }
 
     @Override
-    public int update(CommandContext commandContext) {
+    public int update(CommandDetails commandDetails) {
         return 0;
     }
 
     @Override
-    public int delete(CommandContext commandContext) {
+    public int delete(CommandDetails commandDetails) {
         return 0;
     }
 
     @Override
-    protected <T> Object batchUpdate(BatchCommandContext<T> commandContext) {
+    protected <T> Object batchUpdate(BatchCommandDetails<T> commandContext) {
         return null;
     }
 
     @Override
-    public Object doExecute(CommandContext commandContext) {
-        return this.update(commandContext);
+    public Object doExecute(CommandDetails commandDetails) {
+        return this.update(commandDetails);
     }
 
     @Override
-    protected Object doExecuteScript(CommandContext commandContext) {
+    protected Object doExecuteScript(CommandDetails commandDetails) {
         return null;
     }
 

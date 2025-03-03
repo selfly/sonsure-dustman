@@ -22,7 +22,7 @@ sql中的表名以及列名都是对应实体类的类名和属性名，会自�
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
         <property name="jdbcEngine" ref="jdbcTemplateEngine"/>
     </bean>
     

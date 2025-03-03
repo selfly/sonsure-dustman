@@ -6,7 +6,7 @@
 
 ## 示例一，传统方式
 
-    UserInfo userInfo = daoTemplate.selectFrom(UserInfo.class)
+    UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
             .where("userAge", ">", 5)
             .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
             .singleResult(UserInfo.class);
@@ -16,7 +16,7 @@
 
     Map<String, Object> params = new HashMap<>();
     params.put("userInfoId", 40L);
-    UserInfo userInfo = daoTemplate.selectFrom(UserInfo.class)
+    UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
             .namedParameter()
             .where("userAge", ">", 5)
             .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)

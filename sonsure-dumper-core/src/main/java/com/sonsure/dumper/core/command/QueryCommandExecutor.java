@@ -39,13 +39,11 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
     C limit(int offset, int size);
 
     /**
-     * 是否count查询
+     * 禁用count查询
      *
-     * @param isCount the is count
      * @return select c
      */
-    C isCount(boolean isCount);
-
+    C disableCount();
 
     /**
      * count查询
@@ -148,7 +146,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      * @return t
      */
     default <T> T firstResult(Class<T> cls) {
-        this.paginate(1, 1).isCount(false);
+        this.paginate(1, 1).disableCount(false);
         Page<T> page = this.pageResult(cls);
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
@@ -159,7 +157,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      * @return t object
      */
     default Map<String, Object> firstMapResult() {
-        this.paginate(1, 1).isCount(false);
+        this.paginate(1, 1).disableCount(false);
         Page<Map<String, Object>> page = this.pageMapResult();
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
@@ -173,7 +171,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      */
     default <T> T oneColFirstResult(Class<T> clazz) {
         Page<T> page = this.paginate(1, 1)
-                .isCount(false)
+                .disableCount(false)
                 .oneColPageResult(clazz);
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }

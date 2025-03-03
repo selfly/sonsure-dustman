@@ -25,22 +25,22 @@ import java.util.List;
  */
 public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCommandExecutor<Select<M>> {
 
-    /**
-     * Table alias select.
-     *
-     * @param alias the alias
-     * @return the select
-     */
-    Select<M> tableAlias(String alias);
+//    /**
+//     * Table alias select.
+//     *
+//     * @param alias the alias
+//     * @return the select
+//     */
+//    Select<M> tableAlias(String alias);
 
-    /**
-     * From select.
-     *
-     * @param cls   the cls
-     * @param alias the alias
-     * @return the select
-     */
-    Select<M> from(Class<?> cls, String alias);
+//    /**
+//     * From select.
+//     *
+//     * @param cls   the cls
+//     * @param alias the alias
+//     * @return the select
+//     */
+//    Select<M> from(Class<?> cls, String alias);
 
     /**
      * Select 字段.
@@ -97,31 +97,13 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     <E, R> Select<M> groupBy(Function<E, R> function);
 
     /**
-     * 排序属性
-     *
-     * @param fields the fields
-     * @return select
-     */
-    Select<M> orderBy(String... fields);
-
-    /**
      * Order by select.
      *
-     * @param field the field
-     * @param type  the type
+     * @param field   the field
+     * @param orderBy the order by
      * @return the select
      */
-    Select<M> orderBy(String field, OrderBy type);
-
-    /**
-     * 属性条件
-     *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @return select
-     */
-    <E, R> Select<M> orderBy(Function<E, R> function);
+    Select<M> orderBy(String field, OrderBy orderBy);
 
     /**
      * Order by select.
@@ -129,24 +111,10 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * @param <E>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
-     * @param type     the type
+     * @param orderBy  the order by
      * @return the select
      */
-    <E, R> Select<M> orderBy(Function<E, R> function, OrderBy type);
-
-    /**
-     * asc排序
-     *
-     * @return select
-     */
-    Select<M> asc();
-
-    /**
-     * desc 排序
-     *
-     * @return select
-     */
-    Select<M> desc();
+    <E, R> Select<M> orderBy(Function<E, R> function, OrderBy orderBy);
 
     /**
      * Single result m.

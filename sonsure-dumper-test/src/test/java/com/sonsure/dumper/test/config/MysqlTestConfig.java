@@ -4,7 +4,7 @@ import com.sonsure.dumper.core.config.JdbcEngine;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean;
-import com.sonsure.dumper.springjdbc.persist.SpringJdbcDaoTemplateImpl;
+import com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl;
 import com.sonsure.dumper.test.flyable.FlyableInitializer;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,9 +27,9 @@ public class MysqlTestConfig {
 
     @Bean
     public JdbcDao mysqlJdbcDao(@Qualifier("jdbcTemplateEngine") JdbcEngine jdbcEngine) {
-        SpringJdbcDaoTemplateImpl jdbcDaoTemplate = new SpringJdbcDaoTemplateImpl();
-        jdbcDaoTemplate.setDefaultJdbcEngine(jdbcEngine);
-        return jdbcDaoTemplate;
+        SpringJdbcJdbcDaoImpl jdbcDao = new SpringJdbcJdbcDaoImpl();
+        jdbcDao.setDefaultJdbcEngine(jdbcEngine);
+        return jdbcDao;
     }
 
     @Bean

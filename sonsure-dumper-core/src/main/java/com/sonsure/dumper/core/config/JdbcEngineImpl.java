@@ -134,7 +134,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public int executeUpdate(Object entity) {
-        return this.update(entity.getClass()).setForEntityWhereId(entity).execute();
+        return this.update(entity.getClass()).setForObjectWherePk(entity).execute();
     }
 
     @Override

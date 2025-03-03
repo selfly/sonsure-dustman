@@ -9,17 +9,10 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.common.utils.ClassUtils;
-import com.sonsure.dumper.core.annotation.Transient;
-import com.sonsure.dumper.core.command.AbstractCommonCommandContextBuilder;
-import com.sonsure.dumper.core.command.CommandContext;
+import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
-
-import java.util.Map;
 
 /**
  * The type Update.
@@ -29,84 +22,50 @@ import java.util.Map;
  */
 public class UpdateImpl extends AbstractConditionCommandExecutor<Update> implements Update {
 
-    private final UpdateCommandContextBuilderImpl updateCommandContextBuilder;
-
     public UpdateImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.updateCommandContextBuilder = new UpdateCommandContextBuilderImpl(new UpdateCommandContextBuilderImpl.Context());
-    }
-
-    @Override
-    protected ConditionCommandBuilderImpl getConditionCommandBuilder() {
-        return this.updateCommandContextBuilder.getConditionCommandBuilder();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <T extends AbstractCommonCommandContextBuilder> T getCommandContextBuilder() {
-        return (T) updateCommandContextBuilder;
     }
 
     @Override
     public Update table(Class<?> cls) {
-        this.updateCommandContextBuilder.addModelClass(cls);
+        this.getCommandDetailsBuilder().update(cls);
         return this;
     }
 
     @Override
     public Update set(String field, Object value) {
-        this.updateCommandContextBuilder.addSetField(field, value);
+        this.getCommandDetailsBuilder().setField(field, value);
         return this;
     }
 
     @Override
     public <E, R> Update set(Function<E, R> function, Object value) {
-        String field = LambdaMethod.getField(function);
-        updateCommandContextBuilder.addSetField(field, value);
+        this.getCommandDetailsBuilder().setField(function, value);
         return this;
     }
 
     @Override
-    public Update setForEntityWhereId(Object entity) {
-        updateCommandContextBuilder.addModelClass(entity.getClass());
-        String pkField = getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
-        Map<String, Object> beanPropMap = ClassUtils.getSelfBeanPropMap(entity, Transient.class);
-        //处理主键成where条件
-        Object pkValue = beanPropMap.get(pkField);
-        if (pkValue == null) {
-            throw new SonsureJdbcException("主键属性值不能为空:" + pkField);
-        }
-        this.where(pkField, pkValue);
-        //移除
-        beanPropMap.remove(pkField);
-
-        for (Map.Entry<String, Object> entry : beanPropMap.entrySet()) {
-            //不忽略null，最后构建时根据updateNull设置处理null值
-            updateCommandContextBuilder.addSetField(entry.getKey(), entry.getValue());
-        }
+    public Update setForObjectWherePk(Object object) {
+        this.getCommandDetailsBuilder().setFieldForObjectWherePk(object);
         return this;
     }
 
     @Override
-    public Update setForEntity(Object entity) {
-        Map<String, Object> beanPropMap = ClassUtils.getSelfBeanPropMap(entity, Transient.class);
-        for (Map.Entry<String, Object> entry : beanPropMap.entrySet()) {
-            //不忽略null，最后构建时根据updateNull设置处理null值
-            updateCommandContextBuilder.addSetField(entry.getKey(), entry.getValue());
-        }
+    public Update setForObject(Object object) {
+        this.getCommandDetailsBuilder().setFieldForObject(object);
         return this;
     }
 
     @Override
     public Update updateNull() {
-        updateCommandContextBuilder.setIgnoreNull(false);
+        this.getCommandDetailsBuilder().updateNull();
         return this;
     }
 
     @Override
     public int execute() {
-        CommandContext commandContext = this.updateCommandContextBuilder.build(getJdbcEngineConfig());
-        return (Integer) this.getJdbcEngineConfig().getPersistExecutor().execute(commandContext, CommandType.UPDATE);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        return (Integer) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.UPDATE);
     }
 
 }

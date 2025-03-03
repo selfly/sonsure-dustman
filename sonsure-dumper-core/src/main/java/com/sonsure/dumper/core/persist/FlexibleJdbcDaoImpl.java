@@ -15,14 +15,14 @@ import com.sonsure.dumper.core.config.JdbcEngine;
  *
  * @author liyd
  */
-public class FlexibleDaoTemplate extends AbstractDaoTemplateImpl {
+public class FlexibleJdbcDaoImpl extends AbstractJdbcDaoImpl {
 
-    public FlexibleDaoTemplate(JdbcEngine jdbcEngine) {
+    public FlexibleJdbcDaoImpl(JdbcEngine jdbcEngine) {
         this.setDefaultJdbcEngine(jdbcEngine);
     }
 
     @Override
-    public DaoTemplate use(String name) {
+    public JdbcDao use(String name) {
         throw new UnsupportedOperationException("不支持的方法");
     }
 
