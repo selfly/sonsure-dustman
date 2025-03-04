@@ -1,7 +1,6 @@
 package com.sonsure.dumper.core.interceptor;
 
 import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
 
 /**
  * @author selfly
@@ -13,10 +12,9 @@ public interface PersistInterceptor {
      *
      * @param dialect        the dialect
      * @param commandDetails the command context
-     * @param commandType    the command type
      * @return the boolean
      */
-    default boolean executeBefore(String dialect, CommandDetails commandDetails, CommandType commandType) {
+    default boolean executeBefore(String dialect, CommandDetails commandDetails) {
         return true;
     }
 
@@ -25,11 +23,10 @@ public interface PersistInterceptor {
      *
      * @param dialect        the dialect
      * @param commandDetails the command context
-     * @param commandType    the command type
      * @param commandResult  the command result
      * @return the object
      */
-    default Object executeAfter(String dialect, CommandDetails commandDetails, CommandType commandType, Object commandResult) {
+    default Object executeAfter(String dialect, CommandDetails commandDetails, Object commandResult) {
         return commandResult;
     }
 }

@@ -28,44 +28,46 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
 
     @Override
     public Update table(Class<?> cls) {
-        this.getCommandDetailsBuilder().update(cls);
+        this.getEntityCommandDetailsBuilder().update(cls);
         return this;
     }
 
     @Override
     public Update set(String field, Object value) {
-        this.getCommandDetailsBuilder().setField(field, value);
+        this.getEntityCommandDetailsBuilder().setField(field, value);
         return this;
     }
 
     @Override
     public <E, R> Update set(Function<E, R> function, Object value) {
-        this.getCommandDetailsBuilder().setField(function, value);
+        this.getEntityCommandDetailsBuilder().setField(function, value);
         return this;
     }
 
     @Override
     public Update setForObjectWherePk(Object object) {
-        this.getCommandDetailsBuilder().setFieldForObjectWherePk(object);
+        this.getEntityCommandDetailsBuilder().setFieldForObjectWherePk(object);
         return this;
     }
 
     @Override
     public Update setForObject(Object object) {
-        this.getCommandDetailsBuilder().setFieldForObject(object);
+        this.getEntityCommandDetailsBuilder().setFieldForObject(object);
         return this;
     }
 
     @Override
-    public Update updateNull() {
-        this.getCommandDetailsBuilder().updateNull();
+    public Update updateNull(boolean updateNull) {
+        this.getEntityCommandDetailsBuilder().updateNull(updateNull);
         return this;
     }
 
     @Override
     public int execute() {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        return (Integer) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.UPDATE);
+        commandDetails.setCommandType(CommandType.UPDATE);
+        commandDetails.setResultType(Integer.class);
+        return (Integer) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.sonsure.dumper.core.convert;
 
 import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +56,8 @@ public class JdbcTypeConverterComposite implements JdbcTypeConverter {
      *
      * @param dialect        the dialect
      * @param commandDetails the command context
-     * @param commandType    the command type
      */
-    public void convert(String dialect, CommandDetails commandDetails, CommandType commandType) {
+    public void convert(String dialect, CommandDetails commandDetails) {
         final List<Object> parameters = commandDetails.getParameters();
         final List<Object> newParams = new ArrayList<>();
         for (Object parameter : parameters) {

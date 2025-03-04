@@ -12,6 +12,7 @@ package com.sonsure.dumper.core.config;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.CommandExecutor;
+import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.entity.Delete;
@@ -62,26 +63,26 @@ public class JdbcEngineImpl implements JdbcEngine {
     @Override
     public <T> List<T> find(Class<T> cls) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(cls);
-        return this.selectFrom(cls).orderBy(pkField).desc().list(cls);
+        return this.selectFrom(cls).orderBy(pkField, OrderBy.DESC).list(cls);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> find(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
-        return (List<T>) this.selectFrom(entity.getClass()).where().conditionEntity(entity).orderBy(pkField).desc().list(entity.getClass());
+        //noinspection unchecked
+        return (List<T>) this.selectFrom(entity.getClass()).whereForObject(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Pageable> Page<T> pageResult(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
-        return (Page<T>) this.selectFrom(entity.getClass()).where().conditionEntity(entity).paginate(entity).orderBy(pkField).desc().pageResult(entity.getClass());
+        //noinspection unchecked
+        return (Page<T>) this.selectFrom(entity.getClass()).whereForObject(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).pageResult(entity.getClass());
     }
 
     @Override
     public long findCount(Object entity) {
-        return this.selectFrom(entity.getClass()).where().conditionEntity(entity).count();
+        return this.selectFrom(entity.getClass()).whereForObject(entity).count();
     }
 
     @Override
@@ -92,13 +93,13 @@ public class JdbcEngineImpl implements JdbcEngine {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(T entity) {
-        return (T) this.selectFrom(entity.getClass()).where().conditionEntity(entity).singleResult(entity.getClass());
+        return (T) this.selectFrom(entity.getClass()).whereForObject(entity).singleResult(entity.getClass());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T firstResult(T entity) {
-        return (T) this.selectFrom(entity.getClass()).where().conditionEntity(entity).firstResult(entity.getClass());
+        return (T) this.selectFrom(entity.getClass()).whereForObject(entity).firstResult(entity.getClass());
     }
 
     @Override
@@ -114,7 +115,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public Object executeInsert(Object entity) {
-        return this.insertInto(entity.getClass()).forEntity(entity).execute();
+        return this.insertInto(entity.getClass()).setForObject(entity).execute();
     }
 
     @Override
@@ -159,7 +160,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public int executeDelete(Object entity) {
-        return this.delete().from(entity.getClass()).where().conditionEntity(entity).execute();
+        return this.delete().from(entity.getClass()).whereForObject(entity).execute();
     }
 
     @Override

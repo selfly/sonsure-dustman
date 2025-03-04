@@ -14,8 +14,8 @@
 //import com.sonsure.dumper.core.config.JdbcEngineConfig;
 //import com.sonsure.dumper.core.management.CommandClass;
 //import com.sonsure.dumper.core.management.CommandField;
-//import com.sonsure.dumper.core.management.ModelClassCache;
-//import com.sonsure.dumper.core.management.ModelFieldMeta;
+//import com.sonsure.dumper.core.management.ModelClassDetailsCache;
+//import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 //import com.sonsure.dumper.core.mapping.MappingHandler;
 //import lombok.Getter;
 //import org.apache.commons.lang3.StringUtils;
@@ -175,8 +175,8 @@
 //     * @param clazz the clazz
 //     * @return class fields
 //     */
-//    protected Collection<ModelFieldMeta> getClassFields(Class<?> clazz) {
-//        return ModelClassCache.getClassFieldMetas(clazz);
+//    protected Collection<ModelClassFieldDetails> getClassFields(Class<?> clazz) {
+//        return ModelClassDetailsCache.getClassFieldMetas(clazz);
 //    }
 //
 //    /**

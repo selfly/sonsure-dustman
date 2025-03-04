@@ -28,14 +28,16 @@ public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> impleme
 
     @Override
     public Delete from(Class<?> cls) {
-        this.getCommandDetailsBuilder().deleteFrom(cls);
+        this.getEntityCommandDetailsBuilder().deleteFrom(cls);
         return this;
     }
 
     @Override
     public int execute() {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.DELETE);
+        commandDetails.setCommandType(CommandType.DELETE);
+        commandDetails.setResultType(Integer.class);
+        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
 }

@@ -10,7 +10,6 @@
 package com.sonsure.dumper.core.command.natives;
 
 
-import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandExecutor;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -25,15 +24,13 @@ public class NativeExecutorImpl extends AbstractSimpleCommandExecutor<NativeExec
 
     private static final String DEFAULT_NATIVE_PARAM_PREFIX = "nativeParam";
 
-    private NativeCommandDetailsBuilderImpl nativeCommandContextBuilder;
-
     public NativeExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig, new NativeCommandDetailsBuilderImpl(new AbstractSimpleCommandDetailsBuilder.Context()));
+        super(jdbcEngineConfig, new NativeCommandDetailsBuilderImpl(jdbcEngineConfig));
     }
 
     @Override
     public NativeExecutor parameters(Object... values) {
-        if (this.getSimpleCommandContextBuilder().getSimpleContext().isNamedParameter()) {
+        if (this.isNamedParameter()) {
             throw new SonsureJdbcException("Named Parameter方式不支持数组传参");
         }
         int count = 1;

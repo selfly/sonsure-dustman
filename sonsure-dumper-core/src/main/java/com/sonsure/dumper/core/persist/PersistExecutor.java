@@ -11,7 +11,6 @@ package com.sonsure.dumper.core.persist;
 
 
 import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
 
 /**
  * 持久化执行
@@ -33,9 +32,8 @@ public interface PersistExecutor {
      * 执行command
      *
      * @param commandDetails the command context
-     * @param commandType    the command type
      * @return object
      */
-    Object execute(CommandDetails commandDetails, CommandType commandType);
+    Object execute(CommandDetails commandDetails);
 
 }

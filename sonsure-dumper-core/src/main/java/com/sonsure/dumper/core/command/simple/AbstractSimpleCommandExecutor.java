@@ -10,13 +10,11 @@
 package com.sonsure.dumper.core.command.simple;
 
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
-import com.sonsure.dumper.core.command.GenerateKey;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.management.BeanParameter;
 import com.sonsure.dumper.core.mapping.MappingHandler;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,44 +28,41 @@ import java.util.Map;
  * @author liyd
  * @date 17 /4/25
  */
-@SuppressWarnings("unchecked")
+@Getter
 public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecutor<C>> extends AbstractCommonCommandExecutor<C> implements SimpleCommandExecutor<C> {
 
-    protected AbstractSimpleCommandDetailsBuilder simpleCommandContextBuilder;
+    protected SimpleCommandDetailsBuilder<?> simpleCommandContextBuilder;
 
     protected ResultHandler<?> resultHandler;
 
-    public AbstractSimpleCommandExecutor(JdbcEngineConfig jdbcEngineConfig, AbstractSimpleCommandDetailsBuilder simpleCommandContextBuilder) {
+    public AbstractSimpleCommandExecutor(JdbcEngineConfig jdbcEngineConfig, SimpleCommandDetailsBuilder<?> simpleCommandContextBuilder) {
         super(jdbcEngineConfig);
         this.simpleCommandContextBuilder = simpleCommandContextBuilder;
     }
 
-    public AbstractSimpleCommandDetailsBuilder getSimpleCommandContextBuilder() {
-        return simpleCommandContextBuilder;
-    }
-
     @Override
-    protected <T extends AbstractCommonCommandDetailsBuilder> T getCommandContextBuilder() {
+    protected <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder() {
+        //noinspection unchecked
         return (T) this.simpleCommandContextBuilder;
     }
 
     @Override
     public C command(String command) {
         this.simpleCommandContextBuilder.command(command);
-        return (C) this;
+        return this.getSelf();
     }
 
 
     @Override
     public C parameters(Map<String, Object> parameters) {
         this.simpleCommandContextBuilder.parameters(parameters);
-        return (C) this;
+        return this.getSelf();
     }
 
     @Override
     public C parameter(String name, Object value) {
         this.simpleCommandContextBuilder.parameter(name, value);
-        return (C) this;
+        return this.getSelf();
     }
 
     @Override
@@ -78,71 +73,87 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     @Override
     public <T> C resultHandler(ResultHandler<T> resultHandler) {
         this.resultHandler = resultHandler;
-        return (C) this;
+        return this.getSelf();
+    }
+
+    @Override
+    public C disableCount() {
+        this.simpleCommandContextBuilder.disableCountQuery();
+        return this.getSelf();
     }
 
     @Override
     public long count() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL);
         commandDetails.setResultType(Long.class);
-        return (Long) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL);
+        return (Long) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public <T> T singleResult(Class<T> cls) {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        Object result = getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP);
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP);
+        commandDetails.setResultType(Object.class);
+        Object result = getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
         return this.handleResult(result, getResultHandler(cls));
     }
 
     @Override
     public Map<String, Object> singleMapResult() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        return (Map<String, Object>) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP);
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP);
+        commandDetails.setResultType(Map.class);
+        //noinspection unchecked
+        return (Map<String, Object>) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public <T> T oneColResult(Class<T> clazz) {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL);
         commandDetails.setResultType(clazz);
-        return (T) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL);
+        //noinspection unchecked
+        return (T) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public List<Map<String, Object>> listMaps() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        return (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setResultType(List.class);
+        //noinspection unchecked
+        return (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public C paginate(int pageNum, int pageSize) {
         this.simpleCommandContextBuilder.paginate(pageNum, pageSize);
-        return (C) this;
+        return this.getSelf();
     }
 
     @Override
     public C limit(int offset, int size) {
         this.simpleCommandContextBuilder.limit(offset, size);
-        return (C) this;
-    }
-
-    @Override
-    public C disableCount(boolean isCount) {
-        this.simpleCommandContextBuilder.setCount(isCount);
-        return (C) this;
+        return this.getSelf();
     }
 
     @Override
     public <T> List<T> oneColList(Class<T> clazz) {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL_LIST);
         commandDetails.setResultType(clazz);
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL_LIST);
+        //noinspection unchecked
+        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public <T> List<T> list(Class<T> cls) {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        List<Map<String, Object>> mapList = (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setResultType(List.class);
+        //noinspection unchecked
+        List<Map<String, Object>> mapList = (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
         return this.handleResult(mapList, getResultHandler(cls));
     }
 
@@ -155,7 +166,10 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     @Override
     public Page<Map<String, Object>> pageMapResult() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        Page<Map<String, Object>> page = this.doPageResult(commandDetails, commandDetails.getPagination(), commandDetails.isCount(), commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_MAP_LIST));
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setResultType(Page.class);
+        //noinspection unchecked
+        Page<Map<String, Object>> page = this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
         Page<Map<String, Object>> resultPage = new Page<>(page.getPagination());
         if (page.getList() != null) {
             List<Map<String, Object>> list = new ArrayList<>(page.getList());
@@ -167,8 +181,10 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     @Override
     public <T> Page<T> oneColPageResult(Class<T> clazz) {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL_LIST);
         commandDetails.setResultType(clazz);
-        return this.doPageResult(commandDetails, commandDetails.getPagination(), commandDetails.isCount(), commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_ONE_COL_LIST));
+        //noinspection unchecked
+        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
 
     @Override
@@ -177,7 +193,10 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         GenerateKey generateKey = new GenerateKey();
         generateKey.setPkIsParamVal(false);
         commandDetails.setGenerateKey(generateKey);
-        return (Serializable) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.INSERT);
+
+        commandDetails.setCommandType(CommandType.INSERT);
+        commandDetails.setResultType(Serializable.class);
+        return (Serializable) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
@@ -190,31 +209,48 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         generateKey.setColumn(pkColumn);
         generateKey.setPkIsParamVal(false);
         commandDetails.setGenerateKey(generateKey);
-        return (Serializable) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.INSERT);
+
+        commandDetails.setCommandType(CommandType.INSERT);
+        commandDetails.setResultType(Serializable.class);
+        return (Serializable) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public int update() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.UPDATE);
+        commandDetails.setCommandType(CommandType.UPDATE);
+        commandDetails.setResultType(Integer.class);
+        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public void execute() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.EXECUTE);
+        commandDetails.setCommandType(CommandType.EXECUTE);
+        commandDetails.setResultType(Void.class);
+        getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @Override
     public void executeScript() {
         CommandDetails commandDetails = this.simpleCommandContextBuilder.build(getJdbcEngineConfig());
-        getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.EXECUTE_SCRIPT);
+        commandDetails.setCommandType(CommandType.EXECUTE_SCRIPT);
+        commandDetails.setResultType(Void.class);
+        getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+    }
+
+    protected boolean isNamedParameter() {
+        if (!(this.simpleCommandContextBuilder instanceof AbstractSimpleCommandDetailsBuilder)) {
+            return false;
+        }
+        return ((AbstractSimpleCommandDetailsBuilder<?>) this.simpleCommandContextBuilder).isNamedParameter();
     }
 
     protected <E> ResultHandler<E> getResultHandler(Class<E> cls) {
         if (this.resultHandler == null) {
             return DefaultResultHandler.newInstance(cls);
         }
+        //noinspection unchecked
         return (ResultHandler<E>) this.resultHandler;
     }
 }

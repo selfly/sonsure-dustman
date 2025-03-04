@@ -16,20 +16,24 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 /**
  * @author liyd
  */
-public class NativeCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder {
+public class NativeCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder<NativeCommandDetailsBuilderImpl> {
 
+    public NativeCommandDetailsBuilderImpl(JdbcEngineConfig jdbcEngineConfig) {
+        super(jdbcEngineConfig);
+    }
 
-    public NativeCommandDetailsBuilderImpl(Context simpleContext) {
-        super(simpleContext);
+    @Override
+    public CommandDetails build(JdbcEngineConfig jdbcEngineConfig) {
+        return super.build(jdbcEngineConfig);
     }
 
     @Override
     public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
         CommandDetails commandDetails = new CommandDetails();
-        commandDetails.setCommand(getSimpleContext().getCommand());
-        if (getSimpleContext().getCommandParameters() != null) {
-            commandDetails.addCommandParameters(getSimpleContext().getCommandParameters());
-        }
+        commandDetails.setCommand(this.getCommand());
+//        if (getSimpleContext().getCommandParameters() != null) {
+//            commandDetails.addCommandParameters(getSimpleContext().getCommandParameters());
+//        }
         return commandDetails;
     }
 }

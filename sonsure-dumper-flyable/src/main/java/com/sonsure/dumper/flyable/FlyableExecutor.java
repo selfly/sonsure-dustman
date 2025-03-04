@@ -1,6 +1,7 @@
 package com.sonsure.dumper.flyable;
 
 import com.sonsure.dumper.common.utils.VersionUtils;
+import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.mapping.TablePrefixSupportHandler;
 import com.sonsure.dumper.core.persist.AbstractJdbcDaoImpl;
@@ -102,7 +103,7 @@ public class FlyableExecutor {
         if (flyableHistoryInitialized) {
             List<FlyableHistory> list = jdbcDao.selectFrom(FlyableHistory.class)
                     .where(FlyableHistory::getMigrationGroup, migrationGroup)
-                    .orderBy(FlyableHistory::getFlyableHistoryId).desc()
+                    .orderBy(FlyableHistory::getFlyableHistoryId, OrderBy.DESC)
                     .list(FlyableHistory.class);
             if (list != null && !list.isEmpty()) {
                 FlyableHistory flyableHistory = list.iterator().next();

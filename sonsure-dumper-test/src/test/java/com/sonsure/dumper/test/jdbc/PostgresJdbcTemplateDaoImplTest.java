@@ -10,6 +10,7 @@
 package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.common.model.Page;
+import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +48,7 @@ public class PostgresJdbcTemplateDaoImplTest {
     public void findPage() {
 
         Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
-                .orderBy("userInfoId").asc()
+                .orderBy("userInfoId", OrderBy.ASC)
                 .paginate(1, 20)
                 .pageResult(UserInfo.class);
 

@@ -1,94 +1,94 @@
-package com.sonsure.dumper.core.command.entity;
-
-import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
-import com.sonsure.dumper.core.command.CommandContextBuilderContext;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.management.CommandField;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * @author liyd
- */
-public class OrderByCommandBuilderImpl extends AbstractCommonCommandDetailsBuilder {
-
-    private final Context orderByContext;
-
-    public OrderByCommandBuilderImpl(Context orderByContext) {
-        super(orderByContext);
-        this.orderByContext = orderByContext;
-        this.orderByContext.setSubBuilderContext(true);
-    }
-
-    public void addOrderByField(String... fields) {
-        for (String field : fields) {
-            this.orderByContext.addOrderByField(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
-        }
-    }
-
-    public void asc() {
-        this.orderByContext.setOrderByType("asc");
-    }
-
-    public void desc() {
-        this.orderByContext.setOrderByType("desc");
-    }
-
-    @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
-
-        List<CommandField> orderByFields = this.orderByContext.getOrderByFields();
-        if (orderByFields == null || orderByFields.isEmpty()) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder(" order by ");
-        for (CommandField orderByField : orderByFields) {
-            final String filedCommandName = this.getFiledCommandName(orderByField, jdbcEngineConfig);
-            String aliasField = this.getTableAliasField(orderByField.getTableAlias(), filedCommandName);
-            sb.append(aliasField).append(" ").append(orderByField.getFieldOperator()).append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-
-        CommandDetails commandDetails = this.createCommandContext();
-        commandDetails.setCommand(sb.toString());
-        return commandDetails;
-    }
-
-    public static class Context extends CommandContextBuilderContext {
-
-        private final List<CommandField> orderByFields;
-
-        public Context() {
-            this.orderByFields = new ArrayList<>();
-        }
-
-        public void addOrderByField(CommandField commandField) {
-            getOrderByFields().add(commandField);
-        }
-
-        public void setOrderByType(String type) {
-            final List<CommandField> orderByFields = this.getOrderByFields();
-            if (orderByFields.isEmpty()) {
-                throw new SonsureJdbcException("请先指定需要排序的属性");
-            }
-            int size = orderByFields.size();
-            for (int i = size - 1; i >= 0; i--) {
-                CommandField commandField = orderByFields.get(i);
-                if (StringUtils.isNotBlank(commandField.getFieldOperator())) {
-                    //已经指定了，跳出
-                    break;
-                }
-                commandField.setFieldOperator(type);
-            }
-        }
-
-        public List<CommandField> getOrderByFields() {
-            return orderByFields;
-        }
-    }
-
-}
+//package com.sonsure.dumper.core.command.entity;
+//
+//import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
+//import com.sonsure.dumper.core.command.CommandContextBuilderContext;
+//import com.sonsure.dumper.core.command.CommandDetails;
+//import com.sonsure.dumper.core.config.JdbcEngineConfig;
+//import com.sonsure.dumper.core.exception.SonsureJdbcException;
+//import com.sonsure.dumper.core.management.CommandField;
+//import org.apache.commons.lang3.StringUtils;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//
+///**
+// * @author liyd
+// */
+//public class OrderByCommandBuilderImpl extends AbstractCommonCommandDetailsBuilder {
+//
+//    private final Context orderByContext;
+//
+//    public OrderByCommandBuilderImpl(Context orderByContext) {
+//        super(orderByContext);
+//        this.orderByContext = orderByContext;
+//        this.orderByContext.setSubBuilderContext(true);
+//    }
+//
+//    public void addOrderByField(String... fields) {
+//        for (String field : fields) {
+//            this.orderByContext.addOrderByField(this.createCommandClassField(field, true, CommandField.Type.MANUAL_FIELD));
+//        }
+//    }
+//
+//    public void asc() {
+//        this.orderByContext.setOrderByType("asc");
+//    }
+//
+//    public void desc() {
+//        this.orderByContext.setOrderByType("desc");
+//    }
+//
+//    @Override
+//    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
+//
+//        List<CommandField> orderByFields = this.orderByContext.getOrderByFields();
+//        if (orderByFields == null || orderByFields.isEmpty()) {
+//            return null;
+//        }
+//        StringBuilder sb = new StringBuilder(" order by ");
+//        for (CommandField orderByField : orderByFields) {
+//            final String filedCommandName = this.getFiledCommandName(orderByField, jdbcEngineConfig);
+//            String aliasField = this.getTableAliasField(orderByField.getTableAlias(), filedCommandName);
+//            sb.append(aliasField).append(" ").append(orderByField.getFieldOperator()).append(",");
+//        }
+//        sb.deleteCharAt(sb.length() - 1);
+//
+//        CommandDetails commandDetails = this.createCommandContext();
+//        commandDetails.setCommand(sb.toString());
+//        return commandDetails;
+//    }
+//
+//    public static class Context extends CommandContextBuilderContext {
+//
+//        private final List<CommandField> orderByFields;
+//
+//        public Context() {
+//            this.orderByFields = new ArrayList<>();
+//        }
+//
+//        public void addOrderByField(CommandField commandField) {
+//            getOrderByFields().add(commandField);
+//        }
+//
+//        public void setOrderByType(String type) {
+//            final List<CommandField> orderByFields = this.getOrderByFields();
+//            if (orderByFields.isEmpty()) {
+//                throw new SonsureJdbcException("请先指定需要排序的属性");
+//            }
+//            int size = orderByFields.size();
+//            for (int i = size - 1; i >= 0; i--) {
+//                CommandField commandField = orderByFields.get(i);
+//                if (StringUtils.isNotBlank(commandField.getFieldOperator())) {
+//                    //已经指定了，跳出
+//                    break;
+//                }
+//                commandField.setFieldOperator(type);
+//            }
+//        }
+//
+//        public List<CommandField> getOrderByFields() {
+//            return orderByFields;
+//        }
+//    }
+//
+//}

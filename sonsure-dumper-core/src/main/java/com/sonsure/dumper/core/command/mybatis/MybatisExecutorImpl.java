@@ -10,7 +10,6 @@
 package com.sonsure.dumper.core.command.mybatis;
 
 
-import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandExecutor;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
@@ -21,7 +20,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisExecutor> implements MybatisExecutor {
 
     public MybatisExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig, new MybatisCommandDetailsBuilderImpl(new AbstractSimpleCommandDetailsBuilder.Context()));
+        super(jdbcEngineConfig, new MybatisCommandDetailsBuilderImpl(jdbcEngineConfig));
         this.getSimpleCommandContextBuilder().namedParameter();
     }
 }

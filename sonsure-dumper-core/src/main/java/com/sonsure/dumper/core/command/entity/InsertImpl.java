@@ -26,32 +26,34 @@ public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements
 
     @Override
     public Insert into(Class<?> cls) {
-        this.getCommandDetailsBuilder().insertInto(cls);
+        this.getEntityCommandDetailsBuilder().insertInto(cls);
         return this;
     }
 
     @Override
     public Insert set(String field, Object value) {
-        this.getCommandDetailsBuilder().intoField(field, value);
+        this.getEntityCommandDetailsBuilder().intoField(field, value);
         return this;
     }
 
     @Override
     public <E, R> Insert set(Function<E, R> function, Object value) {
-        this.getCommandDetailsBuilder().intoField(function, value);
+        this.getEntityCommandDetailsBuilder().intoField(function, value);
         return this;
     }
 
     @Override
     public Insert setForObject(Object obj) {
-        this.getCommandDetailsBuilder().intoFieldForObject(obj);
+        this.getEntityCommandDetailsBuilder().intoFieldForObject(obj);
         return this;
     }
 
     @Override
     public Object execute() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        return getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.INSERT);
+        CommandDetails commandDetails = this.getEntityCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.INSERT);
+        commandDetails.setResultType(Object.class);
+        return getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
 }

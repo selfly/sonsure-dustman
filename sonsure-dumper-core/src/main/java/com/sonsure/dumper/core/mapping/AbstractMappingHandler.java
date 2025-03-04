@@ -12,9 +12,9 @@ package com.sonsure.dumper.core.mapping;
 import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.management.ModelClassCache;
-import com.sonsure.dumper.core.management.ModelClassMeta;
-import com.sonsure.dumper.core.management.ModelFieldMeta;
+import com.sonsure.dumper.core.management.ModelClassDetails;
+import com.sonsure.dumper.core.management.ModelClassDetailsCache;
+import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -135,11 +135,11 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getTable(Class<?> entityClass, Map<String, Object> params) {
 
-        ModelClassMeta classMeta = ModelClassCache.getClassMeta(entityClass);
+        ModelClassDetails classMeta = ModelClassDetailsCache.getClassDetails(entityClass);
         Object annotation = classMeta.getAnnotation();
         String tableName;
         if (annotation != null) {
-            tableName = ModelClassCache.getTableAnnotationName(annotation);
+            tableName = ModelClassDetailsCache.getTableAnnotationName(annotation);
         } else {
             if (tablePrefixMap == null) {
                 //默认Java属性的骆驼命名法转换回数据库下划线“_”分隔的格式
@@ -159,14 +159,14 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getPkField(Class<?> entityClass) {
 
-        ModelClassMeta classMeta = ModelClassCache.getClassMeta(entityClass);
-        ModelFieldMeta pkFieldMeta = classMeta.getPkFieldMeta();
+        ModelClassDetails classDetails = ModelClassDetailsCache.getClassDetails(entityClass);
+        ModelClassFieldDetails pkFieldMeta = classDetails.getPrimaryKeyField();
         if (pkFieldMeta != null) {
-            return pkFieldMeta.getName();
+            return pkFieldMeta.getFieldName();
         }
-        Object annotation = classMeta.getAnnotation();
+        Object annotation = classDetails.getAnnotation();
         if (annotation != null) {
-            String table = ModelClassCache.getTableAnnotationName(annotation);
+            String table = ModelClassDetailsCache.getTableAnnotationName(annotation);
             String camelName = NameUtils.getCamelName(table);
             return camelName + PRI_FIELD_SUFFIX;
         }
@@ -177,7 +177,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
     @Override
     public String getColumn(Class<?> entityClass, String fieldName) {
-        ModelFieldMeta classFieldMeta = ModelClassCache.getClassFieldMeta(entityClass, fieldName);
+        ModelClassFieldDetails classFieldMeta = ModelClassDetailsCache.getClassFieldMeta(entityClass, fieldName);
 
         //count(*) as num  num是没有的
         if (classFieldMeta == null) {
@@ -186,16 +186,16 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
         Object columnAnnotation = classFieldMeta.getColumnAnnotation();
         if (columnAnnotation != null) {
-            return ModelClassCache.getColumnAnnotationName(columnAnnotation);
+            return ModelClassDetailsCache.getColumnAnnotationName(columnAnnotation);
         }
         return NameUtils.getUnderlineName(fieldName);
     }
 
     @Override
     public String getField(Class<?> clazz, String columnName) {
-        ModelFieldMeta mappedFieldMeta = ModelClassCache.getMappedFieldMeta(clazz, columnName);
+        ModelClassFieldDetails mappedFieldMeta = ModelClassDetailsCache.getMappedFieldMeta(clazz, columnName);
         if (mappedFieldMeta != null) {
-            return mappedFieldMeta.getName();
+            return mappedFieldMeta.getFieldName();
         }
         return NameUtils.getCamelName(columnName);
     }

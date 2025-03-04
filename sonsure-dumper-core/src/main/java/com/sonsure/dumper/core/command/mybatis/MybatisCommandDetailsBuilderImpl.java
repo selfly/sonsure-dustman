@@ -28,11 +28,11 @@ import java.util.List;
 /**
  * @author liyd
  */
-public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder {
+public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder<MybatisCommandDetailsBuilderImpl> {
 
 
-    public MybatisCommandDetailsBuilderImpl(Context simpleContext) {
-        super(simpleContext);
+    public MybatisCommandDetailsBuilderImpl(JdbcEngineConfig jdbcEngineConfig) {
+        super(jdbcEngineConfig);
     }
 
     @Override
@@ -44,10 +44,10 @@ public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetai
         if (sqlSessionFactory == null) {
             throw new SonsureJdbcException("使用Mybatis请先设置MybatisSqlSessionFactory");
         }
-        MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(getSimpleContext().getCommand());
+        MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(this.getCommand());
         Configuration configuration = sqlSessionFactory.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
-        BoundSql boundSql = statement.getBoundSql(getSimpleContext().getParameters());
+        BoundSql boundSql = statement.getBoundSql(this.getParameters());
         Object parameterObject = boundSql.getParameterObject();
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         if (parameterMappings != null) {
@@ -71,7 +71,7 @@ public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetai
             }
         }
         commandDetails.setCommand(boundSql.getSql());
-        getSimpleContext().setNamedParameter(false);
+        this.namedParameter = false;
         return commandDetails;
     }
 }

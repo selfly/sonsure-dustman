@@ -27,6 +27,8 @@ import java.util.List;
 @Setter
 public class CommandDetails {
 
+    private CommandType commandType;
+
     /**
      * 命令，一般指sql
      */
@@ -36,6 +38,11 @@ public class CommandDetails {
      * The Is native command.
      */
     private boolean forceNative;
+
+    /**
+     * The Parameters.
+     */
+    private List<Object> parameters;
 
     /**
      * The Is named parameter.
@@ -51,11 +58,6 @@ public class CommandDetails {
      * The Command parameters.
      */
     private final List<CommandParameter> commandParameters;
-
-    /**
-     * The Parameters.
-     */
-    private List<Object> parameters;
 
     /**
      * 返回值类型，如果是native操作又不指定，可能为null

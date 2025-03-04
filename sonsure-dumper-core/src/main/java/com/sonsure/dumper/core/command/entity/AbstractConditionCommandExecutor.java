@@ -9,7 +9,6 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
 import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -24,7 +23,7 @@ import java.util.Map;
  * @date 17 /4/11
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractConditionCommandExecutor<T extends ConditionCommandExecutor<T>> extends AbstractCommonCommandExecutor<T> implements ConditionCommandExecutor<T> {
+public abstract class AbstractConditionCommandExecutor<T extends ConditionCommandExecutor<T>> extends AbstractEntityCommandExecutor<T> implements ConditionCommandExecutor<T> {
 
     public AbstractConditionCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
@@ -32,13 +31,13 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
-        this.getCommandDetailsBuilder().where(field, sqlOperator, value);
+        this.getEntityCommandDetailsBuilder().where(field, sqlOperator, value);
         return (T) this;
     }
 
     @Override
     public <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        this.getCommandDetailsBuilder().where(function, sqlOperator, value);
+        this.getEntityCommandDetailsBuilder().where(function, sqlOperator, value);
         return (T) this;
     }
 
@@ -59,26 +58,19 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 //            iff(true);
 //            return (T) this;
 //        }
-        Map<String, Object> propMap = this.obj2PropMap(obj);
-        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-            //忽略掉null
-            if (entry.getValue() == null) {
-                continue;
-            }
-            this.getCommandDetailsBuilder().where(entry.getKey(), SqlOperator.EQ, entry.getValue());
-        }
+        this.getEntityCommandDetailsBuilder().whereForObject(obj);
         return (T) this;
     }
 
     @Override
     public T and() {
-        this.getCommandDetailsBuilder().and();
+        this.getEntityCommandDetailsBuilder().and();
         return (T) this;
     }
 
     @Override
     public T or() {
-        this.getCommandDetailsBuilder().or();
+        this.getEntityCommandDetailsBuilder().or();
         return (T) this;
     }
 

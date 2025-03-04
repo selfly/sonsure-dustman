@@ -34,7 +34,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     public SelectImpl(JdbcEngineConfig jdbcEngineConfig, Class<M> cls) {
         super(jdbcEngineConfig);
         this.cls = cls;
-        this.getCommandDetailsBuilder().from(cls);
+        this.getEntityCommandDetailsBuilder().from(cls);
     }
 
 //    @Override
@@ -51,43 +51,43 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public Select<M> addColumn(String... fields) {
-        this.getCommandDetailsBuilder().addSelectFields(fields);
+        this.getEntityCommandDetailsBuilder().addSelectFields(fields);
         return this;
     }
 
     @Override
     public final <E, R> Select<M> addColumn(Function<E, R> function) {
-        this.getCommandDetailsBuilder().addSelectFields(function);
+        this.getEntityCommandDetailsBuilder().addSelectFields(function);
         return this;
     }
 
     @Override
     public Select<M> dropColumn(String... fields) {
-        this.getCommandDetailsBuilder().dropSelectFields(fields);
+        this.getEntityCommandDetailsBuilder().dropSelectFields(fields);
         return this;
     }
 
     @Override
     public <E, R> Select<M> dropColumn(Function<E, R> function) {
-        this.getCommandDetailsBuilder().dropSelectFields(function);
+        this.getEntityCommandDetailsBuilder().dropSelectFields(function);
         return this;
     }
 
     @Override
     public Select<M> groupBy(String... fields) {
-        this.getCommandDetailsBuilder().groupBy(fields);
+        this.getEntityCommandDetailsBuilder().groupBy(fields);
         return this;
     }
 
     @Override
     public <E, R> Select<M> groupBy(Function<E, R> function) {
-        this.getCommandDetailsBuilder().groupBy(function);
+        this.getEntityCommandDetailsBuilder().groupBy(function);
         return this;
     }
 
     @Override
     public Select<M> orderBy(String field, OrderBy orderBy) {
-        this.getCommandDetailsBuilder().orderBy(field, orderBy);
+        this.getEntityCommandDetailsBuilder().orderBy(field, orderBy);
         return this;
     }
 
@@ -100,31 +100,32 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public Select<M> paginate(int pageNum, int pageSize) {
-        this.getCommandDetailsBuilder().paginate(pageNum, pageSize);
+        this.getEntityCommandDetailsBuilder().paginate(pageNum, pageSize);
         return this;
     }
 
     @Override
     public Select<M> limit(int offset, int size) {
-        this.getCommandDetailsBuilder().limit(offset, size);
+        this.getEntityCommandDetailsBuilder().limit(offset, size);
         return this;
     }
 
     @Override
     public Select<M> disableCount() {
-        this.getCommandDetailsBuilder().disableCountQuery();
+        this.getEntityCommandDetailsBuilder().disableCountQuery();
         return this;
     }
 
     @Override
     public long count() {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
-        String countCommand = this.jdbcEngineConfig.getPageHandler().getCountCommand(commandDetails.getCommand(), persistExecutor.getDialect());
+        PersistExecutor persistExecutor = this.getJdbcEngineConfig().getPersistExecutor();
+        String countCommand = this.getJdbcEngineConfig().getPageHandler().getCountCommand(commandDetails.getCommand(), persistExecutor.getDialect());
         CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
         countCommandDetails.setCommand(countCommand);
+        countCommandDetails.setCommandType(CommandType.QUERY_ONE_COL);
         countCommandDetails.setResultType(Long.class);
-        Object result = persistExecutor.execute(countCommandDetails, CommandType.QUERY_ONE_COL);
+        Object result = persistExecutor.execute(countCommandDetails);
         return (Long) result;
     }
 
@@ -132,8 +133,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public <T> T singleResult(Class<T> cls) {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_SINGLE_RESULT);
         commandDetails.setResultType(cls);
-        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_SINGLE_RESULT);
+        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
 
@@ -141,31 +143,36 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Map<String, Object> singleMapResult() {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP);
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP);
+        commandDetails.setResultType(Map.class);
+        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E> E oneColResult(Class<E> clazz) {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL);
         commandDetails.setResultType(clazz);
-        return (E) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL);
+        return (E) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <E> List<E> oneColList(Class<E> clazz) {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL_LIST);
         commandDetails.setResultType(clazz);
-        return (List<E>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_ONE_COL_LIST);
+        return (List<E>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_FOR_LIST);
         commandDetails.setResultType(cls);
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_LIST);
+        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
 
@@ -173,30 +180,36 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public List<Map<String, Object>> listMaps() {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails, CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setResultType(List.class);
+        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> pageResult(Class<T> cls) {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_FOR_LIST);
         commandDetails.setResultType(cls);
-        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_LIST));
+        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Page<Map<String, Object>> pageMapResult() {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        return this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_FOR_MAP_LIST));
+        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        commandDetails.setResultType(Page.class);
+        return this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> oneColPageResult(Class<T> clazz) {
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        commandDetails.setCommandType(CommandType.QUERY_ONE_COL_LIST);
         commandDetails.setResultType(clazz);
-        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1, CommandType.QUERY_ONE_COL_LIST));
+        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
 
     @Override

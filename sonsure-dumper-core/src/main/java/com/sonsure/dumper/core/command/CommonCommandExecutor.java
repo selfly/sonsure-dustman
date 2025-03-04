@@ -14,20 +14,20 @@ package com.sonsure.dumper.core.command;
  *
  * @author liyd
  */
-public interface CommonCommandExecutor<T extends CommonCommandExecutor<T>> extends CommandExecutor {
+public interface CommonCommandExecutor<E extends CommonCommandExecutor<E>> extends CommandExecutor {
 
     /**
      * 是否禁止转换，command不做任何加工
      *
      * @return t t
      */
-    T nativeCommand();
+    E forceNative();
 
-    /**
-     * 是否使用named parameter 方式
-     *
-     * @return t t
-     */
-    T namedParameter();
+//    /**
+//     * 是否使用named parameter 方式
+//     *
+//     * @return t t
+//     */
+//    T namedParameter();
 
 }

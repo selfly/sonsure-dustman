@@ -7,28 +7,22 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.command;
+package com.sonsure.dumper.core.management;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author selfly
  */
-
+@Setter
 @Getter
-public enum SqlKeyword {
+public class ModelClassFieldDetails {
 
-    /**
-     * Eq comparison.
-     */
-    IS("is"),
+    private String fieldName;
 
-  ;
+    private Object idAnnotation;
 
-    private final String code;
-
-    SqlKeyword(String code) {
-        this.code = code;
-    }
+    private Object columnAnnotation;
 
 }

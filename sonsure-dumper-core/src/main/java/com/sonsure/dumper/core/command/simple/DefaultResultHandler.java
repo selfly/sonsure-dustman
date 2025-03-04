@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author selfly
+ */
 public class DefaultResultHandler<E> implements ResultHandler<E> {
 
     protected static final List<Class<?>> SINGLE_VALUE_CLASSES = new ArrayList<>();

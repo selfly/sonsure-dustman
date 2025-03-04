@@ -11,7 +11,6 @@ package com.sonsure.dumper.core.persist;
 
 
 import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.batch.BatchCommandDetails;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.convert.JdbcTypeConverterComposite;
@@ -48,25 +47,25 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
 
 
     @Override
-    public Object execute(CommandDetails commandDetails, CommandType commandType) {
+    public Object execute(CommandDetails commandDetails) {
         if (getJdbcEngineConfig().getJdbcTypeConverters() != null) {
             JdbcTypeConverterComposite jdbcTypeConverterComposite = new JdbcTypeConverterComposite(getJdbcEngineConfig().getJdbcTypeConverters());
             if (jdbcTypeConverterComposite.support(this.getDialect())) {
-                jdbcTypeConverterComposite.convert(this.getDialect(), commandDetails, commandType);
+                jdbcTypeConverterComposite.convert(this.getDialect(), commandDetails);
             }
         }
         final List<PersistInterceptor> persistInterceptors = getJdbcEngineConfig().getPersistInterceptors();
         boolean process = true;
         if (persistInterceptors != null) {
             for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                if (!persistInterceptor.executeBefore(this.getDialect(), commandDetails, commandType)) {
+                if (!persistInterceptor.executeBefore(this.getDialect(), commandDetails)) {
                     process = false;
                 }
             }
         }
         Object result = null;
         if (process) {
-            switch (commandType) {
+            switch (commandDetails.getCommandType()) {
                 case INSERT:
                     result = this.insert(commandDetails);
                     break;
@@ -104,12 +103,12 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                     result = this.doExecuteScript(commandDetails);
                     break;
                 default:
-                    throw new SonsureJdbcException("不支持的CommandType:" + commandType);
+                    throw new SonsureJdbcException("不支持的CommandType:" + commandDetails.getCommandType());
             }
         }
         if (persistInterceptors != null) {
             for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                result = persistInterceptor.executeAfter(this.getDialect(), commandDetails, commandType, result);
+                result = persistInterceptor.executeAfter(this.getDialect(), commandDetails, result);
             }
         }
         return result;
@@ -220,5 +219,5 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @return the string
      */
     protected abstract String doGetDialect();
-    
+
 }

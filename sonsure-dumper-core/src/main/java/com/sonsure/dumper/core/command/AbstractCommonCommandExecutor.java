@@ -33,31 +33,23 @@ import java.util.List;
 @Setter
 public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecutor<E>> implements CommonCommandExecutor<E> {
 
-    /**
-     * The Jdbc engine config.
-     */
-    protected final JdbcEngineConfig jdbcEngineConfig;
-
-    protected CommandDetailsBuilder commandDetailsBuilder;
+    private JdbcEngineConfig jdbcEngineConfig;
 
     public AbstractCommonCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
-        this.commandDetailsBuilder = new CommandDetailsBuilderImpl(jdbcEngineConfig);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public E nativeCommand() {
+    public E forceNative() {
         this.getCommandDetailsBuilder().forceNative();
-        return (E) this;
+        return this.getSelf();
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public E namedParameter() {
-        this.getCommandDetailsBuilder().namedParameter();
-        return (E) this;
-    }
+//    @Override
+//    public E namedParameter() {
+//        this.getCommandDetailsBuilder().namedParameter();
+//        return (E) this;
+//    }
 
     protected <T> Page<T> doPageResult(CommandDetails commandDetails, PageQueryHandler<T> pageQueryHandler) {
         Pagination pagination = commandDetails.getPagination();
@@ -66,12 +58,13 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
         }
         String dialect = getJdbcEngineConfig().getPersistExecutor().getDialect();
         long count = Long.MAX_VALUE;
-        if (!commandDetails.isDisableCount()) {
+        if (!commandDetails.isDisableCountQuery()) {
             String countCommand = getJdbcEngineConfig().getPageHandler().getCountCommand(commandDetails.getCommand(), dialect);
             CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
             countCommandDetails.setCommand(countCommand);
+            countCommandDetails.setCommandType(CommandType.QUERY_ONE_COL);
             countCommandDetails.setResultType(Long.class);
-            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countCommandDetails, CommandType.QUERY_ONE_COL);
+            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countCommandDetails);
             count = (Long) result;
         }
         pagination.setTotalItems((int) count);
@@ -115,6 +108,19 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
         newPage.setList(resultList);
         return newPage;
     }
+
+    protected E getSelf() {
+        //noinspection unchecked
+        return (E) this;
+    }
+
+    /**
+     * Gets command details builder.
+     *
+     * @param <T> the type parameter
+     * @return the command details builder
+     */
+    protected abstract <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder();
 
     protected interface PageQueryHandler<T> {
 

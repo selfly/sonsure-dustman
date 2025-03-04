@@ -17,7 +17,7 @@
 //import com.sonsure.dumper.core.exception.SonsureJdbcException;
 //import com.sonsure.dumper.core.management.CommandClass;
 //import com.sonsure.dumper.core.management.CommandField;
-//import com.sonsure.dumper.core.management.ModelFieldMeta;
+//import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 //import lombok.Getter;
 //import org.apache.commons.lang3.StringUtils;
 //
@@ -110,8 +110,8 @@
 //        //如果为空没有指定，获取class的属性
 //        if (this.selectContext.getSelectFields().isEmpty()) {
 //            for (CommandClass fromClass : this.selectContext.getFromClasses()) {
-//                Collection<ModelFieldMeta> classFields = this.getClassFields(fromClass.getCls());
-//                for (ModelFieldMeta fieldMeta : classFields) {
+//                Collection<ModelClassFieldDetails> classFields = this.getClassFields(fromClass.getCls());
+//                for (ModelClassFieldDetails fieldMeta : classFields) {
 //                    CommandField commandField = this.createCommandClassField(fieldMeta.getName(), true, CommandField.Type.MANUAL_FIELD);
 //                    //黑名单
 //                    if (this.selectContext.isExcludeField(commandField)) {

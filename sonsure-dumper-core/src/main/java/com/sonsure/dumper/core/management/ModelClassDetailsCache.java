@@ -27,20 +27,20 @@ import java.util.WeakHashMap;
 /**
  * @author selfly
  */
-public class ModelClassCache {
+public class ModelClassDetailsCache {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModelClassCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ModelClassDetailsCache.class);
 
-    private static final Map<Class<?>, ModelClassMeta> CACHE = new WeakHashMap<>();
+    private static final Map<Class<?>, ModelClassDetails> CACHE = new WeakHashMap<>();
 
     private static boolean enableJavaxPersistence = false;
 
-    private ModelClassCache() {
+    private ModelClassDetailsCache() {
     }
 
     static {
         try {
-            Class<?> clazz = ModelClassCache.class.getClassLoader().loadClass("javax.persistence.Entity");
+            Class<?> clazz = ModelClassDetailsCache.class.getClassLoader().loadClass("javax.persistence.Entity");
             enableJavaxPersistence = clazz != null;
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Enable javax.persistence annotation");
@@ -54,12 +54,12 @@ public class ModelClassCache {
         }
     }
 
-    public static ModelClassMeta getClassMeta(Class<?> clazz) {
-        ModelClassMeta modelClassMeta = CACHE.get(clazz);
-        if (modelClassMeta == null) {
-            modelClassMeta = initCache(clazz);
+    public static ModelClassDetails getClassDetails(Class<?> clazz) {
+        ModelClassDetails modelClassDetails = CACHE.get(clazz);
+        if (modelClassDetails == null) {
+            modelClassDetails = initCache(clazz);
         }
-        return modelClassMeta;
+        return modelClassDetails;
     }
 
     public static String getTableAnnotationName(Object annotation) {
@@ -87,22 +87,22 @@ public class ModelClassCache {
      *
      * @return class fields
      */
-    public static Collection<ModelFieldMeta> getClassFieldMetas(Class<?> clazz) {
+    public static Collection<ModelClassFieldDetails> getClassFieldMetas(Class<?> clazz) {
         assertClassNotNull(clazz);
-        ModelClassMeta modelClassMeta = getClassMeta(clazz);
-        return modelClassMeta.getModelFieldMetas();
+        ModelClassDetails modelClassDetails = getClassDetails(clazz);
+        return modelClassDetails.getModelFields();
     }
 
-    public static ModelFieldMeta getClassFieldMeta(Class<?> clazz, String fieldName) {
+    public static ModelClassFieldDetails getClassFieldMeta(Class<?> clazz, String fieldName) {
         assertClassNotNull(clazz);
-        ModelClassMeta classMeta = getClassMeta(clazz);
-        return classMeta.getModelFieldMeta(fieldName);
+        ModelClassDetails classMeta = getClassDetails(clazz);
+        return classMeta.getModelFieldDetails(fieldName);
     }
 
-    public static ModelFieldMeta getMappedFieldMeta(Class<?> clazz, String columnName) {
+    public static ModelClassFieldDetails getMappedFieldMeta(Class<?> clazz, String columnName) {
         assertClassNotNull(clazz);
-        ModelClassMeta classMeta = getClassMeta(clazz);
-        return classMeta.getMappedFieldMeta(columnName);
+        ModelClassDetails classMeta = getClassDetails(clazz);
+        return classMeta.getMappedFieldDetails(columnName);
     }
 
     private static void assertClassNotNull(Class<?> clazz) {
@@ -117,12 +117,12 @@ public class ModelClassCache {
      * @param clazz the clazz
      * @return the model class meta
      */
-    private static ModelClassMeta initCache(Class<?> clazz) {
+    private static ModelClassDetails initCache(Class<?> clazz) {
 
-        ModelClassMeta modelClassMeta = new ModelClassMeta();
+        ModelClassDetails modelClassDetails = new ModelClassDetails();
 
         Object table = getEntityAnnotation(clazz);
-        modelClassMeta.setAnnotation(table);
+        modelClassDetails.setAnnotation(table);
 
         Field[] beanFields = ClassUtils.getSelfOrBaseFields(clazz);
         for (Field field : beanFields) {
@@ -131,16 +131,16 @@ public class ModelClassCache {
                 continue;
             }
 
-            ModelFieldMeta modelFieldMeta = new ModelFieldMeta();
-            modelFieldMeta.setName(field.getName());
-            modelFieldMeta.setIdAnnotation(getFieldIdAnnotation(field));
-            modelFieldMeta.setColumnAnnotation(getFieldColumnAnnotation(field));
+            ModelClassFieldDetails modelClassFieldDetails = new ModelClassFieldDetails();
+            modelClassFieldDetails.setFieldName(field.getName());
+            modelClassFieldDetails.setIdAnnotation(getFieldIdAnnotation(field));
+            modelClassFieldDetails.setColumnAnnotation(getFieldColumnAnnotation(field));
 
-            modelClassMeta.addModelFieldMeta(modelFieldMeta);
+            modelClassDetails.addModelFieldDetails(modelClassFieldDetails);
         }
-        CACHE.put(clazz, modelClassMeta);
+        CACHE.put(clazz, modelClassDetails);
 
-        return modelClassMeta;
+        return modelClassDetails;
     }
 
     private static Object getEntityAnnotation(Class<?> clazz) {

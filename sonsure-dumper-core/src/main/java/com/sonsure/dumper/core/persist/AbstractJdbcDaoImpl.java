@@ -137,12 +137,12 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
         return this.getDefaultJdbcEngine().selectFrom(cls);
     }
 
-    @Override
-    public <M> Select<M> selectFrom(Class<M> cls, String tableAlias) {
-        Select<M> select = this.selectFrom(cls);
-        select.tableAlias(tableAlias);
-        return select;
-    }
+//    @Override
+//    public <M> Select<M> selectFrom(Class<M> cls, String tableAlias) {
+//        Select<M> select = this.selectFrom(cls);
+//        select.tableAlias(tableAlias);
+//        return select;
+//    }
 
     @Override
     public Insert insert() {
@@ -176,7 +176,7 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     @Override
     public void executeScript(String script) {
-        this.nativeExecutor().command(script).nativeCommand().executeScript();
+        this.nativeExecutor().command(script).forceNative().executeScript();
     }
 
     @Override

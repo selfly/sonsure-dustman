@@ -178,15 +178,15 @@ public interface JdbcDao {
      */
     <M> Select<M> selectFrom(Class<M> cls);
 
-    /**
-     * Select from select.
-     *
-     * @param <M>        the type parameter
-     * @param cls        the cls
-     * @param tableAlias the table alias
-     * @return the select
-     */
-    <M> Select<M> selectFrom(Class<M> cls, String tableAlias);
+//    /**
+//     * Select from select.
+//     *
+//     * @param <M>        the type parameter
+//     * @param cls        the cls
+//     * @param tableAlias the table alias
+//     * @return the select
+//     */
+//    <M> Select<M> selectFrom(Class<M> cls, String tableAlias);
 
     /**
      * 创建insert对象
