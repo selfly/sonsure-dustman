@@ -35,7 +35,7 @@ public class NativeExecutorImpl extends AbstractSimpleCommandExecutor<NativeExec
         }
         int count = 1;
         for (Object value : values) {
-            this.getSimpleCommandContextBuilder().parameter(DEFAULT_NATIVE_PARAM_PREFIX + (count++), value);
+            this.getSimpleCommandDetailsBuilder().parameter(DEFAULT_NATIVE_PARAM_PREFIX + (count++), value);
         }
         return this;
     }

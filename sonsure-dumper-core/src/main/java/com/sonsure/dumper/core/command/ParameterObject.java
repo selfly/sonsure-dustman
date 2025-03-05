@@ -9,10 +9,13 @@
 
 package com.sonsure.dumper.core.command;
 
+import lombok.Getter;
+
 /**
  * @author liyd
  */
-public class CommandParameter {
+@Getter
+public class ParameterObject {
 
     /**
      * The Name.
@@ -24,17 +27,9 @@ public class CommandParameter {
      */
     Object value;
 
-    public CommandParameter(String name, Object value) {
+    public ParameterObject(String name, Object value) {
         this.name = name;
         this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Object getValue() {
-        return value;
     }
 
 }

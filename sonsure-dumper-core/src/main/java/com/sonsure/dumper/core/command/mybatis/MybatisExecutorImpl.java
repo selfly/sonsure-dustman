@@ -21,6 +21,6 @@ public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisEx
 
     public MybatisExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig, new MybatisCommandDetailsBuilderImpl(jdbcEngineConfig));
-        this.getSimpleCommandContextBuilder().namedParameter();
+        this.getSimpleCommandDetailsBuilder().namedParameter();
     }
 }

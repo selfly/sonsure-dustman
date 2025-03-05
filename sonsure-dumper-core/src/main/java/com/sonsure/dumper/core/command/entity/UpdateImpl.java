@@ -64,8 +64,7 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
 
     @Override
     public int execute() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.UPDATE);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.UPDATE);
         commandDetails.setResultType(Integer.class);
         return (Integer) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }

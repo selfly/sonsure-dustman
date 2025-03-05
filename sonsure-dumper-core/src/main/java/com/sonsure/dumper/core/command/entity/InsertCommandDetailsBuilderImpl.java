@@ -86,7 +86,7 @@
 //            final String filedCommandName = this.getFiledCommandName(commandField, jdbcEngineConfig);
 //            command.append(filedCommandName).append(",");
 //            argsCommand.append(placeholder).append(",");
-//            commandDetails.addCommandParameter(new CommandParameter(commandField.getFieldName(), commandField.getValue()));
+//            commandDetails.addCommandParameter(new ParameterObject(commandField.getFieldName(), commandField.getValue()));
 //        }
 //        if (!hasPkParam) {
 //            KeyGenerator keyGenerator = jdbcEngineConfig.getKeyGenerator();

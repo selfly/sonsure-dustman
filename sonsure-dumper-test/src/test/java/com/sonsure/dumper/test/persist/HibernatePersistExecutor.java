@@ -53,7 +53,7 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
     public List<?> queryForList(CommandDetails commandDetails) {
         Session session = sessionFactory.openSession();
         NativeQuery<?> nativeQuery = session.createNativeQuery(commandDetails.getCommand(), commandDetails.getResultType());
-        List<Object> parameters = commandDetails.getParameters();
+        List<Object> parameters = commandDetails.getCommandParameters().getParsedParameterValues();
         for (int i = 0; i < parameters.size(); i++) {
             nativeQuery.setParameter(i + 1, parameters.get(i));
         }

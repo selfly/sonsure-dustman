@@ -14,6 +14,7 @@ import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import lombok.Getter;
 
 import java.util.Map;
@@ -29,11 +30,15 @@ import java.util.Map;
 @Getter
 public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBuilder<T>> extends AbstractCommandDetailsBuilder<T> implements DynamicCommandDetailsBuilder<T> {
 
+    protected final CommandSql commandSql;
+    protected final CommandParameters commandParameters;
     protected boolean updateNull = false;
     protected boolean clearedSelectColumns = false;
 
     public AbstractDynamicCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
+        this.commandSql = new CommandSql();
+        this.commandParameters = new CommandParameters();
     }
 
     @Override
@@ -91,7 +96,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     @Override
     public T intoField(String field, Object value) {
         this.getCommandSql().INTO_COLUMNS(field).INTO_VALUES(PARAM_PLACEHOLDER);
-        this.getParameters().add(value);
+        this.getCommandParameters().addParameter(field, value);
         return this.getSelf();
     }
 
@@ -118,6 +123,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     @Override
     public T setField(String field, Object value) {
         this.getCommandSql().SET(String.format("%s %s %s", field, SqlOperator.EQ, PARAM_PLACEHOLDER));
+        this.getCommandParameters().addParameter(field, value);
         return this.getSelf();
     }
 
@@ -138,15 +144,15 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     }
 
     @Override
-    public T where(String field, Object value) {
-        return this.where(field, SqlOperator.EQ, value);
+    public T where(String field, SqlOperator sqlOperator, Object value) {
+        this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), PARAM_PLACEHOLDER));
+        this.getCommandParameters().addParameter(field, value);
+        return this.getSelf();
     }
 
     @Override
-    public T where(String field, SqlOperator sqlOperator, Object value) {
-        this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), PARAM_PLACEHOLDER));
-        this.getParameters().add(value);
-        return this.getSelf();
+    public T where(String field, Object value) {
+        return this.where(field, SqlOperator.EQ, value);
     }
 
     @Override
@@ -206,23 +212,23 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         return this.getSelf();
     }
 
-    @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
-        CommandDetails commandDetails = new CommandDetails();
-        String command = this.getCommandSql().toString();
-        commandDetails.setCommand(command);
-        commandDetails.setForceNative(this.isForceNative());
-        commandDetails.setNamedParameter(false);
-        commandDetails.setParameters(this.getParameters());
-        commandDetails.setPagination(this.getPagination());
-        commandDetails.setDisableCountQuery(this.isDisableCountQuery());
-
-        //commandDetails.setNamedParamNames(false);
-//        commandDetails.commandParameters();
-//        private Class<?> resultType;
-//        private GenerateKey generateKey;
-        return commandDetails;
-    }
+//    @Override
+//    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+////        CommandDetails commandDetails = new CommandDetails();
+////        String command = this.getCommandSql().toString();
+////        commandDetails.setCommand(command);
+////        commandDetails.setCommandParameters(this.getCommandParameters());
+////        commandDetails.setForceNative(this.isForceNative());
+////        commandDetails.setNamedParameter(false);
+////        commandDetails.setPagination(this.getPagination());
+////        commandDetails.setDisableCountQuery(this.isDisableCountQuery());
+//
+//        //commandDetails.setNamedParamNames(false);
+////        commandDetails.commandParameters();
+////        private Class<?> resultType;
+////        private GenerateKey generateKey;
+//        return commandDetails;
+//    }
 
     protected Map<String, Object> obj2PropMap(Object obj) {
         Map<String, Object> propMap;

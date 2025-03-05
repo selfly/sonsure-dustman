@@ -9,10 +9,15 @@
 
 package com.sonsure.dumper.core.management;
 
+import com.sonsure.dumper.common.utils.ClassUtils;
+import com.sonsure.dumper.common.utils.NameUtils;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,6 +28,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class ModelClassDetails {
+
+    private Class<?> modelClass;
 
     /**
      * 注解
@@ -45,20 +52,46 @@ public class ModelClassDetails {
      */
     private final Map<String, ModelClassFieldDetails> mappedFieldMap;
 
-    public ModelClassDetails() {
+    public ModelClassDetails(Class<?> cls) {
+        this.modelClass = cls;
         modelFieldMap = new LinkedHashMap<>(16);
         mappedFieldMap = new LinkedHashMap<>(16);
+
+        Object entityAnnotation = ModelClassDetailsHelper.getEntityAnnotation(this.modelClass);
+        this.setAnnotation(entityAnnotation);
+
+        Field[] beanFields = ClassUtils.getSelfOrBaseFields(this.modelClass);
+        for (Field field : beanFields) {
+            if (Modifier.isStatic(field.getModifiers()) || ModelClassDetailsHelper.getFieldTransientAnnotation(field) != null) {
+                continue;
+            }
+            ModelClassFieldDetails modelClassFieldDetails = new ModelClassFieldDetails();
+            modelClassFieldDetails.setFieldName(field.getName());
+            Object fieldIdAnnotation = ModelClassDetailsHelper.getFieldIdAnnotation(field);
+            if (fieldIdAnnotation != null) {
+                modelClassFieldDetails.setIdAnnotation(fieldIdAnnotation);
+                this.setPrimaryKeyField(modelClassFieldDetails);
+            }
+            modelClassFieldDetails.setColumnAnnotation(ModelClassDetailsHelper.getFieldColumnAnnotation(field));
+
+            this.addModelFieldDetails(modelClassFieldDetails);
+        }
+        if (this.getPrimaryKeyField() == null) {
+            String firstLowerName = NameUtils.getFirstLowerName(this.getModelClass().getSimpleName());
+            String pkFieldName = firstLowerName + ModelClassDetailsHelper.PRI_FIELD_SUFFIX;
+            this.primaryKeyField = this.getModelFieldMap().get(pkFieldName);
+        }
+        if (this.getPrimaryKeyField() == null) {
+            throw new SonsureJdbcException("Class不符合规范，未找到主键Field:" + this.modelClass);
+        }
     }
 
     public void addModelFieldDetails(ModelClassFieldDetails modelClassFieldDetails) {
         this.modelFieldMap.put(modelClassFieldDetails.getFieldName(), modelClassFieldDetails);
-        if (modelClassFieldDetails.getIdAnnotation() != null) {
-            this.primaryKeyField = modelClassFieldDetails;
-        }
         //数据库返回可能大小写不一定，统一处理成小写
         this.mappedFieldMap.put(modelClassFieldDetails.getFieldName().toLowerCase(), modelClassFieldDetails);
         if (modelClassFieldDetails.getColumnAnnotation() != null) {
-            String columnAnnotationName = ModelClassDetailsCache.getColumnAnnotationName(modelClassFieldDetails.getColumnAnnotation());
+            String columnAnnotationName = ModelClassDetailsHelper.getColumnAnnotationName(modelClassFieldDetails.getColumnAnnotation());
             mappedFieldMap.put(columnAnnotationName.toLowerCase(), modelClassFieldDetails);
         }
     }

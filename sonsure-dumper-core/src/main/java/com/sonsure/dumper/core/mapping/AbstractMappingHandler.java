@@ -13,7 +13,7 @@ import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.ModelClassDetails;
-import com.sonsure.dumper.core.management.ModelClassDetailsCache;
+import com.sonsure.dumper.core.management.ModelClassDetailsHelper;
 import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     /**
      * 主键属性后缀
      */
-    protected static final String PRI_FIELD_SUFFIX = "Id";
+    protected static final String PRI_FIELD_SUFFIX = ModelClassDetailsHelper.PRI_FIELD_SUFFIX;
 
     /**
      * class不存在时是否失败 (抛出异常)
@@ -135,11 +135,11 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getTable(Class<?> entityClass, Map<String, Object> params) {
 
-        ModelClassDetails classMeta = ModelClassDetailsCache.getClassDetails(entityClass);
+        ModelClassDetails classMeta = ModelClassDetailsHelper.getClassDetails(entityClass);
         Object annotation = classMeta.getAnnotation();
         String tableName;
         if (annotation != null) {
-            tableName = ModelClassDetailsCache.getTableAnnotationName(annotation);
+            tableName = ModelClassDetailsHelper.getTableAnnotationName(annotation);
         } else {
             if (tablePrefixMap == null) {
                 //默认Java属性的骆驼命名法转换回数据库下划线“_”分隔的格式
@@ -159,25 +159,13 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getPkField(Class<?> entityClass) {
 
-        ModelClassDetails classDetails = ModelClassDetailsCache.getClassDetails(entityClass);
-        ModelClassFieldDetails pkFieldMeta = classDetails.getPrimaryKeyField();
-        if (pkFieldMeta != null) {
-            return pkFieldMeta.getFieldName();
-        }
-        Object annotation = classDetails.getAnnotation();
-        if (annotation != null) {
-            String table = ModelClassDetailsCache.getTableAnnotationName(annotation);
-            String camelName = NameUtils.getCamelName(table);
-            return camelName + PRI_FIELD_SUFFIX;
-        }
-        String firstLowerName = NameUtils.getFirstLowerName(entityClass.getSimpleName());
-        //主键以类名加上“Id” 如user表主键属性即userId
-        return firstLowerName + PRI_FIELD_SUFFIX;
+        ModelClassDetails classDetails = ModelClassDetailsHelper.getClassDetails(entityClass);
+        return classDetails.getPrimaryKeyField().getFieldName();
     }
 
     @Override
     public String getColumn(Class<?> entityClass, String fieldName) {
-        ModelClassFieldDetails classFieldMeta = ModelClassDetailsCache.getClassFieldMeta(entityClass, fieldName);
+        ModelClassFieldDetails classFieldMeta = ModelClassDetailsHelper.getClassFieldMeta(entityClass, fieldName);
 
         //count(*) as num  num是没有的
         if (classFieldMeta == null) {
@@ -186,14 +174,14 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
         Object columnAnnotation = classFieldMeta.getColumnAnnotation();
         if (columnAnnotation != null) {
-            return ModelClassDetailsCache.getColumnAnnotationName(columnAnnotation);
+            return ModelClassDetailsHelper.getColumnAnnotationName(columnAnnotation);
         }
         return NameUtils.getUnderlineName(fieldName);
     }
 
     @Override
     public String getField(Class<?> clazz, String columnName) {
-        ModelClassFieldDetails mappedFieldMeta = ModelClassDetailsCache.getMappedFieldMeta(clazz, columnName);
+        ModelClassFieldDetails mappedFieldMeta = ModelClassDetailsHelper.getMappedFieldMeta(clazz, columnName);
         if (mappedFieldMeta != null) {
             return mappedFieldMeta.getFieldName();
         }

@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.natives;
 
 import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
@@ -23,17 +24,9 @@ public class NativeCommandDetailsBuilderImpl extends AbstractSimpleCommandDetail
     }
 
     @Override
-    public CommandDetails build(JdbcEngineConfig jdbcEngineConfig) {
-        return super.build(jdbcEngineConfig);
-    }
-
-    @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
         CommandDetails commandDetails = new CommandDetails();
         commandDetails.setCommand(this.getCommand());
-//        if (getSimpleContext().getCommandParameters() != null) {
-//            commandDetails.addCommandParameters(getSimpleContext().getCommandParameters());
-//        }
         return commandDetails;
     }
 }

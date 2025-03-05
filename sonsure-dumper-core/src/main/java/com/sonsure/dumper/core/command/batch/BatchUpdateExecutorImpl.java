@@ -43,8 +43,7 @@ public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<Batch
         batchUpdateCommandDetailsBuilder.batchSize(batchSize);
         batchUpdateCommandDetailsBuilder.batchData(batchData);
         batchUpdateCommandDetailsBuilder.parameterizedSetter(parameterizedSetter);
-        CommandDetails commandDetails = this.batchUpdateCommandDetailsBuilder.build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.BATCH_UPDATE);
+        CommandDetails commandDetails = this.batchUpdateCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.BATCH_UPDATE);
         commandDetails.setResultType(Object.class);
         return getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }

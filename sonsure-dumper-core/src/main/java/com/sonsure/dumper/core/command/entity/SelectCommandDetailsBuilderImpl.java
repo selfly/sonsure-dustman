@@ -142,7 +142,7 @@
 //        CommandDetails whereCommandDetails = this.conditionCommandBuilder.build(jdbcEngineConfig);
 //        if (whereCommandDetails != null) {
 //            command.append(whereCommandDetails.getCommand());
-//            commandDetails.addCommandParameters(whereCommandDetails.getCommandParameters());
+//            commandDetails.addCommandParameters(whereCommandDetails.getParameterObjects());
 //        }
 //
 //        CommandDetails groupCommandDetails = this.groupCommandBuilder.build(jdbcEngineConfig);

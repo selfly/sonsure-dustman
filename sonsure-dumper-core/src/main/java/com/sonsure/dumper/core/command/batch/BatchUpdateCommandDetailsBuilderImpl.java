@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.batch;
 
 import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
@@ -53,13 +54,14 @@ public class BatchUpdateCommandDetailsBuilderImpl extends AbstractSimpleCommandD
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
-        BatchCommandDetails batchCommandContext = new BatchCommandDetails();
-        batchCommandContext.setCommand(this.getCommand());
-        batchCommandContext.setBatchData(this.getBatchData());
-        batchCommandContext.setBatchSize(this.getBatchSize());
-        batchCommandContext.setParameterizedSetter(this.getParameterizedSetter());
-        return batchCommandContext;
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+        BatchCommandDetails batchCommandDetails = new BatchCommandDetails();
+        batchCommandDetails.setCommand(this.getCommand());
+        batchCommandDetails.setCommandParameters(this.getCommandParameters());
+        batchCommandDetails.setBatchData(this.getBatchData());
+        batchCommandDetails.setBatchSize(this.getBatchSize());
+        batchCommandDetails.setParameterizedSetter(this.getParameterizedSetter());
+        return batchCommandDetails;
     }
 
 }

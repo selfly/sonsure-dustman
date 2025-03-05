@@ -71,7 +71,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
                 return keys;
             }
         } else {
-            jdbcOperations.update(commandDetails.getCommand(), commandDetails.getParameters().toArray());
+            jdbcOperations.update(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
             //显示指定了主键，可能为null
             return generateKey.getValue();
         }
@@ -79,52 +79,52 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     @Override
     public List<?> queryForList(CommandDetails commandDetails) {
-        return jdbcOperations.query(commandDetails.getCommand(), commandDetails.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
+        return jdbcOperations.query(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
     }
 
     @Override
     public Object querySingleResult(CommandDetails commandDetails) {
         //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<?> list = jdbcOperations.query(commandDetails.getCommand(), commandDetails.getParameters().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
+        List<?> list = jdbcOperations.query(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
         return DataAccessUtils.singleResult(list);
     }
 
     @Override
     public Map<String, Object> queryForMap(CommandDetails commandDetails) {
         //直接queryForMap没有记录时会抛出异常，采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<Map<String, Object>> maps = jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getParameters().toArray());
+        List<Map<String, Object>> maps = jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
         return DataAccessUtils.singleResult(maps);
     }
 
     @Override
     public List<Map<String, Object>> queryForMapList(CommandDetails commandDetails) {
-        return jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getParameters().toArray());
+        return jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
     }
 
     @Override
     public Object queryOneCol(CommandDetails commandDetails) {
-        return jdbcOperations.queryForObject(commandDetails.getCommand(), commandDetails.getParameters().toArray(), commandDetails.getResultType());
+        return jdbcOperations.queryForObject(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray(), commandDetails.getResultType());
     }
 
     @Override
     public List<?> queryOneColList(CommandDetails commandDetails) {
-        return jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getResultType(), commandDetails.getParameters().toArray());
+        return jdbcOperations.queryForList(commandDetails.getCommand(), commandDetails.getResultType(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
     }
 
     @Override
     public int update(CommandDetails commandDetails) {
-        return jdbcOperations.update(commandDetails.getCommand(), commandDetails.getParameters().toArray());
+        return jdbcOperations.update(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
     }
 
     @Override
     protected <T> Object batchUpdate(BatchCommandDetails<T> commandContext) {
         final ParameterizedSetter<T> parameterizedSetter = commandContext.getParameterizedSetter();
-        return jdbcOperations.batchUpdate(commandContext.getCommand(), commandContext.getBatchData(), commandContext.getBatchSize(), (ps, argument) -> parameterizedSetter.setValues(ps, commandContext.getNamedParamNames(), argument));
+        return jdbcOperations.batchUpdate(commandContext.getCommand(), commandContext.getBatchData(), commandContext.getBatchSize(), (ps, argument) -> parameterizedSetter.setValues(ps, commandContext.getCommandParameters().getParsedParameterNames(), argument));
     }
 
     @Override
     public int delete(CommandDetails commandDetails) {
-        return jdbcOperations.update(commandDetails.getCommand(), commandDetails.getParameters().toArray());
+        return jdbcOperations.update(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
     }
 
     @Override
@@ -162,8 +162,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
         @Override
         public void setValues(@NonNull PreparedStatement ps) throws SQLException {
-            ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(commandDetails.getParameters()
-                    .toArray());
+            ArgumentPreparedStatementSetter pss = new ArgumentPreparedStatementSetter(commandDetails.getCommandParameters().getParsedParameterValues().toArray());
             pss.setValues(ps);
         }
 

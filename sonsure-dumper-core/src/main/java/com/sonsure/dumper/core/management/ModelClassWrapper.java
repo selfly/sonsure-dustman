@@ -21,7 +21,7 @@ public class ModelClassWrapper {
     }
 
     public ModelClassDetails getModelClassDetails() {
-        return ModelClassDetailsCache.getClassDetails(this.getModelClass());
+        return ModelClassDetailsHelper.getClassDetails(this.getModelClass());
     }
     
     public Collection<ModelClassFieldDetails> getModelFields() {

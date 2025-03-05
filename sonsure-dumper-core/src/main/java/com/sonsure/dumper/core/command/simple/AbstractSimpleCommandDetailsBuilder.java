@@ -1,6 +1,7 @@
 package com.sonsure.dumper.core.command.simple;
 
 import com.sonsure.dumper.core.command.AbstractCommandDetailsBuilder;
+import com.sonsure.dumper.core.command.CommandParameters;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
 
@@ -13,10 +14,12 @@ import java.util.Map;
 public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleCommandDetailsBuilder<T>> extends AbstractCommandDetailsBuilder<T> implements SimpleCommandDetailsBuilder<T> {
 
     protected String command;
+    protected CommandParameters commandParameters;
     protected boolean namedParameter = false;
 
     public AbstractSimpleCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
+        this.commandParameters = new CommandParameters();
     }
 
     @Override
@@ -27,12 +30,19 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
 
     @Override
     public T parameter(String name, Object value) {
-        return null;
+        this.commandParameters.addParameter(name, value);
+        return getSelf();
     }
 
     @Override
     public T parameters(Map<String, Object> parameters) {
-        return null;
+        if (parameters == null) {
+            return getSelf();
+        }
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            this.getCommandParameters().addParameter(entry.getKey(), entry.getValue());
+        }
+        return getSelf();
     }
 
     @Override
@@ -62,14 +72,14 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
 //
 //        private String command;
 //
-//        private final List<CommandParameter> commandParameters;
+//        private final List<ParameterObject> commandParameters;
 //
 //        public Context() {
 //            this.commandParameters = new ArrayList<>();
 //        }
 //
 //        public void addCommandParameter(String name, Object value) {
-//            commandParameters.add(new CommandParameter(name, value));
+//            commandParameters.add(new ParameterObject(name, value));
 //        }
 //
 //        public void addCommandParameters(Map<String, Object> parameters) {
@@ -83,11 +93,11 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
 //
 //        public Object getParameters() {
 //            if (isNamedParameter()) {
-//                return getCommandParameters().stream()
-//                        .collect(Collectors.toMap(CommandParameter::getName, CommandParameter::getValue, (v1, v2) -> v1));
+//                return getParameterObjects().stream()
+//                        .collect(Collectors.toMap(ParameterObject::getName, ParameterObject::getValue, (v1, v2) -> v1));
 //            } else {
-//                return getCommandParameters().stream()
-//                        .map(CommandParameter::getValue)
+//                return getParameterObjects().stream()
+//                        .map(ParameterObject::getValue)
 //                        .collect(Collectors.toList());
 //            }
 //        }
@@ -100,7 +110,7 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
 //            this.command = command;
 //        }
 //
-//        public List<CommandParameter> getCommandParameters() {
+//        public List<ParameterObject> getParameterObjects() {
 //            return commandParameters;
 //        }
 //    }

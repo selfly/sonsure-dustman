@@ -14,7 +14,7 @@
 //import com.sonsure.dumper.core.config.JdbcEngineConfig;
 //import com.sonsure.dumper.core.management.CommandClass;
 //import com.sonsure.dumper.core.management.CommandField;
-//import com.sonsure.dumper.core.management.ModelClassDetailsCache;
+//import com.sonsure.dumper.core.management.ModelClassDetailsHelper;
 //import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 //import com.sonsure.dumper.core.mapping.MappingHandler;
 //import lombok.Getter;
@@ -54,16 +54,16 @@
 //
 //        if (this.commandContextBuilderContext.isNamedParameter()) {
 //            final ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(commandDetails.getCommand());
-//            final Map<String, Object> paramMap = commandDetails.getCommandParameters().stream()
-//                    .collect(Collectors.toMap(CommandParameter::getName, CommandParameter::getValue));
+//            final Map<String, Object> paramMap = commandDetails.getParameterObjects().stream()
+//                    .collect(Collectors.toMap(ParameterObject::getName, ParameterObject::getValue));
 //            final String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramMap);
 //            final Object[] objects = NamedParameterUtils.buildValueArray(parsedSql, paramMap);
 //            commandDetails.setCommand(sqlToUse);
 //            commandDetails.setNamedParamNames(parsedSql.getParameterNames());
 //            commandDetails.setParameters(Arrays.asList(objects));
 //        } else {
-//            final List<Object> objects = commandDetails.getCommandParameters().stream()
-//                    .map(CommandParameter::getValue)
+//            final List<Object> objects = commandDetails.getParameterObjects().stream()
+//                    .map(ParameterObject::getValue)
 //                    .collect(Collectors.toList());
 //            commandDetails.setParameters(objects);
 //        }
@@ -176,7 +176,7 @@
 //     * @return class fields
 //     */
 //    protected Collection<ModelClassFieldDetails> getClassFields(Class<?> clazz) {
-//        return ModelClassDetailsCache.getClassFieldMetas(clazz);
+//        return ModelClassDetailsHelper.getClassFieldMetas(clazz);
 //    }
 //
 //    /**

@@ -10,7 +10,8 @@
 package com.sonsure.dumper.core.command.mybatis;
 
 import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandParameter;
+import com.sonsure.dumper.core.command.CommandParameters;
+import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandDetailsBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -36,7 +37,7 @@ public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetai
     }
 
     @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
 
         CommandDetails commandDetails = new CommandDetails();
 
@@ -47,10 +48,12 @@ public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetai
         MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(this.getCommand());
         Configuration configuration = sqlSessionFactory.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
-        BoundSql boundSql = statement.getBoundSql(this.getParameters());
+        Object params = getCommandParameters().getParameterMap();
+        BoundSql boundSql = statement.getBoundSql(params);
         Object parameterObject = boundSql.getParameterObject();
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         if (parameterMappings != null) {
+            CommandParameters commandParameters = new CommandParameters();
             for (int i = 0; i < parameterMappings.size(); i++) {
                 ParameterMapping parameterMapping = parameterMappings.get(i);
                 if (parameterMapping.getMode() != ParameterMode.OUT) {
@@ -66,9 +69,11 @@ public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetai
                         MetaObject metaObject = configuration.newMetaObject(parameterObject);
                         value = metaObject.getValue(propertyName);
                     }
-                    commandDetails.addCommandParameter(new CommandParameter(propertyName, value));
+                    commandParameters.addParameter(propertyName, value);
                 }
             }
+            commandParameters.setParsedParameterValues(commandParameters.getParameterValues());
+            commandDetails.setCommandParameters(commandParameters);
         }
         commandDetails.setCommand(boundSql.getSql());
         this.namedParameter = false;

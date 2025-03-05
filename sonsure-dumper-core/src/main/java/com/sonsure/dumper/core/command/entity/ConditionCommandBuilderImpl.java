@@ -3,7 +3,7 @@
 //import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
 //import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 //import com.sonsure.dumper.core.command.CommandDetails;
-//import com.sonsure.dumper.core.command.CommandParameter;
+//import com.sonsure.dumper.core.command.ParameterObject;
 //import com.sonsure.dumper.core.config.JdbcEngineConfig;
 //import com.sonsure.dumper.core.exception.SonsureJdbcException;
 //import com.sonsure.dumper.core.management.CommandField;
@@ -69,7 +69,7 @@
 //        }
 //
 //        StringBuilder whereCommand = new StringBuilder(" ");
-//        List<CommandParameter> commandParameters = new ArrayList<>();
+//        List<ParameterObject> commandParameters = new ArrayList<>();
 //        for (CommandField commandField : whereFields) {
 //
 //            //在前面处理，有单独where or and 的情况
@@ -92,12 +92,12 @@
 //                    if (commandField.getValue() instanceof Object[]) {
 //                        Object[] values = (Object[]) commandField.getValue();
 //                        for (int i = 0; i < values.length; i++) {
-//                            commandParameters.add(new CommandParameter(commandField.getFieldName() + i, values[i]));
+//                            commandParameters.add(new ParameterObject(commandField.getFieldName() + i, values[i]));
 //                        }
 //                    } else if (commandField.getValue() instanceof Map) {
 //                        final Map<String, Object> valueMap = (Map<String, Object>) commandField.getValue();
 //                        for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
-//                            commandParameters.add(new CommandParameter(entry.getKey(), entry.getValue()));
+//                            commandParameters.add(new ParameterObject(entry.getKey(), entry.getValue()));
 //                        }
 //                    } else {
 //                        throw new SonsureJdbcException("不支持的参数类型");
@@ -123,7 +123,7 @@
 //                } else {
 //                    final String placeholder = this.createParameterPlaceholder(commandField.getFieldName(), isNamedParameter);
 //                    whereCommand.append(commandField.isFieldOperatorNeedBracket() ? String.format(" ( %s ) ", placeholder) : String.format(" %s ", placeholder));
-//                    commandParameters.add(new CommandParameter(commandField.getFieldName(), commandField.getValue()));
+//                    commandParameters.add(new ParameterObject(commandField.getFieldName(), commandField.getValue()));
 //                }
 //            }
 //        }
@@ -142,7 +142,7 @@
 //    /**
 //     * 处理数组参数
 //     */
-//    protected void processArrayArgs(CommandField commandField, StringBuilder whereCommand, List<CommandParameter> parameters, JdbcEngineConfig jdbcEngineConfig) {
+//    protected void processArrayArgs(CommandField commandField, StringBuilder whereCommand, List<ParameterObject> parameters, JdbcEngineConfig jdbcEngineConfig) {
 //        final String filedCommandName = this.getFiledCommandName(commandField, jdbcEngineConfig);
 //        String aliasField = this.getTableAliasField(commandField.getTableAlias(), filedCommandName);
 //        Object[] args = (Object[]) commandField.getValue();
@@ -155,7 +155,7 @@
 //                    final String name = commandField.getFieldName() + i;
 //                    String placeholder = this.createParameterPlaceholder(name, this.conditionContext.isNamedParameter());
 //                    whereCommand.append(placeholder);
-//                    parameters.add(new CommandParameter(name, args[i]));
+//                    parameters.add(new ParameterObject(name, args[i]));
 //                }
 //                if (i != args.length - 1) {
 //                    whereCommand.append(",");
@@ -174,7 +174,7 @@
 //                    final String name = commandField.getFieldName() + i;
 //                    String placeholder = this.createParameterPlaceholder(name, this.conditionContext.isNamedParameter());
 //                    whereCommand.append(" ").append(placeholder).append(" ");
-//                    parameters.add(new CommandParameter(name, args[i]));
+//                    parameters.add(new ParameterObject(name, args[i]));
 //                }
 //                if (i != args.length - 1) {
 //                    whereCommand.append(" or ");

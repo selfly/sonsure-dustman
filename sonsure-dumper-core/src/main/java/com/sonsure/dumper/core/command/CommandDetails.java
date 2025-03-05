@@ -13,9 +13,6 @@ import com.sonsure.dumper.common.model.Pagination;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 执行的命令内容
  * <p>
@@ -34,30 +31,32 @@ public class CommandDetails {
      */
     private String command;
 
+    private CommandParameters commandParameters;
+
     /**
      * The Is native command.
      */
     private boolean forceNative;
 
-    /**
-     * The Parameters.
-     */
-    private List<Object> parameters;
+//    /**
+//     * The Parameters.
+//     */
+//    private List<Object> parameters;
 
     /**
      * The Is named parameter.
      */
     private boolean isNamedParameter;
 
-    /**
-     * The Named param names.
-     */
-    private List<String> namedParamNames;
-
-    /**
-     * The Command parameters.
-     */
-    private final List<CommandParameter> commandParameters;
+//    /**
+//     * The Named param names.
+//     */
+//    private List<String> namedParamNames;
+//
+//    /**
+//     * The Command parameters.
+//     */
+//    private final List<ParameterObject> parameterObjects;
 
     /**
      * 返回值类型，如果是native操作又不指定，可能为null
@@ -76,20 +75,6 @@ public class CommandDetails {
     public CommandDetails() {
         forceNative = false;
         isNamedParameter = false;
-        commandParameters = new ArrayList<>();
-        parameters = new ArrayList<>();
-    }
-
-    public void addCommandParameters(List<CommandParameter> commandParameters) {
-        this.commandParameters.addAll(commandParameters);
-    }
-
-    public void addCommandParameter(CommandParameter commandParameter) {
-        this.commandParameters.add(commandParameter);
-    }
-
-    public void addCommandParameter(String name, Object value) {
-        this.addCommandParameter(new CommandParameter(name, value));
     }
 
 }

@@ -5,12 +5,13 @@ import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author selfly
@@ -21,16 +22,12 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     protected static final String PARAM_PLACEHOLDER = " ? ";
 
     protected final JdbcEngineConfig jdbcEngineConfig;
-    protected final CommandSql commandSql;
-    protected final List<Object> parameters;
     protected boolean forceNative = false;
     protected Pagination pagination;
     protected boolean disableCountQuery = false;
 
     public AbstractCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
-        this.commandSql = new CommandSql();
-        this.parameters = new ArrayList<>(16);
     }
 
     @Override
@@ -68,8 +65,9 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     }
 
     @Override
-    public CommandDetails build(JdbcEngineConfig jdbcEngineConfig) {
-        CommandDetails commandDetails = this.doBuild(jdbcEngineConfig);
+    public CommandDetails build(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+        CommandDetails commandDetails = this.doBuild(jdbcEngineConfig, commandType);
+        commandDetails.setCommandType(commandType);
         if (!commandDetails.isForceNative()) {
             // todo 需要收集参数信息，待完成
             Map<String, Object> params = Collections.emptyMap();
@@ -79,18 +77,17 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
 
         if (commandDetails.isNamedParameter()) {
             final ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(commandDetails.getCommand());
-            final Map<String, Object> paramMap = commandDetails.getCommandParameters().stream()
-                    .collect(Collectors.toMap(CommandParameter::getName, CommandParameter::getValue));
+            CommandParameters commandParameters = commandDetails.getCommandParameters();
+            final Map<String, Object> paramMap = commandParameters.getParameterMap();
             final String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramMap);
             final Object[] objects = NamedParameterUtils.buildValueArray(parsedSql, paramMap);
             commandDetails.setCommand(sqlToUse);
-            commandDetails.setNamedParamNames(parsedSql.getParameterNames());
-            commandDetails.setParameters(Arrays.asList(objects));
+            commandParameters.setParsedParameterNames(parsedSql.getParameterNames());
+            commandParameters.setParsedParameterValues(Arrays.asList(objects));
         } else {
-            final List<Object> objects = commandDetails.getCommandParameters().stream()
-                    .map(CommandParameter::getValue)
-                    .collect(Collectors.toList());
-            commandDetails.setParameters(objects);
+            CommandParameters commandParameters = commandDetails.getCommandParameters();
+            final List<Object> objects = commandParameters.getParameterValues();
+            commandParameters.setParsedParameterValues(objects);
         }
         if (StringUtils.isNotBlank(jdbcEngineConfig.getCommandCase())) {
             String resolvedCommand = this.convertCase(commandDetails.getCommand(), jdbcEngineConfig.getCommandCase());
@@ -119,9 +116,10 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
      * 构建
      *
      * @param jdbcEngineConfig the jdbc engine config
+     * @param commandType      the command type
      * @return command context
      */
-    public abstract CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig);
+    public abstract CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType);
 
     protected T getSelf() {
         //noinspection unchecked

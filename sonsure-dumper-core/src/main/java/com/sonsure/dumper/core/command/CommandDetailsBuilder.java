@@ -65,8 +65,9 @@ public interface CommandDetailsBuilder<T extends CommandDetailsBuilder<T>> {
      * 构建执行内容
      *
      * @param jdbcEngineConfig the jdbc engine config
+     * @param commandType      the command type
      * @return command context
      */
-    CommandDetails build(JdbcEngineConfig jdbcEngineConfig);
+    CommandDetails build(JdbcEngineConfig jdbcEngineConfig, CommandType commandType);
 
 }

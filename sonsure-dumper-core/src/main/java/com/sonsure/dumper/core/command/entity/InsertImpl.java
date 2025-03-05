@@ -50,8 +50,7 @@ public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements
 
     @Override
     public Object execute() {
-        CommandDetails commandDetails = this.getEntityCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.INSERT);
+        CommandDetails commandDetails = this.getEntityCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.INSERT);
         commandDetails.setResultType(Object.class);
         return getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }

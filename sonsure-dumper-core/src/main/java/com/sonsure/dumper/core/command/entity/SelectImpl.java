@@ -118,12 +118,11 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public long count() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL);
         PersistExecutor persistExecutor = this.getJdbcEngineConfig().getPersistExecutor();
         String countCommand = this.getJdbcEngineConfig().getPageHandler().getCountCommand(commandDetails.getCommand(), persistExecutor.getDialect());
         CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
         countCommandDetails.setCommand(countCommand);
-        countCommandDetails.setCommandType(CommandType.QUERY_ONE_COL);
         countCommandDetails.setResultType(Long.class);
         Object result = persistExecutor.execute(countCommandDetails);
         return (Long) result;
@@ -132,8 +131,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(Class<T> cls) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_SINGLE_RESULT);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_SINGLE_RESULT);
         commandDetails.setResultType(cls);
         return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
@@ -142,8 +140,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> singleMapResult() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP);
         commandDetails.setResultType(Map.class);
         return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
@@ -151,8 +148,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <E> E oneColResult(Class<E> clazz) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_ONE_COL);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL);
         commandDetails.setResultType(clazz);
         return (E) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
@@ -160,8 +156,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <E> List<E> oneColList(Class<E> clazz) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_ONE_COL_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL_LIST);
         commandDetails.setResultType(clazz);
         return (List<E>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
@@ -169,8 +164,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_FOR_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_LIST);
         commandDetails.setResultType(cls);
         return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
@@ -179,8 +173,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public List<Map<String, Object>> listMaps() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
         commandDetails.setResultType(List.class);
         return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
@@ -188,8 +181,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> pageResult(Class<T> cls) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_FOR_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_LIST);
         commandDetails.setResultType(cls);
         return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
@@ -197,8 +189,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public Page<Map<String, Object>> pageMapResult() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_FOR_MAP_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
         commandDetails.setResultType(Page.class);
         return this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
@@ -206,8 +197,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> oneColPageResult(Class<T> clazz) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig());
-        commandDetails.setCommandType(CommandType.QUERY_ONE_COL_LIST);
+        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL_LIST);
         commandDetails.setResultType(clazz);
         return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }

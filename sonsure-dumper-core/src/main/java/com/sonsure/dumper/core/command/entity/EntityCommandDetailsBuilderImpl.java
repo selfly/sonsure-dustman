@@ -10,12 +10,17 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.AbstractDynamicCommandDetailsBuilder;
+import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.CommandType;
+import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import com.sonsure.dumper.core.management.ModelClassWrapper;
 import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
+import com.sonsure.dumper.core.persist.KeyGenerator;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +96,56 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
         return this.getSelf();
     }
 
+    @Override
+    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+        CommandDetails commandDetails = new CommandDetails();
+
+        if (CommandType.INSERT == commandType) {
+            ModelClassWrapper modelClass = this.getUniqueModelClass();
+            ModelClassFieldDetails primaryKeyField = modelClass.getPrimaryKeyField();
+            boolean hasPrimaryField = this.getCommandParameters().getParameterMap().containsKey(primaryKeyField.getFieldName());
+            if (!hasPrimaryField) {
+                GenerateKey generateKey = new GenerateKey();
+
+                KeyGenerator keyGenerator = jdbcEngineConfig.getKeyGenerator();
+                if (keyGenerator != null) {
+                    Object generateKeyValue = keyGenerator.generateKeyValue(modelClass.getModelClass());
+                    generateKey.setValue(generateKeyValue);
+                    boolean pkIsParamVal = true;
+                    if (generateKeyValue instanceof String) {
+                        pkIsParamVal = !this.isNativeValue((String) generateKeyValue);
+                    }
+                    generateKey.setPkIsParamVal(pkIsParamVal);
+                    //主键列
+                    this.getCommandSql().INTO_COLUMNS(primaryKeyField.getFieldName());
+                    if (pkIsParamVal) {
+//                        final String placeholder = this.createParameterPlaceholder(pkField, this.insertContext.isNamedParameter());
+//                        argsCommand.append(placeholder).append(",");
+//                        commandContext.addCommandParameter(pkField, generateKeyValue);
+                        this.getCommandSql().INTO_VALUES(PARAM_PLACEHOLDER);
+                        this.getCommandParameters().addParameter(primaryKeyField.getFieldName(), generateKeyValue);
+                    } else {
+                        //不传参方式，例如是oracle的序列名
+                        this.getCommandSql().INTO_VALUES(generateKeyValue.toString());
+                    }
+                }
+                commandDetails.setGenerateKey(generateKey);
+            }
+        }
+
+        String command = this.getCommandSql().toString();
+        commandDetails.setCommand(command);
+        commandDetails.setCommandParameters(this.getCommandParameters());
+        commandDetails.setForceNative(this.isForceNative());
+        commandDetails.setNamedParameter(false);
+        commandDetails.setPagination(this.getPagination());
+        commandDetails.setDisableCountQuery(this.isDisableCountQuery());
+        return commandDetails;
+    }
+
+    private boolean isNativeValue(String value) {
+        return StringUtils.startsWith(value, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(value, KeyGenerator.NATIVE_CLOSE_TOKEN);
+    }
 
     protected ModelClassWrapper createModelClassWrapper(Class<?> cls) {
         ModelClassWrapper modelClassWrapper = new ModelClassWrapper(cls);

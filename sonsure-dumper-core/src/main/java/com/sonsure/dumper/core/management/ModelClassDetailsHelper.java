@@ -9,7 +9,6 @@
 
 package com.sonsure.dumper.core.management;
 
-import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
@@ -19,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -27,20 +25,25 @@ import java.util.WeakHashMap;
 /**
  * @author selfly
  */
-public class ModelClassDetailsCache {
+public class ModelClassDetailsHelper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModelClassDetailsCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ModelClassDetailsHelper.class);
+
+    /**
+     * 主键属性后缀
+     */
+    public static final String PRI_FIELD_SUFFIX = "Id";
 
     private static final Map<Class<?>, ModelClassDetails> CACHE = new WeakHashMap<>();
 
     private static boolean enableJavaxPersistence = false;
 
-    private ModelClassDetailsCache() {
+    private ModelClassDetailsHelper() {
     }
 
     static {
         try {
-            Class<?> clazz = ModelClassDetailsCache.class.getClassLoader().loadClass("javax.persistence.Entity");
+            Class<?> clazz = ModelClassDetailsHelper.class.getClassLoader().loadClass("javax.persistence.Entity");
             enableJavaxPersistence = clazz != null;
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Enable javax.persistence annotation");
@@ -88,27 +91,18 @@ public class ModelClassDetailsCache {
      * @return class fields
      */
     public static Collection<ModelClassFieldDetails> getClassFieldMetas(Class<?> clazz) {
-        assertClassNotNull(clazz);
         ModelClassDetails modelClassDetails = getClassDetails(clazz);
         return modelClassDetails.getModelFields();
     }
 
     public static ModelClassFieldDetails getClassFieldMeta(Class<?> clazz, String fieldName) {
-        assertClassNotNull(clazz);
         ModelClassDetails classMeta = getClassDetails(clazz);
         return classMeta.getModelFieldDetails(fieldName);
     }
 
     public static ModelClassFieldDetails getMappedFieldMeta(Class<?> clazz, String columnName) {
-        assertClassNotNull(clazz);
         ModelClassDetails classMeta = getClassDetails(clazz);
         return classMeta.getMappedFieldDetails(columnName);
-    }
-
-    private static void assertClassNotNull(Class<?> clazz) {
-        if (clazz == null) {
-            throw new SonsureJdbcException("class不能为null");
-        }
     }
 
     /**
@@ -117,33 +111,13 @@ public class ModelClassDetailsCache {
      * @param clazz the clazz
      * @return the model class meta
      */
-    private static ModelClassDetails initCache(Class<?> clazz) {
-
-        ModelClassDetails modelClassDetails = new ModelClassDetails();
-
-        Object table = getEntityAnnotation(clazz);
-        modelClassDetails.setAnnotation(table);
-
-        Field[] beanFields = ClassUtils.getSelfOrBaseFields(clazz);
-        for (Field field : beanFields) {
-
-            if (Modifier.isStatic(field.getModifiers()) || getFieldTransientAnnotation(field) != null) {
-                continue;
-            }
-
-            ModelClassFieldDetails modelClassFieldDetails = new ModelClassFieldDetails();
-            modelClassFieldDetails.setFieldName(field.getName());
-            modelClassFieldDetails.setIdAnnotation(getFieldIdAnnotation(field));
-            modelClassFieldDetails.setColumnAnnotation(getFieldColumnAnnotation(field));
-
-            modelClassDetails.addModelFieldDetails(modelClassFieldDetails);
-        }
+    public static ModelClassDetails initCache(Class<?> clazz) {
+        ModelClassDetails modelClassDetails = new ModelClassDetails(clazz);
         CACHE.put(clazz, modelClassDetails);
-
         return modelClassDetails;
     }
 
-    private static Object getEntityAnnotation(Class<?> clazz) {
+    public static Object getEntityAnnotation(Class<?> clazz) {
         Object annotation = clazz.getAnnotation(Entity.class);
         if (annotation == null && enableJavaxPersistence) {
             annotation = clazz.getAnnotation(javax.persistence.Entity.class);
@@ -151,7 +125,7 @@ public class ModelClassDetailsCache {
         return annotation;
     }
 
-    private static Object getFieldTransientAnnotation(Field field) {
+    public static Object getFieldTransientAnnotation(Field field) {
         Object annotation = field.getAnnotation(Transient.class);
         if (annotation == null && enableJavaxPersistence) {
             annotation = field.getAnnotation(javax.persistence.Transient.class);
@@ -159,7 +133,7 @@ public class ModelClassDetailsCache {
         return annotation;
     }
 
-    private static Object getFieldColumnAnnotation(Field field) {
+    public static Object getFieldColumnAnnotation(Field field) {
         Object annotation = field.getAnnotation(Column.class);
         if (annotation == null && enableJavaxPersistence) {
             annotation = field.getAnnotation(javax.persistence.Column.class);
@@ -167,7 +141,7 @@ public class ModelClassDetailsCache {
         return annotation;
     }
 
-    private static Object getFieldIdAnnotation(Field field) {
+    public static Object getFieldIdAnnotation(Field field) {
         Object annotation = field.getAnnotation(Id.class);
         if (annotation == null && enableJavaxPersistence) {
             annotation = field.getAnnotation(javax.persistence.Id.class);
