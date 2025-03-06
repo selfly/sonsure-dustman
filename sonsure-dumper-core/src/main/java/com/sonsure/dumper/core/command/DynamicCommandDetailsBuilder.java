@@ -15,8 +15,9 @@ import com.sonsure.dumper.core.command.lambda.Function;
  * CommandContext构建
  * <p>
  *
+ * @param <T> the type parameter
  * @author liyd
- * @date 17/4/11
+ * @date 17 /4/11
  */
 public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBuilder<T>> extends CommandDetailsBuilder<T> {
 
@@ -146,6 +147,14 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
     T deleteFrom(String entity);
 
     /**
+     * Alias t.
+     *
+     * @param aliasName the alias name
+     * @return the t
+     */
+    T tableAlias(String aliasName);
+
+    /**
      * Where command
      *
      * @param field the field
@@ -183,6 +192,23 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      * @return the t
      */
     T whereForObject(Object object);
+
+    /**
+     * Where append t.
+     *
+     * @param segment the segment
+     * @return the t
+     */
+    T whereAppend(String segment);
+
+    /**
+     * Where append t.
+     *
+     * @param segment the segment
+     * @param value   the value
+     * @return the t
+     */
+    T whereAppend(String segment, Object value);
 
     /**
      * And
@@ -239,9 +265,9 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
     /**
      * update null
      *
-     * @param updateNull the update null
+     * @param ignoreNull the ignore null
      * @return the t
      */
-    T updateNull(boolean updateNull);
+    T ignoreNull(boolean ignoreNull);
 
 }

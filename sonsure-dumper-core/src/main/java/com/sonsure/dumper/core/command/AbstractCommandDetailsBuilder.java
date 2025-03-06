@@ -68,6 +68,11 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     public CommandDetails build(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
         CommandDetails commandDetails = this.doBuild(jdbcEngineConfig, commandType);
         commandDetails.setCommandType(commandType);
+        commandDetails.setPagination(this.getPagination());
+        commandDetails.setForceNative(this.isForceNative());
+//        commandDetails.setNamedParameter(this.isn);
+        commandDetails.setDisableCountQuery(this.isDisableCountQuery());
+
         if (!commandDetails.isForceNative()) {
             // todo 需要收集参数信息，待完成
             Map<String, Object> params = Collections.emptyMap();

@@ -51,7 +51,6 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
         return this.getSelf();
     }
 
-
     //    public void command(String command) {
 //        this.simpleContext.setCommand(command);
 //    }

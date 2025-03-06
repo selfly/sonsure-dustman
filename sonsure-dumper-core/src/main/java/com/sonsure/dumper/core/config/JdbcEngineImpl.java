@@ -41,7 +41,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public <T extends CommandExecutor, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass) {
-        return this.jdbcEngineConfig.getCommandExecutorFactory().getCommandExecutor(commandExecutorClass, modelClass, this.jdbcEngineConfig);
+        return this.jdbcEngineConfig.getCommandExecutorFactory().createCommandExecutor(commandExecutorClass, this.jdbcEngineConfig, modelClass);
     }
 
     @Override

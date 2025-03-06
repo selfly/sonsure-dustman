@@ -16,6 +16,8 @@
 package com.sonsure.dumper.core.third.mybatis;
 
 
+import java.util.List;
+
 /**
  * 修改父类 sql()、SQLStatement 为 protected
  *
@@ -49,6 +51,23 @@ public class CommandSql extends AbstractSQL<CommandSql> {
         for (String field : fields) {
             this.sql().select.remove(field);
         }
-        return this;
+        return getSelf();
+    }
+
+    /**
+     * Table alias command sql.
+     *
+     * @param aliasName the alias name
+     * @return the command sql
+     */
+    public CommandSql tableAlias(String aliasName) {
+        List<String> tables = this.sql().tables;
+        String lastTable = tables.remove(tables.size() - 1);
+        tables.add(lastTable + " " + aliasName);
+        return getSelf();
+    }
+
+    public boolean isEmptySelectColumns() {
+        return this.sql().select.isEmpty();
     }
 }

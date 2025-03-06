@@ -24,9 +24,9 @@ public class GenerateKey {
     private Object value;
 
     /**
-     * 主键是否是参数
-     * 例如oracle主键传的是序列名称，非值
+     * 主键是否是传参的参数
+     * 例如oracle主键传的是序列名称，拼接在sql当中，非传参 为 false
      */
-    private boolean pkIsParamVal;
+    private boolean primaryKeyParameter;
 
 }

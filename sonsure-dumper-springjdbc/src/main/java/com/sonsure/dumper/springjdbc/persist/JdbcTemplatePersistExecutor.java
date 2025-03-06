@@ -28,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author liyd
@@ -53,7 +54,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     public Object insert(final CommandDetails commandDetails) {
         final GenerateKey generateKey = commandDetails.getGenerateKey();
         //数据库自增 或设置主键值 处理
-        if (!generateKey.isPkIsParamVal()) {
+        if (generateKey != null && !generateKey.isPrimaryKeyParameter()) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcOperations.update(new InsertPreparedStatementCreator(commandDetails, generateKey), keyHolder);
             Map<String, Object> keys = keyHolder.getKeys();
@@ -73,7 +74,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
         } else {
             jdbcOperations.update(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
             //显示指定了主键，可能为null
-            return generateKey.getValue();
+            return Optional.ofNullable(generateKey).map(GenerateKey::getValue).orElse(null);
         }
     }
 

@@ -64,10 +64,10 @@ public interface Update extends ConditionCommandExecutor<Update> {
     /**
      * 更新null值
      *
-     * @param updateNull the update null
+     * @param ignoreNull the ignore null
      * @return update update
      */
-    Update updateNull(boolean updateNull);
+    Update ignoreNull(boolean ignoreNull);
 
     /**
      * 执行

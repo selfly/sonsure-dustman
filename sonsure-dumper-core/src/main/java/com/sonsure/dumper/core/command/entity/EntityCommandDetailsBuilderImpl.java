@@ -15,15 +15,14 @@ import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import com.sonsure.dumper.core.management.ModelClassDetailsHelper;
 import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import com.sonsure.dumper.core.management.ModelClassWrapper;
+import com.sonsure.dumper.core.management.NativeContentWrapper;
 import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,21 +34,25 @@ import java.util.Map;
  */
 public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetailsBuilder<EntityCommandDetailsBuilder> implements EntityCommandDetailsBuilder {
 
-    protected final List<ModelClassWrapper> modelClassList;
+    protected ModelClassWrapper latestModelClass;
 
     public EntityCommandDetailsBuilderImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.modelClassList = new ArrayList<>(8);
     }
 
     @Override
     public EntityCommandDetailsBuilder from(Class<?> cls) {
         this.addClassMapping(cls);
         ModelClassWrapper modelClassWrapper = this.createModelClassWrapper(cls);
-        String[] fields = modelClassWrapper.getModelFields().stream()
-                .map(ModelClassFieldDetails::getFieldName).toArray(String[]::new);
-        this.commandSql.SELECT(fields);
         this.commandSql.FROM(modelClassWrapper.getModelName());
+        return this;
+    }
+
+    @Override
+    public EntityCommandDetailsBuilder addAllColumns() {
+        String[] fields = this.getLatestModelClass().getModelFields().stream()
+                .map(v -> ModelClassDetailsHelper.getTableAliasFileName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
+        this.addSelectFields(fields);
         return this;
     }
 
@@ -79,8 +82,8 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
 
     @Override
     public EntityCommandDetailsBuilder setFieldForObjectWherePk(Object object) {
-        Map<String, Object> propMap = this.obj2PropMap(object);
-        ModelClassWrapper uniqueModelClass = this.getUniqueModelClass();
+        Map<String, Object> propMap = this.obj2PropMap(object, this.isIgnoreNull());
+        ModelClassWrapper uniqueModelClass = this.getLatestModelClass();
         ModelClassFieldDetails pkField = uniqueModelClass.getPrimaryKeyField();
         //处理主键成where条件
         Object pkValue = propMap.get(pkField.getFieldName());
@@ -98,30 +101,30 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
 
     @Override
     public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+        if (CommandType.isSelectCommandType(commandType) && this.getCommandSql().isEmptySelectColumns()) {
+            this.addAllColumns();
+        }
         CommandDetails commandDetails = new CommandDetails();
 
         if (CommandType.INSERT == commandType) {
-            ModelClassWrapper modelClass = this.getUniqueModelClass();
+            ModelClassWrapper modelClass = this.getLatestModelClass();
             ModelClassFieldDetails primaryKeyField = modelClass.getPrimaryKeyField();
-            boolean hasPrimaryField = this.getCommandParameters().getParameterMap().containsKey(primaryKeyField.getFieldName());
-            if (!hasPrimaryField) {
-                GenerateKey generateKey = new GenerateKey();
-
+            Object primaryKeyValue = this.getCommandParameters().getParameterMap().get(primaryKeyField.getFieldName());
+            GenerateKey generateKey = new GenerateKey();
+            if (primaryKeyValue == null) {
                 KeyGenerator keyGenerator = jdbcEngineConfig.getKeyGenerator();
                 if (keyGenerator != null) {
                     Object generateKeyValue = keyGenerator.generateKeyValue(modelClass.getModelClass());
                     generateKey.setValue(generateKeyValue);
-                    boolean pkIsParamVal = true;
+                    boolean primaryKeyParameter = true;
                     if (generateKeyValue instanceof String) {
-                        pkIsParamVal = !this.isNativeValue((String) generateKeyValue);
+                        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper((String) generateKeyValue);
+                        primaryKeyParameter = !nativeContentWrapper.isNatives();
                     }
-                    generateKey.setPkIsParamVal(pkIsParamVal);
+                    generateKey.setPrimaryKeyParameter(primaryKeyParameter);
                     //主键列
                     this.getCommandSql().INTO_COLUMNS(primaryKeyField.getFieldName());
-                    if (pkIsParamVal) {
-//                        final String placeholder = this.createParameterPlaceholder(pkField, this.insertContext.isNamedParameter());
-//                        argsCommand.append(placeholder).append(",");
-//                        commandContext.addCommandParameter(pkField, generateKeyValue);
+                    if (primaryKeyParameter) {
                         this.getCommandSql().INTO_VALUES(PARAM_PLACEHOLDER);
                         this.getCommandParameters().addParameter(primaryKeyField.getFieldName(), generateKeyValue);
                     } else {
@@ -129,8 +132,11 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
                         this.getCommandSql().INTO_VALUES(generateKeyValue.toString());
                     }
                 }
-                commandDetails.setGenerateKey(generateKey);
+            } else {
+                generateKey.setValue(primaryKeyValue);
+                generateKey.setPrimaryKeyParameter(true);
             }
+            commandDetails.setGenerateKey(generateKey);
         }
 
         String command = this.getCommandSql().toString();
@@ -143,21 +149,17 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
         return commandDetails;
     }
 
-    private boolean isNativeValue(String value) {
-        return StringUtils.startsWith(value, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(value, KeyGenerator.NATIVE_CLOSE_TOKEN);
-    }
-
     protected ModelClassWrapper createModelClassWrapper(Class<?> cls) {
         ModelClassWrapper modelClassWrapper = new ModelClassWrapper(cls);
-        this.modelClassList.add(modelClassWrapper);
+        this.latestModelClass = modelClassWrapper;
         return modelClassWrapper;
     }
 
-    protected ModelClassWrapper getUniqueModelClass() {
-        if (this.modelClassList.size() != 1) {
-            throw new SonsureJdbcException("当前执行业务必须且只能有一个Model Class");
+    protected ModelClassWrapper getLatestModelClass() {
+        if (this.latestModelClass == null) {
+            throw new SonsureJdbcException("当前执行业务必须先指定ModelClass");
         }
-        return this.modelClassList.iterator().next();
+        return this.latestModelClass;
     }
 
     protected void addClassMapping(Class<?> cls) {

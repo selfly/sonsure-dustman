@@ -25,13 +25,12 @@ import com.sonsure.dumper.core.command.natives.NativeExecutorImpl;
  */
 public class CommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends CommandExecutor, M> T build(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig) {
+    public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
         if (Insert.class == commandExecutorClass) {
             return (T) new InsertImpl(jdbcEngineConfig);
         } else if (Select.class == commandExecutorClass) {
-            return (T) new SelectImpl<>(jdbcEngineConfig, modelClass);
+            return (T) new SelectImpl<>(jdbcEngineConfig, params);
         } else if (Update.class == commandExecutorClass) {
             return (T) new UpdateImpl(jdbcEngineConfig);
         } else if (Delete.class == commandExecutorClass) {

@@ -14,6 +14,7 @@ import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
 import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ public class ModelClassDetailsHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModelClassDetailsHelper.class);
 
+    public static final String DOT = ".";
     /**
      * 主键属性后缀
      */
@@ -147,6 +149,13 @@ public class ModelClassDetailsHelper {
             annotation = field.getAnnotation(javax.persistence.Id.class);
         }
         return annotation;
+    }
+
+    public static String getTableAliasFileName(String tableAlias, String field) {
+        if (StringUtils.isBlank(tableAlias)) {
+            return field;
+        }
+        return tableAlias + DOT + field;
     }
 
 }

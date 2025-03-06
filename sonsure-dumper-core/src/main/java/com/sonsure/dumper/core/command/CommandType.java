@@ -74,4 +74,13 @@ public enum CommandType {
      * Execute script command type.
      */
     EXECUTE_SCRIPT;
+
+    public static boolean isSelectCommandType(CommandType commandType) {
+        return commandType == QUERY_FOR_LIST
+                || commandType == QUERY_SINGLE_RESULT
+                || commandType == QUERY_FOR_MAP
+                || commandType == QUERY_FOR_MAP_LIST
+                || commandType == QUERY_ONE_COL
+                || commandType == QUERY_ONE_COL_LIST;
+    }
 }

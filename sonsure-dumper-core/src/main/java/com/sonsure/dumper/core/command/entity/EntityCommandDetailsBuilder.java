@@ -29,6 +29,13 @@ public interface EntityCommandDetailsBuilder extends DynamicCommandDetailsBuilde
     EntityCommandDetailsBuilder from(Class<?> cls);
 
     /**
+     * Add all columns entity command details builder.
+     *
+     * @return the entity command details builder
+     */
+    EntityCommandDetailsBuilder addAllColumns();
+
+    /**
      * Insert into
      *
      * @param cls the cls

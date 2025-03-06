@@ -30,9 +30,9 @@ public class CommandExecutorFactoryImpl implements CommandExecutorFactory {
     }
 
     @Override
-    public <T extends CommandExecutor, M> T getCommandExecutor(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig) {
+    public <T extends CommandExecutor> T createCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
         for (CommandExecutorBuilder commandExecutorBuilder : this.commandExecutorBuilders) {
-            T executor = commandExecutorBuilder.build(commandExecutorClass, modelClass, jdbcEngineConfig);
+            T executor = commandExecutorBuilder.build(commandExecutorClass, jdbcEngineConfig, params);
             if (executor != null) {
                 return executor;
             }

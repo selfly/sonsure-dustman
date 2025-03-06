@@ -105,20 +105,5 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @return c c
      */
     C append(String segment, Map<String, Object> params);
-
-    /**
-     * 如果传入false，下一个条件将不构建
-     *
-     * @param iff the iff
-     * @return the c
-     */
-    C iff(boolean iff);
-
-    /**
-     * 如果传入false，上一个条件将被删除
-     *
-     * @param with the with
-     * @return the c
-     */
-    C with(boolean with);
+    
 }

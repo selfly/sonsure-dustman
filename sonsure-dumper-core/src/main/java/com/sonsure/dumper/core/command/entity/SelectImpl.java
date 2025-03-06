@@ -31,23 +31,24 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     private final Class<M> cls;
 
-    public SelectImpl(JdbcEngineConfig jdbcEngineConfig, Class<M> cls) {
+    public SelectImpl(JdbcEngineConfig jdbcEngineConfig, Object... params) {
         super(jdbcEngineConfig);
-        this.cls = cls;
+        //noinspection unchecked
+        this.cls = (Class<M>) params[0];
         this.getEntityCommandDetailsBuilder().from(cls);
     }
 
-//    @Override
-//    public Select<M> tableAlias(String alias) {
-//        this.selectCommandContextBuilder.tableAlias(alias);
-//        return this;
-//    }
+    @Override
+    public Select<M> tableAlias(String alias) {
+        this.getEntityCommandDetailsBuilder().tableAlias(alias);
+        return this;
+    }
 
-//    @Override
-//    public Select<M> from(Class<?> cls, String alias) {
-//        this.selectCommandContextBuilder.addFromClass(cls, alias);
-//        return this;
-//    }
+    @Override
+    public Select<M> addAllColumns() {
+        this.getEntityCommandDetailsBuilder().addAllColumns();
+        return this;
+    }
 
     @Override
     public Select<M> addColumn(String... fields) {

@@ -137,13 +137,6 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
         return this.getDefaultJdbcEngine().selectFrom(cls);
     }
 
-//    @Override
-//    public <M> Select<M> selectFrom(Class<M> cls, String tableAlias) {
-//        Select<M> select = this.selectFrom(cls);
-//        select.tableAlias(tableAlias);
-//        return select;
-//    }
-
     @Override
     public Insert insert() {
         return this.getDefaultJdbcEngine().insert();

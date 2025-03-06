@@ -28,6 +28,10 @@ public class CommandParameters {
         this.parameterObjects.add(new ParameterObject(name, value));
     }
 
+    public void addParameters(List<ParameterObject> parameters) {
+        this.parameterObjects.addAll(parameters);
+    }
+
     public Map<String, Object> getParameterMap() {
         return this.parameterObjects.stream()
                 .collect(Collectors.toMap(ParameterObject::getName, ParameterObject::getValue));

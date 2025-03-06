@@ -25,22 +25,20 @@ import java.util.List;
  */
 public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCommandExecutor<Select<M>> {
 
-//    /**
-//     * Table alias select.
-//     *
-//     * @param alias the alias
-//     * @return the select
-//     */
-//    Select<M> tableAlias(String alias);
+    /**
+     * Table alias select.
+     *
+     * @param alias the alias
+     * @return the select
+     */
+    Select<M> tableAlias(String alias);
 
-//    /**
-//     * From select.
-//     *
-//     * @param cls   the cls
-//     * @param alias the alias
-//     * @return the select
-//     */
-//    Select<M> from(Class<?> cls, String alias);
+    /**
+     * Select 字段.
+     *
+     * @return the select
+     */
+    Select<M> addAllColumns();
 
     /**
      * Select 字段.

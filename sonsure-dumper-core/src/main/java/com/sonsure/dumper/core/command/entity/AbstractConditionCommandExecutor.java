@@ -54,10 +54,6 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T whereForObject(Object obj) {
-//        if (!this.getConditionBuilder().isIf()) {
-//            iff(true);
-//            return (T) this;
-//        }
         this.getEntityCommandDetailsBuilder().whereForObject(obj);
         return (T) this;
     }
@@ -86,20 +82,6 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     @Override
     public T append(String segment, Map<String, Object> params) {
 //        this.addWhereField(null, segment, null, params, CommandField.Type.WHERE_APPEND);
-        return (T) this;
-    }
-
-    @Override
-    public T iff(boolean iff) {
-//        this.getConditionBuilder().setIf(iff);
-        return (T) this;
-    }
-
-    @Override
-    public T with(boolean with) {
-//        if (!with) {
-//            this.getConditionBuilder().removeLastWhereFields();
-//        }
         return (T) this;
     }
 

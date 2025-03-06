@@ -57,8 +57,8 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
     }
 
     @Override
-    public Update updateNull(boolean updateNull) {
-        this.getEntityCommandDetailsBuilder().updateNull(updateNull);
+    public Update ignoreNull(boolean ignoreNull) {
+        this.getEntityCommandDetailsBuilder().ignoreNull(ignoreNull);
         return this;
     }
 
