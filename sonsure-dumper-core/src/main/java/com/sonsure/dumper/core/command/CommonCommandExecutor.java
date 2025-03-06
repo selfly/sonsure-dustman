@@ -23,11 +23,11 @@ public interface CommonCommandExecutor<E extends CommonCommandExecutor<E>> exten
      */
     E forceNative();
 
-//    /**
-//     * 是否使用named parameter 方式
-//     *
-//     * @return t t
-//     */
-//    T namedParameter();
+    /**
+     * 是否使用named parameter 方式
+     *
+     * @return e
+     */
+    E namedParameter();
 
 }

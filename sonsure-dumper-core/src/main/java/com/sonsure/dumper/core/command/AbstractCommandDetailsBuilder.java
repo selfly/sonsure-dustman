@@ -19,9 +19,11 @@ import java.util.Map;
 @Getter
 public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuilder<T>> implements CommandDetailsBuilder<T> {
 
+    protected static final String COLON = ":";
     protected static final String PARAM_PLACEHOLDER = " ? ";
 
     protected final JdbcEngineConfig jdbcEngineConfig;
+    protected boolean namedParameter = false;
     protected boolean forceNative = false;
     protected Pagination pagination;
     protected boolean disableCountQuery = false;
@@ -33,6 +35,12 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     @Override
     public T forceNative() {
         this.forceNative = true;
+        return this.getSelf();
+    }
+
+    @Override
+    public T namedParameter() {
+        this.namedParameter = true;
         return this.getSelf();
     }
 
@@ -70,7 +78,7 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
         commandDetails.setCommandType(commandType);
         commandDetails.setPagination(this.getPagination());
         commandDetails.setForceNative(this.isForceNative());
-//        commandDetails.setNamedParameter(this.isn);
+        commandDetails.setNamedParameter(this.isNamedParameter());
         commandDetails.setDisableCountQuery(this.isDisableCountQuery());
 
         if (!commandDetails.isForceNative()) {

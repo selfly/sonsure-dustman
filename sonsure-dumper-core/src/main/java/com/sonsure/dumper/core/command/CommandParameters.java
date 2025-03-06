@@ -32,6 +32,12 @@ public class CommandParameters {
         this.parameterObjects.addAll(parameters);
     }
 
+    public void addParameters(Map<String,Object> parameters) {
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            this.addParameter(entry.getKey(), entry.getValue());
+        }
+    }
+
     public Map<String, Object> getParameterMap() {
         return this.parameterObjects.stream()
                 .collect(Collectors.toMap(ParameterObject::getName, ParameterObject::getValue));

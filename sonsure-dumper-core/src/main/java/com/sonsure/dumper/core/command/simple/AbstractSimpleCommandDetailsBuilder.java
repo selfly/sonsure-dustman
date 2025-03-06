@@ -15,7 +15,6 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
 
     protected String command;
     protected CommandParameters commandParameters;
-    protected boolean namedParameter = false;
 
     public AbstractSimpleCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
@@ -43,12 +42,6 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
             this.getCommandParameters().addParameter(entry.getKey(), entry.getValue());
         }
         return getSelf();
-    }
-
-    @Override
-    public T namedParameter() {
-        this.namedParameter = true;
-        return this.getSelf();
     }
 
     //    public void command(String command) {

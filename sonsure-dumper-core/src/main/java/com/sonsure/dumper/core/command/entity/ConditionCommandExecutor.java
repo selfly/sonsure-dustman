@@ -12,8 +12,6 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.lambda.Function;
 
-import java.util.Map;
-
 /**
  * 条件构建
  * 实现标识接口
@@ -75,6 +73,23 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
     C whereForObject(Object obj);
 
     /**
+     * Where append t.
+     *
+     * @param segment the segment
+     * @return the t
+     */
+    C whereAppend(String segment);
+
+    /**
+     * Where append t.
+     *
+     * @param segment the segment
+     * @param value   the value
+     * @return the t
+     */
+    C whereAppend(String segment, Object value);
+
+    /**
      * and
      *
      * @return c
@@ -88,22 +103,4 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      */
     C or();
 
-    /**
-     * append sql片断
-     *
-     * @param segment the segment
-     * @param params  the params
-     * @return c
-     */
-    C append(String segment, Object... params);
-
-    /**
-     * append sql片断
-     *
-     * @param segment the segment
-     * @param params  the params
-     * @return c c
-     */
-    C append(String segment, Map<String, Object> params);
-    
 }

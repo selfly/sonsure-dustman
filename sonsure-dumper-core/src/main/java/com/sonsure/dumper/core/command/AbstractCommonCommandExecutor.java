@@ -45,11 +45,11 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
         return this.getSelf();
     }
 
-//    @Override
-//    public E namedParameter() {
-//        this.getCommandDetailsBuilder().namedParameter();
-//        return (E) this;
-//    }
+    @Override
+    public E namedParameter() {
+        this.getCommandDetailsBuilder().namedParameter();
+        return this.getSelf();
+    }
 
     protected <T> Page<T> doPageResult(CommandDetails commandDetails, PageQueryHandler<T> pageQueryHandler) {
         Pagination pagination = commandDetails.getPagination();

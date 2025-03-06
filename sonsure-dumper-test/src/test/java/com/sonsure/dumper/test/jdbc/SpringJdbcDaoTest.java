@@ -522,26 +522,6 @@ public class SpringJdbcDaoTest {
         Assertions.assertNotNull(object);
     }
 
-//    @Test
-//    public void singleResultObject2() {
-//
-//        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
-//                .from(Account.class, "t2")
-//                .where("{{t1.userInfoId}}", "t2.accountId")
-//                .listMaps();
-//
-//        Assertions.assertNotNull(list);
-//
-//        List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
-//                .from(Account.class, "t2")
-//                .addColumn("t1.loginName as name1", "t2.loginName as name2")
-//                .where()
-//                .append("t1.userInfoId = t2.accountId")
-//                .listMaps();
-//
-//        Assertions.assertNotNull(list1);
-//    }
-
     @Test
     public void selectForAnnotation() {
         Page<AnnotationUserInfo> page = jdbcDao.selectFrom(AnnotationUserInfo.class)
@@ -572,27 +552,6 @@ public class SpringJdbcDaoTest {
         List<Map<String, Object>> objects = select.listMaps();
         Assertions.assertEquals(50, objects.size());
     }
-
-//    @Test
-//    public void append() {
-//        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
-//                .where("userAge", SqlOperator.GT, 5)
-//                .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
-//                .singleResult(UserInfo.class);
-//        Assertions.assertNotNull(userInfo);
-//    }
-
-//    @Test
-//    public void append2() {
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("userInfoId", 40L);
-//        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
-//                .namedParameter()
-//                .where("userAge", ">", 5)
-//                .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
-//                .singleResult(UserInfo.class);
-//        Assertions.assertNotNull(userInfo);
-//    }
 
     @Test
     public void updateSetStrField() {
@@ -724,30 +683,6 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(18, (int) user2.getUserAge());
     }
 
-//    @Test
-//    public void namedParamHandler() {
-//        String sql = "insert into UserInfo(userInfoId,loginName,password,userAge) values(:userInfoId,:loginName,:password,:random_z10_z30)";
-//
-//        Set<Integer> ages = new HashSet<>();
-//        for (int i = 0; i < 10; i++) {
-//            jdbcDao.nativeExecutor()
-//                    .namedParameter()
-//                    .command(sql)
-//                    .parameter("userInfoId", 99L + i)
-//                    .parameter("loginName", "newName")
-//                    .parameter("password", "123456")
-//                    .parameter("random_z10_z30", new JdbcRandomNamedParamHandler())
-//                    .insert();
-//
-//            UserInfo user = jdbcDao.get(UserInfo.class, 99L + i);
-//            ages.add(user.getUserAge());
-//            Assertions.assertEquals(user.getLoginName(), "newName");
-//            Assertions.assertTrue(user.getUserAge() >= 10 && user.getUserAge() <= 30);
-//        }
-//        Assertions.assertTrue(ages.size() > 1);
-//    }
-
-
     @Test
     public void nativeExecutor() {
         int count = jdbcDao.nativeExecutor()
@@ -759,46 +694,46 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(user.getLoginName(), "newName");
     }
 
-//    @Test
-//    public void nativeExecutor1() {
-//        int count = jdbcDao.nativeExecutor()
-//                .namedParameter()
-//                .nativeCommand()
-//                .command("update sd_User_Info set login_Name = :loginName where user_Info_Id = :userInfoId")
-//                .parameter("loginName", "newName")
-//                .parameter("userInfoId", 39L)
-//                .update();
-//        Assertions.assertEquals(1, count);
-//        UserInfo user = jdbcDao.get(UserInfo.class, 39L);
-//        Assertions.assertEquals(user.getLoginName(), "newName");
-//    }
+    @Test
+    public void nativeExecutorForceNativeAndNamed() {
+        int count = jdbcDao.nativeExecutor()
+                .namedParameter()
+                .forceNative()
+                .command("update sd_User_Info set login_Name = :loginName where user_Info_Id = :userInfoId")
+                .parameter("loginName", "newName")
+                .parameter("userInfoId", 39L)
+                .update();
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 39L);
+        Assertions.assertEquals(user.getLoginName(), "newName");
+    }
 
-//    @Test
-//    public void nativeExecutor2() {
-//
-//        List<Long> ids = new ArrayList<>();
-//        ids.add(39L);
-//        ids.add(40L);
-//
-//        Long[] userInfoId2 = new Long[]{23L, 24L};
-//
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("loginName", "newName");
-//        params.put("userInfoId", ids);
-//        params.put("userInfoId2", userInfoId2);
-//
-//        String sql = "update sd_User_Info set login_Name = :loginName where user_Info_Id in (:userInfoId) or user_info_id in (:userInfoId2)";
-//
-//        int count = jdbcDao.nativeExecutor()
-//                .namedParameter()
-//                .nativeCommand()
-//                .command(sql)
-//                .parameters(params)
-//                .update();
-//        Assertions.assertEquals(4, count);
-//        UserInfo user = jdbcDao.get(UserInfo.class, 39L);
-//        Assertions.assertEquals(user.getLoginName(), "newName");
-//    }
+    @Test
+    public void nativeExecutorNamedIn() {
+
+        List<Long> ids = new ArrayList<>();
+        ids.add(39L);
+        ids.add(40L);
+
+        Long[] userInfoId2 = new Long[]{23L, 24L};
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginName", "newName");
+        params.put("userInfoId", ids);
+        params.put("userInfoId2", userInfoId2);
+
+        String sql = "update sd_User_Info set login_Name = :loginName where user_Info_Id in (:userInfoId) or user_info_id in (:userInfoId2)";
+
+        int count = jdbcDao.nativeExecutor()
+                .namedParameter()
+                .forceNative()
+                .command(sql)
+                .parameters(params)
+                .update();
+        Assertions.assertEquals(4, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 39L);
+        Assertions.assertEquals(user.getLoginName(), "newName");
+    }
 
 
     @Test
@@ -1192,19 +1127,93 @@ public class SpringJdbcDaoTest {
 
     }
 
+    @Test
+    public void deleteWhereAppendParam() {
+        int count = jdbcDao.deleteFrom(UserInfo.class)
+                .whereAppend("userInfoId = ?", 4L)
+                .execute();
+
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 4L);
+        Assertions.assertNull(user);
+    }
+
+    @Test
+    public void deleteWhereAppendNamed() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userInfoId", 4L);
+        int count = jdbcDao.deleteFrom(UserInfo.class)
+                .namedParameter()
+                .whereAppend("userInfoId = :userInfoId", params)
+                .execute();
+
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 4L);
+        Assertions.assertNull(user);
+    }
+
+
+    @Test
+    public void whereAppendSubSqlParam() {
+        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
+                .where("userAge", SqlOperator.GT, 5)
+                .whereAppend("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
+                .singleResult(UserInfo.class);
+        Assertions.assertNotNull(userInfo);
+    }
+
+    @Test
+    public void whereAppendSubSqlNamed() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userInfoId", 40L);
+        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
+                .namedParameter()
+                .where("userAge", SqlOperator.GT, 5)
+                .whereAppend("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
+                .singleResult(UserInfo.class);
+        Assertions.assertNotNull(userInfo);
+    }
+
+    @Test
+    public void namedParamHandler() {
+        String sql = "insert into UserInfo(userInfoId,loginName,password,userAge) values(:userInfoId,:loginName,:password,:random_z10_z30)";
+        Set<Integer> ages = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            jdbcDao.nativeExecutor()
+                    .namedParameter()
+                    .command(sql)
+                    .parameter("userInfoId", 99L + i)
+                    .parameter("loginName", "newName")
+                    .parameter("password", "123456")
+                    .parameter("random_z10_z30", new JdbcRandomNamedParamHandler())
+                    .insert();
+
+            UserInfo user = jdbcDao.get(UserInfo.class, 99L + i);
+            ages.add(user.getUserAge());
+            Assertions.assertEquals(user.getLoginName(), "newName");
+            Assertions.assertTrue(user.getUserAge() >= 10 && user.getUserAge() <= 30);
+        }
+        Assertions.assertTrue(ages.size() > 1);
+    }
+
 //    @Test
-//    public void deleteNamedWhere() {
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("userInfoId", 4L);
-//        int count = jdbcDao.deleteFrom(UserInfo.class)
-//                .where()
-//                .append("userInfoId = :userInfoId", params)
-//                .namedParameter()
-//                .execute();
+//    public void selectInnerJoin() {
 //
-//        Assertions.assertEquals(1, count);
-//        UserInfo user = jdbcDao.get(UserInfo.class, 4L);
-//        Assertions.assertNull(user);
+//        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
+//                .from(Account.class, "t2")
+//                .where("{{t1.userInfoId}}", "t2.accountId")
+//                .listMaps();
+//
+//        Assertions.assertNotNull(list);
+//
+//        List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
+//                .from(Account.class, "t2")
+//                .addColumn("t1.loginName as name1", "t2.loginName as name2")
+//                .where()
+//                .append("t1.userInfoId = t2.accountId")
+//                .listMaps();
+//
+//        Assertions.assertNotNull(list1);
 //    }
 
 //    @Test

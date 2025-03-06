@@ -10,10 +10,12 @@
 package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.utils.ClassUtils;
+import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.management.NativeContentWrapper;
 import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import lombok.Getter;
@@ -163,26 +165,34 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
+
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
-        if (nativeContentWrapper.isNatives()) {
+        if (value == null) {
+            this.getCommandSql().WHERE(String.format("%s %s null", field, sqlOperator.getCode()));
+        } else if (nativeContentWrapper.isNatives()) {
             this.getCommandSql().WHERE(String.format("%s %s %s", nativeContentWrapper.getActualContent(), sqlOperator.getCode(), value));
         } else {
-            if (value != null && value.getClass().isArray()) {
-                Object[] valArray = (Object[]) value;
-                StringBuilder paramPlaceholder = new StringBuilder("(");
-                List<ParameterObject> params = new ArrayList<>(valArray.length);
-                int count = 1;
-                for (Object val : valArray) {
-                    paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
-                    params.add(new ParameterObject(field + (count++), val));
-                }
-                paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
-                paramPlaceholder.append(")");
-                this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), paramPlaceholder));
-                this.getCommandParameters().addParameters(params);
-            } else {
-                this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), PARAM_PLACEHOLDER));
+            if (this.isNamedParameter()) {
+                this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), COLON + field));
                 this.getCommandParameters().addParameter(field, value);
+            } else {
+                if (value.getClass().isArray()) {
+                    Object[] valArray = (Object[]) value;
+                    StringBuilder paramPlaceholder = new StringBuilder("(");
+                    List<ParameterObject> params = new ArrayList<>(valArray.length);
+                    int count = 1;
+                    for (Object val : valArray) {
+                        paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
+                        params.add(new ParameterObject(field + (count++), val));
+                    }
+                    paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
+                    paramPlaceholder.append(")");
+                    this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), paramPlaceholder));
+                    this.getCommandParameters().addParameters(params);
+                } else {
+                    this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), PARAM_PLACEHOLDER));
+                    this.getCommandParameters().addParameter(field, value);
+                }
             }
         }
         return this.getSelf();
@@ -217,6 +227,24 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     @Override
     public T whereAppend(String segment, Object value) {
         this.getCommandSql().WHERE(segment);
+        if (this.isNamedParameter()) {
+            if (!(value instanceof Map)) {
+                throw new SonsureJdbcException("namedParameter模式参数必须为Map类型,key与name对应");
+            }
+            //noinspection unchecked
+            this.getCommandParameters().addParameters((Map<String, Object>) value);
+        } else {
+            if (value.getClass().isArray()) {
+                Object[] valArray = (Object[]) value;
+                for (Object val : valArray) {
+                    //这里的参数名用不到，随机生成
+                    this.getCommandParameters().addParameter(UUIDUtils.getUUID8(), val);
+                }
+            } else {
+                this.getCommandParameters().addParameter(UUIDUtils.getUUID8(), value);
+            }
+        }
+
         return this.getSelf();
     }
 

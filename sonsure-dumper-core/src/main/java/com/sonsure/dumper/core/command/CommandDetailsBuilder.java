@@ -29,6 +29,13 @@ public interface CommandDetailsBuilder<T extends CommandDetailsBuilder<T>> {
     T forceNative();
 
     /**
+     * Named parameter
+     *
+     * @return the t
+     */
+    T namedParameter();
+
+    /**
      * Paginate.
      *
      * @param pageNum  the page num

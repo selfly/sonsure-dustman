@@ -34,11 +34,4 @@ public interface SimpleCommandDetailsBuilder<T extends SimpleCommandDetailsBuild
      */
     T parameters(Map<String, Object> parameters);
 
-    /**
-     * Named parameter
-     *
-     * @return the t
-     */
-    T namedParameter();
-
 }
