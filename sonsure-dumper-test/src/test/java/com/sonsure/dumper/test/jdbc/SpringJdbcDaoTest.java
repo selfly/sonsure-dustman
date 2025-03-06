@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.io.Serializable;
 import java.util.*;
@@ -1196,7 +1197,45 @@ public class SpringJdbcDaoTest {
         Assertions.assertTrue(ages.size() > 1);
     }
 
-//    @Test
+    @Test
+    public void batchUpdate2() {
+
+        jdbcDao.executeDelete(UserInfo.class);
+        String sql = "INSERT INTO sd_USER_INFO (PASSWORD, LOGIN_NAME, GMT_CREATE, USER_AGE, USER_INFO_ID) VALUES (:PASSWORD, :LOGIN_NAME, :GMT_CREATE, :USER_AGE, :USER_INFO_ID)";
+        List<Map<String, Object>> userInfoList = new ArrayList<>();
+        for (int i = 1; i <= 10000; i++) {
+            Map<String, Object> map = new LinkedCaseInsensitiveMap<>();
+            map.put("password", "123456-" + i);
+            map.put("login_name", "name-" + i);
+            map.put("gmt_create", new Date());
+            map.put("user_age", i);
+            map.put("USER_INFO_ID", (long) i);
+            userInfoList.add(map);
+        }
+        jdbcDao.batchUpdate()
+                .forceNative()
+                .namedParameter()
+                .execute(sql, userInfoList, userInfoList.size(), (ps, names, map) -> {
+                    for (int j = 0; j < names.size(); j++) {
+                        Object val = map.get(names.get(j));
+                        if (val == null) {
+                            throw new RuntimeException("参数不存在");
+                        }
+                        ps.setObject(j + 1, val);
+                    }
+                });
+
+        long count = jdbcDao.findCount(UserInfo.class);
+        Assertions.assertTrue(count >= 10000);
+
+        long count1 = jdbcDao.selectFrom(UserInfo.class)
+                .where(UserInfo::getLoginName, "name-9999")
+                .count();
+        Assertions.assertTrue(count1 > 0);
+
+    }
+
+    //    @Test
 //    public void selectInnerJoin() {
 //
 //        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
@@ -1215,45 +1254,6 @@ public class SpringJdbcDaoTest {
 //
 //        Assertions.assertNotNull(list1);
 //    }
-
-//    @Test
-//    public void batchUpdate2() {
-//
-//        jdbcDao.executeDelete(UserInfo.class);
-//        String sql = "INSERT INTO sd_USER_INFO (PASSWORD, LOGIN_NAME, GMT_CREATE, USER_AGE, USER_INFO_ID) VALUES (:PASSWORD, :LOGIN_NAME, :GMT_CREATE, :USER_AGE, :USER_INFO_ID)";
-//        List<Map<String, Object>> userInfoList = new ArrayList<>();
-//        for (int i = 1; i <= 10000; i++) {
-//            Map<String, Object> map = new LinkedCaseInsensitiveMap<>();
-//            map.put("password", "123456-" + i);
-//            map.put("login_name", "name-" + i);
-//            map.put("gmt_create", new Date());
-//            map.put("user_age", i);
-//            map.put("USER_INFO_ID", (long) i);
-//            userInfoList.add(map);
-//        }
-//        jdbcDao.batchUpdate()
-//                .forceNative()
-//                .namedParameter()
-//                .execute(sql, userInfoList, userInfoList.size(), (ps, names, map) -> {
-//                    for (int j = 0; j < names.size(); j++) {
-//                        Object val = map.get(names.get(j));
-//                        if (val == null) {
-//                            throw new RuntimeException("参数不存在");
-//                        }
-//                        ps.setObject(j + 1, val);
-//                    }
-//                });
-//
-//        long count = jdbcDao.findCount(UserInfo.class);
-//        Assertions.assertTrue(count >= 10000);
-//
-//        long count1 = jdbcDao.selectFrom(UserInfo.class)
-//                .where(UserInfo::getLoginName, "name-9999")
-//                .count();
-//        Assertions.assertTrue(count1 > 0);
-//
-//    }
-
 
 //    @Test
 //    public void testIf() {
