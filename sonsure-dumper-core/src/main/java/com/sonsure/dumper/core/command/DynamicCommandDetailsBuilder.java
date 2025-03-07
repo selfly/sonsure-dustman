@@ -186,6 +186,14 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
     <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
     /**
+     * Where t.
+     *
+     * @param sqlPart the sql part
+     * @return the t
+     */
+    T where(SqlPart sqlPart);
+
+    /**
      * Where for object t.
      *
      * @param object the object

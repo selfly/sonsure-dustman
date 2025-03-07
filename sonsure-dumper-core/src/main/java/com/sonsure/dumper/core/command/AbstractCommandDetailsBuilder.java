@@ -19,6 +19,8 @@ import java.util.Map;
 @Getter
 public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuilder<T>> implements CommandDetailsBuilder<T> {
 
+    protected static final String SPACE = " ";
+    protected static final String NULL = "null";
     protected static final String COLON = ":";
     protected static final String PARAM_PLACEHOLDER = " ? ";
 

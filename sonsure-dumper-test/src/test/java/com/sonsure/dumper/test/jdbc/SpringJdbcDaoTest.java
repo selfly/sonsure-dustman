@@ -13,6 +13,7 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.persist.JdbcDao;
@@ -263,7 +264,7 @@ public class SpringJdbcDaoTest {
     }
 
     @Test
-    public void selectWhereStrField() {
+    public void selectWhereField() {
 
         jdbcDao.executeDelete(UserInfo.class);
         for (int i = 60; i < 70; i++) {
@@ -287,8 +288,8 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(5, page1.getList().size());
 
         Select<UserInfo> select2 = jdbcDao.selectFrom(UserInfo.class)
-                .where("userAge", 19)
-                .where("loginName", "nameStrField");
+                .where(UserInfo::getUserAge, 19)
+                .where(UserInfo::getLoginName, "nameStrField");
         long count2 = select2.count();
         Assertions.assertEquals(10, count2);
 
@@ -321,6 +322,29 @@ public class SpringJdbcDaoTest {
         } catch (IncorrectResultSizeDataAccessException e) {
             Assertions.assertEquals("Incorrect result size: expected 1, actual 2", e.getMessage());
         }
+    }
+
+    @Test
+    public void selectWhereAndSqlPart() {
+
+        jdbcDao.executeDelete(UserInfo.class);
+        for (int i = 1; i < 3; i++) {
+            UserInfo user = new UserInfo();
+            user.setUserInfoId((long) i);
+            user.setLoginName("whereAnd");
+            user.setPassword("123456-" + i);
+            user.setUserAge(21);
+            user.setGmtCreate(new Date());
+            jdbcDao.executeInsert(user);
+        }
+        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
+                .where(
+                        SqlPart.of("loginName", "whereAnd").or(UserInfo::getPassword, "123456-5")
+                )
+                .and()
+                .where(UserInfo::getUserInfoId, 2L)
+                .singleResult(UserInfo.class);
+        Assertions.assertEquals(userInfo.getUserInfoId(), 2L);
     }
 
     @Test

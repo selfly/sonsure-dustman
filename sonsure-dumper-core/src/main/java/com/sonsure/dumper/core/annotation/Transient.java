@@ -16,7 +16,9 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Created by liyd on 2015-12-31.
+ *
+ * @author liyd
+ * @date 2015-12-31
  */
 @Target({ FIELD })
 @Retention(RUNTIME)

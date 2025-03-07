@@ -15,7 +15,7 @@ import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.management.ModelClassDetailsHelper;
+import com.sonsure.dumper.core.management.CommandBuildHelper;
 import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import com.sonsure.dumper.core.management.ModelClassWrapper;
 import com.sonsure.dumper.core.management.NativeContentWrapper;
@@ -51,7 +51,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
     @Override
     public EntityCommandDetailsBuilder addAllColumns() {
         String[] fields = this.getLatestModelClass().getModelFields().stream()
-                .map(v -> ModelClassDetailsHelper.getTableAliasFileName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
+                .map(v -> CommandBuildHelper.getTableAliasFileName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
         this.addSelectFields(fields);
         return this;
     }
@@ -82,7 +82,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
 
     @Override
     public EntityCommandDetailsBuilder setFieldForObjectWherePk(Object object) {
-        Map<String, Object> propMap = this.obj2PropMap(object, this.isIgnoreNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(object, this.isIgnoreNull());
         ModelClassWrapper uniqueModelClass = this.getLatestModelClass();
         ModelClassFieldDetails pkField = uniqueModelClass.getPrimaryKeyField();
         //处理主键成where条件

@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
@@ -46,6 +47,12 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     @Override
     public T where(String field, Object value) {
         this.where(field, value == null ? SqlOperator.IS : SqlOperator.EQ, value);
+        return this.getSelf();
+    }
+
+    @Override
+    public T where(SqlPart sqlPart) {
+        this.getEntityCommandDetailsBuilder().where(sqlPart);
         return this.getSelf();
     }
 

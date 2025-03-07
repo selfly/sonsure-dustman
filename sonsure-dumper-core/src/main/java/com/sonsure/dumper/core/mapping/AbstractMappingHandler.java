@@ -12,8 +12,8 @@ package com.sonsure.dumper.core.mapping;
 import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import com.sonsure.dumper.core.management.CommandBuildHelper;
 import com.sonsure.dumper.core.management.ModelClassDetails;
-import com.sonsure.dumper.core.management.ModelClassDetailsHelper;
 import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     /**
      * 主键属性后缀
      */
-    protected static final String PRI_FIELD_SUFFIX = ModelClassDetailsHelper.PRI_FIELD_SUFFIX;
+    protected static final String PRI_FIELD_SUFFIX = CommandBuildHelper.PRI_FIELD_SUFFIX;
 
     /**
      * class不存在时是否失败 (抛出异常)
@@ -135,11 +135,11 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getTable(Class<?> entityClass, Map<String, Object> params) {
 
-        ModelClassDetails classMeta = ModelClassDetailsHelper.getClassDetails(entityClass);
+        ModelClassDetails classMeta = CommandBuildHelper.getClassDetails(entityClass);
         Object annotation = classMeta.getAnnotation();
         String tableName;
         if (annotation != null) {
-            tableName = ModelClassDetailsHelper.getTableAnnotationName(annotation);
+            tableName = CommandBuildHelper.getTableAnnotationName(annotation);
         } else {
             if (tablePrefixMap == null) {
                 //默认Java属性的骆驼命名法转换回数据库下划线“_”分隔的格式
@@ -159,13 +159,13 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getPkField(Class<?> entityClass) {
 
-        ModelClassDetails classDetails = ModelClassDetailsHelper.getClassDetails(entityClass);
+        ModelClassDetails classDetails = CommandBuildHelper.getClassDetails(entityClass);
         return classDetails.getPrimaryKeyField().getFieldName();
     }
 
     @Override
     public String getColumn(Class<?> entityClass, String fieldName) {
-        ModelClassFieldDetails classFieldMeta = ModelClassDetailsHelper.getClassFieldMeta(entityClass, fieldName);
+        ModelClassFieldDetails classFieldMeta = CommandBuildHelper.getClassFieldMeta(entityClass, fieldName);
 
         //count(*) as num  num是没有的
         if (classFieldMeta == null) {
@@ -174,14 +174,14 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
         Object columnAnnotation = classFieldMeta.getColumnAnnotation();
         if (columnAnnotation != null) {
-            return ModelClassDetailsHelper.getColumnAnnotationName(columnAnnotation);
+            return CommandBuildHelper.getColumnAnnotationName(columnAnnotation);
         }
         return NameUtils.getUnderlineName(fieldName);
     }
 
     @Override
     public String getField(Class<?> clazz, String columnName) {
-        ModelClassFieldDetails mappedFieldMeta = ModelClassDetailsHelper.getMappedFieldMeta(clazz, columnName);
+        ModelClassFieldDetails mappedFieldMeta = CommandBuildHelper.getMappedFieldMeta(clazz, columnName);
         if (mappedFieldMeta != null) {
             return mappedFieldMeta.getFieldName();
         }

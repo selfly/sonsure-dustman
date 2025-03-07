@@ -21,7 +21,7 @@ public class ModelClassWrapper {
     }
 
     public ModelClassDetails getModelClassDetails() {
-        return ModelClassDetailsHelper.getClassDetails(this.getModelClass());
+        return CommandBuildHelper.getClassDetails(this.getModelClass());
     }
     
     public Collection<ModelClassFieldDetails> getModelFields() {

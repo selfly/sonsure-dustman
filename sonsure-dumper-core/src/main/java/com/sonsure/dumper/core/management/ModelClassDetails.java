@@ -57,28 +57,28 @@ public class ModelClassDetails {
         modelFieldMap = new LinkedHashMap<>(16);
         mappedFieldMap = new LinkedHashMap<>(16);
 
-        Object entityAnnotation = ModelClassDetailsHelper.getEntityAnnotation(this.modelClass);
+        Object entityAnnotation = CommandBuildHelper.getEntityAnnotation(this.modelClass);
         this.setAnnotation(entityAnnotation);
 
         Field[] beanFields = ClassUtils.getSelfOrBaseFields(this.modelClass);
         for (Field field : beanFields) {
-            if (Modifier.isStatic(field.getModifiers()) || ModelClassDetailsHelper.getFieldTransientAnnotation(field) != null) {
+            if (Modifier.isStatic(field.getModifiers()) || CommandBuildHelper.getFieldTransientAnnotation(field) != null) {
                 continue;
             }
             ModelClassFieldDetails modelClassFieldDetails = new ModelClassFieldDetails();
             modelClassFieldDetails.setFieldName(field.getName());
-            Object fieldIdAnnotation = ModelClassDetailsHelper.getFieldIdAnnotation(field);
+            Object fieldIdAnnotation = CommandBuildHelper.getFieldIdAnnotation(field);
             if (fieldIdAnnotation != null) {
                 modelClassFieldDetails.setIdAnnotation(fieldIdAnnotation);
                 this.setPrimaryKeyField(modelClassFieldDetails);
             }
-            modelClassFieldDetails.setColumnAnnotation(ModelClassDetailsHelper.getFieldColumnAnnotation(field));
+            modelClassFieldDetails.setColumnAnnotation(CommandBuildHelper.getFieldColumnAnnotation(field));
 
             this.addModelFieldDetails(modelClassFieldDetails);
         }
         if (this.getPrimaryKeyField() == null) {
             String firstLowerName = NameUtils.getFirstLowerName(this.getModelClass().getSimpleName());
-            String pkFieldName = firstLowerName + ModelClassDetailsHelper.PRI_FIELD_SUFFIX;
+            String pkFieldName = firstLowerName + CommandBuildHelper.PRI_FIELD_SUFFIX;
             this.primaryKeyField = this.getModelFieldMap().get(pkFieldName);
         }
         if (this.getPrimaryKeyField() == null) {
@@ -91,7 +91,7 @@ public class ModelClassDetails {
         //数据库返回可能大小写不一定，统一处理成小写
         this.mappedFieldMap.put(modelClassFieldDetails.getFieldName().toLowerCase(), modelClassFieldDetails);
         if (modelClassFieldDetails.getColumnAnnotation() != null) {
-            String columnAnnotationName = ModelClassDetailsHelper.getColumnAnnotationName(modelClassFieldDetails.getColumnAnnotation());
+            String columnAnnotationName = CommandBuildHelper.getColumnAnnotationName(modelClassFieldDetails.getColumnAnnotation());
             mappedFieldMap.put(columnAnnotationName.toLowerCase(), modelClassFieldDetails);
         }
     }

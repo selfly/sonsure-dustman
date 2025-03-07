@@ -9,19 +9,19 @@
 
 package com.sonsure.dumper.core.command;
 
-import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.common.utils.UUIDUtils;
-import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import com.sonsure.dumper.core.management.CommandBuildHelper;
 import com.sonsure.dumper.core.management.NativeContentWrapper;
 import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -124,7 +124,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T intoFieldForObject(Object object) {
-        Map<String, Object> propMap = obj2PropMap(object, this.isIgnoreNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(object, this.isIgnoreNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             //忽略掉null
             if (entry.getValue() == null) {
@@ -155,7 +155,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T setFieldForObject(Object object) {
-        Map<String, Object> propMap = this.obj2PropMap(object, this.isIgnoreNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(object, this.isIgnoreNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             //不忽略null，最后构建时根据updateNull设置处理null值
             this.setField(entry.getKey(), entry.getValue());
@@ -165,36 +165,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
-
-        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
-        if (value == null) {
-            this.getCommandSql().WHERE(String.format("%s %s null", field, sqlOperator.getCode()));
-        } else if (nativeContentWrapper.isNatives()) {
-            this.getCommandSql().WHERE(String.format("%s %s %s", nativeContentWrapper.getActualContent(), sqlOperator.getCode(), value));
-        } else {
-            if (this.isNamedParameter()) {
-                this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), COLON + field));
-                this.getCommandParameters().addParameter(field, value);
-            } else {
-                if (value.getClass().isArray()) {
-                    Object[] valArray = (Object[]) value;
-                    StringBuilder paramPlaceholder = new StringBuilder("(");
-                    List<ParameterObject> params = new ArrayList<>(valArray.length);
-                    int count = 1;
-                    for (Object val : valArray) {
-                        paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
-                        params.add(new ParameterObject(field + (count++), val));
-                    }
-                    paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
-                    paramPlaceholder.append(")");
-                    this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), paramPlaceholder));
-                    this.getCommandParameters().addParameters(params);
-                } else {
-                    this.getCommandSql().WHERE(String.format("%s %s %s", field, sqlOperator.getCode(), PARAM_PLACEHOLDER));
-                    this.getCommandParameters().addParameter(field, value);
-                }
-            }
-        }
+        ImmutablePair<String, CommandParameters> pair = this.buildCondition(field, sqlOperator, value);
+        this.getCommandSql().WHERE(pair.getLeft());
+        this.getCommandParameters().addParameters(pair.getRight().getParameterObjects());
         return this.getSelf();
     }
 
@@ -210,8 +183,70 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     }
 
     @Override
+    public T where(SqlPart sqlPart) {
+        List<SqlPart.Condition> conditions = sqlPart.getConditions();
+        StringBuilder partSql = new StringBuilder();
+        CommandParameters partParameters = new CommandParameters();
+        for (SqlPart.Condition condition : conditions) {
+            if (StringUtils.isNotBlank(condition.getLogical())) {
+                partSql.append(condition.getLogical());
+            }
+            ImmutablePair<String, CommandParameters> pair = this.buildCondition(condition.getName(), condition.getSqlOperator(), condition.getValue());
+            partSql.append(pair.getLeft());
+            partParameters.addParameters(pair.getRight().getParameterObjects());
+        }
+        this.getCommandSql().WHERE(partSql.toString());
+        this.commandParameters.addParameters(partParameters.getParameterObjects());
+        return this.getSelf();
+    }
+
+    protected ImmutablePair<String, CommandParameters> buildCondition(String field, SqlOperator sqlOperator, Object value) {
+        StringBuilder conditionSql = new StringBuilder();
+        CommandParameters conditionParameters = new CommandParameters();
+        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
+        if (value == null) {
+            conditionSql.append(field).append(SPACE)
+                    .append(sqlOperator.getCode()).append(SPACE).append(NULL);
+        } else if (nativeContentWrapper.isNatives()) {
+            conditionSql.append(nativeContentWrapper.getActualContent()).append(SPACE)
+                    .append(sqlOperator.getCode()).append(SPACE)
+                    .append(value);
+        } else {
+            if (this.isNamedParameter()) {
+                conditionSql.append(field).append(SPACE)
+                        .append(sqlOperator.getCode()).append(SPACE)
+                        .append(COLON).append(field);
+                conditionParameters.addParameter(field, value);
+            } else {
+                if (value.getClass().isArray()) {
+                    Object[] valArray = (Object[]) value;
+                    StringBuilder paramPlaceholder = new StringBuilder("(");
+                    List<ParameterObject> params = new ArrayList<>(valArray.length);
+                    int count = 1;
+                    for (Object val : valArray) {
+                        paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
+                        params.add(new ParameterObject(field + (count++), val));
+                    }
+                    paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
+                    paramPlaceholder.append(")");
+                    conditionSql.append(field).append(SPACE)
+                            .append(sqlOperator.getCode()).append(SPACE)
+                            .append(paramPlaceholder);
+                    conditionParameters.addParameters(params);
+                } else {
+                    conditionSql.append(field).append(SPACE)
+                            .append(sqlOperator.getCode()).append(SPACE)
+                            .append(PARAM_PLACEHOLDER);
+                    conditionParameters.addParameter(field, value);
+                }
+            }
+        }
+        return new ImmutablePair<>(conditionSql.toString(), conditionParameters);
+    }
+
+    @Override
     public T whereForObject(Object object) {
-        Map<String, Object> propMap = this.obj2PropMap(object, this.isIgnoreNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(object, this.isIgnoreNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             this.where(entry.getKey(), entry.getValue());
         }
@@ -288,19 +323,6 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T ignoreNull(boolean ignoreNull) {
         this.ignoreNull = ignoreNull;
         return this.getSelf();
-    }
-
-    protected Map<String, Object> obj2PropMap(Object obj, boolean ignoreNull) {
-        //noinspection unchecked
-        Map<String, Object> propMap = obj instanceof Map ? (Map<String, Object>) obj : ClassUtils.getSelfBeanPropMap(obj, Transient.class);
-        Map<String, Object> resultMap = new LinkedHashMap<>(propMap.size());
-        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-            Object value = entry.getValue();
-            if (value != null || !ignoreNull) {
-                resultMap.put(entry.getKey(), value);
-            }
-        }
-        return resultMap;
     }
 
 }

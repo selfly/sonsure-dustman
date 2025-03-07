@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.management;
 
+import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
@@ -20,15 +21,16 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
  * @author selfly
  */
-public class ModelClassDetailsHelper {
+public class CommandBuildHelper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModelClassDetailsHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommandBuildHelper.class);
 
     public static final String DOT = ".";
     /**
@@ -40,12 +42,12 @@ public class ModelClassDetailsHelper {
 
     private static boolean enableJavaxPersistence = false;
 
-    private ModelClassDetailsHelper() {
+    private CommandBuildHelper() {
     }
 
     static {
         try {
-            Class<?> clazz = ModelClassDetailsHelper.class.getClassLoader().loadClass("javax.persistence.Entity");
+            Class<?> clazz = CommandBuildHelper.class.getClassLoader().loadClass("javax.persistence.Entity");
             enableJavaxPersistence = clazz != null;
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Enable javax.persistence annotation");
@@ -156,6 +158,19 @@ public class ModelClassDetailsHelper {
             return field;
         }
         return tableAlias + DOT + field;
+    }
+
+    public static Map<String, Object> obj2PropMap(Object obj, boolean ignoreNull) {
+        //noinspection unchecked
+        Map<String, Object> propMap = obj instanceof Map ? (Map<String, Object>) obj : ClassUtils.getSelfBeanPropMap(obj, Transient.class);
+        Map<String, Object> resultMap = new LinkedHashMap<>(propMap.size());
+        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
+            Object value = entry.getValue();
+            if (value != null || !ignoreNull) {
+                resultMap.put(entry.getKey(), value);
+            }
+        }
+        return resultMap;
     }
 
 }

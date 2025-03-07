@@ -17,6 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * 主键标识
+ * @author selfly
  */
 @Target({FIELD})
 @Retention(RUNTIME)

@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 /**
@@ -63,6 +64,14 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @return the c
      */
     C where(String field, Object value);
+
+    /**
+     * Where c.
+     *
+     * @param sqlPart the sql part
+     * @return the c
+     */
+    C where(SqlPart sqlPart);
 
     /**
      * 实体属性条件
