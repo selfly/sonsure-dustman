@@ -14,8 +14,6 @@ import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaMethod;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.management.CommandBuildHelper;
-import com.sonsure.dumper.core.management.NativeContentWrapper;
 import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;

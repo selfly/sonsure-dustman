@@ -10,8 +10,8 @@
 package com.sonsure.dumper.core.command.simple;
 
 
+import com.sonsure.dumper.core.command.BeanParameter;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
-import com.sonsure.dumper.core.management.BeanParameter;
 
 import java.io.Serializable;
 import java.util.Map;

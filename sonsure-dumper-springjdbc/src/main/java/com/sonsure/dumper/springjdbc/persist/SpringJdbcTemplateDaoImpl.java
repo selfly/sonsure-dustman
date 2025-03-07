@@ -25,7 +25,7 @@ import java.util.List;
  * @author liyd
  * @date 17/4/12
  */
-public class SpringJdbcJdbcDaoImpl extends AbstractJdbcDaoImpl implements InitializingBean {
+public class SpringJdbcTemplateDaoImpl extends AbstractJdbcDaoImpl implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {

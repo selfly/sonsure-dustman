@@ -9,7 +9,9 @@
 
 package com.sonsure.dumper.core.command;
 
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author selfly
@@ -33,9 +35,11 @@ public enum SqlOperator {
 
     LTE("<="),
 
-    IN("in"),
-
     IS("is"),
+
+    LIKE("like"),
+
+    IN("in"),
 
     NOT_IN("not in");
 
@@ -43,6 +47,15 @@ public enum SqlOperator {
 
     SqlOperator(String code) {
         this.code = code;
+    }
+
+    public static SqlOperator of(String code) {
+        for (SqlOperator value : values()) {
+            if (value.getCode().equalsIgnoreCase(StringUtils.trim(code))) {
+                return value;
+            }
+        }
+        throw new SonsureJdbcException("不支持的sql操作符:" + code);
     }
 
 }

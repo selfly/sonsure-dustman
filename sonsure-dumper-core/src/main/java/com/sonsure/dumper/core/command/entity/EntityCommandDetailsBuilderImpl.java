@@ -9,16 +9,9 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.AbstractDynamicCommandDetailsBuilder;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
-import com.sonsure.dumper.core.command.GenerateKey;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.management.CommandBuildHelper;
-import com.sonsure.dumper.core.management.ModelClassFieldDetails;
-import com.sonsure.dumper.core.management.ModelClassWrapper;
-import com.sonsure.dumper.core.management.NativeContentWrapper;
 import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;

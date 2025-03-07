@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.management;
+package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.core.annotation.Column;

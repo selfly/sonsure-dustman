@@ -75,7 +75,7 @@
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
         <!--<property name="dataSource" ref="dataSource"/>-->
     </bean>

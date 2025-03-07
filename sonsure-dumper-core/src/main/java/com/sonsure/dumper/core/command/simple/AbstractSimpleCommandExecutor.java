@@ -10,12 +10,8 @@
 package com.sonsure.dumper.core.command.simple;
 
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandDetailsBuilder;
-import com.sonsure.dumper.core.command.CommandType;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.management.BeanParameter;
 import lombok.Getter;
 
 import java.io.Serializable;

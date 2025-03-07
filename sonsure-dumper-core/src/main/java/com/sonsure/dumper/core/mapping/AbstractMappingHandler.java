@@ -11,10 +11,10 @@ package com.sonsure.dumper.core.mapping;
 
 import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
+import com.sonsure.dumper.core.command.CommandBuildHelper;
+import com.sonsure.dumper.core.command.ModelClassDetails;
+import com.sonsure.dumper.core.command.ModelClassFieldDetails;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.management.CommandBuildHelper;
-import com.sonsure.dumper.core.management.ModelClassDetails;
-import com.sonsure.dumper.core.management.ModelClassFieldDetails;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

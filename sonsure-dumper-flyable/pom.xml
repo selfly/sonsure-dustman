@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.sonsure</groupId>
         <artifactId>sonsure-dumper</artifactId>
-        <version>4.3.2</version>
+        <version>4.4.0</version>
     </parent>
 
     <artifactId>sonsure-dumper-flyable</artifactId>

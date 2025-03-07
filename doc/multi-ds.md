@@ -21,7 +21,7 @@
         <property name="keyGenerator" ref="oracleKeyGenerator"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="defaultJdbcEngine" ref="mysqlJdbcTemplateEngine"/>
         <property name="jdbcEngineMap">
             <map>

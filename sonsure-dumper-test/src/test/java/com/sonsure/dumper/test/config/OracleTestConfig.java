@@ -6,7 +6,7 @@ import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.core.persist.KeyGenerator;
 import com.sonsure.dumper.core.persist.OracleKeyGenerator;
 import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean;
-import com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl;
+import com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ public class OracleTestConfig {
 
     @Bean
     public JdbcDao oracleJdbcDao(@Qualifier("oracleJdbcTemplateEngine") JdbcEngine jdbcEngine) {
-        SpringJdbcJdbcDaoImpl jdbcDao = new SpringJdbcJdbcDaoImpl();
+        SpringJdbcTemplateDaoImpl jdbcDao = new SpringJdbcTemplateDaoImpl();
         jdbcDao.setDefaultJdbcEngine(jdbcEngine);
         return jdbcDao;
     }

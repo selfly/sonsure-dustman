@@ -125,7 +125,7 @@ CountCommandContextBuilder 代码：
         <property name="commandExecutorFactory" ref="commandExecutorFactory"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcJdbcDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
     </bean>
     

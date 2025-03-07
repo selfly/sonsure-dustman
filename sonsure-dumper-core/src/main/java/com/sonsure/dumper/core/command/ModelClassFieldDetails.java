@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.management;
+package com.sonsure.dumper.core.command;
 
 import lombok.Getter;
 import lombok.Setter;
