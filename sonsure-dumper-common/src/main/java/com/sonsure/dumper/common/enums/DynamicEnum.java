@@ -1,5 +1,8 @@
 package com.sonsure.dumper.common.enums;
 
+/**
+ * @author selfly
+ */
 public abstract class DynamicEnum<T extends BaseDynamicEnum> implements BaseEnum, ValueEnum, DescriptionEnum {
 
     public static <T extends DynamicEnum<?>> T of(BaseEnum baseEnum) {

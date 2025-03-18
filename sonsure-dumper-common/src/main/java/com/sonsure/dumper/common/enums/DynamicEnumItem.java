@@ -16,6 +16,7 @@ public class DynamicEnumItem extends DynamicEnum<BaseDynamicEnum> {
     private String name;
     private Object value;
     private String description;
+    private String origName;
 
     private DynamicEnumItem(String code, String name, Object value, String description) {
         this.code = code;

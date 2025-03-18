@@ -1,6 +1,7 @@
 package com.sonsure.dumper.common.enums;
 
 import com.sonsure.dumper.common.exception.SonsureCommonsException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +58,15 @@ public class DynamicEnumHelper {
             throw new SonsureCommonsException("枚举不存在,class:" + enumCls.getName() + ",code:" + code);
         }
         return null;
+    }
+
+    public static DynamicEnumItem getEnumItemByOrigName(Class<? extends BaseDynamicEnum> enumCls, String origName) {
+        for (Map.Entry<BaseDynamicEnum, DynamicEnumItem> entry : computeIfAbsentWithClass(enumCls).entrySet()) {
+            if (StringUtils.equalsIgnoreCase(entry.getKey().getOrigName(), origName)) {
+                return entry.getValue();
+            }
+        }
+        throw new SonsureCommonsException("枚举不存在,class:" + enumCls.getName() + ",origName:" + origName);
     }
 
     /**
