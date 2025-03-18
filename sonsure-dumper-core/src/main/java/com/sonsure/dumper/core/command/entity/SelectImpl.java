@@ -15,8 +15,9 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandType;
 import com.sonsure.dumper.core.command.OrderBy;
+import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaMethod;
+import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 
@@ -39,8 +40,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public Select<M> tableAlias(String alias) {
-        this.getEntityCommandDetailsBuilder().tableAlias(alias);
+    public Select<M> as(String alias) {
+        this.getEntityCommandDetailsBuilder().as(alias);
         return this;
     }
 
@@ -75,6 +76,30 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
+    public Select<M> innerJoin(String table) {
+        this.getEntityCommandDetailsBuilder().innerJoin(table);
+        return this;
+    }
+
+    @Override
+    public Select<M> innerJoin(Class<?> cls) {
+        this.getEntityCommandDetailsBuilder().innerJoin(cls);
+        return this;
+    }
+
+    @Override
+    public Select<M> on(String on) {
+        this.getEntityCommandDetailsBuilder().on(on);
+        return this;
+    }
+
+    @Override
+    public Select<M> on(SqlPart sqlPart) {
+        this.getEntityCommandDetailsBuilder().on(sqlPart);
+        return this;
+    }
+
+    @Override
     public Select<M> groupBy(String... fields) {
         this.getEntityCommandDetailsBuilder().groupBy(fields);
         return this;
@@ -94,7 +119,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public <E, R> Select<M> orderBy(Function<E, R> function, OrderBy orderBy) {
-        String field = LambdaMethod.getField(function);
+        String field = LambdaHelper.getFieldName(function);
         this.orderBy(field, orderBy);
         return this;
     }

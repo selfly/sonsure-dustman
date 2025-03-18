@@ -60,14 +60,38 @@ public class CommandSql extends AbstractSQL<CommandSql> {
      * @param aliasName the alias name
      * @return the command sql
      */
-    public CommandSql tableAlias(String aliasName) {
-        List<String> tables = this.sql().tables;
-        String lastTable = tables.remove(tables.size() - 1);
-        tables.add(lastTable + " " + aliasName);
+    public CommandSql as(String aliasName, SqlStatement sqlStatement) {
+        List<String> list = getLatestList(sqlStatement);
+        String last = list.remove(list.size() - 1);
+        list.add(last + " " + aliasName);
+        return getSelf();
+    }
+
+    /**
+     * Join on command sql.
+     *
+     * @param on           the on
+     * @param sqlStatement the sql statement
+     * @return the command sql
+     */
+    public CommandSql joinOn(String on, SqlStatement sqlStatement) {
+        List<String> list = getLatestList(sqlStatement);
+        String last = list.remove(list.size() - 1);
+        list.add(last + " on " + on);
         return getSelf();
     }
 
     public boolean isEmptySelectColumns() {
         return this.sql().select.isEmpty();
+    }
+
+    private List<String> getLatestList(SqlStatement sqlStatement) {
+        List<String> list;
+        if (SqlStatement.INNER_JOIN == sqlStatement) {
+            list = this.sql().innerJoin;
+        } else {
+            list = this.sql().tables;
+        }
+        return list;
     }
 }

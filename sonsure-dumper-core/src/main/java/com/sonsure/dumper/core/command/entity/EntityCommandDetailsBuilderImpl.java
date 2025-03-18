@@ -15,6 +15,7 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
+import com.sonsure.dumper.core.third.mybatis.SqlStatement;
 
 import java.util.Map;
 
@@ -23,7 +24,6 @@ import java.util.Map;
  * <p>
  *
  * @author liyd
- * @date 17/4/11
  */
 public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetailsBuilder<EntityCommandDetailsBuilder> implements EntityCommandDetailsBuilder {
 
@@ -35,42 +35,39 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
 
     @Override
     public EntityCommandDetailsBuilder from(Class<?> cls) {
-        this.addClassMapping(cls);
-        ModelClassWrapper modelClassWrapper = this.createModelClassWrapper(cls);
-        this.commandSql.FROM(modelClassWrapper.getModelName());
-        return this;
+        ModelClassWrapper modelClassWrapper = this.mppingAndCreateModelClassWrapper(cls);
+        return this.from(modelClassWrapper.getModelName());
     }
 
     @Override
     public EntityCommandDetailsBuilder addAllColumns() {
         String[] fields = this.getLatestModelClass().getModelFields().stream()
                 .map(v -> CommandBuildHelper.getTableAliasFileName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
-        this.addSelectFields(fields);
-        return this;
+        return this.addSelectFields(fields);
     }
 
     @Override
     public EntityCommandDetailsBuilder insertInto(Class<?> cls) {
-        this.addClassMapping(cls);
-        ModelClassWrapper modelClassWrapper = this.createModelClassWrapper(cls);
-        this.commandSql.INSERT_INTO(modelClassWrapper.getModelName());
-        return this;
+        ModelClassWrapper modelClassWrapper = this.mppingAndCreateModelClassWrapper(cls);
+        return this.insertInto(modelClassWrapper.getModelName());
     }
 
     @Override
     public EntityCommandDetailsBuilder update(Class<?> cls) {
-        this.addClassMapping(cls);
-        ModelClassWrapper modelClassWrapper = this.createModelClassWrapper(cls);
-        this.commandSql.UPDATE(modelClassWrapper.getModelName());
-        return this;
+        ModelClassWrapper modelClassWrapper = this.mppingAndCreateModelClassWrapper(cls);
+        return this.update(modelClassWrapper.getModelName());
     }
 
     @Override
     public EntityCommandDetailsBuilder deleteFrom(Class<?> cls) {
-        this.addClassMapping(cls);
-        ModelClassWrapper modelClassWrapper = this.createModelClassWrapper(cls);
-        this.commandSql.DELETE_FROM(modelClassWrapper.getModelName());
-        return this.getSelf();
+        ModelClassWrapper modelClassWrapper = this.mppingAndCreateModelClassWrapper(cls);
+        return this.deleteFrom(modelClassWrapper.getModelName());
+    }
+
+    @Override
+    public EntityCommandDetailsBuilder innerJoin(Class<?> cls) {
+        ModelClassWrapper modelClassWrapper = this.mppingAndCreateModelClassWrapper(cls);
+        return this.innerJoin(modelClassWrapper.getModelName());
     }
 
     @Override
@@ -142,7 +139,11 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
         return commandDetails;
     }
 
-    protected ModelClassWrapper createModelClassWrapper(Class<?> cls) {
+    protected ModelClassWrapper mppingAndCreateModelClassWrapper(Class<?> cls) {
+        MappingHandler mappingHandler = this.getJdbcEngineConfig().getMappingHandler();
+        if (mappingHandler instanceof AbstractMappingHandler) {
+            ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
+        }
         ModelClassWrapper modelClassWrapper = new ModelClassWrapper(cls);
         this.latestModelClass = modelClassWrapper;
         return modelClassWrapper;
@@ -153,12 +154,5 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
             throw new SonsureJdbcException("当前执行业务必须先指定ModelClass");
         }
         return this.latestModelClass;
-    }
-
-    protected void addClassMapping(Class<?> cls) {
-        MappingHandler mappingHandler = this.getJdbcEngineConfig().getMappingHandler();
-        if (mappingHandler instanceof AbstractMappingHandler) {
-            ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
-        }
     }
 }

@@ -47,7 +47,7 @@
 
 以下where条件使用不传参方式，与上面等价：
 
-    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
+    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).as("t1")
             .from(Account.class, "t2")
             .addColumn("t1.loginName as name1", "t2.loginName as name2")
             .where("{{t1.userInfoId}}", "t2.accountId")

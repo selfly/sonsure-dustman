@@ -9,7 +9,6 @@
 
 package com.sonsure.dumper.test.model;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,6 +43,5 @@ public class UserInfo extends BaseUser {
      * 年龄
      */
     private Integer userAge;
-
 
 }

@@ -10,9 +10,6 @@
 package com.sonsure.dumper.core.command.lambda;
 
 import com.sonsure.dumper.common.spring.ReflectionUtils;
-import com.sonsure.dumper.common.utils.NameUtils;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
@@ -20,18 +17,23 @@ import java.lang.reflect.Method;
 /**
  * @author liyd
  */
-public class LambdaMethod {
+public class LambdaHelper {
 
-    public static <T, R> String getField(Function<T, R> lambda) {
+    public static <T, R> LambdaClass getLambdaClass(Function<T, R> lambda) {
         SerializedLambda invoke = getSerializedLambda(lambda);
-        return methodToField(invoke.getImplMethodName());
+        return new LambdaClass(invoke.getImplClass(), invoke.getImplMethodName());
+    }
+
+    public static <T, R> String getFieldName(Function<T, R> lambda) {
+        LambdaClass lambdaClass = getLambdaClass(lambda);
+        return lambdaClass.getFieldName();
     }
 
     @SafeVarargs
-    public static <T, R> String[] getFields(Function<T, R>... functions) {
+    public static <T, R> String[] getFieldNames(Function<T, R>... functions) {
         String[] fields = new String[functions.length];
         for (int i = 0; i < functions.length; i++) {
-            fields[i] = getField(functions[i]);
+            fields[i] = getFieldName(functions[i]);
         }
         return fields;
     }
@@ -40,19 +42,5 @@ public class LambdaMethod {
         Method writeReplace = ReflectionUtils.findMethod(lambda.getClass(), "writeReplace");
         ReflectionUtils.makeAccessible(writeReplace);
         return (SerializedLambda) ReflectionUtils.invokeMethod(writeReplace, lambda);
-    }
-
-    public static String methodToField(String name) {
-        if (name.startsWith("is")) {
-            name = StringUtils.substring(name, 2);
-        } else if (name.startsWith("get")) {
-            name = StringUtils.substring(name, 3);
-        } else {
-            throw new SonsureJdbcException("只能是JavaBean的get方法");
-        }
-        if (StringUtils.isNotBlank(name)) {
-            name = NameUtils.getFirstLowerName(name);
-        }
-        return name;
     }
 }

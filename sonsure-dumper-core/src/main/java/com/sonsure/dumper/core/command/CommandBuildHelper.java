@@ -32,6 +32,12 @@ public class CommandBuildHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandBuildHelper.class);
 
+    /**
+     * value需要native内容前后包围符号
+     */
+    public static final String NATIVE_OPEN_TOKEN = "{{";
+    public static final String NATIVE_CLOSE_TOKEN = "}}";
+
     public static final String DOT = ".";
     /**
      * 主键属性后缀
@@ -158,6 +164,18 @@ public class CommandBuildHelper {
             return field;
         }
         return tableAlias + DOT + field;
+    }
+
+    public static String wrapperToNative(String name) {
+        return NATIVE_OPEN_TOKEN + name + NATIVE_CLOSE_TOKEN;
+    }
+
+    public static boolean isNativeContent(String content) {
+        return StringUtils.startsWith(content, NATIVE_OPEN_TOKEN) && StringUtils.endsWith(content, NATIVE_CLOSE_TOKEN);
+    }
+
+    public static String getNativeContentActualValue(String content) {
+        return StringUtils.substring(content, NATIVE_OPEN_TOKEN.length(), content.length() - NATIVE_CLOSE_TOKEN.length());
     }
 
     public static Map<String, Object> obj2PropMap(Object obj, boolean ignoreNull) {

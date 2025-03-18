@@ -5,7 +5,7 @@ import com.sonsure.dumper.common.validation.ValidationError;
 import com.sonsure.dumper.common.validation.ValidationGroup;
 import com.sonsure.dumper.common.validation.ValidationResult;
 import com.sonsure.dumper.common.validation.Verifier;
-import com.sonsure.dumper.core.command.lambda.LambdaMethod;
+import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.test.model.UserInfo;
 import com.sonsure.dumper.test.model.ValidationModel;
 import org.junit.jupiter.api.Assertions;
@@ -193,7 +193,7 @@ public class VerifierTest {
 
     @Test
     public void lambda() {
-        String field = LambdaMethod.getField(UserInfo::getUserInfoId);
+        String field = LambdaHelper.getFieldName(UserInfo::getUserInfoId);
         System.out.println(field);
 
         Assertions.assertEquals("aa", field);

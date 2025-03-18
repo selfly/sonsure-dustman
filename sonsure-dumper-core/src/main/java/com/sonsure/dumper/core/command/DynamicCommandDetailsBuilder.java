@@ -17,7 +17,6 @@ import com.sonsure.dumper.core.command.lambda.Function;
  *
  * @param <T> the type parameter
  * @author liyd
- * @date 17 /4/11
  */
 public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBuilder<T>> extends CommandDetailsBuilder<T> {
 
@@ -152,7 +151,31 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      * @param aliasName the alias name
      * @return the t
      */
-    T tableAlias(String aliasName);
+    T as(String aliasName);
+
+    /**
+     * Inner join t.
+     *
+     * @param table the table
+     * @return the t
+     */
+    T innerJoin(String table);
+
+    /**
+     * On t.
+     *
+     * @param on the on
+     * @return the t
+     */
+    T on(String on);
+
+    /**
+     * On t.
+     *
+     * @param sqlPart the sql part
+     * @return the t
+     */
+    T on(SqlPart sqlPart);
 
     /**
      * Where command

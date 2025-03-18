@@ -16,7 +16,7 @@ import com.sonsure.dumper.core.command.DynamicCommandDetailsBuilder;
  * <p>
  *
  * @author liyd
- * @date 17/4/11
+ * @date 17 /4/11
  */
 public interface EntityCommandDetailsBuilder extends DynamicCommandDetailsBuilder<EntityCommandDetailsBuilder> {
 
@@ -59,6 +59,13 @@ public interface EntityCommandDetailsBuilder extends DynamicCommandDetailsBuilde
      */
     EntityCommandDetailsBuilder deleteFrom(Class<?> cls);
 
+    /**
+     * Inner join entity command details builder.
+     *
+     * @param cls the cls
+     * @return the entity command details builder
+     */
+    EntityCommandDetailsBuilder innerJoin(Class<?> cls);
 
     /**
      * Sets field for object where pk.

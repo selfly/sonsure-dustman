@@ -339,7 +339,9 @@ public class SpringJdbcDaoTest {
         }
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .where(
-                        SqlPart.of("loginName", "whereAnd").or(UserInfo::getPassword, "123456-5")
+                        SqlPart.of("loginName").eq("whereAnd")
+                                .or(UserInfo::getPassword).eq("123456-5")
+//                        SqlPart.of("loginName", "whereAnd").or(UserInfo::getPassword, "123456-5")
                 )
                 .and()
                 .where(UserInfo::getUserInfoId, 2L)
@@ -456,7 +458,7 @@ public class SpringJdbcDaoTest {
 
     @Test
     public void select13() {
-        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
+        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where("t1.userInfoId", SqlOperator.IN, new Object[]{11L, 12L, 13L})
                 .where("t1.loginName", SqlOperator.IN, new Object[]{"name-11", "name-12", "name-13"})
                 .where("t1.userAge", SqlOperator.IN, new Object[]{11L, 12L, 13L})
@@ -1257,6 +1259,44 @@ public class SpringJdbcDaoTest {
                 .count();
         Assertions.assertTrue(count1 > 0);
 
+    }
+
+    @Test
+    public void innerJoinClassFieldStr() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 11; i++) {
+            Account account = new Account();
+            account.setAccountId((long) i);
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+                .innerJoin(Account.class).as("t2")
+                .on("t1.userInfoId = t2.accountId")
+                .list();
+        Assertions.assertEquals(10, list.size());
+    }
+
+    @Test
+    public void innerJoinClassFieldLambda() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 11; i++) {
+            Account account = new Account();
+            account.setAccountId((long) i);
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+                .innerJoin(Account.class).as("t2")
+                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
+                .list();
+        Assertions.assertEquals(10, list.size());
     }
 
     //    @Test

@@ -11,15 +11,18 @@ package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaMethod;
+import com.sonsure.dumper.core.command.lambda.LambdaClass;
+import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.third.mybatis.CommandSql;
+import com.sonsure.dumper.core.third.mybatis.SqlStatement;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,43 +40,88 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     protected final CommandSql commandSql;
     protected final CommandParameters commandParameters;
     protected boolean ignoreNull = true;
+    protected Map<String, String> tableAliasMapping;
+    protected String latestTable;
     protected String latestTableAlias;
+    protected SqlStatement latestStatement;
 
     public AbstractDynamicCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
         this.commandSql = new CommandSql();
         this.commandParameters = new CommandParameters();
+        this.tableAliasMapping = new LinkedHashMap<>(8);
     }
 
     @Override
     public T from(String entity) {
         this.getCommandSql().FROM(entity);
+        this.latestTable = entity;
+        latestStatement = SqlStatement.TABLE;
         return this.getSelf();
     }
 
     @Override
     public T insertInto(String entity) {
         this.getCommandSql().INSERT_INTO(entity);
+        this.latestTable = entity;
+        latestStatement = SqlStatement.TABLE;
         return this.getSelf();
     }
 
     @Override
     public T update(String entity) {
         this.getCommandSql().UPDATE(entity);
+        this.latestTable = entity;
+        latestStatement = SqlStatement.TABLE;
         return this.getSelf();
     }
 
     @Override
     public T deleteFrom(String entity) {
         this.getCommandSql().DELETE_FROM(entity);
+        this.latestTable = entity;
+        latestStatement = SqlStatement.TABLE;
         return this.getSelf();
     }
 
 
     @Override
-    public T tableAlias(String aliasName) {
-        this.getCommandSql().tableAlias(aliasName);
+    public T as(String aliasName) {
+        this.getCommandSql().as(aliasName, this.getLatestStatement());
         this.latestTableAlias = aliasName;
+        this.tableAliasMapping.put(this.latestTable, aliasName);
+        return this.getSelf();
+    }
+
+    @Override
+    public T innerJoin(String table) {
+        this.getCommandSql().INNER_JOIN(table);
+        this.latestTable = table;
+        latestStatement = SqlStatement.INNER_JOIN;
+        return this.getSelf();
+    }
+
+    @Override
+    public T on(String on) {
+        this.getCommandSql().joinOn(on, getLatestStatement());
+        return this.getSelf();
+    }
+
+    @Override
+    public T on(SqlPart sqlPart) {
+        List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
+        StringBuilder partSql = new StringBuilder();
+        CommandParameters partParameters = new CommandParameters();
+        for (SqlPart.PartStatement partStatement : partStatements) {
+            if (StringUtils.isNotBlank(partStatement.getLogical())) {
+                partSql.append(partStatement.getLogical());
+            }
+            ImmutablePair<String, CommandParameters> pair = this.buildPartStatement(partStatement);
+            partSql.append(pair.getLeft());
+            partParameters.addParameters(pair.getRight().getParameterObjects());
+        }
+        this.getCommandSql().WHERE(partSql.toString());
+        this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
     }
 
@@ -85,13 +133,13 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T addSelectFields(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
+        String[] fields = LambdaHelper.getFieldNames(function);
         return this.addSelectFields(fields);
     }
 
     @Override
     public <E, R> T dropSelectFields(Function<E, R> function) {
-        String[] fields = LambdaMethod.getFields(function);
+        String[] fields = LambdaHelper.getFieldNames(function);
         return this.dropSelectFields(fields);
     }
 
@@ -115,7 +163,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T intoField(Function<E, R> function, Object value) {
-        String field = LambdaMethod.getField(function);
+        String field = LambdaHelper.getFieldName(function);
         this.intoField(field, value);
         return this.getSelf();
     }
@@ -147,7 +195,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T setField(Function<E, R> function, Object value) {
-        String field = LambdaMethod.getField(function);
+        String field = LambdaHelper.getFieldName(function);
         return this.setField(field, value);
     }
 
@@ -163,7 +211,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
-        ImmutablePair<String, CommandParameters> pair = this.buildCondition(field, sqlOperator, value);
+        ImmutablePair<String, CommandParameters> pair = this.buildPartStatement(field, sqlOperator, value);
         this.getCommandSql().WHERE(pair.getLeft());
         this.getCommandParameters().addParameters(pair.getRight().getParameterObjects());
         return this.getSelf();
@@ -176,32 +224,49 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        String field = LambdaMethod.getField(function);
+        String field = LambdaHelper.getFieldName(function);
         return this.where(field, sqlOperator, value);
     }
 
     @Override
     public T where(SqlPart sqlPart) {
-        List<SqlPart.Condition> conditions = sqlPart.getConditions();
+        List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
         StringBuilder partSql = new StringBuilder();
         CommandParameters partParameters = new CommandParameters();
-        for (SqlPart.Condition condition : conditions) {
-            if (StringUtils.isNotBlank(condition.getLogical())) {
-                partSql.append(condition.getLogical());
+        for (SqlPart.PartStatement partStatement : partStatements) {
+            if (StringUtils.isNotBlank(partStatement.getLogical())) {
+                partSql.append(partStatement.getLogical());
             }
-            ImmutablePair<String, CommandParameters> pair = this.buildCondition(condition.getName(), condition.getSqlOperator(), condition.getValue());
+            ImmutablePair<String, CommandParameters> pair = this.buildPartStatement(partStatement);
             partSql.append(pair.getLeft());
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
         this.getCommandSql().WHERE(partSql.toString());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
+
+
+//        List<SqlPart.Condition> conditions = sqlPart.getConditions();
+//        StringBuilder partSql = new StringBuilder();
+//        CommandParameters partParameters = new CommandParameters();
+//        for (SqlPart.Condition condition : conditions) {
+//            if (StringUtils.isNotBlank(condition.getLogical())) {
+//                partSql.append(condition.getLogical());
+//            }
+//            ImmutablePair<String, CommandParameters> pair = this.buildCondition(condition.getName(), condition.getSqlOperator(), condition.getValue());
+//            partSql.append(pair.getLeft());
+//            partParameters.addParameters(pair.getRight().getParameterObjects());
+//        }
+//        this.getCommandSql().WHERE(partSql.toString());
+//        this.commandParameters.addParameters(partParameters.getParameterObjects());
+//        return this.getSelf();
     }
 
-    protected ImmutablePair<String, CommandParameters> buildCondition(String field, SqlOperator sqlOperator, Object value) {
+    protected ImmutablePair<String, CommandParameters> buildPartStatement(String field, SqlOperator sqlOperator, Object value) {
         StringBuilder conditionSql = new StringBuilder();
         CommandParameters conditionParameters = new CommandParameters();
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
+
         if (value == null) {
             conditionSql.append(field).append(SPACE)
                     .append(sqlOperator.getCode()).append(SPACE).append(NULL);
@@ -240,6 +305,30 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             }
         }
         return new ImmutablePair<>(conditionSql.toString(), conditionParameters);
+    }
+
+    protected ImmutablePair<String, CommandParameters> buildPartStatement(SqlPart.PartStatement partStatement) {
+        String field;
+        SqlOperator sqlOperator = partStatement.getSqlOperator();
+        Object value;
+        if (partStatement.getSource() instanceof LambdaClass) {
+            LambdaClass lambdaClass = (LambdaClass) partStatement.getSource();
+            String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
+            field = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
+        } else {
+            field = ((String) partStatement.getSource());
+        }
+        if (partStatement.getTarget() instanceof LambdaClass) {
+            LambdaClass lambdaClass = (LambdaClass) partStatement.getTarget();
+            String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
+            value = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
+        } else {
+            value = partStatement.getTarget();
+        }
+        if (partStatement.isRaw()) {
+            field = CommandBuildHelper.wrapperToNative(field);
+        }
+        return this.buildPartStatement(field, sqlOperator, value);
     }
 
     @Override
@@ -301,7 +390,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T orderBy(Function<E, R> function, OrderBy orderBy) {
-        String field = LambdaMethod.getField(function);
+        String field = LambdaHelper.getFieldName(function);
         return this.orderBy(field, orderBy);
     }
 
@@ -313,7 +402,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T groupBy(Function<E, R> function) {
-        String field = LambdaMethod.getField(function);
+        String field = LambdaHelper.getFieldName(function);
         return this.groupBy(field);
     }
 

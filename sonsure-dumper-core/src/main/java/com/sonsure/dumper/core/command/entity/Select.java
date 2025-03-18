@@ -13,6 +13,8 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
+import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 import java.util.List;
@@ -31,7 +33,7 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * @param alias the alias
      * @return the select
      */
-    Select<M> tableAlias(String alias);
+    Select<M> as(String alias);
 
     /**
      * Select 字段.
@@ -75,6 +77,38 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * @return the select
      */
     <E, R> Select<M> dropColumn(Function<E, R> function);
+
+    /**
+     * Inner join select.
+     *
+     * @param table the table
+     * @return the select
+     */
+    Select<M> innerJoin(String table);
+
+    /**
+     * Inner join select.
+     *
+     * @param cls the cls
+     * @return the select
+     */
+    Select<M> innerJoin(Class<?> cls);
+
+    /**
+     * On select.
+     *
+     * @param on the on
+     * @return the select
+     */
+    Select<M> on(String on);
+
+    /**
+     * On select.
+     *
+     * @param sqlPart the sql part
+     * @return the select
+     */
+    Select<M> on(SqlPart sqlPart);
 
     /**
      * 添加 group by属性

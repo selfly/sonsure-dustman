@@ -25,6 +25,7 @@ import com.sonsure.dumper.core.command.natives.NativeExecutorImpl;
  */
 public class CommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
         if (Insert.class == commandExecutorClass) {
