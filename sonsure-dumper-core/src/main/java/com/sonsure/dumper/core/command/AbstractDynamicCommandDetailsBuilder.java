@@ -231,7 +231,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     @Override
     public T where(SqlPart sqlPart) {
         List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
-        StringBuilder partSql = new StringBuilder();
+        StringBuilder partSql = new StringBuilder("(");
         CommandParameters partParameters = new CommandParameters();
         for (SqlPart.PartStatement partStatement : partStatements) {
             if (StringUtils.isNotBlank(partStatement.getLogical())) {
@@ -241,6 +241,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             partSql.append(pair.getLeft());
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
+        partSql.append(")");
         this.getCommandSql().WHERE(partSql.toString());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();

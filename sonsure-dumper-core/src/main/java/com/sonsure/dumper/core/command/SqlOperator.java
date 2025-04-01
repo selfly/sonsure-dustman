@@ -37,6 +37,8 @@ public enum SqlOperator {
 
     IS("is"),
 
+    IS_NOT("is not"),
+
     LIKE("like"),
 
     IN("in"),
