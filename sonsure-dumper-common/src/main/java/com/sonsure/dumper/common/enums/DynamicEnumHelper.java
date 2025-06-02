@@ -50,7 +50,7 @@ public class DynamicEnumHelper {
      */
     public static DynamicEnumItem getEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code, boolean required) {
         for (Map.Entry<BaseDynamicEnum, DynamicEnumItem> entry : computeIfAbsentWithClass(enumCls).entrySet()) {
-            if (entry.getKey().getCode().equals(code)) {
+            if (entry.getKey().getCode().equalsIgnoreCase(code)) {
                 return entry.getValue();
             }
         }
@@ -115,7 +115,7 @@ public class DynamicEnumHelper {
     static void addEnumItem(BaseDynamicEnum enumType, DynamicEnumItem enumItem) {
         Map<BaseDynamicEnum, DynamicEnumItem> map = computeIfAbsentWithClass(enumType.getEnumClass());
         for (BaseDynamicEnum type : map.keySet()) {
-            if (type.getCode().equals(enumItem.getCode())) {
+            if (type.getCode().equalsIgnoreCase(enumItem.getCode())) {
                 throw new SonsureCommonsException(enumType.getEnumClass() + " code已经存在:" + enumItem.getCode());
             }
         }
@@ -142,12 +142,12 @@ public class DynamicEnumHelper {
     public static void removeEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code) {
         BaseDynamicEnum[] enumConstants = enumCls.getEnumConstants();
         for (BaseDynamicEnum enumConstant : enumConstants) {
-            if (enumConstant.getCode().equals(code)) {
+            if (enumConstant.getCode().equalsIgnoreCase(code)) {
                 throw new SonsureCommonsException("自带枚举值不允许删除 " + enumCls + " code:" + code);
             }
         }
         Map<BaseDynamicEnum, DynamicEnumItem> map = computeIfAbsentWithClass(enumCls);
-        map.entrySet().removeIf(next -> next.getKey().getCode().equals(code));
+        map.entrySet().removeIf(next -> next.getKey().getCode().equalsIgnoreCase(code));
     }
 
     /**
@@ -161,7 +161,7 @@ public class DynamicEnumHelper {
         List<DynamicEnumItem> enumItems = getEnumItems(enumCls);
         boolean notExists = true;
         for (DynamicEnumItem enumItem : enumItems) {
-            if (enumItem.getCode().equals(code)) {
+            if (enumItem.getCode().equalsIgnoreCase(code)) {
                 enumItem.setName(name);
                 notExists = false;
             }
