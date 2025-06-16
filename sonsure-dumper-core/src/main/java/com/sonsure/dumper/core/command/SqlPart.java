@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 属性分开处理，适配联表查询时使用，例如：
+ * .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
+ *
  * @author selfly
  */
 @Getter
@@ -17,6 +20,7 @@ public class SqlPart {
 
     private static final String OR = " OR ";
     private static final String AND = " AND ";
+    private static final String FUZZY = "%";
 
     private final List<PartStatement> partStatements = new ArrayList<>(8);
 
@@ -47,6 +51,25 @@ public class SqlPart {
         partStatement.setTarget(LambdaHelper.getLambdaClass(function));
         partStatement.setRaw(true);
         return this;
+    }
+
+    public SqlPart like(String value) {
+        PartStatement partStatement = this.partStatements.get(this.partStatements.size() - 1);
+        partStatement.setSqlOperator(SqlOperator.LIKE);
+        partStatement.setTarget(value);
+        return this;
+    }
+
+    public SqlPart likeFuzzy(String value) {
+        return this.like(FUZZY + value + FUZZY);
+    }
+
+    public SqlPart likeLeftFuzzy(String value) {
+        return this.like(FUZZY + value);
+    }
+
+    public SqlPart likeRightFuzzy(String value) {
+        return this.like(value + FUZZY);
     }
 
     public SqlPart or(String name) {
