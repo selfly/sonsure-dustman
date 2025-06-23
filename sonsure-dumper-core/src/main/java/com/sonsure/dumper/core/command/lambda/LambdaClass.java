@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.invoke.SerializedLambda;
+import java.time.LocalDateTime;
+
 /**
  * @author selfly
  */
@@ -13,26 +16,25 @@ import org.apache.commons.lang3.StringUtils;
 @Setter
 public class LambdaClass {
 
-    private String className;
-    private String methodName;
 
     private String simpleClassName;
+    private String methodName;
     private String fieldName;
 
-    public LambdaClass(String className, String methodName) {
-        this.className = className;
-        this.methodName = methodName;
-        String[] clsInfo = StringUtils.split(className, "/");
-        this.simpleClassName = clsInfo[clsInfo.length - 1];
+    public LambdaClass(SerializedLambda serializedLambda) {
+        String[] info = StringUtils.split(serializedLambda.getInstantiatedMethodType(), ";");
+        int index = StringUtils.lastIndexOf(info[0], "/");
+        this.simpleClassName = StringUtils.substring(info[0], index + 1);
+        this.methodName = serializedLambda.getImplMethodName();
         int prefixLength = 0;
-        if (methodName.startsWith("is")) {
+        if (this.methodName.startsWith("is")) {
             prefixLength = 2;
-        } else if (methodName.startsWith("get")) {
+        } else if (this.methodName.startsWith("get")) {
             prefixLength = 3;
         }
         if (prefixLength == 0) {
             throw new SonsureJdbcException("方法名不符合规范:" + prefixLength);
         }
-        this.fieldName = NameUtils.getFirstLowerName(StringUtils.substring(methodName, prefixLength));
+        this.fieldName = NameUtils.getFirstLowerName(StringUtils.substring(this.methodName, prefixLength));
     }
 }

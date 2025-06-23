@@ -1,7 +1,6 @@
 package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaClass;
 import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import lombok.Getter;
 import lombok.Setter;

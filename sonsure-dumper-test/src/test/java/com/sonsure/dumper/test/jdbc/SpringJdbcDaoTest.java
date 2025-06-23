@@ -275,6 +275,7 @@ public class SpringJdbcDaoTest {
     public void selectSingleTableOrderByAliasName() {
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .orderBy(UserInfo::getUserInfoId, OrderBy.ASC)
+                .orderBy(UserInfo::getGmtCreate, OrderBy.DESC)
                 .list();
         Assertions.assertEquals(50, list.size());
         Assertions.assertEquals(1L, list.get(0).getUserInfoId());

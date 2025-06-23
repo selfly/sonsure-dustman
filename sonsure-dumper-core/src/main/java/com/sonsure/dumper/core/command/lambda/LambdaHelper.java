@@ -21,7 +21,7 @@ public class LambdaHelper {
 
     public static <T, R> LambdaClass getLambdaClass(Function<T, R> lambda) {
         SerializedLambda invoke = getSerializedLambda(lambda);
-        return new LambdaClass(invoke.getImplClass(), invoke.getImplMethodName());
+        return new LambdaClass(invoke);
     }
 
     public static <T, R> String getFieldName(Function<T, R> lambda) {

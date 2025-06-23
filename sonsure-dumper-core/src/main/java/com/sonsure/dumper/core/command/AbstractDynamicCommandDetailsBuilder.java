@@ -120,7 +120,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             partSql.append(pair.getLeft());
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
-        this.getCommandSql().WHERE(partSql.toString());
+        this.getCommandSql().joinOn(partSql.toString(), getLatestStatement());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
     }
