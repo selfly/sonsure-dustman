@@ -224,7 +224,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        String field = LambdaHelper.getFieldName(function);
+        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+        String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
+        String field = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
         return this.where(field, sqlOperator, value);
     }
 
@@ -391,7 +393,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T orderBy(Function<E, R> function, OrderBy orderBy) {
-        String field = LambdaHelper.getFieldName(function);
+        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+        String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
+        String field = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
         return this.orderBy(field, orderBy);
     }
 

@@ -264,6 +264,23 @@ public class SpringJdbcDaoTest {
     }
 
     @Test
+    public void selectSingleTableWhereAliasName() {
+        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .where(UserInfo::getUserInfoId, 1L)
+                .singleResult();
+        Assertions.assertEquals(1L, userInfo.getUserInfoId());
+    }
+
+    @Test
+    public void selectSingleTableOrderByAliasName() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .orderBy(UserInfo::getUserInfoId, OrderBy.ASC)
+                .list();
+        Assertions.assertEquals(50, list.size());
+        Assertions.assertEquals(1L, list.get(0).getUserInfoId());
+    }
+
+    @Test
     public void selectWhereField() {
 
         jdbcDao.executeDelete(UserInfo.class);

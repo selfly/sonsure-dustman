@@ -12,11 +12,9 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
-import com.sonsure.dumper.core.command.OrderBy;
-import com.sonsure.dumper.core.command.SqlPart;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.lambda.LambdaClass;
 import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
@@ -119,8 +117,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public <E, R> Select<M> orderBy(Function<E, R> function, OrderBy orderBy) {
-        String field = LambdaHelper.getFieldName(function);
-        this.orderBy(field, orderBy);
+        this.getEntityCommandDetailsBuilder().orderBy(function, orderBy);
         return this;
     }
 
