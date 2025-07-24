@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * @author liyd
- * @date 17/4/11
+ * @since 17/4/11
  */
 public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
 
@@ -82,16 +82,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
      * mybatis SqlSessionFactory
      */
     protected SqlSessionFactory mybatisSqlSessionFactory;
-
-    /**
-     * The Native command.
-     */
-    protected boolean nativeCommand;
-
-    /**
-     * The Named parameter.
-     */
-    protected boolean namedParameter;
 
     /**
      * command大小写
@@ -165,25 +155,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
 
     public void setCommandCase(String commandCase) {
         this.commandCase = commandCase;
-    }
-
-
-    @Override
-    public boolean isNativeCommand() {
-        return nativeCommand;
-    }
-
-    public void setNativeCommand(boolean nativeCommand) {
-        this.nativeCommand = nativeCommand;
-    }
-
-    @Override
-    public boolean isNamedParameter() {
-        return namedParameter;
-    }
-
-    public void setNamedParameter(boolean namedParameter) {
-        this.namedParameter = namedParameter;
     }
 
     @Override

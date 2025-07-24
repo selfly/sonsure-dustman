@@ -105,20 +105,6 @@ public interface JdbcEngineConfig {
     SqlSessionFactory getMybatisSqlSessionFactory();
 
     /**
-     * Native command boolean.
-     *
-     * @return the boolean
-     */
-    boolean isNativeCommand();
-
-    /**
-     * Named parameter boolean.
-     *
-     * @return the boolean
-     */
-    boolean isNamedParameter();
-
-    /**
      * command大小写
      *
      * @return command case
