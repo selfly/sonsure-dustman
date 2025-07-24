@@ -37,6 +37,7 @@ public class EnumConverter {
             return BaseEnum.class.isAssignableFrom(targetType) || DynamicEnum.class.isAssignableFrom(targetType);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public Object convert(PropertyDescriptor targetPd, Object value) {
             if (DynamicEnum.class.isAssignableFrom(targetPd.getPropertyType())) {

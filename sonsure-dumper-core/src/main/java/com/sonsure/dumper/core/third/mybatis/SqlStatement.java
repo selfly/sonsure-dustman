@@ -1,8 +1,5 @@
 package com.sonsure.dumper.core.third.mybatis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author selfly
  */

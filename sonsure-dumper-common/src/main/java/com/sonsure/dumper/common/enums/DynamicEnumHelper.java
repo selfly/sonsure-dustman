@@ -90,6 +90,7 @@ public class DynamicEnumHelper {
      * @param required the required
      * @return the generic enum item
      */
+    @SuppressWarnings("unchecked")
     public static <T extends BaseDynamicEnum> DynamicEnum<T> getGenericEnumItem(Class<T> enumCls, String code, boolean required) {
         //noinspection unchecked
         return (DynamicEnum<T>) getEnumItem(enumCls, code, required);

@@ -31,6 +31,7 @@ public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<Batch
         this.batchUpdateCommandDetailsBuilder = new BatchUpdateCommandDetailsBuilderImpl();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder() {
         //noinspection unchecked

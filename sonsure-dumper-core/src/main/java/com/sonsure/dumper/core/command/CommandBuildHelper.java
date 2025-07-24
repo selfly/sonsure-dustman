@@ -178,6 +178,7 @@ public class CommandBuildHelper {
         return StringUtils.substring(content, NATIVE_OPEN_TOKEN.length(), content.length() - NATIVE_CLOSE_TOKEN.length());
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Object> obj2PropMap(Object obj, boolean ignoreNull) {
         //noinspection unchecked
         Map<String, Object> propMap = obj instanceof Map ? (Map<String, Object>) obj : ClassUtils.getSelfBeanPropMap(obj, Transient.class);

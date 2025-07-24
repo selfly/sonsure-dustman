@@ -491,18 +491,18 @@ public class ClassUtils {
                 clazz.equals(DayOfWeek.class);
     }
 
-    private static void getSuperTypes(Class<?> cls, List<Class<?>> superTypes) {
-        getInterfaces(cls, superTypes);
-        getSuperClasses(cls, superTypes);
-    }
+    // private static void getSuperTypes(Class<?> cls, List<Class<?>> superTypes) {
+    //     getInterfaces(cls, superTypes);
+    //     getSuperClasses(cls, superTypes);
+    // }
 
-    private static void getSuperClasses(Class<?> cls, List<Class<?>> superClasses) {
-        final Class<?> superclass = cls.getSuperclass();
-        if (superclass != null) {
-            getSuperClasses(superclass, superClasses);
-            superClasses.add(superclass);
-        }
-    }
+    // private static void getSuperClasses(Class<?> cls, List<Class<?>> superClasses) {
+    //     final Class<?> superclass = cls.getSuperclass();
+    //     if (superclass != null) {
+    //         getSuperClasses(superclass, superClasses);
+    //         superClasses.add(superclass);
+    //     }
+    // }
 
     public static void getInterfaces(Class<?> cls, List<Class<?>> interfaces) {
         final Class<?>[] ifs = cls.getInterfaces();

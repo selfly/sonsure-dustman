@@ -38,6 +38,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.simpleCommandDetailsBuilder = simpleCommandDetailsBuilder;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder() {
         //noinspection unchecked
@@ -95,6 +96,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         return this.handleResult(result, getResultHandler(cls));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> singleMapResult() {
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP);
@@ -103,6 +105,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         return (Map<String, Object>) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T oneColResult(Class<T> clazz) {
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL);
@@ -111,6 +114,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         return (T) getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Map<String, Object>> listMaps() {
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
@@ -131,6 +135,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         return this.getSelf();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> oneColList(Class<T> clazz) {
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL_LIST);
@@ -144,6 +149,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
         commandDetails.setResultType(List.class);
         //noinspection unchecked
+        @SuppressWarnings("unchecked")
         List<Map<String, Object>> mapList = (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
         return this.handleResult(mapList, getResultHandler(cls));
     }
@@ -159,6 +165,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
         commandDetails.setResultType(Page.class);
         //noinspection unchecked
+        @SuppressWarnings("unchecked")
         Page<Map<String, Object>> page = this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
         Page<Map<String, Object>> resultPage = new Page<>(page.getPagination());
         if (page.getList() != null) {
@@ -168,6 +175,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         return resultPage;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> oneColPageResult(Class<T> clazz) {
         CommandDetails commandDetails = this.simpleCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL_LIST);
@@ -218,6 +226,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         return ((AbstractSimpleCommandDetailsBuilder<?>) this.simpleCommandDetailsBuilder).isNamedParameter();
     }
 
+    @SuppressWarnings("unchecked")
     protected <E> ResultHandler<E> getResultHandler(Class<E> cls) {
         if (this.resultHandler == null) {
             return DefaultResultHandler.newInstance(cls);

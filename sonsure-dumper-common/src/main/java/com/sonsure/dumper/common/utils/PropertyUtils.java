@@ -155,6 +155,7 @@ public final class PropertyUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void yml2propMap(Map<String, Object> ymlMap, String parentKey, Map<String, String> resultMap) {
 
         for (Map.Entry<String, Object> entry : ymlMap.entrySet()) {

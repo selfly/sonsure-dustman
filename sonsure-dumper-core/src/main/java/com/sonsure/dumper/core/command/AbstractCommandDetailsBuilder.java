@@ -131,6 +131,7 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
      */
     public abstract CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType);
 
+    @SuppressWarnings("unchecked")
     protected T getSelf() {
         //noinspection unchecked
         return (T) this;

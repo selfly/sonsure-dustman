@@ -459,8 +459,7 @@ public class SpringJdbcDaoTest {
         Object result = jdbcDao.selectFrom(UserInfo.class)
                 .listMaps();
         Assertions.assertNotNull(result);
-        //noinspection rawtypes
-        Assertions.assertInstanceOf(Map.class, ((List) result).get(0));
+        Assertions.assertInstanceOf(Map.class, ((List<?>) result).get(0));
     }
 
     @Test

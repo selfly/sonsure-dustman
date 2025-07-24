@@ -54,6 +54,7 @@ public class JdbcEngineImpl implements JdbcEngine {
         return jdbcEngineConfig.getDataSource();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <M> Select<M> selectFrom(Class<M> cls) {
         //noinspection unchecked
@@ -66,6 +67,7 @@ public class JdbcEngineImpl implements JdbcEngine {
         return this.selectFrom(cls).orderBy(pkField, OrderBy.DESC).list(cls);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> find(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
@@ -73,6 +75,7 @@ public class JdbcEngineImpl implements JdbcEngine {
         return (List<T>) this.selectFrom(entity.getClass()).whereForObject(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Pageable> Page<T> pageResult(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());

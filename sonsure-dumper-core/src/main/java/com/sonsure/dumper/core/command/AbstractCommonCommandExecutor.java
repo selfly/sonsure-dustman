@@ -109,6 +109,7 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
         return newPage;
     }
 
+    @SuppressWarnings("unchecked")
     protected E getSelf() {
         //noinspection unchecked
         return (E) this;

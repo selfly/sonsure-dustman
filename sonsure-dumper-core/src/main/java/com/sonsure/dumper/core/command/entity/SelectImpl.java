@@ -31,6 +31,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     private final Class<M> cls;
 
+    @SuppressWarnings("unchecked")
     public SelectImpl(JdbcEngineConfig jdbcEngineConfig, Object... params) {
         super(jdbcEngineConfig);
         //noinspection unchecked

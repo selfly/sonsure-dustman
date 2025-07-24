@@ -9,8 +9,6 @@
 
 package com.sonsure.dumper.common.validation;
 
-import java.text.MessageFormat;
-
 /**
  * @author liyd
  * @since 17/3/19

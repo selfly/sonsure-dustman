@@ -18,6 +18,7 @@ public class CustomResultHandler implements ResultHandler<Account> {
 
     @Override
     public Account handle(Object object) {
+        @SuppressWarnings("unchecked")
         Map<String, Object> map = (Map<String, Object>) object;
         Account account = new Account();
         account.setLoginName((String) map.get("LOGIN_NAME"));

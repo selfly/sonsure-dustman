@@ -29,6 +29,7 @@ public abstract class AbstractEntityCommandExecutor<T extends EntityCommandExecu
         this.entityCommandDetailsBuilder = new EntityCommandDetailsBuilderImpl();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected <B extends CommandDetailsBuilder<B>> B getCommandDetailsBuilder() {
         //noinspection unchecked

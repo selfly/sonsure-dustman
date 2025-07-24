@@ -347,6 +347,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         return this.getSelf();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T whereAppend(String segment, Object value) {
         this.getCommandSql().WHERE(segment);

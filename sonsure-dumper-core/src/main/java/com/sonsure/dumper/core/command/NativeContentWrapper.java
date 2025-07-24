@@ -1,8 +1,6 @@
 package com.sonsure.dumper.core.command;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author selfly
