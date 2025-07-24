@@ -26,6 +26,7 @@ public class InsertImpl extends AbstractEntityCommandExecutor<Insert> implements
 
     @Override
     public Insert into(Class<?> cls) {
+        this.registerClassToMappingHandler(cls);
         this.getEntityCommandDetailsBuilder().insertInto(cls);
         return this;
     }

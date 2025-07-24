@@ -28,6 +28,7 @@ public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> impleme
 
     @Override
     public Delete from(Class<?> cls) {
+        this.registerClassToMappingHandler(cls);
         this.getEntityCommandDetailsBuilder().deleteFrom(cls);
         return this;
     }

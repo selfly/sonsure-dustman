@@ -29,10 +29,6 @@ public class BatchUpdateCommandDetailsBuilderImpl extends AbstractSimpleCommandD
     protected int batchSize;
     protected ParameterizedSetter<?> parameterizedSetter;
 
-    public BatchUpdateCommandDetailsBuilderImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
-    }
-
     @Override
     public BatchUpdateCommandDetailsBuilder batchSize(int batchSize) {
         this.batchSize = batchSize;

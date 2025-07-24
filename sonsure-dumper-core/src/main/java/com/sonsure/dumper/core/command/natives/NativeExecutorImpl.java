@@ -18,14 +18,14 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
  * The type Native executor.
  *
  * @author liyd
- * @date 17 /4/25
+ * @since 17 /4/25
  */
 public class NativeExecutorImpl extends AbstractSimpleCommandExecutor<NativeExecutor> implements NativeExecutor {
 
     private static final String DEFAULT_NATIVE_PARAM_PREFIX = "nativeParam";
 
     public NativeExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig, new NativeCommandDetailsBuilderImpl(jdbcEngineConfig));
+        super(jdbcEngineConfig, new NativeCommandDetailsBuilderImpl());
     }
 
     @Override

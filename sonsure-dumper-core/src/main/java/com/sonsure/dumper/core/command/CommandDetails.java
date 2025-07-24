@@ -26,6 +26,8 @@ public class CommandDetails {
 
     private CommandType commandType;
 
+    private CommandCase commandCase;
+
     /**
      * 命令，一般指sql
      */
@@ -38,25 +40,10 @@ public class CommandDetails {
      */
     private boolean forceNative;
 
-//    /**
-//     * The Parameters.
-//     */
-//    private List<Object> parameters;
-
     /**
      * The Is named parameter.
      */
     private boolean isNamedParameter;
-
-//    /**
-//     * The Named param names.
-//     */
-//    private List<String> namedParamNames;
-//
-//    /**
-//     * The Command parameters.
-//     */
-//    private final List<ParameterObject> parameterObjects;
 
     /**
      * 返回值类型，如果是native操作又不指定，可能为null

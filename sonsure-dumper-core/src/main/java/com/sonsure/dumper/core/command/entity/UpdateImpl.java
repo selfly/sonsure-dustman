@@ -18,7 +18,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
  * The type Update.
  *
  * @author liyd
- * @date 17 /4/14
+ * @since 17 /4/14
  */
 public class UpdateImpl extends AbstractConditionCommandExecutor<Update> implements Update {
 
@@ -28,6 +28,7 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
 
     @Override
     public Update table(Class<?> cls) {
+        this.registerClassToMappingHandler(cls);
         this.getEntityCommandDetailsBuilder().update(cls);
         return this;
     }

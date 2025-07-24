@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.config;
 
 
+import com.sonsure.dumper.core.command.CommandCase;
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
 import com.sonsure.dumper.core.command.sql.JSqlParserCommandConversionHandler;
 import com.sonsure.dumper.core.convert.JdbcTypeConverter;
@@ -86,7 +87,9 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
     /**
      * command大小写
      */
-    protected String commandCase;
+    protected CommandCase commandCase = CommandCase.NONE;
+
+    protected boolean initialized = false;
 
     @Override
     public CommandExecutorFactory getCommandExecutorFactory() {
@@ -149,11 +152,11 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
     }
 
     @Override
-    public String getCommandCase() {
+    public CommandCase getCommandCase() {
         return commandCase;
     }
 
-    public void setCommandCase(String commandCase) {
+    public void setCommandCase(CommandCase commandCase) {
         this.commandCase = commandCase;
     }
 

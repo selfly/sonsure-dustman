@@ -31,11 +31,6 @@ import java.util.List;
  */
 public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder<MybatisCommandDetailsBuilderImpl> {
 
-
-    public MybatisCommandDetailsBuilderImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
-    }
-
     @Override
     public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
 

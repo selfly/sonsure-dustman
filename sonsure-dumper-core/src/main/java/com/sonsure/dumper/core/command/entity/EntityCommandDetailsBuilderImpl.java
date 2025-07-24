@@ -12,10 +12,7 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
-import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
-import com.sonsure.dumper.core.third.mybatis.SqlStatement;
 
 import java.util.Map;
 
@@ -28,10 +25,6 @@ import java.util.Map;
 public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetailsBuilder<EntityCommandDetailsBuilder> implements EntityCommandDetailsBuilder {
 
     protected ModelClassWrapper latestModelClass;
-
-    public EntityCommandDetailsBuilderImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
-    }
 
     @Override
     public EntityCommandDetailsBuilder from(Class<?> cls) {
@@ -140,10 +133,6 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
     }
 
     protected ModelClassWrapper mppingAndCreateModelClassWrapper(Class<?> cls) {
-        MappingHandler mappingHandler = this.getJdbcEngineConfig().getMappingHandler();
-        if (mappingHandler instanceof AbstractMappingHandler) {
-            ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
-        }
         ModelClassWrapper modelClassWrapper = new ModelClassWrapper(cls);
         this.latestModelClass = modelClassWrapper;
         return modelClassWrapper;

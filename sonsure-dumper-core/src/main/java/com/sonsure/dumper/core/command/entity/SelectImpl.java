@@ -12,10 +12,11 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.*;
+import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.CommandType;
+import com.sonsure.dumper.core.command.OrderBy;
+import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaClass;
-import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 
@@ -24,7 +25,7 @@ import java.util.Map;
 
 /**
  * @author liyd
- * @date 17/4/12
+ * @since 17/4/12
  */
 public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> implements Select<M> {
 
@@ -34,6 +35,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         super(jdbcEngineConfig);
         //noinspection unchecked
         this.cls = (Class<M>) params[0];
+        this.registerClassToMappingHandler(cls);
         this.getEntityCommandDetailsBuilder().from(cls);
     }
 
@@ -81,6 +83,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public Select<M> innerJoin(Class<?> cls) {
+        this.registerClassToMappingHandler(cls);
         this.getEntityCommandDetailsBuilder().innerJoin(cls);
         return this;
     }
@@ -154,6 +157,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(Class<T> cls) {
+        this.registerClassToMappingHandler(cls);
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_SINGLE_RESULT);
         commandDetails.setResultType(cls);
         return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
@@ -187,6 +191,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
+        this.registerClassToMappingHandler(cls);
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_LIST);
         commandDetails.setResultType(cls);
         return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
@@ -204,6 +209,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> pageResult(Class<T> cls) {
+        this.registerClassToMappingHandler(cls);
         CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_LIST);
         commandDetails.setResultType(cls);
         return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));

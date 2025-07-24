@@ -12,6 +12,8 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
 import com.sonsure.dumper.core.command.CommandDetailsBuilder;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
+import com.sonsure.dumper.core.mapping.MappingHandler;
 import lombok.Getter;
 
 /**
@@ -24,12 +26,19 @@ public abstract class AbstractEntityCommandExecutor<T extends EntityCommandExecu
 
     public AbstractEntityCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.entityCommandDetailsBuilder = new EntityCommandDetailsBuilderImpl(jdbcEngineConfig);
+        this.entityCommandDetailsBuilder = new EntityCommandDetailsBuilderImpl();
     }
 
     @Override
     protected <B extends CommandDetailsBuilder<B>> B getCommandDetailsBuilder() {
         //noinspection unchecked
         return (B) entityCommandDetailsBuilder;
+    }
+
+    protected void registerClassToMappingHandler(Class<?> cls) {
+        MappingHandler mappingHandler = this.getJdbcEngineConfig().getMappingHandler();
+        if (mappingHandler instanceof AbstractMappingHandler) {
+            ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
+        }
     }
 }

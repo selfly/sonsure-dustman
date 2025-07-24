@@ -13,7 +13,6 @@ import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaClass;
 import com.sonsure.dumper.core.command.lambda.LambdaHelper;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import com.sonsure.dumper.core.third.mybatis.SqlStatement;
@@ -32,7 +31,7 @@ import java.util.Map;
  *
  * @param <T> the type parameter
  * @author liyd
- * @date 17 /4/11
+ * @since 17 /4/11
  */
 @Getter
 public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBuilder<T>> extends AbstractCommandDetailsBuilder<T> implements DynamicCommandDetailsBuilder<T> {
@@ -45,8 +44,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     protected String latestTableAlias;
     protected SqlStatement latestStatement;
 
-    public AbstractDynamicCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public AbstractDynamicCommandDetailsBuilder() {
         this.commandSql = new CommandSql();
         this.commandParameters = new CommandParameters();
         this.tableAliasMapping = new LinkedHashMap<>(8);

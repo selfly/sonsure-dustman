@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.config;
 
 
+import com.sonsure.dumper.core.command.CommandCase;
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
 import com.sonsure.dumper.core.convert.JdbcTypeConverter;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
@@ -27,7 +28,7 @@ import java.util.List;
  * <p>
  *
  * @author liyd
- * @date 17/4/11
+ * @since 17/4/11
  */
 public interface JdbcEngineConfig {
 
@@ -109,6 +110,6 @@ public interface JdbcEngineConfig {
      *
      * @return command case
      */
-    String getCommandCase();
+    CommandCase getCommandCase();
 
 }

@@ -2,7 +2,6 @@ package com.sonsure.dumper.core.command.simple;
 
 import com.sonsure.dumper.core.command.AbstractCommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandParameters;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
 
 import java.util.Map;
@@ -16,8 +15,7 @@ public abstract class AbstractSimpleCommandDetailsBuilder<T extends SimpleComman
     protected String command;
     protected CommandParameters commandParameters;
 
-    public AbstractSimpleCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public AbstractSimpleCommandDetailsBuilder() {
         this.commandParameters = new CommandParameters();
     }
 

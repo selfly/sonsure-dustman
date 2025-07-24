@@ -17,7 +17,7 @@ import com.sonsure.dumper.core.command.CommonCommandExecutor;
  * <p>
  *
  * @author liyd
- * @date 17/4/19
+ * @since 17/4/19
  */
 public interface EntityCommandExecutor<T extends EntityCommandExecutor<T>> extends CommonCommandExecutor<T> {
 }

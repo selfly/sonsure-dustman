@@ -32,7 +32,7 @@ import java.util.Optional;
 
 /**
  * @author liyd
- * @date 17/4/12
+ * @since 17/4/12
  */
 public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
@@ -80,13 +80,13 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     @Override
     public List<?> queryForList(CommandDetails commandDetails) {
-        return jdbcOperations.query(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
+        return jdbcOperations.query(commandDetails.getCommand(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
     }
 
     @Override
     public Object querySingleResult(CommandDetails commandDetails) {
         //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<?> list = jdbcOperations.query(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()));
+        List<?> list = jdbcOperations.query(commandDetails.getCommand(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcEngineConfig(), commandDetails.getResultType()), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
         return DataAccessUtils.singleResult(list);
     }
 
@@ -104,7 +104,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     @Override
     public Object queryOneCol(CommandDetails commandDetails) {
-        return jdbcOperations.queryForObject(commandDetails.getCommand(), commandDetails.getCommandParameters().getParsedParameterValues().toArray(), commandDetails.getResultType());
+        return jdbcOperations.queryForObject(commandDetails.getCommand(), commandDetails.getResultType(), commandDetails.getCommandParameters().getParsedParameterValues().toArray());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
         @Override
         @NonNull
-        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+        public PreparedStatement createPreparedStatement(@NonNull Connection con) throws SQLException {
             PreparedStatement ps = generateKey.getColumn() == null ? con.prepareStatement(commandDetails.getCommand(), PreparedStatement.RETURN_GENERATED_KEYS) : con.prepareStatement(commandDetails.getCommand(), new String[]{generateKey.getColumn()});
             setValues(ps);
             return ps;

@@ -28,7 +28,7 @@ public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<Batch
 
     public BatchUpdateExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.batchUpdateCommandDetailsBuilder = new BatchUpdateCommandDetailsBuilderImpl(jdbcEngineConfig);
+        this.batchUpdateCommandDetailsBuilder = new BatchUpdateCommandDetailsBuilderImpl();
     }
 
     @Override

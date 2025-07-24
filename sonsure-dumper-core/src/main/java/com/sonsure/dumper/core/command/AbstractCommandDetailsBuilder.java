@@ -6,7 +6,6 @@ import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,15 +23,10 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     protected static final String COLON = ":";
     protected static final String PARAM_PLACEHOLDER = " ? ";
 
-    protected final JdbcEngineConfig jdbcEngineConfig;
     protected boolean namedParameter = false;
     protected boolean forceNative = false;
     protected Pagination pagination;
     protected boolean disableCountQuery = false;
-
-    public AbstractCommandDetailsBuilder(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
-    }
 
     @Override
     public T forceNative() {
@@ -78,6 +72,7 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     public CommandDetails build(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
         CommandDetails commandDetails = this.doBuild(jdbcEngineConfig, commandType);
         commandDetails.setCommandType(commandType);
+        commandDetails.setCommandCase(jdbcEngineConfig.getCommandCase());
         commandDetails.setPagination(this.getPagination());
         commandDetails.setForceNative(this.isForceNative());
         commandDetails.setNamedParameter(this.isNamedParameter());
@@ -104,9 +99,9 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
             final List<Object> objects = commandParameters.getParameterValues();
             commandParameters.setParsedParameterValues(objects);
         }
-        if (StringUtils.isNotBlank(jdbcEngineConfig.getCommandCase())) {
-            String resolvedCommand = this.convertCase(commandDetails.getCommand(), jdbcEngineConfig.getCommandCase());
-            commandDetails.setCommand(resolvedCommand);
+        if (commandDetails.getCommandCase() != null) {
+            String caseCommand = this.convertCase(commandDetails.getCommand(), commandDetails.getCommandCase());
+            commandDetails.setCommand(caseCommand);
         }
         return commandDetails;
     }
@@ -118,10 +113,10 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
      * @param commandCase the command case
      * @return string
      */
-    protected String convertCase(String content, String commandCase) {
-        if (StringUtils.equalsIgnoreCase(commandCase, "upper")) {
+    protected String convertCase(String content, CommandCase commandCase) {
+        if (CommandCase.UPPER == commandCase) {
             content = content.toUpperCase();
-        } else if (StringUtils.equalsIgnoreCase(commandCase, "lower")) {
+        } else if (CommandCase.LOWER == commandCase) {
             content = content.toLowerCase();
         }
         return content;

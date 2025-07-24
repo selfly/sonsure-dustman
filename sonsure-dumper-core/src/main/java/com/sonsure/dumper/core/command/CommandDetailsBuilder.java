@@ -17,7 +17,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
  * <p>
  *
  * @author liyd
- * @date 17/4/11
+ * @since 17/4/11
  */
 public interface CommandDetailsBuilder<T extends CommandDetailsBuilder<T>> {
 

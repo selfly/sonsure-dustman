@@ -15,12 +15,12 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 /**
  * @author liyd
- * @date 17/4/25
+ * @since 17/4/25
  */
 public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisExecutor> implements MybatisExecutor {
 
     public MybatisExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig, new MybatisCommandDetailsBuilderImpl(jdbcEngineConfig));
+        super(jdbcEngineConfig, new MybatisCommandDetailsBuilderImpl());
         this.getSimpleCommandDetailsBuilder().namedParameter();
     }
 }

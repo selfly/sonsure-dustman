@@ -13,7 +13,7 @@ import com.sonsure.dumper.core.command.lambda.Function;
 
 /**
  * @author liyd
- * @date 17/4/14
+ * @since 17/4/14
  */
 public interface Update extends ConditionCommandExecutor<Update> {
 

@@ -19,7 +19,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
  *
  * @param <T> the type parameter
  * @author liyd
- * @date 17 /4/11
+ * @since 17 /4/11
  */
 public abstract class AbstractConditionCommandExecutor<T extends ConditionCommandExecutor<T>> extends AbstractEntityCommandExecutor<T> implements ConditionCommandExecutor<T> {
 
