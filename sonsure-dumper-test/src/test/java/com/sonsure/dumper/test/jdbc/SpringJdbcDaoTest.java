@@ -1316,25 +1316,53 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(10, list.size());
     }
 
-    //    @Test
-//    public void selectInnerJoin() {
-//
-//        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
-//                .from(Account.class, "t2")
-//                .where("{{t1.userInfoId}}", "t2.accountId")
-//                .listMaps();
-//
-//        Assertions.assertNotNull(list);
-//
-//        List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).tableAlias("t1")
-//                .from(Account.class, "t2")
-//                .addColumn("t1.loginName as name1", "t2.loginName as name2")
-//                .where()
-//                .append("t1.userInfoId = t2.accountId")
-//                .listMaps();
-//
-//        Assertions.assertNotNull(list1);
-//    }
+
+    @Test
+    public void testTableAliasInWhereCondition() {
+        // 测试使用表别名的where条件
+        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .where("t1.userInfoId", 1L)
+                .singleResult();
+
+        Assertions.assertNotNull(userInfo);
+        Assertions.assertEquals(1L, userInfo.getUserInfoId());
+        Assertions.assertEquals("name-1", userInfo.getLoginName());
+    }
+
+    @Test
+    public void testTableAliasWithLambdaInWhereCondition() {
+        // 测试使用Lambda表达式的where条件
+        UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .where(UserInfo::getUserInfoId, 1L)
+                .singleResult();
+
+        Assertions.assertNotNull(userInfo);
+        Assertions.assertEquals(1L, userInfo.getUserInfoId());
+        Assertions.assertEquals("name-1", userInfo.getLoginName());
+    }
+
+    @Test
+    public void testTableAliasWithMultipleConditions() {
+        // 测试多个where条件
+        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .where("t1.userInfoId", 1L)
+                .where("t1.loginName", "name-1")
+                .list();
+
+        Assertions.assertEquals(1, users.size());
+        Assertions.assertEquals(1L, users.get(0).getUserInfoId());
+    }
+
+    @Test
+    public void testTableAliasWithOperator() {
+        // 测试使用操作符的where条件
+        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .where("t1.userAge", SqlOperator.GTE, 40)
+                .list();
+
+        Assertions.assertEquals(11, users.size());
+        Assertions.assertEquals(40, users.get(0).getUserAge());
+    }
 
 //    @Test
 //    public void testIf() {
