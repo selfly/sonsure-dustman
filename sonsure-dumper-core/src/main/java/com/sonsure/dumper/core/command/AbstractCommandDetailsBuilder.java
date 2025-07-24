@@ -129,7 +129,7 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
      * @param commandType      the command type
      * @return command context
      */
-    public abstract CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType);
+    protected abstract CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType);
 
     @SuppressWarnings("unchecked")
     protected T getSelf() {

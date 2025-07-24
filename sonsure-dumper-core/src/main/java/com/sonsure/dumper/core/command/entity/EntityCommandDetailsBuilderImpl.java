@@ -83,7 +83,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
     }
 
     @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+    protected CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
         if (CommandType.isSelectCommandType(commandType) && this.getCommandSql().isEmptySelectColumns()) {
             this.addAllColumns();
         }

@@ -32,7 +32,7 @@ import java.util.List;
 public class MybatisCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder<MybatisCommandDetailsBuilderImpl> {
 
     @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+    protected CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
 
         CommandDetails commandDetails = new CommandDetails();
 

@@ -21,7 +21,7 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 public class NativeCommandDetailsBuilderImpl extends AbstractSimpleCommandDetailsBuilder<NativeCommandDetailsBuilderImpl> {
 
     @Override
-    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+    protected CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
         CommandDetails commandDetails = new CommandDetails();
         commandDetails.setCommand(this.getCommand());
         commandDetails.setCommandParameters(this.getCommandParameters());
