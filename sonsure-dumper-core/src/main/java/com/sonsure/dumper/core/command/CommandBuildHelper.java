@@ -159,7 +159,7 @@ public class CommandBuildHelper {
         return annotation;
     }
 
-    public static String getTableAliasFileName(String tableAlias, String field) {
+    public static String getTableAliasFieldName(String tableAlias, String field) {
         if (StringUtils.isBlank(tableAlias)) {
             return field;
         }

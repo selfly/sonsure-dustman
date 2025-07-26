@@ -50,6 +50,15 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     Select<M> addColumn(String... fields);
 
     /**
+     * Add alias column select.
+     *
+     * @param tableAlias the table alias
+     * @param fields     the fields
+     * @return the select
+     */
+    Select<M> addAliasColumn(String tableAlias, String... fields);
+
+    /**
      * include.
      *
      * @param <E>      the type parameter

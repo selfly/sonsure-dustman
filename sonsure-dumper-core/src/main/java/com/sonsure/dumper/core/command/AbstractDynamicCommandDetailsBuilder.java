@@ -130,15 +130,28 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     }
 
     @Override
+    public T addAliasSelectFields(String tableAlias, String... fields) {
+        for (String field : fields) {
+            String aliasField = CommandBuildHelper.getTableAliasFieldName(tableAlias, field);
+            this.addSelectFields(aliasField);
+        }
+        return this.getSelf();
+    }
+
+    @Override
     public <E, R> T addSelectFields(Function<E, R> function) {
-        String[] fields = LambdaHelper.getFieldNames(function);
-        return this.addSelectFields(fields);
+        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+        String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
+        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaClass.getFieldName());
+        return this.addSelectFields(field);
     }
 
     @Override
     public <E, R> T dropSelectFields(Function<E, R> function) {
-        String[] fields = LambdaHelper.getFieldNames(function);
-        return this.dropSelectFields(fields);
+        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+        String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
+        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaClass.getFieldName());
+        return this.dropSelectFields(field);
     }
 
     @Override
@@ -224,7 +237,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value) {
         LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
         String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
-        String field = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
+        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaClass.getFieldName());
         return this.where(field, sqlOperator, value);
     }
 
@@ -315,14 +328,14 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         if (partStatement.getSource() instanceof LambdaClass) {
             LambdaClass lambdaClass = (LambdaClass) partStatement.getSource();
             String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
-            field = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
+            field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaClass.getFieldName());
         } else {
             field = ((String) partStatement.getSource());
         }
         if (partStatement.getTarget() instanceof LambdaClass) {
             LambdaClass lambdaClass = (LambdaClass) partStatement.getTarget();
             String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
-            value = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
+            value = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaClass.getFieldName());
         } else {
             value = partStatement.getTarget();
         }
@@ -394,7 +407,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public <E, R> T orderBy(Function<E, R> function, OrderBy orderBy) {
         LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
         String tableAlias = this.getTableAliasMapping().get(lambdaClass.getSimpleClassName());
-        String field = CommandBuildHelper.getTableAliasFileName(tableAlias, lambdaClass.getFieldName());
+        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaClass.getFieldName());
         return this.orderBy(field, orderBy);
     }
 

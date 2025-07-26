@@ -1316,6 +1316,25 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(10, list.size());
     }
 
+    @Test
+    public void innerJoinClassAddColumn() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 11; i++) {
+            Account account = new Account();
+            account.setAccountId((long) i);
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAliasColumn("t1", "loginName")
+                .innerJoin(Account.class).as("t2")
+                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
+                .list();
+        Assertions.assertEquals(10, list.size());
+    }
+
 
     @Test
     public void testTableAliasInWhereCondition() {

@@ -35,7 +35,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
     @Override
     public EntityCommandDetailsBuilder addAllColumns() {
         String[] fields = this.getLatestModelClass().getModelFields().stream()
-                .map(v -> CommandBuildHelper.getTableAliasFileName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
+                .map(v -> CommandBuildHelper.getTableAliasFieldName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
         return this.addSelectFields(fields);
     }
 

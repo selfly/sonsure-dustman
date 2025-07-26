@@ -59,6 +59,12 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
+    public Select<M> addAliasColumn(String tableAlias, String... fields) {
+        this.getEntityCommandDetailsBuilder().addAliasSelectFields(tableAlias, fields);
+        return this;
+    }
+
+    @Override
     public final <E, R> Select<M> addColumn(Function<E, R> function) {
         this.getEntityCommandDetailsBuilder().addSelectFields(function);
         return this;

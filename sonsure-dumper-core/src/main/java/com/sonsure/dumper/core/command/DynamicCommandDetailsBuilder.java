@@ -37,6 +37,15 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
     T addSelectFields(String... fields);
 
     /**
+     * Add select fields t.
+     *
+     * @param tableAlias the table alias
+     * @param fields         the fields
+     * @return the t
+     */
+    T addAliasSelectFields(String tableAlias, String... fields);
+
+    /**
      * Add select fields command details builder.
      *
      * @param <E>      the type parameter
