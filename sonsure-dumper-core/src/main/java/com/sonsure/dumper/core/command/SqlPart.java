@@ -38,9 +38,14 @@ public class SqlPart {
     }
 
     public SqlPart eq(Object value) {
+        return this.eq(value, false);
+    }
+
+    public SqlPart eq(Object value, boolean isRaw) {
         PartStatement partStatement = this.partStatements.get(this.partStatements.size() - 1);
         partStatement.setSqlOperator(SqlOperator.EQ);
         partStatement.setTarget(value);
+        partStatement.setRaw(isRaw);
         return this;
     }
 
