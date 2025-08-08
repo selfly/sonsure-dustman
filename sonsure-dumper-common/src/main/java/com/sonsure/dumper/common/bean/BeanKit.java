@@ -11,6 +11,7 @@ package com.sonsure.dumper.common.bean;
 
 import com.sonsure.dumper.common.model.Page;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -78,7 +79,7 @@ public class BeanKit {
      * @param beanClass the bean class
      * @return t list
      */
-    public static <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(List<T> mapList, Class<R> beanClass) {
+    public static <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(Collection<T> mapList, Class<R> beanClass) {
         return INSTANCE.mapToBean(mapList, beanClass, '_', null);
     }
 
@@ -92,7 +93,7 @@ public class BeanKit {
      * @param consumer  the consumer
      * @return t list
      */
-    public static <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(List<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
+    public static <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(Collection<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
         return INSTANCE.mapToBean(mapList, beanClass, '_', consumer);
     }
 
@@ -105,7 +106,7 @@ public class BeanKit {
      * @param beanClass the bean class
      * @return t list
      */
-    public static <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass) {
+    public static <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass) {
         return INSTANCE.mapToBean(mapList, beanClass);
     }
 
@@ -119,7 +120,7 @@ public class BeanKit {
      * @param delimiter the delimiter
      * @return t list
      */
-    public static <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass, Character delimiter) {
+    public static <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, Character delimiter) {
         return INSTANCE.mapToBean(mapList, beanClass, delimiter);
     }
 
@@ -133,7 +134,7 @@ public class BeanKit {
      * @param consumer  the consumer
      * @return t list
      */
-    public static <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
+    public static <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
         return INSTANCE.mapToBean(mapList, beanClass, null, consumer);
     }
 
@@ -150,7 +151,7 @@ public class BeanKit {
      * @param consumer  the consumer
      * @return t list
      */
-    public static <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass, Character delimiter, BiConsumer<T, R> consumer) {
+    public static <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, Character delimiter, BiConsumer<T, R> consumer) {
         return INSTANCE.mapToBean(mapList, beanClass, delimiter, consumer);
     }
 
@@ -287,7 +288,7 @@ public class BeanKit {
      * @param list  the list
      * @return the page list
      */
-    public static <T, R> List<R> copyProperties(Class<R> clazz, List<T> list) {
+    public static <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list) {
         return INSTANCE.copyProperties(clazz, list);
     }
 
@@ -301,7 +302,7 @@ public class BeanKit {
      * @param ignoreProperties the ignore properties
      * @return the page list
      */
-    public static <T, R> List<R> copyProperties(Class<R> clazz, List<T> list, String[] ignoreProperties) {
+    public static <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list, String[] ignoreProperties) {
         return INSTANCE.copyProperties(clazz, list, ignoreProperties);
     }
 
@@ -315,7 +316,7 @@ public class BeanKit {
      * @param consumer the consumer
      * @return the page list
      */
-    public static <T, R> List<R> copyProperties(Class<R> clazz, List<T> list, BiConsumer<T, R> consumer) {
+    public static <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list, BiConsumer<T, R> consumer) {
         return INSTANCE.copyProperties(clazz, list, consumer);
     }
 
@@ -330,7 +331,7 @@ public class BeanKit {
      * @param consumer         the consumer
      * @return the page list
      */
-    public static <T, R> List<R> copyProperties(Class<R> clazz, List<T> list, String[] ignoreProperties, BiConsumer<T, R> consumer) {
+    public static <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list, String[] ignoreProperties, BiConsumer<T, R> consumer) {
         return INSTANCE.copyProperties(clazz, list, ignoreProperties, consumer);
     }
 

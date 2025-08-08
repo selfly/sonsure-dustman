@@ -140,7 +140,7 @@ public class BeanKitInst {
      * @param beanClass the bean class
      * @return t list
      */
-    public <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(List<T> mapList, Class<R> beanClass) {
+    public <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(Collection<T> mapList, Class<R> beanClass) {
         return mapToBean(mapList, beanClass, '_', null);
     }
 
@@ -154,7 +154,7 @@ public class BeanKitInst {
      * @param consumer  the consumer
      * @return t list
      */
-    public <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(List<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
+    public <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(Collection<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
         return mapToBean(mapList, beanClass, '_', consumer);
     }
 
@@ -167,7 +167,7 @@ public class BeanKitInst {
      * @param beanClass the bean class
      * @return t list
      */
-    public <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass) {
+    public <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass) {
 
         if (mapList == null) {
             return Collections.emptyList();
@@ -190,7 +190,7 @@ public class BeanKitInst {
      * @param delimiter the delimiter
      * @return t list
      */
-    public <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass, Character delimiter) {
+    public <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, Character delimiter) {
 
         if (mapList == null) {
             return Collections.emptyList();
@@ -213,7 +213,7 @@ public class BeanKitInst {
      * @param consumer  the consumer
      * @return t list
      */
-    public <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
+    public <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
         return mapToBean(mapList, beanClass, null, consumer);
     }
 
@@ -230,7 +230,7 @@ public class BeanKitInst {
      * @param consumer  the consumer
      * @return t list
      */
-    public <T extends Map<String, ?>, R> List<R> mapToBean(List<T> mapList, Class<R> beanClass, Character delimiter, BiConsumer<T, R> consumer) {
+    public <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, Character delimiter, BiConsumer<T, R> consumer) {
 
         if (mapList == null) {
             return Collections.emptyList();
@@ -411,7 +411,7 @@ public class BeanKitInst {
      * @param list  the list
      * @return the page list
      */
-    public <T, R> List<R> copyProperties(Class<R> clazz, List<T> list) {
+    public <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list) {
         return copyProperties(clazz, list, EMPTY_ARRAY);
     }
 
@@ -425,7 +425,7 @@ public class BeanKitInst {
      * @param ignoreProperties the ignore properties
      * @return the page list
      */
-    public <T, R> List<R> copyProperties(Class<R> clazz, List<T> list, String[] ignoreProperties) {
+    public <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list, String[] ignoreProperties) {
         return copyProperties(clazz, list, ignoreProperties, (BiConsumer<T, R>) null);
     }
 
@@ -439,7 +439,7 @@ public class BeanKitInst {
      * @param consumer the consumer
      * @return the page list
      */
-    public <T, R> List<R> copyProperties(Class<R> clazz, List<T> list, BiConsumer<T, R> consumer) {
+    public <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list, BiConsumer<T, R> consumer) {
         return copyProperties(clazz, list, EMPTY_ARRAY, consumer);
     }
 
@@ -454,7 +454,7 @@ public class BeanKitInst {
      * @param consumer         the consumer
      * @return the page list
      */
-    public <T, R> List<R> copyProperties(Class<R> clazz, List<T> list, String[] ignoreProperties, BiConsumer<T, R> consumer) {
+    public <T, R> List<R> copyProperties(Class<R> clazz, Collection<T> list, String[] ignoreProperties, BiConsumer<T, R> consumer) {
 
         //返回的list列表
         List<R> resultList = new ArrayList<>();
