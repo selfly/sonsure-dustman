@@ -48,8 +48,8 @@ public class DynamicEnumItem extends DynamicEnum<BaseDynamicEnum> {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof DynamicEnumItem) {
-            DynamicEnumItem another = (DynamicEnumItem) obj;
+        if (obj instanceof BaseEnum) {
+            BaseEnum another = (BaseEnum) obj;
             return this.code.equals(another.getCode());
         }
         return false;

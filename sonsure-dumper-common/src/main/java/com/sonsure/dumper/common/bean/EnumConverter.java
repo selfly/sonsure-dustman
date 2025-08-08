@@ -44,10 +44,10 @@ public class EnumConverter {
                 Type[] parameterTypes = targetPd.getWriteMethod().getGenericParameterTypes();
                 Type[] actualTypeArguments = ((ParameterizedType) parameterTypes[0]).getActualTypeArguments();
                 //noinspection unchecked
-                return DynamicEnumHelper.getEnumItem((Class<? extends BaseDynamicEnum>) actualTypeArguments[0], (String) value, false);
+                return EnumHelper.getDynamicEnumItem((Class<? extends BaseDynamicEnum>) actualTypeArguments[0], (String) value, false);
             } else {
                 //noinspection unchecked
-                return EnumHelper.getEnum((Class<? extends BaseEnum>) targetPd.getPropertyType(), (String) value);
+                return EnumHelper.getFinalEnumItem((Class<? extends BaseEnum>) targetPd.getPropertyType(), (String) value);
             }
         }
     }

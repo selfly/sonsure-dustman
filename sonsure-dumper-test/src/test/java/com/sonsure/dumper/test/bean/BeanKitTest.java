@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.bean;
 
 import com.sonsure.dumper.common.bean.BeanKit;
-import com.sonsure.dumper.common.enums.DynamicEnumHelper;
+import com.sonsure.dumper.common.enums.EnumHelper;
 import com.sonsure.dumper.common.enums.DynamicEnumItem;
 import com.sonsure.dumper.test.enums.ActiveStatusEnum;
 import com.sonsure.dumper.test.enums.MenuStatusEnum;
@@ -49,7 +49,7 @@ public class BeanKitTest {
         Assertions.assertEquals(menu.getGmtCreate(), menuVo.getGmtCreate());
         Assertions.assertEquals(menu.getGmtModify(), menuVo.getGmtModify());
 
-        DynamicEnumHelper.addEnumItem(ActiveStatusEnum.class, DynamicEnumItem.of("5", "激活"));
+        EnumHelper.addDynamicEnumItem(ActiveStatusEnum.class, DynamicEnumItem.of("5", "激活"));
 
         menu.setActiveStatus("5");
         MenuVo menuVo2 = BeanKit.copyProperties(new MenuVo(), menu);

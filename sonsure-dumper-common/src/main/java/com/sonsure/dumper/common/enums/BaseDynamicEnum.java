@@ -34,7 +34,7 @@ public interface BaseDynamicEnum extends BaseEnum {
      */
     default void putEnum(DynamicEnumItem enumItem) {
         enumItem.setOrigName(((Enum<?>) this).name());
-        DynamicEnumHelper.addEnumItem(this, enumItem);
+        EnumHelper.addDynamicEnumItem(this, enumItem);
     }
 
     /**
@@ -43,7 +43,7 @@ public interface BaseDynamicEnum extends BaseEnum {
      * @return the enum item
      */
     default DynamicEnumItem getEnumItem() {
-        return DynamicEnumHelper.getEnumItem(this);
+        return EnumHelper.getDynamicEnumItem(this);
     }
 
     /**
