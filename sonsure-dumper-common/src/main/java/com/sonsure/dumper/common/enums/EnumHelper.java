@@ -84,7 +84,7 @@ public class EnumHelper {
     public static DynamicEnumItem getDynamicEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code, boolean required) {
         Collection<DynamicEnumItem> enumItems = getDynamicEnumItems(enumCls);
         for (DynamicEnumItem enumItem : enumItems) {
-            if (StringUtils.equals(enumItem.getCode(), code)) {
+            if (StringUtils.equalsIgnoreCase(enumItem.getCode(), code)) {
                 return enumItem;
             }
         }
