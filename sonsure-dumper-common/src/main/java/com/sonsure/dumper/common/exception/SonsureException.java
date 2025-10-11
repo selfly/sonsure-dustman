@@ -11,9 +11,9 @@ package com.sonsure.dumper.common.exception;
 
 
 import com.sonsure.dumper.common.enums.BaseEnum;
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.common.utils.UUIDUtils;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * 自定义异常类
@@ -85,7 +85,7 @@ public class SonsureException extends RuntimeException {
      */
     public SonsureException(String code, String message) {
         super(message);
-        this.resultCode = StringUtils.isBlank(code) ? ERROR_CODE_PREFIX + UUIDUtils.getUUID16(message.getBytes()) : code;
+        this.resultCode = StrUtils.isNotBlank(code) ? code : ERROR_CODE_PREFIX + UUIDUtils.getUUID16(message.getBytes());
         this.resultMsg = message;
     }
 
@@ -98,7 +98,7 @@ public class SonsureException extends RuntimeException {
      */
     public SonsureException(String code, String message, Throwable e) {
         super(message, e);
-        this.resultCode = StringUtils.isBlank(code) ? ERROR_CODE_PREFIX + UUIDUtils.getUUID16(message.getBytes()) : code;
+        this.resultCode = StrUtils.isNotBlank(code) ? code : ERROR_CODE_PREFIX + UUIDUtils.getUUID16(message.getBytes());
         this.resultMsg = message;
     }
 

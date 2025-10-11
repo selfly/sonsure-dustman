@@ -4,7 +4,6 @@ import com.sonsure.dumper.common.enums.BaseEnum;
 import com.sonsure.dumper.exception.FlyableException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author selfly
@@ -24,7 +23,7 @@ public enum DatabaseType implements BaseEnum {
 
     public static DatabaseType resolveDatabase(String databaseProduct) {
         for (DatabaseType databaseType : values()) {
-            if (StringUtils.containsIgnoreCase(databaseProduct, databaseType.getCode())) {
+            if (databaseType.getCode().contains(databaseProduct.toLowerCase())) {
                 return databaseType;
             }
         }

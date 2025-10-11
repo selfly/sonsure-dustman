@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.persist;
 
 
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.batch.BatchCommandDetails;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -18,7 +19,6 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
 
     @Override
     public String getDialect() {
-        if (StringUtils.isBlank(dialect)) {
+        if (StrUtils.isBlank(dialect)) {
             dialect = this.doGetDialect();
         }
         return dialect;

@@ -14,7 +14,6 @@ import com.sonsure.dumper.common.bean.IntrospectionCache;
 import com.sonsure.dumper.common.exception.SonsureBeanException;
 import com.sonsure.dumper.common.exception.SonsureException;
 import com.sonsure.dumper.common.model.BaseProperties;
-import org.apache.commons.lang3.BooleanUtils;
 
 import java.beans.PropertyDescriptor;
 import java.io.*;
@@ -332,7 +331,7 @@ public class ClassUtils {
                 if (parameterTypes[i] == value[i].getClass()) {
                     parameters[i] = value[i];
                 } else if (parameterTypes[i] == Boolean.class || parameterTypes[i] == boolean.class) {
-                    parameters[i] = BooleanUtils.toBoolean(String.valueOf(value[i]));
+                    parameters[i] = Boolean.parseBoolean(String.valueOf(value[i]));
                 } else if (parameterTypes[i] == Integer.class || parameterTypes[i] == int.class) {
                     parameters[i] = Integer.valueOf(String.valueOf(value[i]));
                 } else if (parameterTypes[i] == Long.class || parameterTypes[i] == long.class) {

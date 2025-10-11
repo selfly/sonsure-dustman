@@ -9,7 +9,8 @@
 
 package com.sonsure.dumper.common.validation;
 
-import org.apache.commons.lang3.StringUtils;
+
+import com.sonsure.dumper.common.utils.StrUtils;
 
 /**
  * @author liyd
@@ -21,7 +22,7 @@ public class StringValidator implements Validator {
 
     @Override
     public ValidatorResult validate(Object value, String message, Object[] msgArgs) {
-        ValidatorResult validatorResult = new ValidatorResult(StringUtils.isNotBlank((String) value));
+        ValidatorResult validatorResult = new ValidatorResult(StrUtils.isNotBlank((String) value));
         validatorResult.resolveError(ERROR_CODE, message, msgArgs);
         return validatorResult;
     }

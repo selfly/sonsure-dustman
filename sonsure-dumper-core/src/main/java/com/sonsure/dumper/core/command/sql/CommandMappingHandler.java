@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.command.sql;
 
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -23,7 +24,6 @@ import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.update.UpdateSet;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +174,7 @@ public class CommandMappingHandler {
 
     protected void extractColumnMapping(Column column, Map<String, Object> mappings) {
         Table table = column.getTable();
-        String name = (table == null || StringUtils.isBlank(table.getName())) ? DEFAULT_ALIAS : table.getName();
+        String name = (table == null || StrUtils.isBlank(table.getName())) ? DEFAULT_ALIAS : table.getName();
         String mappingName = column.getColumnName();
         Object obj = mappings.get(name);
         if (obj instanceof String) {
@@ -257,7 +257,7 @@ public class CommandMappingHandler {
 
     private String getTableAliasName(Table table) {
         Alias alias = table.getAlias();
-        return alias == null || StringUtils.isBlank(alias.getName()) ? DEFAULT_ALIAS : alias.getName();
+        return alias == null || StrUtils.isBlank(alias.getName()) ? DEFAULT_ALIAS : alias.getName();
     }
 
     protected void extractTableMappings(List<Table> tables, Map<String, Object> mappings) {

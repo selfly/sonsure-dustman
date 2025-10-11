@@ -10,12 +10,12 @@
 package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.utils.ClassUtils;
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
 import com.sonsure.dumper.core.annotation.Transient;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +160,7 @@ public class CommandBuildHelper {
     }
 
     public static String getTableAliasFieldName(String tableAlias, String field) {
-        if (StringUtils.isBlank(tableAlias)) {
+        if (StrUtils.isBlank(tableAlias)) {
             return field;
         }
         return tableAlias + DOT + field;
@@ -171,11 +171,11 @@ public class CommandBuildHelper {
     }
 
     public static boolean isNativeContent(String content) {
-        return StringUtils.startsWith(content, NATIVE_OPEN_TOKEN) && StringUtils.endsWith(content, NATIVE_CLOSE_TOKEN);
+        return content.startsWith(NATIVE_OPEN_TOKEN) && content.endsWith(NATIVE_CLOSE_TOKEN);
     }
 
     public static String getNativeContentActualValue(String content) {
-        return StringUtils.substring(content, NATIVE_OPEN_TOKEN.length(), content.length() - NATIVE_CLOSE_TOKEN.length());
+        return content.substring(NATIVE_OPEN_TOKEN.length(), content.length() - NATIVE_CLOSE_TOKEN.length());
     }
 
     @SuppressWarnings("unchecked")

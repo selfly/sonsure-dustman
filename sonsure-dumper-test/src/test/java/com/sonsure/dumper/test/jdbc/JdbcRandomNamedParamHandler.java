@@ -1,7 +1,6 @@
 package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.core.command.named.NamedParamHandler;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
 
@@ -18,7 +17,7 @@ public class JdbcRandomNamedParamHandler implements NamedParamHandler {
 
     @Override
     public Object getValue(String paramName) {
-        final String[] values = StringUtils.split(paramName, "_");
+        final String[] values = paramName.split("_");
         int min = this.getNumValue(values[1]);
         int max = this.getNumValue(values[2]);
         int range = max - min;
@@ -27,10 +26,11 @@ public class JdbcRandomNamedParamHandler implements NamedParamHandler {
     }
 
     private int getNumValue(String str) {
-        if (StringUtils.startsWithIgnoreCase(str, MINUS)) {
-            return Integer.parseInt(StringUtils.substring(str, 1)) * -1;
-        } else if (StringUtils.startsWithIgnoreCase(str, PLUS)) {
-            return Integer.parseInt(StringUtils.substring(str, 1));
+        String theStr = str.toLowerCase();
+        if (theStr.startsWith(MINUS)) {
+            return Integer.parseInt(theStr.substring(1)) * -1;
+        } else if (theStr.startsWith(PLUS)) {
+            return Integer.parseInt(theStr.substring(1));
         } else {
             return Integer.parseInt(str);
         }

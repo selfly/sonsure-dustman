@@ -27,8 +27,14 @@ public class Page<T> implements Serializable {
 
     private static final long serialVersionUID = -376015922238121976L;
 
+    /**
+     * 数据列表
+     */
     private List<T> list;
 
+    /**
+     * 分页信息
+     */
     private Pagination pagination;
 
     public Page() {

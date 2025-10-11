@@ -6,7 +6,6 @@ import net.sf.jsqlparser.expression.RowConstructor;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -34,8 +33,8 @@ public class JsqlParserUtils {
      */
     public static void mappingColumn(Column column, CommandMappingHandler mappingHandler) {
         String columnName = column.getColumnName();
-        if (StringUtils.startsWith(columnName, KeyGenerator.NATIVE_OPEN_TOKEN) && StringUtils.endsWith(columnName, KeyGenerator.NATIVE_CLOSE_TOKEN)) {
-            columnName = StringUtils.substring(columnName, KeyGenerator.NATIVE_OPEN_TOKEN.length(), columnName.length() - KeyGenerator.NATIVE_CLOSE_TOKEN.length());
+        if (columnName.startsWith(KeyGenerator.NATIVE_OPEN_TOKEN) && columnName.endsWith(KeyGenerator.NATIVE_CLOSE_TOKEN)) {
+            columnName = columnName.substring(KeyGenerator.NATIVE_OPEN_TOKEN.length(), columnName.length() - KeyGenerator.NATIVE_CLOSE_TOKEN.length());
         } else {
             columnName = mappingHandler.getColumnName(column);
         }

@@ -1,7 +1,6 @@
 package com.sonsure.dumper.common.enums;
 
 import com.sonsure.dumper.common.exception.SonsureCommonsException;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +83,7 @@ public class EnumHelper {
     public static DynamicEnumItem getDynamicEnumItem(Class<? extends BaseDynamicEnum> enumCls, String code, boolean required) {
         Collection<DynamicEnumItem> enumItems = getDynamicEnumItems(enumCls);
         for (DynamicEnumItem enumItem : enumItems) {
-            if (StringUtils.equalsIgnoreCase(enumItem.getCode(), code)) {
+            if (enumItem.getCode().equalsIgnoreCase(code)) {
                 return enumItem;
             }
         }
@@ -97,7 +96,7 @@ public class EnumHelper {
     public static DynamicEnumItem getDynamicEnumItemByOrigName(Class<? extends BaseDynamicEnum> enumCls, String origName) {
         Collection<DynamicEnumItem> enumItems = getDynamicEnumItems(enumCls);
         for (DynamicEnumItem enumItem : enumItems) {
-            if (StringUtils.equalsIgnoreCase(enumItem.getOrigName(), origName)) {
+            if (enumItem.getOrigName().equalsIgnoreCase(origName)) {
                 return enumItem;
             }
         }

@@ -24,6 +24,7 @@
 
 package com.sonsure.dumper.core.page;
 
+import com.sonsure.dumper.common.utils.StrUtils;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
@@ -32,7 +33,6 @@ import net.sf.jsqlparser.parser.Token;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -143,10 +143,10 @@ public class CountSqlParser {
     /**
      * 添加到聚合函数，可以是逗号隔开的多个函数前缀
      *
-     * @param functions
+     * @param functions the functions
      */
     public static void addAggregateFunctions(String functions) {
-        if (StringUtils.isNotBlank(functions)) {
+        if (StrUtils.isNotBlank(functions)) {
             String[] funs = functions.split(",");
             for (int i = 0; i < funs.length; i++) {
                 AGGREGATE_FUNCTIONS.add(funs[i].toUpperCase());

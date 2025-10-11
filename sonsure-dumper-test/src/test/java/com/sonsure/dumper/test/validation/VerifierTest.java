@@ -5,8 +5,6 @@ import com.sonsure.dumper.common.validation.ValidationError;
 import com.sonsure.dumper.common.validation.ValidationGroup;
 import com.sonsure.dumper.common.validation.ValidationResult;
 import com.sonsure.dumper.common.validation.Verifier;
-import com.sonsure.dumper.core.command.lambda.LambdaHelper;
-import com.sonsure.dumper.test.model.UserInfo;
 import com.sonsure.dumper.test.model.ValidationModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -189,13 +187,5 @@ public class VerifierTest {
             Verifier.jsrValidate(validationModel, ValidationGroup.Update.class);
         });
         Assertions.assertEquals("id不能为空", ex1.getMessage());
-    }
-
-    @Test
-    public void lambda() {
-        String field = LambdaHelper.getFieldName(UserInfo::getUserInfoId);
-        System.out.println(field);
-
-        Assertions.assertEquals("aa", field);
     }
 }

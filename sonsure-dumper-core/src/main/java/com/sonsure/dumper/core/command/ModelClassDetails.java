@@ -14,7 +14,6 @@ import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -97,7 +96,7 @@ public class ModelClassDetails {
     }
 
     public ModelClassFieldDetails getMappedFieldDetails(String columnName) {
-        return mappedFieldMap.get(StringUtils.lowerCase(columnName));
+        return mappedFieldMap.get(columnName.toLowerCase());
     }
 
     public ModelClassFieldDetails getModelFieldDetails(String fileName) {

@@ -9,15 +9,16 @@
 
 package com.sonsure.dumper.common.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import com.sonsure.dumper.common.utils.StrUtils;
 
 import java.io.Serializable;
 
 /**
  * 分页等常用信息存储
  * <p/>
- * Created by liyd on 6/26/14.
+ *
+ * @author liyd
+ * @since  6/26/14
  */
 public class Pageable implements Serializable {
 
@@ -45,7 +46,7 @@ public class Pageable implements Serializable {
     /**
      * 简化前端参数
      *
-     * @param pageNum
+     * @param pageNum the page num
      */
     public void setPn(int pageNum) {
         this.pageNum = pageNum;
@@ -73,6 +74,6 @@ public class Pageable implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+        return StrUtils.reflectionToString(this);
     }
 }

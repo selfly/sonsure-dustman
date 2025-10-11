@@ -10,7 +10,6 @@
 package com.sonsure.dumper.common.utils;
 
 import com.sonsure.dumper.common.exception.SonsureException;
-import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -71,9 +70,9 @@ public final class PropertyUtils {
         propMap = new HashMap<>();
         for (URL resource : resources) {
             Map<String, String> map = null;
-            if (StringUtils.endsWithIgnoreCase(resource.getFile(), PRO_SUFFIX)) {
+            if (resource.getFile().toLowerCase().endsWith(PRO_SUFFIX)) {
                 map = getPropertiesResourceMap(resource);
-            } else if (StringUtils.endsWithIgnoreCase(resource.getFile(), YML_SUFFIX)) {
+            } else if (resource.getFile().toLowerCase().endsWith(YML_SUFFIX)) {
                 map = getYmlResourceMap(resource);
             } else {
                 throw new SonsureException("不支持的配置资源文件加载:" + resourceName);
@@ -133,7 +132,7 @@ public final class PropertyUtils {
     public static String getProperty(String resourceName, String key, String defaultValue, ClassLoader classLoader) {
         Map<String, String> map = getProperties(resourceName, classLoader);
         String value = map.get(key);
-        return StringUtils.isBlank(value) ? defaultValue : value;
+        return StrUtils.isNotBlank(value) ? value : defaultValue;
     }
 
     /**
@@ -160,7 +159,7 @@ public final class PropertyUtils {
 
         for (Map.Entry<String, Object> entry : ymlMap.entrySet()) {
             StringBuilder sb = new StringBuilder();
-            if (StringUtils.isNotBlank(parentKey)) {
+            if (StrUtils.isNotBlank(parentKey)) {
                 sb.append(parentKey).append(".");
             }
             sb.append(entry.getKey());

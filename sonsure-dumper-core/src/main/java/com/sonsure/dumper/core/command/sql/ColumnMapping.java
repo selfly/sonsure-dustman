@@ -9,8 +9,8 @@
 
 package com.sonsure.dumper.core.command.sql;
 
+import com.sonsure.dumper.common.utils.StrUtils;
 import net.sf.jsqlparser.schema.Column;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author liyd
@@ -27,7 +27,7 @@ public class ColumnMapping {
     }
 
     public String getSmartMappingName() {
-        if (StringUtils.isBlank(this.mappingName)) {
+        if (StrUtils.isBlank(this.mappingName)) {
             return column.getColumnName();
         }
         return mappingName;

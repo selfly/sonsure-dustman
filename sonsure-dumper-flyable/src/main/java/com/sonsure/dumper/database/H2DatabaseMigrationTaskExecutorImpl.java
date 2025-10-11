@@ -1,6 +1,5 @@
 package com.sonsure.dumper.database;
 
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author selfly
@@ -10,7 +9,7 @@ public class H2DatabaseMigrationTaskExecutorImpl extends MysqlDatabaseMigrationT
 
     @Override
     public boolean support(String databaseProduct) {
-        return StringUtils.containsIgnoreCase(databaseProduct, "h2");
+        return databaseProduct.toLowerCase().contains("h2");
     }
 
 }

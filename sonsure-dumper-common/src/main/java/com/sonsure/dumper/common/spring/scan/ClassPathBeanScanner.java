@@ -10,12 +10,8 @@
 package com.sonsure.dumper.common.spring.scan;
 
 import com.sonsure.dumper.common.exception.SonsureException;
-import com.sonsure.dumper.common.spring.BundlePathMatchingResourcePatternResolver;
-import com.sonsure.dumper.common.spring.PathMatchingResourcePatternResolver;
-import com.sonsure.dumper.common.spring.Resource;
-import com.sonsure.dumper.common.spring.ResourcePatternResolver;
+import com.sonsure.dumper.common.spring.*;
 import com.sonsure.dumper.common.utils.FileIOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

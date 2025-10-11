@@ -13,7 +13,7 @@ import com.sonsure.dumper.common.exception.SonsureException;
 import com.sonsure.dumper.common.spring.ClassPathResource;
 import com.sonsure.dumper.common.spring.Resource;
 import com.sonsure.dumper.common.utils.PropertyUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.sonsure.dumper.common.utils.StrUtils;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
@@ -36,7 +36,7 @@ public final class XmlParser {
     public static XmlNode parse(Resource resource, String propertyFile) {
 
         Map<String, String> properties = null;
-        if (StringUtils.isNotBlank(propertyFile)) {
+        if (StrUtils.isNotBlank(propertyFile)) {
             properties = PropertyUtils.getProperties(propertyFile);
         }
         Document document = readXml(resource, properties);
@@ -98,7 +98,7 @@ public final class XmlParser {
         }
 
         Iterator<Element> iter = null;
-        if (StringUtils.equals("include", element.getName())) {
+        if ("include".equals(element.getName())) {
             Attribute attr = element.attribute("file");
             Document document = readXml(new ClassPathResource(attr.getValue()), properties);
             Element rootElement = document.getRootElement();
@@ -172,9 +172,9 @@ public final class XmlParser {
         }
         String theXml = xml;
         for (Map.Entry<String, String> entry : properties.entrySet()) {
-            String value = StringUtils.replace(entry.getValue(), "&amp", "&");
-            value = StringUtils.replace(value, "&", "&amp;");
-            theXml = StringUtils.replace(theXml, String.format("${%s}", entry.getKey()), value);
+            String value = StrUtils.replace(entry.getValue(), "&amp", "&");
+            value = StrUtils.replace(value, "&", "&amp;");
+            theXml = StrUtils.replace(theXml, String.format("${%s}", entry.getKey()), value);
         }
         return theXml;
     }

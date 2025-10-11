@@ -13,7 +13,6 @@ import com.sonsure.dumper.common.exception.SonsureBeanException;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.common.utils.NameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -310,7 +309,7 @@ public class BeanKitInst {
 
             String name = entry.getKey();
             if (delimiter != null) {
-                name = StringUtils.indexOf(name, delimiter) != -1 ? NameUtils.getCamelName(name, delimiter) : name
+                name = name.indexOf(delimiter) != -1 ? NameUtils.getCamelName(name, delimiter) : name
                         .toLowerCase();
             }
             PropertyDescriptor targetPd = ClassUtils.getPropertyDescriptor(beanClass, name);

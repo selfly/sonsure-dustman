@@ -10,10 +10,11 @@
 package com.sonsure.dumper.common.utils;
 
 import com.sonsure.dumper.common.exception.SonsureException;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.sonsure.dumper.common.spring.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 /**
  * 字符文本操作
@@ -23,7 +24,7 @@ import java.io.UnsupportedEncodingException;
  * @author liyd
  * @date 2015-8-14
  */
-public class TextUtils {
+public class StrUtils {
 
     public static String minify(String text) {
         StringBuilder sb = new StringBuilder();
@@ -46,12 +47,11 @@ public class TextUtils {
      * @return string
      */
     public static String convertHtmlSpecialChars(String str) {
-        if (StringUtils.isBlank(str)) {
+        if (StringUtils.hasText(str)) {
             return null;
         }
         //最后一个中文全角空格换成英文，防止string的trim方法失效
-        String[][] chars = new String[][]{{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {"\"", "&quot;"},
-                {"　", " "}};
+        String[][] chars = new String[][]{{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {"\"", "&quot;"}, {"　", " "}};
         return replaceChars(str, chars);
     }
 
@@ -62,11 +62,10 @@ public class TextUtils {
      * @return string
      */
     public static String reverseHtmlSpecialChars(String str) {
-        if (StringUtils.isBlank(str)) {
+        if (!StringUtils.hasText(str)) {
             return null;
         }
-        String[][] chars = new String[][]{{"&amp;", "&"}, {"&lt;", "<"}, {"&gt;", ">"}, {"&quot;", "\""},
-                {"　", " "}};
+        String[][] chars = new String[][]{{"&amp;", "&"}, {"&lt;", "<"}, {"&gt;", ">"}, {"&quot;", "\""}, {"　", " "}};
         return replaceChars(str, chars);
     }
 
@@ -99,7 +98,7 @@ public class TextUtils {
      */
     public static String substringForByte(String text, int length, boolean isConvertSpecialChars) {
 
-        if (StringUtils.isBlank(text) || length < 1) {
+        if (!StringUtils.hasText(text) || length < 1) {
             return text;
         }
         //转换特殊字符，页面显示时非常有用
@@ -112,7 +111,7 @@ public class TextUtils {
             byte[] bytes = text.getBytes("GBK");
 
             //截取
-            byte[] contentNameBytes = ArrayUtils.subarray(bytes, 0, length);
+            byte[] contentNameBytes = Arrays.copyOfRange(bytes, 0, length);
 
             //处理截取了半个汉字的情况
             int count = 0;
@@ -122,12 +121,54 @@ public class TextUtils {
                 }
             }
             if (count % 2 != 0) {
-                contentNameBytes = ArrayUtils.subarray(contentNameBytes, 0, contentNameBytes.length - 1);
+                contentNameBytes = Arrays.copyOfRange(contentNameBytes, 0, contentNameBytes.length - 1);
             }
 
             return new String(contentNameBytes, "GBK");
         } catch (UnsupportedEncodingException e) {
             throw new SonsureException("根据byte截取字符串失败", e);
         }
+    }
+
+    public static String reflectionToString(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+
+        Class<?> clazz = obj.getClass();
+        StringBuilder sb = new StringBuilder();
+        sb.append(clazz.getSimpleName()).append("@").append(Integer.toHexString(obj.hashCode())).append("[\n");
+
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                sb.append("  ").append(field.getName()).append("=").append(field.get(obj)).append(System.lineSeparator());
+            } catch (IllegalAccessException e) {
+                sb.append("  ").append(field.getName()).append("=N/A (Access Denied)").append(System.lineSeparator());
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static boolean isBlank(String str) {
+        return !StringUtils.hasText(str);
+    }
+
+    public static boolean isNotBlank(String str) {
+        return StringUtils.hasText(str);
+    }
+
+    public static String replace(String inString, String oldPattern, String newPattern) {
+        return StringUtils.replace(inString, oldPattern, newPattern);
+    }
+
+    public static String[] split(String toSplit, String delimiter) {
+        String[] split = StringUtils.split(toSplit, delimiter);
+        if (split == null) {
+            return toSplit == null ? new String[0] : new String[]{toSplit};
+        }
+        return split;
     }
 }

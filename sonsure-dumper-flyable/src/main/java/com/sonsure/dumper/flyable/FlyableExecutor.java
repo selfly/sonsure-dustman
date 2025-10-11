@@ -15,8 +15,6 @@ import com.sonsure.dumper.resource.MigrationResourceResolver;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -107,7 +105,7 @@ public class FlyableExecutor {
                     .list(FlyableHistory.class);
             if (list != null && !list.isEmpty()) {
                 FlyableHistory flyableHistory = list.iterator().next();
-                if (BooleanUtils.isFalse(flyableHistory.getSuccess())) {
+                if (flyableHistory.getSuccess() == null || !flyableHistory.getSuccess()) {
                     throw new FlyableException("Execution failures have been recorded. :" + flyableHistory.getScript());
                 }
                 installedLatestVersion = flyableHistory.getVersion();
@@ -161,7 +159,7 @@ public class FlyableExecutor {
         if (checksum == null) {
             return true;
         }
-        return StringUtils.equals(checksum, resource.getChecksum());
+        return checksum.equals(resource.getChecksum());
     }
 
     public void registerDefaultDatabaseMigrationTask() {

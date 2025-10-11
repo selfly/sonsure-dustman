@@ -4,10 +4,9 @@ import com.sonsure.dumper.common.parse.GenericTokenParser;
 import com.sonsure.dumper.common.spring.Resource;
 import com.sonsure.dumper.common.utils.EncryptUtils;
 import com.sonsure.dumper.common.utils.FileIOUtils;
-import com.sonsure.dumper.common.utils.TextUtils;
+import com.sonsure.dumper.common.utils.StrUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -44,15 +43,15 @@ public class MigrationResource {
         this.resource = resource;
         this.variables = new HashMap<>(8);
         String filename = resource.getFilename();
-        this.prefix = StringUtils.substring(filename, 0, 1);
-        int versionIndex = StringUtils.indexOf(filename, VERSION_DELIMITER);
-        this.version = StringUtils.substring(filename, 1, versionIndex);
+        this.prefix = filename.substring(0, 1);
+        int versionIndex = filename.indexOf(VERSION_DELIMITER);
+        this.version = filename.substring(1, versionIndex);
 
-        int groupIndex = StringUtils.indexOf(filename, GROUP_DELIMITER, versionIndex + VERSION_DELIMITER.length());
-        this.group = StringUtils.substring(filename, versionIndex + VERSION_DELIMITER.length(), groupIndex);
+        int groupIndex = filename.indexOf(GROUP_DELIMITER, versionIndex + VERSION_DELIMITER.length());
+        this.group = filename.substring(versionIndex + VERSION_DELIMITER.length(), groupIndex);
 
-        int suffixIndex = StringUtils.lastIndexOf(filename, SUFFIX_DELIMITER);
-        this.description = StringUtils.substring(filename, groupIndex + GROUP_DELIMITER.length(), suffixIndex);
+        int suffixIndex = filename.lastIndexOf(SUFFIX_DELIMITER);
+        this.description = filename.substring(groupIndex + GROUP_DELIMITER.length(), suffixIndex);
 
         this.init(resource);
     }
@@ -61,7 +60,7 @@ public class MigrationResource {
     private void init(Resource rs) {
         try (InputStream is = rs.getInputStream()) {
             this.resourceBytes = FileIOUtils.toByteArray(is);
-            String minify = TextUtils.minify(new String(this.resourceBytes));
+            String minify = StrUtils.minify(new String(this.resourceBytes));
             this.checksum = EncryptUtils.getMD5(minify);
         }
     }

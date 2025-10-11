@@ -9,9 +9,7 @@
 
 package com.sonsure.dumper.common.parse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import com.sonsure.dumper.common.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,8 +42,8 @@ public class XmlNode {
     /**
      * 添加属性
      *
-     * @param name
-     * @param value
+     * @param name  the name
+     * @param value the value
      */
     public void addAttribute(String name, String value) {
         this.attributes.put(name, value);
@@ -54,8 +52,8 @@ public class XmlNode {
     /**
      * 获取属性
      *
-     * @param attributeName
-     * @return
+     * @param attributeName the attribute name
+     * @return attribute
      */
     public String getAttribute(String attributeName) {
         return attributes == null ? "" : attributes.get(attributeName);
@@ -64,12 +62,12 @@ public class XmlNode {
     /**
      * 根据节点名称获取唯一子节点
      *
-     * @param nodeName
-     * @return
+     * @param nodeName the node name
+     * @return single child node
      */
     public XmlNode getSingleChildNode(String nodeName) {
         for (XmlNode childNode : this.childNodes) {
-            if (StringUtils.equals(nodeName, childNode.getName())) {
+            if (nodeName.equals(childNode.getName())) {
                 return childNode;
             }
         }
@@ -86,7 +84,7 @@ public class XmlNode {
      */
     public XmlNode getSingleChildNode(String nodeName, String attrName, String attrVal) {
         for (XmlNode childNode : this.childNodes) {
-            if (StringUtils.equals(nodeName, childNode.getName()) && StringUtils.equals(childNode.getAttribute(attrName), attrVal)) {
+            if (nodeName.equals(childNode.getName()) && attrVal.equals(childNode.getAttribute(attrName))) {
                 return childNode;
             }
         }
@@ -96,14 +94,14 @@ public class XmlNode {
     /**
      * 获取子节点
      *
-     * @param nodeName
-     * @return
+     * @param nodeName the node name
+     * @return child nodes
      */
     public List<XmlNode> getChildNodes(String nodeName) {
 
         List<XmlNode> nodes = new ArrayList<>();
         for (XmlNode childNode : this.childNodes) {
-            if (StringUtils.equals(nodeName, childNode.getName())) {
+            if (nodeName.equals(childNode.getName())) {
                 nodes.add(childNode);
             }
         }
@@ -113,8 +111,8 @@ public class XmlNode {
     /**
      * 根据节点名称,获取子节点内容
      *
-     * @param nodeName
-     * @return
+     * @param nodeName the node name
+     * @return single child node text
      */
     public String getSingleChildNodeText(String nodeName) {
         XmlNode childNode = getSingleChildNode(nodeName);
@@ -137,8 +135,8 @@ public class XmlNode {
     /**
      * 根据节点名称,获取子节点value属性值
      *
-     * @param nodeName
-     * @return
+     * @param nodeName the node name
+     * @return single child node value
      */
     public String getSingleChildNodeValue(String nodeName) {
         XmlNode childNode = getSingleChildNode(nodeName);
@@ -161,7 +159,7 @@ public class XmlNode {
     /**
      * 添加子节点
      *
-     * @param xmlNode
+     * @param xmlNode the xml node
      */
     public void addChildNode(XmlNode xmlNode) {
         childNodes.add(xmlNode);
@@ -201,6 +199,6 @@ public class XmlNode {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+        return StrUtils.reflectionToString(this);
     }
 }

@@ -11,7 +11,6 @@ package com.sonsure.dumper.common.utils;
 
 import com.sonsure.dumper.common.exception.SonsureException;
 import com.sonsure.dumper.common.spring.encrypt.BCrypt;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -88,19 +87,20 @@ public class EncryptUtils {
      * 计算内容md5值
      * 可以是字符串byte，也可以是文件byte
      *
-     * @param bytes
+     * @param bytes          the bytes
      * @param salt           盐
      * @param hashIterations 散列次数
-     * @return md5
+     * @return md5 md 5
      */
     public static String getMD5(byte[] bytes, String salt, int hashIterations) {
 
         try {
 
             // 生成一个MD5加密计算摘要
+            
             MessageDigest md = MessageDigest.getInstance("MD5");
 
-            if (StringUtils.isNotBlank(salt)) {
+            if (StrUtils.isNotBlank(salt)) {
                 md.update(salt.getBytes());
             }
             // 计算md5函数
@@ -129,8 +129,8 @@ public class EncryptUtils {
     /**
      * BCrypt加密
      *
-     * @param str
-     * @return
+     * @param str the str
+     * @return string string
      */
     public static String encodeBCrypt(String str) {
         return encodeBCrypt(str, 10, null);
@@ -139,9 +139,9 @@ public class EncryptUtils {
     /**
      * BCrypt加密
      *
-     * @param str
-     * @param strength
-     * @return
+     * @param str      the str
+     * @param strength the strength
+     * @return string string
      */
     public static String encodeBCrypt(String str, int strength) {
         return encodeBCrypt(str, strength, null);
@@ -150,9 +150,10 @@ public class EncryptUtils {
     /**
      * BCrypt加密
      *
-     * @param charSequence
-     * @param strength
-     * @return
+     * @param charSequence the char sequence
+     * @param strength     the strength
+     * @param random       the random
+     * @return string
      */
     public static String encodeBCrypt(CharSequence charSequence, int strength, SecureRandom random) {
         String salt;
@@ -171,12 +172,12 @@ public class EncryptUtils {
     /**
      * 检查加密的字符串
      *
-     * @param charSequence
-     * @param encodedStr
-     * @return
+     * @param charSequence the char sequence
+     * @param encodedStr   the encoded str
+     * @return boolean
      */
     public static boolean matchesBCrypt(CharSequence charSequence, String encodedStr) {
-        if (encodedStr == null || encodedStr.length() == 0) {
+        if (encodedStr == null || encodedStr.isEmpty()) {
             return false;
         }
 
@@ -192,7 +193,7 @@ public class EncryptUtils {
      *
      * @param encryptText 被签名的字符串
      * @param encryptKey  密钥
-     * @return
+     * @return byte [ ]
      */
     public static byte[] hmacSHA1Encrypt(String encryptText, String encryptKey) {
         try {

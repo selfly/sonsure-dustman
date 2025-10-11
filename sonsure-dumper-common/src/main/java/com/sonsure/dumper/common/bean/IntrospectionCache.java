@@ -10,7 +10,7 @@
 package com.sonsure.dumper.common.bean;
 
 import com.sonsure.dumper.common.exception.SonsureBeanException;
-import org.apache.commons.lang3.StringUtils;
+import com.sonsure.dumper.common.utils.StrUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -143,7 +143,7 @@ public class IntrospectionCache {
 
         PropertyDescriptor pd = this.propertyDescriptorCache.get(name);
 
-        if (pd == null && StringUtils.isNotBlank(name)) {
+        if (pd == null && StrUtils.isNotBlank(name)) {
             // Same lenient fallback checking as in PropertyTypeDescriptor...
             pd = this.propertyDescriptorCache.get(name.substring(0, 1).toLowerCase() + name.substring(1));
             if (pd == null) {

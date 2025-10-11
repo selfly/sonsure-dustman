@@ -9,10 +9,10 @@
 
 package com.sonsure.dumper.common.validation;
 
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.common.utils.UUIDUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author liyd
@@ -58,7 +58,7 @@ public class ValidatorElement {
      * create
      *
      * @param value     the value
-     * @param message  the message
+     * @param message   the message
      * @param validator 验证器
      */
     public ValidatorElement(Object value, String message, Validator validator) {
@@ -77,14 +77,14 @@ public class ValidatorElement {
         ValidatorResult theResult = new ValidatorResult(result.isSuccess());
         if (!result.isSuccess()) {
             //为空，自动生成一个唯一code
-            if (StringUtils.isBlank(errorCode)) {
+            if (StrUtils.isBlank(errorCode)) {
                 this.errorCode = new StringBuilder(PREFIX)
                         .append(result.getCode())
                         .append(".")
                         .append(UUIDUtils.getUUID16(result.getMessage().getBytes()))
                         .toString();
             }
-            if (StringUtils.isBlank(errorMsg)) {
+            if (StrUtils.isBlank(errorMsg)) {
                 this.errorMsg = result.getMessage();
             }
             theResult.setCode(this.errorCode);

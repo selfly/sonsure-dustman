@@ -11,6 +11,7 @@ package com.sonsure.dumper.core.mapping;
 
 import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.CommandBuildHelper;
 import com.sonsure.dumper.core.command.ModelClassDetails;
 import com.sonsure.dumper.core.command.ModelClassFieldDetails;
@@ -18,7 +19,6 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -150,7 +150,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
             }
         }
 
-        if (StringUtils.isBlank(tableName)) {
+        if (StrUtils.isBlank(tableName)) {
             throw new SonsureJdbcException("没有找到对应的表名:" + entityClass);
         }
         return tableName;
@@ -191,7 +191,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getTablePrefix(String classPackage) {
         for (Map.Entry<String, String> entry : tablePrefixMap.entrySet()) {
-            if (StringUtils.startsWith(classPackage, entry.getKey())) {
+            if (classPackage.startsWith(entry.getKey())) {
                 return entry.getValue();
             }
         }
@@ -200,14 +200,14 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
     protected Class<?> getTableClass(String className) {
 
-        if (StringUtils.isBlank(className)) {
+        if (StrUtils.isBlank(className)) {
             throw new SonsureJdbcException("className不能为空");
         }
-        if (StringUtils.startsWith(className, REFERENCE_CLASS_TOKEN) && StringUtils.endsWith(className, REFERENCE_CLASS_TOKEN)) {
-            className = StringUtils.substring(className, REFERENCE_CLASS_TOKEN.length(), className.length() - REFERENCE_CLASS_TOKEN.length());
+        if (className.startsWith(REFERENCE_CLASS_TOKEN) && className.endsWith(REFERENCE_CLASS_TOKEN)) {
+            className = className.substring(REFERENCE_CLASS_TOKEN.length(), className.length() - REFERENCE_CLASS_TOKEN.length());
         }
         Class<?> clazz = null;
-        if (StringUtils.indexOf(className, ".") != -1) {
+        if (className.contains(".")) {
             clazz = loadedClass.get(className);
             if (clazz == null) {
                 clazz = this.loadClass(className);
@@ -232,16 +232,16 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
      */
     protected void scanClassMapping() {
 
-        if (StringUtils.isBlank(this.modelPackages)) {
+        if (StrUtils.isBlank(this.modelPackages)) {
             return;
         }
-        String[] pks = StringUtils.split(modelPackages, ",");
+        String[] pks = StrUtils.split(modelPackages, ",");
         for (String pk : pks) {
             List<String> classes = ClassPathBeanScanner.scanClasses(pk, getClassLoader());
             for (String clazz : classes) {
 
-                int index = StringUtils.lastIndexOf(clazz, ".");
-                String simpleName = StringUtils.substring(clazz, index + 1);
+                int index = clazz.lastIndexOf(".");
+                String simpleName = clazz.substring(index + 1);
 
                 if (classMapping.containsKey(simpleName)) {
                     log.warn("短类名相同，使用时请自定义短类名或使用完整类名:class1:{},class2:{}", classMapping.get(simpleName), clazz);

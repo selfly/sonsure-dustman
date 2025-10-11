@@ -11,7 +11,6 @@ package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author selfly
@@ -53,7 +52,7 @@ public enum SqlOperator {
 
     public static SqlOperator of(String code) {
         for (SqlOperator value : values()) {
-            if (value.getCode().equalsIgnoreCase(StringUtils.trim(code))) {
+            if (value.getCode().equalsIgnoreCase(code.trim())) {
                 return value;
             }
         }

@@ -9,6 +9,8 @@
 
 package com.sonsure.dumper.core.command;
 
+import com.sonsure.dumper.common.model.MultiTuple;
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaClass;
@@ -17,8 +19,6 @@ import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.third.mybatis.CommandSql;
 import com.sonsure.dumper.core.third.mybatis.SqlStatement;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -111,10 +111,10 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         StringBuilder partSql = new StringBuilder();
         CommandParameters partParameters = new CommandParameters();
         for (SqlPart.PartStatement partStatement : partStatements) {
-            if (StringUtils.isNotBlank(partStatement.getLogical())) {
+            if (StrUtils.isNotBlank(partStatement.getLogical())) {
                 partSql.append(partStatement.getLogical());
             }
-            ImmutablePair<String, CommandParameters> pair = this.buildPartStatement(partStatement);
+            MultiTuple<String, CommandParameters> pair = this.buildPartStatement(partStatement);
             partSql.append(pair.getLeft());
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
@@ -222,7 +222,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
-        ImmutablePair<String, CommandParameters> pair = this.buildPartStatement(field, sqlOperator, value);
+        MultiTuple<String, CommandParameters> pair = this.buildPartStatement(field, sqlOperator, value);
         this.getCommandSql().WHERE(pair.getLeft());
         this.getCommandParameters().addParameters(pair.getRight().getParameterObjects());
         return this.getSelf();
@@ -247,10 +247,10 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         StringBuilder partSql = new StringBuilder("(");
         CommandParameters partParameters = new CommandParameters();
         for (SqlPart.PartStatement partStatement : partStatements) {
-            if (StringUtils.isNotBlank(partStatement.getLogical())) {
+            if (StrUtils.isNotBlank(partStatement.getLogical())) {
                 partSql.append(partStatement.getLogical());
             }
-            ImmutablePair<String, CommandParameters> pair = this.buildPartStatement(partStatement);
+            MultiTuple<String, CommandParameters> pair = this.buildPartStatement(partStatement);
             partSql.append(pair.getLeft());
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
@@ -258,25 +258,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         this.getCommandSql().WHERE(partSql.toString());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
-
-
-//        List<SqlPart.Condition> conditions = sqlPart.getConditions();
-//        StringBuilder partSql = new StringBuilder();
-//        CommandParameters partParameters = new CommandParameters();
-//        for (SqlPart.Condition condition : conditions) {
-//            if (StringUtils.isNotBlank(condition.getLogical())) {
-//                partSql.append(condition.getLogical());
-//            }
-//            ImmutablePair<String, CommandParameters> pair = this.buildCondition(condition.getName(), condition.getSqlOperator(), condition.getValue());
-//            partSql.append(pair.getLeft());
-//            partParameters.addParameters(pair.getRight().getParameterObjects());
-//        }
-//        this.getCommandSql().WHERE(partSql.toString());
-//        this.commandParameters.addParameters(partParameters.getParameterObjects());
-//        return this.getSelf();
     }
 
-    protected ImmutablePair<String, CommandParameters> buildPartStatement(String field, SqlOperator sqlOperator, Object value) {
+    protected MultiTuple<String, CommandParameters> buildPartStatement(String field, SqlOperator sqlOperator, Object value) {
         StringBuilder conditionSql = new StringBuilder();
         CommandParameters conditionParameters = new CommandParameters();
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
@@ -318,10 +302,10 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
                 }
             }
         }
-        return new ImmutablePair<>(conditionSql.toString(), conditionParameters);
+        return new MultiTuple<>(conditionSql.toString(), conditionParameters);
     }
 
-    protected ImmutablePair<String, CommandParameters> buildPartStatement(SqlPart.PartStatement partStatement) {
+    protected MultiTuple<String, CommandParameters> buildPartStatement(SqlPart.PartStatement partStatement) {
         String field;
         SqlOperator sqlOperator = partStatement.getSqlOperator();
         Object value;
