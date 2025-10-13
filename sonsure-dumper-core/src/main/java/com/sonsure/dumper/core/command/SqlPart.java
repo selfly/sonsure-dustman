@@ -121,7 +121,7 @@ public class SqlPart {
 //    }
 //
 //    public static <E, R> SqlPart of(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-//        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+//        LambdaField lambdaClass = LambdaHelper.getLambdaClass(function);
 //        return new SqlPart().condition(null, lambdaClass, sqlOperator, value);
 //    }
 //
@@ -134,7 +134,7 @@ public class SqlPart {
 //    }
 //
 //    public <E, R> SqlPart or(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-//        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+//        LambdaField lambdaClass = LambdaHelper.getLambdaClass(function);
 //        return this.condition(OR, lambdaClass, sqlOperator, value);
 //    }
 //
@@ -151,7 +151,7 @@ public class SqlPart {
 //    }
 //
 //    public <E, R> SqlPart and(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-//        LambdaClass lambdaClass = LambdaHelper.getLambdaClass(function);
+//        LambdaField lambdaClass = LambdaHelper.getLambdaClass(function);
 //        return this.condition(AND, lambdaClass, sqlOperator, value);
 //    }
 //
@@ -165,7 +165,7 @@ public class SqlPart {
 //        return this;
 //    }
 //
-//    private SqlPart condition(String logical, LambdaClass lambdaClass, SqlOperator sqlOperator, Object value) {
+//    private SqlPart condition(String logical, LambdaField lambdaClass, SqlOperator sqlOperator, Object value) {
 //        this.conditions.add(Condition.of(logical, lambdaClass, sqlOperator, value));
 //        return this;
 //    }

@@ -19,14 +19,14 @@ import java.lang.reflect.Method;
  */
 public class LambdaHelper {
 
-    public static <T, R> LambdaClass getLambdaClass(Function<T, R> lambda) {
+    public static <T, R> LambdaField getLambdaClass(Function<T, R> lambda) {
         SerializedLambda invoke = getSerializedLambda(lambda);
-        return new LambdaClass(invoke);
+        return new LambdaField(invoke);
     }
 
     public static <T, R> String getFieldName(Function<T, R> lambda) {
-        LambdaClass lambdaClass = getLambdaClass(lambda);
-        return lambdaClass.getFieldName();
+        LambdaField lambdaField = getLambdaClass(lambda);
+        return lambdaField.getFieldName();
     }
 
     @SafeVarargs

@@ -12,13 +12,13 @@ import java.lang.invoke.SerializedLambda;
  */
 @Getter
 @Setter
-public class LambdaClass {
+public class LambdaField {
     
     private String simpleClassName;
     private String methodName;
     private String fieldName;
 
-    public LambdaClass(SerializedLambda serializedLambda) {
+    public LambdaField(SerializedLambda serializedLambda) {
         String[] info = serializedLambda.getInstantiatedMethodType().split(";");
         int index = info[0].lastIndexOf("/");
         this.simpleClassName = info[0].substring(index + 1);
