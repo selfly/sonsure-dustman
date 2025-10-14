@@ -39,9 +39,14 @@ public abstract class AbstractSQL<T> {
 
     private final SQLStatement sql = new SQLStatement();
 
+    /**
+     * Gets self.
+     *
+     * @return the self
+     */
     public abstract T getSelf();
 
-    public T UPDATE(String table) {
+    public T update(String table) {
         sql().statementType = SQLStatement.StatementType.UPDATE;
         sql().tables.add(table);
         return getSelf();
@@ -54,20 +59,20 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T SET(String... sets) {
+    public T set(String... sets) {
         Collections.addAll(sql().sets, sets);
         return getSelf();
     }
 
-    public T INSERT_INTO(String tableName) {
+    public T insertInto(String tableName) {
         sql().statementType = SQLStatement.StatementType.INSERT;
         sql().tables.add(tableName);
         return getSelf();
     }
 
-    public T VALUES(String columns, String values) {
-        INTO_COLUMNS(columns);
-        INTO_VALUES(values);
+    public T values(String columns, String values) {
+        intoColumns(columns);
+        intoValues(values);
         return getSelf();
     }
 
@@ -78,8 +83,8 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T INTO_COLUMNS(String... columns) {
-        sql().columns.addAll(Arrays.asList(columns));
+    public T intoColumns(String... columns) {
+        Collections.addAll(sql().columns, columns);
         return getSelf();
     }
 
@@ -90,7 +95,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T INTO_VALUES(String... values) {
+    public T intoValues(String... values) {
         List<String> list = sql().valuesList.get(sql().valuesList.size() - 1);
         Collections.addAll(list, values);
         return getSelf();
@@ -103,7 +108,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T SELECT(String... columns) {
+    public T select(String... columns) {
         sql().statementType = SQLStatement.StatementType.SELECT;
         Collections.addAll(sql().select, columns);
         return getSelf();
@@ -116,13 +121,13 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T SELECT_DISTINCT(String... columns) {
+    public T selectDistinct(String... columns) {
         sql().distinct = true;
-        SELECT(columns);
+        select(columns);
         return getSelf();
     }
 
-    public T DELETE_FROM(String table) {
+    public T deleteFrom(String table) {
         sql().statementType = SQLStatement.StatementType.DELETE;
         sql().tables.add(table);
         return getSelf();
@@ -135,7 +140,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T FROM(String... tables) {
+    public T from(String... tables) {
         Collections.addAll(sql().tables, tables);
         return getSelf();
     }
@@ -147,7 +152,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T JOIN(String... joins) {
+    public T join(String... joins) {
         Collections.addAll(sql().join, joins);
         return getSelf();
     }
@@ -159,7 +164,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T INNER_JOIN(String... joins) {
+    public T innerJoin(String... joins) {
         Collections.addAll(sql().innerJoin, joins);
         return getSelf();
     }
@@ -171,7 +176,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T LEFT_OUTER_JOIN(String... joins) {
+    public T leftOuterJoin(String... joins) {
         Collections.addAll(sql().leftOuterJoin, joins);
         return getSelf();
     }
@@ -183,7 +188,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T RIGHT_OUTER_JOIN(String... joins) {
+    public T rightOuterJoin(String... joins) {
         Collections.addAll(sql().rightOuterJoin, joins);
         return getSelf();
     }
@@ -195,12 +200,12 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T OUTER_JOIN(String... joins) {
+    public T outerJoin(String... joins) {
         Collections.addAll(sql().outerJoin, joins);
         return getSelf();
     }
 
-    public T WHERE() {
+    public T where() {
         sql().lastList = sql().where;
         return getSelf();
     }
@@ -212,13 +217,13 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T WHERE(String... conditions) {
+    public T where(String... conditions) {
         Collections.addAll(sql().where, conditions);
         sql().lastList = sql().where;
         return getSelf();
     }
 
-    public T OR() {
+    public T or() {
         if (!sql().lastList.isEmpty()) {
             sql().lastList.add(OR);
         }
@@ -226,16 +231,22 @@ public abstract class AbstractSQL<T> {
         return getSelf();
     }
 
-    public T AND() {
+    public T or(String... conditions) {
+        this.or();
+        Collections.addAll(sql().lastList, conditions);
+        return getSelf();
+    }
+
+    public T and() {
         if (!sql().lastList.isEmpty()) {
             sql().lastList.add(AND);
         }
         return getSelf();
     }
 
-    public T AND(String... conditions) {
-        this.AND();
-        sql().lastList.addAll(Arrays.asList(conditions));
+    public T and(String... conditions) {
+        this.and();
+        Collections.addAll(sql().lastList, conditions);
         return getSelf();
     }
 
@@ -256,7 +267,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T GROUP_BY(String... columns) {
+    public T groupBy(String... columns) {
         Collections.addAll(sql().groupBy, columns);
         return getSelf();
     }
@@ -268,7 +279,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T HAVING(String... conditions) {
+    public T having(String... conditions) {
         Collections.addAll(sql().having, conditions);
         sql().lastList = sql().having;
         return getSelf();
@@ -281,9 +292,8 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.4.2
      */
-    public T ORDER_BY(String... columns) {
+    public T orderBy(String... columns) {
         Collections.addAll(sql().orderBy, columns);
-        sql().orderBy.addAll(Arrays.asList(columns));
         return getSelf();
     }
 
@@ -292,10 +302,10 @@ public abstract class AbstractSQL<T> {
      *
      * @param variable a limit variable string
      * @return a self instance
-     * @see #OFFSET(String)
+     * @see #offset(String)
      * @since 3.5.2
      */
-    public T LIMIT(String variable) {
+    public T limit(String variable) {
         sql().limit = variable;
         sql().limitingRowsStrategy = SQLStatement.LimitingRowsStrategy.OFFSET_LIMIT;
         return getSelf();
@@ -306,11 +316,11 @@ public abstract class AbstractSQL<T> {
      *
      * @param value an offset value
      * @return a self instance
-     * @see #OFFSET(long)
+     * @see #offset(long)
      * @since 3.5.2
      */
-    public T LIMIT(int value) {
-        return LIMIT(String.valueOf(value));
+    public T limit(int value) {
+        return limit(String.valueOf(value));
     }
 
     /**
@@ -318,10 +328,10 @@ public abstract class AbstractSQL<T> {
      *
      * @param variable a offset variable string
      * @return a self instance
-     * @see #LIMIT(String)
+     * @see #limit(String)
      * @since 3.5.2
      */
-    public T OFFSET(String variable) {
+    public T offset(String variable) {
         sql().offset = variable;
         sql().limitingRowsStrategy = SQLStatement.LimitingRowsStrategy.OFFSET_LIMIT;
         return getSelf();
@@ -332,11 +342,11 @@ public abstract class AbstractSQL<T> {
      *
      * @param value an offset value
      * @return a self instance
-     * @see #LIMIT(int)
+     * @see #limit(int)
      * @since 3.5.2
      */
-    public T OFFSET(long value) {
-        return OFFSET(String.valueOf(value));
+    public T offset(long value) {
+        return offset(String.valueOf(value));
     }
 
     /**
@@ -344,10 +354,10 @@ public abstract class AbstractSQL<T> {
      *
      * @param variable a fetch first rows variable string
      * @return a self instance
-     * @see #OFFSET_ROWS(String)
+     * @see #offsetRows(String)
      * @since 3.5.2
      */
-    public T FETCH_FIRST_ROWS_ONLY(String variable) {
+    public T fetchFirstRowsOnly(String variable) {
         sql().limit = variable;
         sql().limitingRowsStrategy = SQLStatement.LimitingRowsStrategy.ISO;
         return getSelf();
@@ -358,11 +368,11 @@ public abstract class AbstractSQL<T> {
      *
      * @param value a fetch first rows value
      * @return a self instance
-     * @see #OFFSET_ROWS(long)
+     * @see #offsetRows(long)
      * @since 3.5.2
      */
-    public T FETCH_FIRST_ROWS_ONLY(int value) {
-        return FETCH_FIRST_ROWS_ONLY(String.valueOf(value));
+    public T fetchFirstRowsOnly(int value) {
+        return fetchFirstRowsOnly(String.valueOf(value));
     }
 
     /**
@@ -370,10 +380,10 @@ public abstract class AbstractSQL<T> {
      *
      * @param variable a offset rows variable string
      * @return a self instance
-     * @see #FETCH_FIRST_ROWS_ONLY(String)
+     * @see #fetchFirstRowsOnly(String)
      * @since 3.5.2
      */
-    public T OFFSET_ROWS(String variable) {
+    public T offsetRows(String variable) {
         sql().offset = variable;
         sql().limitingRowsStrategy = SQLStatement.LimitingRowsStrategy.ISO;
         return getSelf();
@@ -384,11 +394,11 @@ public abstract class AbstractSQL<T> {
      *
      * @param value an offset rows value
      * @return a self instance
-     * @see #FETCH_FIRST_ROWS_ONLY(int)
+     * @see #fetchFirstRowsOnly(int)
      * @since 3.5.2
      */
-    public T OFFSET_ROWS(long value) {
-        return OFFSET_ROWS(String.valueOf(value));
+    public T offsetRows(long value) {
+        return offsetRows(String.valueOf(value));
     }
 
     /**
@@ -397,7 +407,7 @@ public abstract class AbstractSQL<T> {
      * @return the t
      * @since 3.5.2
      */
-    public T ADD_ROW() {
+    public T addRow() {
         sql().valuesList.add(new ArrayList<>());
         return getSelf();
     }

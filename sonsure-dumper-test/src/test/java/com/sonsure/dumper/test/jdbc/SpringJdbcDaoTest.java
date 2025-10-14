@@ -461,10 +461,10 @@ public class SpringJdbcDaoTest {
 
     @Test
     public void select10() {
-        Object result = jdbcDao.selectFrom(UserInfo.class)
+        List<?> result = jdbcDao.selectFrom(UserInfo.class)
                 .listMaps();
         Assertions.assertNotNull(result);
-        Assertions.assertInstanceOf(Map.class, ((List<?>) result).get(0));
+        Assertions.assertInstanceOf(Map.class, result.get(0));
     }
 
     @Test
@@ -687,7 +687,7 @@ public class SpringJdbcDaoTest {
         ai.setLoginName("666");
         ai.setPassword("6666");
         Object id = jdbcDao.executeInsert(ai);
-        Assertions.assertEquals(id, 36L);
+        Assertions.assertEquals(36L, id);
 
         AnnotationUserInfo ku = new AnnotationUserInfo();
         ku.setRowId(36L);
@@ -740,7 +740,7 @@ public class SpringJdbcDaoTest {
                 .update();
         Assertions.assertEquals(1, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 39L);
-        Assertions.assertEquals(user.getLoginName(), "newName");
+        Assertions.assertEquals("newName", user.getLoginName());
     }
 
     @Test
@@ -754,7 +754,7 @@ public class SpringJdbcDaoTest {
                 .update();
         Assertions.assertEquals(1, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 39L);
-        Assertions.assertEquals(user.getLoginName(), "newName");
+        Assertions.assertEquals("newName", user.getLoginName());
     }
 
     @Test
@@ -781,7 +781,7 @@ public class SpringJdbcDaoTest {
                 .update();
         Assertions.assertEquals(4, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 39L);
-        Assertions.assertEquals(user.getLoginName(), "newName");
+        Assertions.assertEquals("newName", user.getLoginName());
     }
 
 
@@ -793,7 +793,7 @@ public class SpringJdbcDaoTest {
                 .update();
         Assertions.assertEquals(1, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 39L);
-        Assertions.assertEquals(user.getLoginName(), "newName");
+        Assertions.assertEquals("newName", user.getLoginName());
     }
 
 
@@ -1239,7 +1239,7 @@ public class SpringJdbcDaoTest {
 
             UserInfo user = jdbcDao.get(UserInfo.class, 99L + i);
             ages.add(user.getUserAge());
-            Assertions.assertEquals(user.getLoginName(), "newName");
+            Assertions.assertEquals("newName", user.getLoginName());
             Assertions.assertTrue(user.getUserAge() >= 10 && user.getUserAge() <= 30);
         }
         Assertions.assertTrue(ages.size() > 1);
@@ -1388,54 +1388,5 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(11, users.size());
         Assertions.assertEquals(40, users.get(0).getUserAge());
     }
-
-//    @Test
-//    public void testIf() {
-//
-//        UserInfo addUser = new UserInfo();
-//        addUser.setLoginName("name-1");
-//        addUser.setPassword("123456-a");
-//        addUser.setUserAge(18);
-//        addUser.setGmtCreate(new Date());
-//
-//        System.out.println("jdbcDao:" + jdbcDao);
-//        jdbcDao.executeInsert(addUser);
-//
-//        long count = jdbcDao.selectFrom(UserInfo.class)
-//                .where(UserInfo::getLoginName, "name-1")
-//                .where(UserInfo::getPassword, "123456-1")
-//                .count();
-//        Assertions.assertEquals(1, count);
-//
-//        long count1 = jdbcDao.selectFrom(UserInfo.class)
-//                .where(UserInfo::getLoginName, "name-1")
-//                .iff(false).where(UserInfo::getPassword, "123456-1")
-//                .count();
-//        Assertions.assertEquals(2, count1);
-//
-//        UserInfo user = new UserInfo();
-//        user.setLoginName("name-1");
-//        long count2 = jdbcDao.selectFrom(UserInfo.class)
-//                .whereForObject(user)
-//                .count();
-//        Assertions.assertEquals(2, count2);
-//
-//        long count3 = jdbcDao.selectFrom(UserInfo.class)
-//                .iff(user.getPassword() != null).whereForObject(user)
-//                .count();
-//        Assertions.assertEquals(51, count3);
-//
-//        long count4 = jdbcDao.selectFrom(UserInfo.class)
-//                .iff(user.getPassword() != null).whereForObject(user)
-//                .where(UserInfo::getLoginName, "name-5")
-//                .count();
-//        Assertions.assertEquals(1, count4);
-//
-//        long count5 = jdbcDao.selectFrom(UserInfo.class)
-//                .iff(addUser.getUserAge() != null).where(UserInfo::getUserAge, addUser.getUserAge())
-//                .where(UserInfo::getPassword, addUser.getPassword())
-//                .count();
-//        Assertions.assertEquals(1, count5);
-//    }
 
 }

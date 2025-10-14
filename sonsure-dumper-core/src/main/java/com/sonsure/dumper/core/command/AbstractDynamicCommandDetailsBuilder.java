@@ -52,7 +52,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T from(String entity) {
-        this.getCommandSql().FROM(entity);
+        this.getCommandSql().from(entity);
         this.latestTable = entity;
         latestStatement = SqlStatement.TABLE;
         return this.getSelf();
@@ -60,7 +60,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T insertInto(String entity) {
-        this.getCommandSql().INSERT_INTO(entity);
+        this.getCommandSql().insertInto(entity);
         this.latestTable = entity;
         latestStatement = SqlStatement.TABLE;
         return this.getSelf();
@@ -68,7 +68,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T update(String entity) {
-        this.getCommandSql().UPDATE(entity);
+        this.getCommandSql().update(entity);
         this.latestTable = entity;
         latestStatement = SqlStatement.TABLE;
         return this.getSelf();
@@ -76,7 +76,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T deleteFrom(String entity) {
-        this.getCommandSql().DELETE_FROM(entity);
+        this.getCommandSql().deleteFrom(entity);
         this.latestTable = entity;
         latestStatement = SqlStatement.TABLE;
         return this.getSelf();
@@ -93,7 +93,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T innerJoin(String table) {
-        this.getCommandSql().INNER_JOIN(table);
+        this.getCommandSql().innerJoin(table);
         this.latestTable = table;
         latestStatement = SqlStatement.INNER_JOIN;
         return this.getSelf();
@@ -138,7 +138,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T addSelectFields(String... fields) {
-        this.getCommandSql().SELECT(fields);
+        this.getCommandSql().select(fields);
         return this.getSelf();
     }
 
@@ -177,9 +177,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T intoField(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
         if (nativeContentWrapper.isNatives()) {
-            this.getCommandSql().INTO_COLUMNS(nativeContentWrapper.getActualContent()).INTO_VALUES(String.valueOf(value));
+            this.getCommandSql().intoColumns(nativeContentWrapper.getActualContent()).intoValues(String.valueOf(value));
         } else {
-            this.getCommandSql().INTO_COLUMNS(field).INTO_VALUES(PARAM_PLACEHOLDER);
+            this.getCommandSql().intoColumns(field).intoValues(PARAM_PLACEHOLDER);
             this.getCommandParameters().addParameter(field, value);
         }
         return this.getSelf();
@@ -209,9 +209,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T setField(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
         if (nativeContentWrapper.isNatives()) {
-            this.getCommandSql().SET(String.format("%s %s %s", nativeContentWrapper.getActualContent(), SqlOperator.EQ.getCode(), value));
+            this.getCommandSql().set(String.format("%s %s %s", nativeContentWrapper.getActualContent(), SqlOperator.EQ.getCode(), value));
         } else {
-            this.getCommandSql().SET(String.format("%s %s %s", field, SqlOperator.EQ.getCode(), PARAM_PLACEHOLDER));
+            this.getCommandSql().set(String.format("%s %s %s", field, SqlOperator.EQ.getCode(), PARAM_PLACEHOLDER));
             this.getCommandParameters().addParameter(field, value);
         }
         return this.getSelf();
@@ -235,14 +235,14 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where() {
-        this.getCommandSql().WHERE();
+        this.getCommandSql().where();
         return this.getSelf();
     }
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
         MultiTuple<String, CommandParameters> pair = this.buildPartStatement(field, sqlOperator, value);
-        this.getCommandSql().WHERE(pair.getLeft());
+        this.getCommandSql().where(pair.getLeft());
         this.getCommandParameters().addParameters(pair.getRight().getParameterObjects());
         return this.getSelf();
     }
@@ -274,7 +274,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
         partSql.append(")");
-        this.getCommandSql().WHERE(partSql.toString());
+        this.getCommandSql().where(partSql.toString());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
     }
@@ -359,14 +359,14 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T whereAppend(String segment) {
-        this.getCommandSql().WHERE(segment);
+        this.getCommandSql().where(segment);
         return this.getSelf();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public T whereAppend(String segment, Object value) {
-        this.getCommandSql().WHERE(segment);
+        this.getCommandSql().where(segment);
         if (this.isNamedParameter()) {
             if (!(value instanceof Map)) {
                 throw new SonsureJdbcException("namedParameter模式参数必须为Map类型,key与name对应");
@@ -402,19 +402,19 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T and() {
-        this.getCommandSql().AND();
+        this.getCommandSql().and();
         return this.getSelf();
     }
 
     @Override
     public T or() {
-        this.getCommandSql().OR();
+        this.getCommandSql().or();
         return this.getSelf();
     }
 
     @Override
     public T orderBy(String field, OrderBy orderBy) {
-        this.getCommandSql().ORDER_BY(String.format("%s %s", field, orderBy.getCode()));
+        this.getCommandSql().orderBy(String.format("%s %s", field, orderBy.getCode()));
         return this.getSelf();
     }
 
@@ -428,7 +428,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T groupBy(String... fields) {
-        this.getCommandSql().GROUP_BY(fields);
+        this.getCommandSql().groupBy(fields);
         return this.getSelf();
     }
 

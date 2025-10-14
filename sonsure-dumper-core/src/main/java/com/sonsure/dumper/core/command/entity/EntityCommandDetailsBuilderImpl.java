@@ -106,13 +106,13 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
                     }
                     generateKey.setPrimaryKeyParameter(primaryKeyParameter);
                     //主键列
-                    this.getCommandSql().INTO_COLUMNS(primaryKeyField.getFieldName());
+                    this.getCommandSql().intoColumns(primaryKeyField.getFieldName());
                     if (primaryKeyParameter) {
-                        this.getCommandSql().INTO_VALUES(PARAM_PLACEHOLDER);
+                        this.getCommandSql().intoValues(PARAM_PLACEHOLDER);
                         this.getCommandParameters().addParameter(primaryKeyField.getFieldName(), generateKeyValue);
                     } else {
                         //不传参方式，例如是oracle的序列名
-                        this.getCommandSql().INTO_VALUES(generateKeyValue.toString());
+                        this.getCommandSql().intoValues(generateKeyValue.toString());
                     }
                 }
             } else {

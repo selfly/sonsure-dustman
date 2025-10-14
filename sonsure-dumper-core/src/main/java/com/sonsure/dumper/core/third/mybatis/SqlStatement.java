@@ -6,6 +6,9 @@ package com.sonsure.dumper.core.third.mybatis;
 
 public enum SqlStatement {
 
+    /**
+     * Set sql statement.
+     */
     SET,
 
     SELECT,
