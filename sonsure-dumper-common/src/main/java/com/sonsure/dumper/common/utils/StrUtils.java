@@ -26,6 +26,9 @@ import java.util.Arrays;
  */
 public class StrUtils {
 
+    public static final String EMPTY = "";
+    public static final int INDEX_NOT_FOUND = -1;
+
     public static String minify(String text) {
         StringBuilder sb = new StringBuilder();
         char pre = ' ';
@@ -164,11 +167,29 @@ public class StrUtils {
         return StringUtils.replace(inString, oldPattern, newPattern);
     }
 
+    public static boolean contains(String str, String subStr) {
+        return str != null && str.contains(subStr);
+    }
+
     public static String[] split(String toSplit, String delimiter) {
         String[] split = StringUtils.split(toSplit, delimiter);
         if (split == null) {
             return toSplit == null ? new String[0] : new String[]{toSplit};
         }
         return split;
+    }
+
+    public static String substringBefore(String str, String separator) {
+        if (isBlank(str) || separator == null) {
+            return str;
+        }
+        if (separator.isEmpty()) {
+            return EMPTY;
+        }
+        int pos = str.indexOf(separator);
+        if (pos == INDEX_NOT_FOUND) {
+            return str;
+        }
+        return str.substring(0, pos);
     }
 }

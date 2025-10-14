@@ -24,6 +24,13 @@ import com.sonsure.dumper.core.command.lambda.Function;
 public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>> extends EntityCommandExecutor<C> {
 
     /**
+     * Where c.
+     *
+     * @return the c
+     */
+    C where();
+
+    /**
      * where 属性条件
      *
      * @param field       the field
@@ -97,6 +104,20 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @return the t
      */
     C whereAppend(String segment, Object value);
+
+    /**
+     * Open paren c.
+     *
+     * @return the c
+     */
+    C openParen();
+
+    /**
+     * Close paren c.
+     *
+     * @return the c
+     */
+    C closeParen();
 
     /**
      * and

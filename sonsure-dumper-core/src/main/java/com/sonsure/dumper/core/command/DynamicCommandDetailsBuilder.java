@@ -40,7 +40,7 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      * Add select fields t.
      *
      * @param tableAlias the table alias
-     * @param fields         the fields
+     * @param fields     the fields
      * @return the t
      */
     T addAliasSelectFields(String tableAlias, String... fields);
@@ -179,12 +179,33 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
     T on(String on);
 
     /**
+     * On select.
+     *
+     * @param <E1>        the type parameter
+     * @param <R1>        the type parameter
+     * @param <E2>        the type parameter
+     * @param <R2>        the type parameter
+     * @param table1Field the table 1 field
+     * @param sqlOperator the sql operator
+     * @param table2Field the table 2 field
+     * @return the select
+     */
+    <E1, R1, E2, R2> T on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field);
+
+    /**
      * On t.
      *
      * @param sqlPart the sql part
      * @return the t
      */
     T on(SqlPart sqlPart);
+
+    /**
+     * Where t.
+     *
+     * @return the t
+     */
+    T where();
 
     /**
      * Where command
@@ -249,6 +270,20 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      * @return the t
      */
     T whereAppend(String segment, Object value);
+
+    /**
+     * Open paren t.
+     *
+     * @return the c
+     */
+    T openParen();
+
+    /**
+     * Close paren t.
+     *
+     * @return the c
+     */
+    T closeParen();
 
     /**
      * And

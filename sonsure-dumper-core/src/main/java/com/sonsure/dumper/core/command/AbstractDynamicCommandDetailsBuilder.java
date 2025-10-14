@@ -106,6 +106,19 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     }
 
     @Override
+    public <E1, R1, E2, R2> T on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field) {
+        LambdaField lambdaField1 = LambdaHelper.getLambdaClass(table1Field);
+        String tableAlias1 = this.getTableAliasMapping().get(lambdaField1.getSimpleClassName());
+        String field1 = CommandBuildHelper.getTableAliasFieldName(tableAlias1, lambdaField1.getFieldName());
+
+        LambdaField lambdaField2 = LambdaHelper.getLambdaClass(table2Field);
+        String tableAlias2 = this.getTableAliasMapping().get(lambdaField2.getSimpleClassName());
+        String field2 = CommandBuildHelper.getTableAliasFieldName(tableAlias2, lambdaField2.getFieldName());
+        this.getCommandSql().joinOn(String.format("%s %s %s", field1, sqlOperator.getCode(), field2), getLatestStatement());
+        return this.getSelf();
+    }
+
+    @Override
     public T on(SqlPart sqlPart) {
         List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
         StringBuilder partSql = new StringBuilder();
@@ -217,6 +230,12 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             //不忽略null，最后构建时根据updateNull设置处理null值
             this.setField(entry.getKey(), entry.getValue());
         }
+        return this.getSelf();
+    }
+
+    @Override
+    public T where() {
+        this.getCommandSql().WHERE();
         return this.getSelf();
     }
 
@@ -366,6 +385,18 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             }
         }
 
+        return this.getSelf();
+    }
+
+    @Override
+    public T openParen() {
+        this.getCommandSql().openParen();
+        return this.getSelf();
+    }
+
+    @Override
+    public T closeParen() {
+        this.getCommandSql().closeParen();
         return this.getSelf();
     }
 

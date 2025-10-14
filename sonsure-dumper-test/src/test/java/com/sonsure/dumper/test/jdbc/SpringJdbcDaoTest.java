@@ -13,7 +13,6 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.SqlOperator;
-import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.persist.JdbcDao;
@@ -356,15 +355,21 @@ public class SpringJdbcDaoTest {
             jdbcDao.executeInsert(user);
         }
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
-                .where(
-                        SqlPart.of("loginName").eq("whereAnd")
-                                .or(UserInfo::getPassword).eq("123456-5")
-//                        SqlPart.of("loginName", "whereAnd").or(UserInfo::getPassword, "123456-5")
-                )
+                .where()
+                .openParen()
+                .where(UserInfo::getLoginName, SqlOperator.EQ, "whereAnd")
+                .or()
+                .where(UserInfo::getPassword, SqlOperator.EQ, "123456-5")
+                .closeParen()
+//                .where(
+//                        SqlPart.of("loginName").eq("whereAnd")
+//                                .or(UserInfo::getPassword).eq("123456-5")
+////                        SqlPart.of("loginName", "whereAnd").or(UserInfo::getPassword, "123456-5")
+//                )
                 .and()
                 .where(UserInfo::getUserInfoId, 2L)
                 .singleResult(UserInfo.class);
-        Assertions.assertEquals(userInfo.getUserInfoId(), 2L);
+        Assertions.assertEquals(2L, userInfo.getUserInfoId());
     }
 
     @Test
@@ -1311,7 +1316,8 @@ public class SpringJdbcDaoTest {
         }
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
                 .innerJoin(Account.class).as("t2")
-                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
+                .on(UserInfo::getUserInfoId, Account::getAccountId)
+//                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
                 .list();
         Assertions.assertEquals(10, list.size());
     }
@@ -1330,7 +1336,7 @@ public class SpringJdbcDaoTest {
         }
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAliasColumn("t1", "loginName")
                 .innerJoin(Account.class).as("t2")
-                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
+                .on(UserInfo::getUserInfoId, Account::getAccountId)
                 .list();
         Assertions.assertEquals(10, list.size());
     }

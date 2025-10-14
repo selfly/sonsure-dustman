@@ -12,10 +12,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandType;
-import com.sonsure.dumper.core.command.OrderBy;
-import com.sonsure.dumper.core.command.SqlPart;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
@@ -98,6 +95,17 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Select<M> on(String on) {
         this.getEntityCommandDetailsBuilder().on(on);
+        return this;
+    }
+
+    @Override
+    public <E1, R1, E2, R2> Select<M> on(Function<E1, R1> table1Field, Function<E2, R2> table2Field) {
+        return this.on(table1Field, SqlOperator.EQ, table2Field);
+    }
+
+    @Override
+    public <E1, R1, E2, R2> Select<M> on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field) {
+        this.getEntityCommandDetailsBuilder().on(table1Field, sqlOperator, table2Field);
         return this;
     }
 

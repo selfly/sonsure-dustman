@@ -13,6 +13,7 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
+import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 
@@ -109,6 +110,33 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * @return the select
      */
     Select<M> on(String on);
+
+    /**
+     * On select.
+     *
+     * @param <E1>        the type parameter
+     * @param <R1>        the type parameter
+     * @param <E2>        the type parameter
+     * @param <R2>        the type parameter
+     * @param table1Field the table 1 field
+     * @param table2Field the table 2 field
+     * @return the select
+     */
+    <E1, R1, E2, R2> Select<M> on(Function<E1, R1> table1Field, Function<E2, R2> table2Field);
+
+    /**
+     * On select.
+     *
+     * @param <E1>        the type parameter
+     * @param <R1>        the type parameter
+     * @param <E2>        the type parameter
+     * @param <R2>        the type parameter
+     * @param table1Field the table 1 field
+     * @param sqlOperator the sql operator
+     * @param table2Field the table 2 field
+     * @return the select
+     */
+    <E1, R1, E2, R2> Select<M> on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field);
 
     /**
      * On select.

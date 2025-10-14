@@ -28,6 +28,12 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
+    public T where() {
+        this.getEntityCommandDetailsBuilder().where();
+        return this.getSelf();
+    }
+
+    @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
         this.getEntityCommandDetailsBuilder().where(field, sqlOperator, value);
         return this.getSelf();
@@ -72,6 +78,18 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     public T whereAppend(String segment, Object value) {
         this.getEntityCommandDetailsBuilder().whereAppend(segment, value);
         return getSelf();
+    }
+
+    @Override
+    public T openParen() {
+        this.getEntityCommandDetailsBuilder().openParen();
+        return this.getSelf();
+    }
+
+    @Override
+    public T closeParen() {
+        this.getEntityCommandDetailsBuilder().closeParen();
+        return this.getSelf();
     }
 
     @Override
