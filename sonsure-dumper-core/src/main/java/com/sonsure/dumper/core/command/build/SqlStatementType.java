@@ -1,10 +1,10 @@
-package com.sonsure.dumper.core.third.mybatis;
+package com.sonsure.dumper.core.command.build;
 
 /**
  * @author selfly
  */
 
-public enum SqlStatement {
+public enum SqlStatementType {
 
     /**
      * Set sql statement.

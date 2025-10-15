@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.sonsure.dumper.core.third.mybatis;
+package com.sonsure.dumper.core.command.build;
 
 
 import java.util.List;
@@ -23,23 +23,23 @@ import java.util.List;
  *
  * @author selfly
  */
-public class CommandSql extends AbstractSQL<CommandSql> {
+public class SimpleSQL extends AbstractSQL<SimpleSQL> {
 
 
     @Override
-    public CommandSql getSelf() {
+    public SimpleSQL getSelf() {
         return this;
     }
 
-    /**
-     * Clear select columns command sql.
-     *
-     * @return the command sql
-     */
-    public CommandSql clearSelectColumns() {
-        this.sql().select.clear();
-        return getSelf();
-    }
+//    /**
+//     * Clear select columns command sql.
+//     *
+//     * @return the command sql
+//     */
+//    public SimpleSQL clearSelectColumns() {
+//        this.sql().select.clear();
+//        return getSelf();
+//    }
 
     /**
      * Drop select columns command sql.
@@ -47,7 +47,7 @@ public class CommandSql extends AbstractSQL<CommandSql> {
      * @param fields the fields
      * @return the command sql
      */
-    public CommandSql dropSelectColumns(String... fields) {
+    public SimpleSQL dropSelectColumns(String... fields) {
         for (String field : fields) {
             this.sql().select.remove(field);
         }
@@ -60,8 +60,8 @@ public class CommandSql extends AbstractSQL<CommandSql> {
      * @param aliasName the alias name
      * @return the command sql
      */
-    public CommandSql as(String aliasName, SqlStatement sqlStatement) {
-        List<String> list = getLatestList(sqlStatement);
+    public SimpleSQL as(String aliasName, SqlStatementType sqlStatementType) {
+        List<String> list = this.getLatestList(sqlStatementType);
         String last = list.remove(list.size() - 1);
         list.add(last + " " + aliasName);
         return getSelf();
@@ -71,11 +71,11 @@ public class CommandSql extends AbstractSQL<CommandSql> {
      * Join on command sql.
      *
      * @param on           the on
-     * @param sqlStatement the sql statement
+     * @param sqlStatementType the sql statement
      * @return the command sql
      */
-    public CommandSql joinOn(String on, SqlStatement sqlStatement) {
-        List<String> list = getLatestList(sqlStatement);
+    public SimpleSQL joinStepOn(String on, SqlStatementType sqlStatementType) {
+        List<String> list = this.getLatestList(sqlStatementType);
         String last = list.remove(list.size() - 1);
         list.add(last + " on " + on);
         return getSelf();
@@ -85,10 +85,18 @@ public class CommandSql extends AbstractSQL<CommandSql> {
         return this.sql().select.isEmpty();
     }
 
-    private List<String> getLatestList(SqlStatement sqlStatement) {
+    private List<String> getLatestList(SqlStatementType sqlStatementType) {
         List<String> list;
-        if (SqlStatement.INNER_JOIN == sqlStatement) {
+        if (SqlStatementType.JOIN == sqlStatementType) {
+            list = this.sql().join;
+        } else if (SqlStatementType.INNER_JOIN == sqlStatementType) {
             list = this.sql().innerJoin;
+        } else if (SqlStatementType.OUTER_JOIN == sqlStatementType) {
+            list = this.sql().outerJoin;
+        } else if (SqlStatementType.LEFT_OUTER_JOIN == sqlStatementType) {
+            list = this.sql().leftOuterJoin;
+        } else if (SqlStatementType.RIGHT_OUTER_JOIN == sqlStatementType) {
+            list = this.sql().rightOuterJoin;
         } else {
             list = this.sql().tables;
         }

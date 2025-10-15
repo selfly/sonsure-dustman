@@ -1,7 +1,7 @@
 package com.sonsure.dumper.test.sql;
 
 import com.sonsure.dumper.common.utils.StrUtils;
-import com.sonsure.dumper.core.third.mybatis.SimpleSQL;
+import com.sonsure.dumper.core.command.build.SimpleSQL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,30 +9,84 @@ public class SimpleSQLTest {
 
     @Test
     public void select() {
-        //SELECT * FROM employees;
-        String expect = "SELECT * FROM employees";
+        String expect = "SELECT * FROM user_info";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("*").from("employees");
+        sql.select("*").from("user_info");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
-    public void update() {
-        String expect = "UPDATE employees SET salary = salary * 1.1 WHERE department_id = 10";
+    public void selectColumnsAndWhere() {
+        String expect = "select userInfoId, loginName, password, userAge,userType,status,gender,realName,email,mobile,avatar,description FROM user_info where loginName = 'test-user-123' and password = '123456'";
         SimpleSQL sql = new SimpleSQL();
-        sql.update("employees")
-                .set("salary = salary * 1.1")
-                .where("department_id = 10");
+        sql.select("userInfoId, loginName, password")
+                .select("userAge,userType,status,gender,realName,email,mobile,avatar,description")
+                .from("user_info")
+                .where("loginName = 'test-user-123'")
+                .and("password = '123456'");
+        String minify = StrUtils.minify(sql.toString());
+        Assertions.assertEquals(expect.toLowerCase(), minify.toLowerCase());
+    }
+
+    @Test
+    public void selectColumnsAndWhereParen() {
+        String expect = "select userInfoId, loginName, password, userAge,userType,status,gender,realName,email,mobile,avatar,description FROM user_info where (loginName = 'test-user-123' or email = 'test-user-123@sonsure.com') and password = '123456'";
+        SimpleSQL sql = new SimpleSQL();
+        sql.select("userInfoId, loginName, password")
+                .select("userAge,userType,status,gender,realName,email,mobile,avatar,description")
+                .from("user_info")
+                .where()
+                .openParen()
+                .where("loginName = 'test-user-123'")
+                .or("email = 'test-user-123@sonsure.com'")
+                .closeParen()
+                .and("password = '123456'");
+        String minify = StrUtils.minify(sql.toString());
+        Assertions.assertEquals(expect.toLowerCase(), minify.toLowerCase());
+    }
+
+    @Test
+    public void selectDynamicWhere() {
+        String expect = "select userInfoId, loginName, password, userAge,userType,status,gender,realName,email,mobile,avatar,description FROM user_info";
+        SimpleSQL sql = new SimpleSQL();
+        sql.select("userInfoId, loginName, password")
+                .select("userAge,userType,status,gender,realName,email,mobile,avatar,description")
+                .from("user_info")
+                .where();
+//                .openParen()
+//                .where("loginName = 'test-user-123'")
+//                .or("email = 'test-user-123@sonsure.com'")
+//                .closeParen()
+//                .and("password = '123456'");
+        //动态条件为空处理where情况
+        String minify = StrUtils.minify(sql.toString());
+        Assertions.assertEquals(expect.toLowerCase(), minify.toLowerCase());
+
+        //动态条件不为空，处理 where and 情况
+        sql.and("loginName = 'test-user-123'");
+
+        String expect2 = expect + " where loginName = 'test-user-123'";
+        String minify2 = StrUtils.minify(sql.toString());
+        Assertions.assertEquals(expect2.toLowerCase(), minify2.toLowerCase());
+    }
+
+    @Test
+    public void update() {
+        String expect = "UPDATE user_info SET userAge = userAge + 1 WHERE userInfoId = 10";
+        SimpleSQL sql = new SimpleSQL();
+        sql.update("user_info")
+                .set("userAge = userAge + 1")
+                .where("userInfoId = 10");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void delete() {
-        String expect = "DELETE FROM employees WHERE status = 'resigned'";
+        String expect = "DELETE FROM user_info WHERE status = 'resigned'";
         SimpleSQL sql = new SimpleSQL();
-        sql.deleteFrom("employees")
+        sql.deleteFrom("user_info")
                 .where("status = 'resigned'");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
@@ -40,113 +94,105 @@ public class SimpleSQLTest {
 
     @Test
     public void insert() {
-        String expect = "INSERT INTO employees (id, name, department_id, salary) VALUES (101, 'Alice', 3, 75000)";
+        String expect = "INSERT INTO user_info (loginName, password, userAge,userType) VALUES ('test-user-123', '123456', 13, '1')";
         SimpleSQL sql = new SimpleSQL();
-        sql.insertInto("employees")
-                .values("id, name, department_id, salary", "101, 'Alice', 3, 75000");
+        sql.insertInto("user_info")
+                .values("loginName, password, userAge,userType", "'test-user-123', '123456', 13, '1'");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void selectDistinct() {
-        String expect = "SELECT DISTINCT department_name FROM departments";
+        String expect = "SELECT DISTINCT loginName FROM user_info";
         SimpleSQL sql = new SimpleSQL();
-        sql.selectDistinct("department_name")
-                .from("departments");
+        sql.selectDistinct("loginName")
+                .from("user_info");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void innerJoin() {
-        String expect = "SELECT e.name, d.department_name FROM employees e INNER JOIN departments d ON e.department_id = d.id";
+        String expect = "SELECT t1.loginName, t2.accountName FROM user_info t1 INNER JOIN account t2 ON t1.userInfoId = t2.accountId";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("e.name, d.department_name")
-                .from("employees e")
-                .innerJoin("departments d ON e.department_id = d.id");
+        sql.select("t1.loginName, t2.accountName")
+                .from("user_info t1")
+                .innerJoin("account t2 ON t1.userInfoId = t2.accountId");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void leftJoin() {
-        String expect = "SELECT e.name, d.department_name FROM employees e LEFT OUTER JOIN departments d ON e.department_id = d.id";
+        String expect = "SELECT t1.loginName, t2.accountName FROM user_info t1 LEFT OUTER JOIN account t2 ON t1.userInfoId = t2.accountId";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("e.name, d.department_name")
-                .from("employees e")
-                .leftOuterJoin("departments d ON e.department_id = d.id");
+        sql.select("t1.loginName, t2.accountName")
+                .from("user_info t1")
+                .leftOuterJoin("account t2 ON t1.userInfoId = t2.accountId");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
+
     @Test
     public void rightJoin() {
-        String expect = "SELECT e.name, d.department_name FROM employees e RIGHT OUTER JOIN departments d ON e.department_id = d.id";
+        String expect = "SELECT t1.loginName, t2.accountName FROM user_info t1 RIGHT OUTER JOIN account t2 ON t1.userInfoId = t2.accountId";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("e.name, d.department_name")
-                .from("employees e")
-                .rightOuterJoin("departments d ON e.department_id = d.id");
+        sql.select("t1.loginName, t2.accountName")
+                .from("user_info t1")
+                .rightOuterJoin("account t2 ON t1.userInfoId = t2.accountId");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void outerJoin() {
-        String expect = "SELECT e.name, d.department_name FROM employees e OUTER JOIN departments d ON e.department_id = d.id";
+        String expect = "SELECT t1.loginName, t2.accountName FROM user_info t1 OUTER JOIN account t2 ON t1.userInfoId = t2.accountId";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("e.name, d.department_name")
-                .from("employees e")
-                .outerJoin("departments d ON e.department_id = d.id");
+        sql.select("t1.loginName, t2.accountName")
+                .from("user_info t1")
+                .outerJoin("account t2 ON t1.userInfoId = t2.accountId");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
-    public void selectOrderByGroupBy() {
-        String expect = "SELECT department, COUNT(*) AS employee_count FROM employees WHERE salary > 5000 AND (department = 'IT' OR department = 'HR') GROUP BY department";
+    public void selectGroupBy() {
+
+        String expect = "SELECT gender, COUNT(*) AS user_count FROM user_info WHERE userAge > 15 AND (status = '1' OR status = '2') GROUP BY gender";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("department, COUNT(*) AS employee_count")
-                .from("employees")
-                .where("salary > 5000")
+        sql.select("gender, COUNT(*) AS user_count")
+                .from("user_info")
+                .where("userAge > 15")
                 .and()
                 .openParen()
-                .where("department = 'IT'").or().where("department = 'HR'")
+                .condition("status = '1'").or("status = '2'")
                 .closeParen()
-                .groupBy("department");
+                .groupBy("gender");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void selectOrderBy() {
-        String expect = "SELECT name, salary, hire_date FROM employees ORDER BY salary DESC, hire_date ASC";
+        String expect = "SELECT loginName, gender, userAge FROM user_info ORDER BY gender DESC, userAge ASC";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("name, salary, hire_date")
-                .from("employees")
-                .orderBy("salary DESC")
-                .orderBy("hire_date ASC");
-        String minify = StrUtils.minify(sql.toString());
-        Assertions.assertEquals(expect, minify);
-    }
-    @Test
-    public void selectGroupBy() {
-        String expect = "SELECT department, AVG(salary) AS avg_salary FROM employees GROUP BY department";
-        SimpleSQL sql = new SimpleSQL();
-        sql.select("department, AVG(salary) AS avg_salary")
-                .from("employees")
-                .groupBy("department");
+        sql.select("loginName, gender, userAge")
+                .from("user_info")
+                .orderBy("gender DESC")
+                .orderBy("userAge ASC");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
 
     @Test
     public void selectHaving() {
-        String expect = "SELECT department, COUNT(*) AS employee_count FROM employees GROUP BY department HAVING COUNT(*) > 5";
+        String expect = "SELECT gender, COUNT(*) AS user_count FROM user_info GROUP BY gender HAVING COUNT(*) > 5";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("department, COUNT(*) AS employee_count")
-                .from("employees")
-                .groupBy("department")
+        sql.select("gender, COUNT(*) AS user_count")
+                .from("user_info")
+                .groupBy("gender")
                 .having("COUNT(*) > 5");
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
@@ -154,13 +200,13 @@ public class SimpleSQLTest {
 
     @Test
     public void select2() {
-        String expect = "SELECT e.department_id, e.name, e.salary, d.avg_salary FROM employees e INNER JOIN ( SELECT department_id, AVG(salary) AS avg_salary FROM employees GROUP BY department_id HAVING AVG(salary) > 6000 ) d ON e.department_id = d.department_id WHERE e.salary > d.avg_salary ORDER BY e.salary DESC";
+        String expect = "SELECT t1.department_id, t1.name, t1.salary, t2.avg_salary FROM user_info e INNER JOIN ( SELECT department_id, AVG(salary) AS avg_salary FROM user_info GROUP BY department_id HAVING AVG(salary) > 6000 ) d ON t1.department_id = t2.department_id WHERE t1.salary > t2.avg_salary ORDER BY t1.salary DESC";
         SimpleSQL sql = new SimpleSQL();
-        sql.select("e.department_id, e.name, e.salary, d.avg_salary")
-                .from("employees e")
-                .innerJoin("( SELECT department_id, AVG(salary) AS avg_salary FROM employees GROUP BY department_id HAVING AVG(salary) > 6000 ) d ON e.department_id = d.department_id")
-                .where("e.salary > d.avg_salary")
-                .orderBy("e.salary DESC");
+        sql.select("t1.department_id, t1.name, t1.salary, t2.avg_salary")
+                .from("user_info e")
+                .innerJoin("( SELECT department_id, AVG(salary) AS avg_salary FROM user_info GROUP BY department_id HAVING AVG(salary) > 6000 ) d ON t1.department_id = t2.department_id")
+                .where("t1.salary > t2.avg_salary")
+                .orderBy("t1.salary DESC");
         String minify = StrUtils.minify(sql.toString());
         System.out.println(expect);
         System.out.println(minify);

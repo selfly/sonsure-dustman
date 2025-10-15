@@ -1,19 +1,4 @@
-/*
- *    Copyright 2009-2024 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       https://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-package com.sonsure.dumper.core.third.mybatis;
+package com.sonsure.dumper.core.command.build;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,10 +9,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * @author Clinton Begin
- * @author Jeff Butler
- * @author Adam Gent
- * @author Kazuki Shimizu
+ * reference: org.apache.ibatis.jdbc.AbstractSQL
+ *
+ * @param <T> the type parameter
  */
 public abstract class AbstractSQL<T> {
 
@@ -221,6 +205,10 @@ public abstract class AbstractSQL<T> {
         Collections.addAll(sql().where, conditions);
         sql().lastList = sql().where;
         return getSelf();
+    }
+
+    public T condition(String... conditions) {
+        return this.where(conditions);
     }
 
     public T or() {

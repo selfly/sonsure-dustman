@@ -84,7 +84,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
 
     @Override
     protected CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
-        if (CommandType.isSelectCommandType(commandType) && this.getCommandSql().isEmptySelectColumns()) {
+        if (CommandType.isSelectCommandType(commandType) && this.getSimpleSQL().isEmptySelectColumns()) {
             this.addAllColumns();
         }
         CommandDetails commandDetails = new CommandDetails();
@@ -106,13 +106,13 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
                     }
                     generateKey.setPrimaryKeyParameter(primaryKeyParameter);
                     //主键列
-                    this.getCommandSql().intoColumns(primaryKeyField.getFieldName());
+                    this.getSimpleSQL().intoColumns(primaryKeyField.getFieldName());
                     if (primaryKeyParameter) {
-                        this.getCommandSql().intoValues(PARAM_PLACEHOLDER);
+                        this.getSimpleSQL().intoValues(PARAM_PLACEHOLDER);
                         this.getCommandParameters().addParameter(primaryKeyField.getFieldName(), generateKeyValue);
                     } else {
                         //不传参方式，例如是oracle的序列名
-                        this.getCommandSql().intoValues(generateKeyValue.toString());
+                        this.getSimpleSQL().intoValues(generateKeyValue.toString());
                     }
                 }
             } else {
@@ -122,7 +122,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
             commandDetails.setGenerateKey(generateKey);
         }
 
-        String command = this.getCommandSql().toString();
+        String command = this.getSimpleSQL().toString();
         commandDetails.setCommand(command);
         commandDetails.setCommandParameters(this.getCommandParameters());
         commandDetails.setForceNative(this.isForceNative());

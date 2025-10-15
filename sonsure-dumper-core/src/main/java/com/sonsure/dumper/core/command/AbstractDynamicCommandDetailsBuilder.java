@@ -16,8 +16,8 @@ import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaField;
 import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.third.mybatis.CommandSql;
-import com.sonsure.dumper.core.third.mybatis.SqlStatement;
+import com.sonsure.dumper.core.command.build.SimpleSQL;
+import com.sonsure.dumper.core.command.build.SqlStatementType;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -36,56 +36,56 @@ import java.util.Map;
 @Getter
 public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBuilder<T>> extends AbstractCommandDetailsBuilder<T> implements DynamicCommandDetailsBuilder<T> {
 
-    protected final CommandSql commandSql;
+    protected final SimpleSQL simpleSQL;
     protected final CommandParameters commandParameters;
     protected boolean ignoreNull = true;
     protected Map<String, String> tableAliasMapping;
     protected String latestTable;
     protected String latestTableAlias;
-    protected SqlStatement latestStatement;
+    protected SqlStatementType latestStatement;
 
     public AbstractDynamicCommandDetailsBuilder() {
-        this.commandSql = new CommandSql();
+        this.simpleSQL = new SimpleSQL();
         this.commandParameters = new CommandParameters();
         this.tableAliasMapping = new LinkedHashMap<>(8);
     }
 
     @Override
     public T from(String entity) {
-        this.getCommandSql().from(entity);
+        this.getSimpleSQL().from(entity);
         this.latestTable = entity;
-        latestStatement = SqlStatement.TABLE;
+        latestStatement = SqlStatementType.TABLE;
         return this.getSelf();
     }
 
     @Override
     public T insertInto(String entity) {
-        this.getCommandSql().insertInto(entity);
+        this.getSimpleSQL().insertInto(entity);
         this.latestTable = entity;
-        latestStatement = SqlStatement.TABLE;
+        latestStatement = SqlStatementType.TABLE;
         return this.getSelf();
     }
 
     @Override
     public T update(String entity) {
-        this.getCommandSql().update(entity);
+        this.getSimpleSQL().update(entity);
         this.latestTable = entity;
-        latestStatement = SqlStatement.TABLE;
+        latestStatement = SqlStatementType.TABLE;
         return this.getSelf();
     }
 
     @Override
     public T deleteFrom(String entity) {
-        this.getCommandSql().deleteFrom(entity);
+        this.getSimpleSQL().deleteFrom(entity);
         this.latestTable = entity;
-        latestStatement = SqlStatement.TABLE;
+        latestStatement = SqlStatementType.TABLE;
         return this.getSelf();
     }
 
 
     @Override
     public T as(String aliasName) {
-        this.getCommandSql().as(aliasName, this.getLatestStatement());
+        this.getSimpleSQL().as(aliasName, this.getLatestStatement());
         this.latestTableAlias = aliasName;
         this.tableAliasMapping.put(this.latestTable, aliasName);
         return this.getSelf();
@@ -93,15 +93,15 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T innerJoin(String table) {
-        this.getCommandSql().innerJoin(table);
+        this.getSimpleSQL().innerJoin(table);
         this.latestTable = table;
-        latestStatement = SqlStatement.INNER_JOIN;
+        latestStatement = SqlStatementType.INNER_JOIN;
         return this.getSelf();
     }
 
     @Override
     public T on(String on) {
-        this.getCommandSql().joinOn(on, getLatestStatement());
+        this.getSimpleSQL().joinStepOn(on, getLatestStatement());
         return this.getSelf();
     }
 
@@ -114,7 +114,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
         LambdaField lambdaField2 = LambdaHelper.getLambdaClass(table2Field);
         String tableAlias2 = this.getTableAliasMapping().get(lambdaField2.getSimpleClassName());
         String field2 = CommandBuildHelper.getTableAliasFieldName(tableAlias2, lambdaField2.getFieldName());
-        this.getCommandSql().joinOn(String.format("%s %s %s", field1, sqlOperator.getCode(), field2), getLatestStatement());
+        this.getSimpleSQL().joinStepOn(String.format("%s %s %s", field1, sqlOperator.getCode(), field2), getLatestStatement());
         return this.getSelf();
     }
 
@@ -131,14 +131,14 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             partSql.append(pair.getLeft());
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
-        this.getCommandSql().joinOn(partSql.toString(), getLatestStatement());
+        this.getSimpleSQL().joinStepOn(partSql.toString(), getLatestStatement());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
     }
 
     @Override
     public T addSelectFields(String... fields) {
-        this.getCommandSql().select(fields);
+        this.getSimpleSQL().select(fields);
         return this.getSelf();
     }
 
@@ -169,7 +169,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T dropSelectFields(String... fields) {
-        this.getCommandSql().dropSelectColumns(fields);
+        this.getSimpleSQL().dropSelectColumns(fields);
         return this.getSelf();
     }
 
@@ -177,9 +177,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T intoField(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
         if (nativeContentWrapper.isNatives()) {
-            this.getCommandSql().intoColumns(nativeContentWrapper.getActualContent()).intoValues(String.valueOf(value));
+            this.getSimpleSQL().intoColumns(nativeContentWrapper.getActualContent()).intoValues(String.valueOf(value));
         } else {
-            this.getCommandSql().intoColumns(field).intoValues(PARAM_PLACEHOLDER);
+            this.getSimpleSQL().intoColumns(field).intoValues(PARAM_PLACEHOLDER);
             this.getCommandParameters().addParameter(field, value);
         }
         return this.getSelf();
@@ -209,9 +209,9 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T setField(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
         if (nativeContentWrapper.isNatives()) {
-            this.getCommandSql().set(String.format("%s %s %s", nativeContentWrapper.getActualContent(), SqlOperator.EQ.getCode(), value));
+            this.getSimpleSQL().set(String.format("%s %s %s", nativeContentWrapper.getActualContent(), SqlOperator.EQ.getCode(), value));
         } else {
-            this.getCommandSql().set(String.format("%s %s %s", field, SqlOperator.EQ.getCode(), PARAM_PLACEHOLDER));
+            this.getSimpleSQL().set(String.format("%s %s %s", field, SqlOperator.EQ.getCode(), PARAM_PLACEHOLDER));
             this.getCommandParameters().addParameter(field, value);
         }
         return this.getSelf();
@@ -235,14 +235,14 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where() {
-        this.getCommandSql().where();
+        this.getSimpleSQL().where();
         return this.getSelf();
     }
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
         MultiTuple<String, CommandParameters> pair = this.buildPartStatement(field, sqlOperator, value);
-        this.getCommandSql().where(pair.getLeft());
+        this.getSimpleSQL().where(pair.getLeft());
         this.getCommandParameters().addParameters(pair.getRight().getParameterObjects());
         return this.getSelf();
     }
@@ -274,7 +274,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
             partParameters.addParameters(pair.getRight().getParameterObjects());
         }
         partSql.append(")");
-        this.getCommandSql().where(partSql.toString());
+        this.getSimpleSQL().where(partSql.toString());
         this.commandParameters.addParameters(partParameters.getParameterObjects());
         return this.getSelf();
     }
@@ -359,14 +359,14 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T whereAppend(String segment) {
-        this.getCommandSql().where(segment);
+        this.getSimpleSQL().where(segment);
         return this.getSelf();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public T whereAppend(String segment, Object value) {
-        this.getCommandSql().where(segment);
+        this.getSimpleSQL().where(segment);
         if (this.isNamedParameter()) {
             if (!(value instanceof Map)) {
                 throw new SonsureJdbcException("namedParameter模式参数必须为Map类型,key与name对应");
@@ -390,31 +390,31 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T openParen() {
-        this.getCommandSql().openParen();
+        this.getSimpleSQL().openParen();
         return this.getSelf();
     }
 
     @Override
     public T closeParen() {
-        this.getCommandSql().closeParen();
+        this.getSimpleSQL().closeParen();
         return this.getSelf();
     }
 
     @Override
     public T and() {
-        this.getCommandSql().and();
+        this.getSimpleSQL().and();
         return this.getSelf();
     }
 
     @Override
     public T or() {
-        this.getCommandSql().or();
+        this.getSimpleSQL().or();
         return this.getSelf();
     }
 
     @Override
     public T orderBy(String field, OrderBy orderBy) {
-        this.getCommandSql().orderBy(String.format("%s %s", field, orderBy.getCode()));
+        this.getSimpleSQL().orderBy(String.format("%s %s", field, orderBy.getCode()));
         return this.getSelf();
     }
 
@@ -428,7 +428,7 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T groupBy(String... fields) {
-        this.getCommandSql().groupBy(fields);
+        this.getSimpleSQL().groupBy(fields);
         return this.getSelf();
     }
 

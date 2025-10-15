@@ -44,4 +44,44 @@ public class UserInfo extends BaseUser {
      */
     private Integer userAge;
 
+    /**
+     * 用户类型
+     */
+    private String userType;
+
+    /**
+     * 状态
+     */
+    private String status;
+
+    /**
+     * 性別
+     */
+    private String gender;
+
+    /**
+     * 姓名
+     */
+    private String realName;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 手机
+     */
+    private String mobile;
+
+    /**
+     * 头像图片
+     */
+    private String avatar;
+
+    /**
+     * 介绍
+     */
+    private String description;
+
 }
