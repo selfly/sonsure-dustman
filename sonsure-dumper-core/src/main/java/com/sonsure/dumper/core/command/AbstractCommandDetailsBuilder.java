@@ -2,6 +2,7 @@ package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.common.model.Pagination;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -23,7 +24,6 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     protected static final String COLON = ":";
     protected static final String PARAM_PLACEHOLDER = " ? ";
 
-    protected boolean namedParameter = false;
     protected boolean forceNative = false;
     protected Pagination pagination;
     protected boolean disableCountQuery = false;
@@ -70,13 +70,18 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
 
     @Override
     public CommandDetails build(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
-        CommandDetails commandDetails = this.doBuild(jdbcEngineConfig, commandType);
-        commandDetails.setCommandType(commandType);
-        commandDetails.setCommandCase(jdbcEngineConfig.getCommandCase());
-        commandDetails.setPagination(this.getPagination());
-        commandDetails.setForceNative(this.isForceNative());
-        commandDetails.setNamedParameter(this.isNamedParameter());
-        commandDetails.setDisableCountQuery(this.isDisableCountQuery());
+        ExecutableCmd executableCmd = new ExecutableCmd();
+        executableCmd.setJdbcEngineConfig(jdbcEngineConfig);
+        executableCmd.setCommandType(commandType);
+        executableCmd.setCommandCase(jdbcEngineConfig.getCommandCase());
+        executableCmd.setPagination(this.getPagination());
+        executableCmd.setForceNative(this.isForceNative());
+        executableCmd.setNamedParameter(this.isNamedParameter());
+        executableCmd.setDisableCountQuery(this.isDisableCountQuery());
+
+        this.doCustomize(executableCmd);
+
+
 
         if (!commandDetails.isForceNative()) {
             // todo 需要收集参数信息，待完成
@@ -125,15 +130,12 @@ public abstract class AbstractCommandDetailsBuilder<T extends CommandDetailsBuil
     /**
      * 构建
      *
-     * @param jdbcEngineConfig the jdbc engine config
-     * @param commandType      the command type
-     * @return command context
+     * @param executableCmd the executable cmd
      */
-    protected abstract CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType);
+    protected abstract void doCustomize(ExecutableCmd executableCmd);
 
     @SuppressWarnings("unchecked")
     protected T getSelf() {
-        //noinspection unchecked
         return (T) this;
     }
 }

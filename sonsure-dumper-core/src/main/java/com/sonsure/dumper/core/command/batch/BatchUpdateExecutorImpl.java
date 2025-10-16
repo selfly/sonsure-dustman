@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.command.batch;
 
-import com.sonsure.dumper.core.command.AbstractCommonCommandExecutor;
+import com.sonsure.dumper.core.command.AbstractCommandExecutor;
 import com.sonsure.dumper.core.command.CommandDetails;
 import com.sonsure.dumper.core.command.CommandDetailsBuilder;
 import com.sonsure.dumper.core.command.CommandType;
@@ -22,7 +22,7 @@ import java.util.Collection;
  *
  * @author liyd
  */
-public class BatchUpdateExecutorImpl extends AbstractCommonCommandExecutor<BatchUpdateExecutor> implements BatchUpdateExecutor {
+public class BatchUpdateExecutorImpl extends AbstractCommandExecutor<BatchUpdateExecutor> implements BatchUpdateExecutor {
 
     private final BatchUpdateCommandDetailsBuilder batchUpdateCommandDetailsBuilder;
 

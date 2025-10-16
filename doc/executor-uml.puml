@@ -1,0 +1,127 @@
+@startuml Executor类图
+title Executor类图
+
+interface CommandExecutor<E extends CommandExecutor<E>> {
+  + forceNative(): E
+  + namedParameter(): E
+}
+
+interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends CommandExecutor {
+  + paginate(int pageNum, int pageSize): E
+  + limit(int offset, int size): E
+  + disableCount(): E
+  + count(): long
+  + singleResult(Class<T> cls): T
+  + singleMapResult(): Map<String, Object>
+  + oneColResult(Class<T> clazz): T
+  + oneColList(Class<T> clazz): List<T>
+  + list(Class<T> cls): List<T>
+  + listMaps(): List<Map<String, Object>>
+  + pageResult(Class<T> cls): Page<T>
+  + pageMapResult(): Page<Map<String, Object>>
+  + oneColPageResult(Class<T> clazz): Page<T>
+  + default paginate(Pageable pageable): E
+  + default firstResult(Class<T> cls): T
+  + default firstMapResult(): Map<String, Object>
+  + default oneColFirstResult(Class<T> clazz): T
+}
+
+interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>> extends CommandExecutor {
+  + where(): E
+  + where(String field, SqlOperator sqlOperator, Object value): E
+  + where(Function<E, R> function, SqlOperator sqlOperator, Object value): E
+  + where(Function<E, R> function, Object value): E
+  + where(String field, Object value): E
+  + where(SqlPart sqlPart): E
+  + whereForObject(Object obj): E
+  + whereAppend(String segment): E
+  + whereAppend(String segment, Object value): E
+  + openParen(): E
+  + closeParen(): E
+  + and(): E
+  + or(): E
+}
+
+
+interface Select<M> extends QueryCommandExecutor, ConditionCommandExecutor {
+  + as(String alias): Select
+  + addAllColumns(): Select
+  + addColumn(String... fields): Select
+  + addAliasColumn(String tableAlias, String... fields): Select
+  + addColumn(Function<T, R> function): Select
+  + dropColumn(String... fields): Select
+  + dropColumn(Function<T, R> function): Select
+  + join(String table): Select
+  + join(Class<?> cls): Select
+  + innerJoin(String table): Select
+  + innerJoin(Class<?> cls): Select
+  + outerJoin(String table): Select
+  + outerJoin(Class<?> cls): Select
+  + leftJoin(String table): Select
+  + leftJoin(Class<?> cls): Select
+  + rightJoin(String table): Select
+  + rightJoin(Class<?> cls): Select
+  + on(String on): Select
+  + on(Function<T1, R1> table1Field, Function<T2, R2> table2Field): Select
+  + on(Function<T1, R1> table1Field, SqlOperator sqlOperator, Function<T2, R2> table2Field): Select
+  + on(SqlPart sqlPart): Select
+  + groupBy(String... fields): Select
+  + groupBy(Function<T, R> function): Select
+  + orderBy(String field, OrderBy orderBy): Select
+  + orderBy(Function<T, R> function, OrderBy orderBy): Select
+  + having(String having): Select
+  + singleResult(): M
+  + firstResult(): M
+  + list(): List<M>
+  + pageResult(): Page<M>
+}
+
+interface Update extends ConditionCommandExecutor {
+  + table(Class<?> cls): Update
+  + set(String field, Object value): Update
+  + set(Function<E, R> function, Object value): Update
+  + setForObjectWherePk(Object object): Update
+  + setForObject(Object object): Update
+  + ignoreNull(boolean ignoreNull): Update
+  + execute(): int
+}
+
+interface Delete extends ConditionCommandExecutor {
+  + from(Class<?> cls): Delete
+  + execute(): int
+}
+
+interface Insert extends CommandExecutor {
+  + into(Class<?> cls): Insert
+  + set(String field, Object value): Insert
+  + set(Function<E, R> function, Object value): Insert
+  + setForObject(Object obj): Insert
+  + execute(): Object
+}
+
+interface SimpleCommandExecutor<E extends SimpleCommandExecutor<E>> extends QueryCommandExecutor {
+  + command(String command): E
+  + parameters(Map<String, Object> parameters): E
+  + parameter(String name, Object value): E
+  + parameter(BeanParameter beanParameter): E
+  + resultHandler(ResultHandler<M> resultHandler): E
+  + insert(): Serializable
+  + insert(Class<?> clazz): Serializable
+  + update(): int
+  + execute(): void
+  + executeScript(): void
+}
+
+interface NativeExecutor extends SimpleCommandExecutor {
+  + parameters(Object... parameters): NativeExecutor
+}
+
+interface MybatisExecutor extends SimpleCommandExecutor {
+
+}
+
+interface BatchUpdateExecutor extends CommandExecutor {
+  + execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter): Object
+}
+
+@enduml

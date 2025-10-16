@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 /**
@@ -16,7 +17,7 @@ import com.sonsure.dumper.core.command.lambda.Function;
  * @author liyd
  * @since 17/4/14
  */
-public interface Insert extends EntityCommandExecutor<Insert> {
+public interface Insert extends CommandExecutor<Insert> {
 
     /**
      * into对应class

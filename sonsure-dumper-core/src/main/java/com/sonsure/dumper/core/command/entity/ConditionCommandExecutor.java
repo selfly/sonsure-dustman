@@ -9,26 +9,25 @@
 
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 /**
- * 条件构建
- * 实现标识接口
- * <p>
+ * 条件构建接口
  *
  * @author liyd
- * @date 17/4/11
+ * @since 17/4/11
  */
-public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>> extends EntityCommandExecutor<C> {
+public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>> extends CommandExecutor<E> {
 
     /**
      * Where c.
      *
      * @return the c
      */
-    C where();
+    E where();
 
     /**
      * where 属性条件
@@ -38,30 +37,30 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @param value       the value
      * @return c c
      */
-    C where(String field, SqlOperator sqlOperator, Object value);
+    E where(String field, SqlOperator sqlOperator, Object value);
 
     /**
      * where 属性条件
      *
-     * @param <E>         the type parameter
+     * @param <T>         the type parameter
      * @param <R>         the type parameter
      * @param function    the function
      * @param sqlOperator the sql operator
      * @param value       the value
      * @return c c
      */
-    <E, R> C where(Function<E, R> function, SqlOperator sqlOperator, Object value);
+    <T, R> E where(Function<T, R> function, SqlOperator sqlOperator, Object value);
 
     /**
      * Where c.
      *
-     * @param <E>      the type parameter
+     * @param <T>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
      * @param value    the value
      * @return the c
      */
-    <E, R> C where(Function<E, R> function, Object value);
+    <T, R> E where(Function<T, R> function, Object value);
 
     /**
      * Where c.
@@ -70,7 +69,7 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @param value the value
      * @return the c
      */
-    C where(String field, Object value);
+    E where(String field, Object value);
 
     /**
      * Where c.
@@ -78,7 +77,7 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @param sqlPart the sql part
      * @return the c
      */
-    C where(SqlPart sqlPart);
+    E where(SqlPart sqlPart);
 
     /**
      * 实体属性条件
@@ -86,7 +85,7 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @param obj the obj
      * @return c c
      */
-    C whereForObject(Object obj);
+    E whereForObject(Object obj);
 
     /**
      * Where append t.
@@ -94,7 +93,7 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @param segment the segment
      * @return the t
      */
-    C whereAppend(String segment);
+    E whereAppend(String segment);
 
     /**
      * Where append t.
@@ -103,34 +102,34 @@ public interface ConditionCommandExecutor<C extends ConditionCommandExecutor<C>>
      * @param value   the value
      * @return the t
      */
-    C whereAppend(String segment, Object value);
+    E whereAppend(String segment, Object value);
 
     /**
      * Open paren c.
      *
      * @return the c
      */
-    C openParen();
+    E openParen();
 
     /**
      * Close paren c.
      *
      * @return the c
      */
-    C closeParen();
+    E closeParen();
 
     /**
      * and
      *
      * @return c
      */
-    C and();
+    E and();
 
     /**
      * or
      *
      * @return c
      */
-    C or();
+    E or();
 
 }

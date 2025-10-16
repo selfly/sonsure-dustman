@@ -12,7 +12,7 @@ package com.sonsure.dumper.core.command.entity;
 /**
  *
  * @author liyd
- * @date 17/4/14
+ * @since 17/4/14
  */
 public interface Delete extends ConditionCommandExecutor<Delete> {
 

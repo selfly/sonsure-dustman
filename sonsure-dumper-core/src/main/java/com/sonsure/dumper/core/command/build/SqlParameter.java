@@ -1,10 +1,13 @@
 package com.sonsure.dumper.core.command.build;
 
+import lombok.Getter;
+
 /**
  * The type Sql parameter.
  *
  * @author selfly
  */
+@Getter
 public class SqlParameter {
 
     /**

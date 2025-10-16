@@ -16,7 +16,7 @@ import com.sonsure.dumper.core.command.simple.SimpleCommandExecutor;
  * The interface Native executor.
  *
  * @author liyd
- * @date 17 /4/25
+ * @since 17 /4/25
  */
 public interface NativeExecutor extends SimpleCommandExecutor<NativeExecutor> {
 

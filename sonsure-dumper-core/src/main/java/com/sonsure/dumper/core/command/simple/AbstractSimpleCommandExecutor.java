@@ -24,10 +24,10 @@ import java.util.Map;
  *
  * @param <C> the type parameter
  * @author liyd
- * @date 17 /4/25
+ * @since 17 /4/25
  */
 @Getter
-public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecutor<C>> extends AbstractCommonCommandExecutor<C> implements SimpleCommandExecutor<C> {
+public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecutor<C>> extends AbstractCommandExecutor<C> implements SimpleCommandExecutor<C> {
 
     protected SimpleCommandDetailsBuilder<?> simpleCommandDetailsBuilder;
 
@@ -36,13 +36,6 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     public AbstractSimpleCommandExecutor(JdbcEngineConfig jdbcEngineConfig, SimpleCommandDetailsBuilder<?> simpleCommandDetailsBuilder) {
         super(jdbcEngineConfig);
         this.simpleCommandDetailsBuilder = simpleCommandDetailsBuilder;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder() {
-        //noinspection unchecked
-        return (T) this.simpleCommandDetailsBuilder;
     }
 
     @Override

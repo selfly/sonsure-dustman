@@ -186,19 +186,18 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      * @param <E2>        the type parameter
      * @param <R2>        the type parameter
      * @param table1Field the table 1 field
-     * @param sqlOperator the sql operator
      * @param table2Field the table 2 field
      * @return the select
      */
-    <E1, R1, E2, R2> T on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field);
+    <E1, R1, E2, R2> T on(Function<E1, R1> table1Field, Function<E2, R2> table2Field);
 
-    /**
-     * On t.
-     *
-     * @param sqlPart the sql part
-     * @return the t
-     */
-    T on(SqlPart sqlPart);
+//    /**
+//     * On t.
+//     *
+//     * @param sqlPart the sql part
+//     * @return the t
+//     */
+//    T on(SqlPart sqlPart);
 
     /**
      * Where t.
@@ -238,13 +237,13 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      */
     <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
-    /**
-     * Where t.
-     *
-     * @param sqlPart the sql part
-     * @return the t
-     */
-    T where(SqlPart sqlPart);
+//    /**
+//     * Where t.
+//     *
+//     * @param sqlPart the sql part
+//     * @return the t
+//     */
+//    T where(SqlPart sqlPart);
 
     /**
      * Where for object t.
@@ -266,10 +265,10 @@ public interface DynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBui
      * Where append t.
      *
      * @param segment the segment
-     * @param value   the value
+     * @param params   the params
      * @return the t
      */
-    T whereAppend(String segment, Object value);
+    T whereAppend(String segment, Object params);
 
     /**
      * Open paren t.

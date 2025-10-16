@@ -19,11 +19,11 @@ import java.util.Map;
 /**
  * The interface Simple command executor.
  *
- * @param <T> the type parameter
+ * @param <E> the type parameter
  * @author liyd
- * @date 17 /4/25
+ * @since  17 /4/25
  */
-public interface SimpleCommandExecutor<T extends SimpleCommandExecutor<T>> extends QueryCommandExecutor<T> {
+public interface SimpleCommandExecutor<E extends SimpleCommandExecutor<E>> extends QueryCommandExecutor<E> {
 
     /**
      * 命令
@@ -31,7 +31,7 @@ public interface SimpleCommandExecutor<T extends SimpleCommandExecutor<T>> exten
      * @param command the command
      * @return t
      */
-    T command(String command);
+    E command(String command);
 
     /**
      * 参数
@@ -39,7 +39,7 @@ public interface SimpleCommandExecutor<T extends SimpleCommandExecutor<T>> exten
      * @param parameters the parameters
      * @return mybatis executor
      */
-    T parameters(Map<String, Object> parameters);
+    E parameters(Map<String, Object> parameters);
 
     /**
      * 参数
@@ -48,7 +48,7 @@ public interface SimpleCommandExecutor<T extends SimpleCommandExecutor<T>> exten
      * @param value the value
      * @return mybatis executor
      */
-    T parameter(String name, Object value);
+    E parameter(String name, Object value);
 
     /**
      * 参数
@@ -56,16 +56,16 @@ public interface SimpleCommandExecutor<T extends SimpleCommandExecutor<T>> exten
      * @param beanParameter the bean parameter
      * @return mybatis executor
      */
-    T parameter(BeanParameter beanParameter);
+    E parameter(BeanParameter beanParameter);
 
     /**
      * 结果处理器
      *
-     * @param <E>           the type parameter
+     * @param <M>           the type parameter
      * @param resultHandler the result handler
      * @return t
      */
-    <E> T resultHandler(ResultHandler<E> resultHandler);
+    <M> E resultHandler(ResultHandler<M> resultHandler);
 
     /**
      * 插入

@@ -14,8 +14,21 @@ package com.sonsure.dumper.core.command;
  * <p>
  *
  * @author liyd
- * @date 17/4/11
+ * @since  17/4/11
  */
-public interface CommandExecutor {
+public interface CommandExecutor<E extends CommandExecutor<E>> {
 
+    /**
+     * 是否禁止转换，command不做任何加工
+     *
+     * @return C
+     */
+    E forceNative();
+
+    /**
+     * 是否使用named parameter 方式
+     *
+     * @return C
+     */
+    E namedParameter();
 }

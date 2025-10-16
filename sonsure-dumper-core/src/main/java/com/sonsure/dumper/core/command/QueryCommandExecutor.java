@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * @author liyd
  */
-public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends CommonCommandExecutor<C> {
+public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends CommandExecutor<E> {
 
     /**
      * 分页信息
@@ -27,7 +27,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      * @param pageSize the page size
      * @return c
      */
-    C paginate(int pageNum, int pageSize);
+    E paginate(int pageNum, int pageSize);
 
     /**
      * 指定偏移量和页大小，返回所在页数据
@@ -36,14 +36,14 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      * @param size   the size
      * @return select select
      */
-    C limit(int offset, int size);
+    E limit(int offset, int size);
 
     /**
      * 禁用count查询
      *
      * @return select c
      */
-    C disableCount();
+    E disableCount();
 
     /**
      * count查询
@@ -134,7 +134,7 @@ public interface QueryCommandExecutor<C extends QueryCommandExecutor<C>> extends
      * @param pageable the pageable
      * @return select c
      */
-    default C paginate(Pageable pageable) {
+    default E paginate(Pageable pageable) {
         return this.paginate(pageable.getPageNum(), pageable.getPageSize());
     }
 

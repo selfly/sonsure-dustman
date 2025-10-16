@@ -9,20 +9,12 @@
 
 package com.sonsure.dumper.core.command;
 
-import com.sonsure.dumper.common.model.MultiTuple;
-import com.sonsure.dumper.common.utils.StrUtils;
-import com.sonsure.dumper.common.utils.UUIDUtils;
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilderImpl;
 import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaField;
 import com.sonsure.dumper.core.command.lambda.LambdaHelper;
-import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.command.build.SimpleSQL;
-import com.sonsure.dumper.core.command.build.SqlStatementType;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,109 +28,83 @@ import java.util.Map;
 @Getter
 public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicCommandDetailsBuilder<T>> extends AbstractCommandDetailsBuilder<T> implements DynamicCommandDetailsBuilder<T> {
 
-    protected final SimpleSQL simpleSQL;
-    protected final CommandParameters commandParameters;
+    protected final ExecutableCmdBuilder executableCmdBuilder;
     protected boolean ignoreNull = true;
-    protected Map<String, String> tableAliasMapping;
-    protected String latestTable;
-    protected String latestTableAlias;
-    protected SqlStatementType latestStatement;
 
     public AbstractDynamicCommandDetailsBuilder() {
-        this.simpleSQL = new SimpleSQL();
-        this.commandParameters = new CommandParameters();
-        this.tableAliasMapping = new LinkedHashMap<>(8);
+        this.executableCmdBuilder = new ExecutableCmdBuilderImpl();
     }
 
     @Override
     public T from(String entity) {
-        this.getSimpleSQL().from(entity);
-        this.latestTable = entity;
-        latestStatement = SqlStatementType.TABLE;
+        this.executableCmdBuilder.from(entity);
         return this.getSelf();
     }
 
     @Override
     public T insertInto(String entity) {
-        this.getSimpleSQL().insertInto(entity);
-        this.latestTable = entity;
-        latestStatement = SqlStatementType.TABLE;
+        this.executableCmdBuilder.insertInto(entity);
         return this.getSelf();
     }
 
     @Override
     public T update(String entity) {
-        this.getSimpleSQL().update(entity);
-        this.latestTable = entity;
-        latestStatement = SqlStatementType.TABLE;
+        this.executableCmdBuilder.update(entity);
         return this.getSelf();
     }
 
     @Override
     public T deleteFrom(String entity) {
-        this.getSimpleSQL().deleteFrom(entity);
-        this.latestTable = entity;
-        latestStatement = SqlStatementType.TABLE;
+        this.executableCmdBuilder.deleteFrom(entity);
         return this.getSelf();
     }
 
 
     @Override
     public T as(String aliasName) {
-        this.getSimpleSQL().as(aliasName, this.getLatestStatement());
-        this.latestTableAlias = aliasName;
-        this.tableAliasMapping.put(this.latestTable, aliasName);
+        this.executableCmdBuilder.as(aliasName);
         return this.getSelf();
     }
 
     @Override
     public T innerJoin(String table) {
-        this.getSimpleSQL().innerJoin(table);
-        this.latestTable = table;
-        latestStatement = SqlStatementType.INNER_JOIN;
+        this.executableCmdBuilder.innerJoin(table);
         return this.getSelf();
     }
 
     @Override
     public T on(String on) {
-        this.getSimpleSQL().joinStepOn(on, getLatestStatement());
+        this.executableCmdBuilder.joinStepOn(on);
         return this.getSelf();
     }
 
     @Override
-    public <E1, R1, E2, R2> T on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field) {
-        LambdaField lambdaField1 = LambdaHelper.getLambdaClass(table1Field);
-        String tableAlias1 = this.getTableAliasMapping().get(lambdaField1.getSimpleClassName());
-        String field1 = CommandBuildHelper.getTableAliasFieldName(tableAlias1, lambdaField1.getFieldName());
-
-        LambdaField lambdaField2 = LambdaHelper.getLambdaClass(table2Field);
-        String tableAlias2 = this.getTableAliasMapping().get(lambdaField2.getSimpleClassName());
-        String field2 = CommandBuildHelper.getTableAliasFieldName(tableAlias2, lambdaField2.getFieldName());
-        this.getSimpleSQL().joinStepOn(String.format("%s %s %s", field1, sqlOperator.getCode(), field2), getLatestStatement());
+    public <E1, R1, E2, R2> T on(Function<E1, R1> table1Field, Function<E2, R2> table2Field) {
+        this.executableCmdBuilder.joinStepOn(table1Field, table2Field);
         return this.getSelf();
     }
 
-    @Override
-    public T on(SqlPart sqlPart) {
-        List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
-        StringBuilder partSql = new StringBuilder();
-        CommandParameters partParameters = new CommandParameters();
-        for (SqlPart.PartStatement partStatement : partStatements) {
-            if (StrUtils.isNotBlank(partStatement.getLogical())) {
-                partSql.append(partStatement.getLogical());
-            }
-            MultiTuple<String, CommandParameters> pair = this.buildPartStatement(partStatement);
-            partSql.append(pair.getLeft());
-            partParameters.addParameters(pair.getRight().getParameterObjects());
-        }
-        this.getSimpleSQL().joinStepOn(partSql.toString(), getLatestStatement());
-        this.commandParameters.addParameters(partParameters.getParameterObjects());
-        return this.getSelf();
-    }
+//    @Override
+//    public T on(SqlPart sqlPart) {
+//        List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
+//        StringBuilder partSql = new StringBuilder();
+//        CommandParameters partParameters = new CommandParameters();
+//        for (SqlPart.PartStatement partStatement : partStatements) {
+//            if (StrUtils.isNotBlank(partStatement.getLogical())) {
+//                partSql.append(partStatement.getLogical());
+//            }
+//            MultiTuple<String, CommandParameters> pair = this.buildPartStatement(partStatement);
+//            partSql.append(pair.getLeft());
+//            partParameters.addParameters(pair.getRight().getParameterObjects());
+//        }
+//        this.getSimpleSQL().joinStepOn(partSql.toString());
+//        this.commandParameters.addParameters(partParameters.getParameterObjects());
+//        return this.getSelf();
+//    }
 
     @Override
     public T addSelectFields(String... fields) {
-        this.getSimpleSQL().select(fields);
+        this.executableCmdBuilder.select(fields);
         return this.getSelf();
     }
 
@@ -153,23 +119,19 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T addSelectFields(Function<E, R> function) {
-        LambdaField lambdaField = LambdaHelper.getLambdaClass(function);
-        String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
-        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
-        return this.addSelectFields(field);
+        this.executableCmdBuilder.select(function);
+        return this.getSelf();
     }
 
     @Override
     public <E, R> T dropSelectFields(Function<E, R> function) {
-        LambdaField lambdaField = LambdaHelper.getLambdaClass(function);
-        String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
-        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
-        return this.dropSelectFields(field);
+        this.executableCmdBuilder.dropSelectColumn(function);
+        return this.getSelf();
     }
 
     @Override
     public T dropSelectFields(String... fields) {
-        this.getSimpleSQL().dropSelectColumns(fields);
+        this.executableCmdBuilder.dropSelectColumn(fields);
         return this.getSelf();
     }
 
@@ -177,10 +139,10 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T intoField(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
         if (nativeContentWrapper.isNatives()) {
-            this.getSimpleSQL().intoColumns(nativeContentWrapper.getActualContent()).intoValues(String.valueOf(value));
+            this.executableCmdBuilder.intoColumns(nativeContentWrapper.getActualContent()).intoValues(String.valueOf(value));
         } else {
-            this.getSimpleSQL().intoColumns(field).intoValues(PARAM_PLACEHOLDER);
-            this.getCommandParameters().addParameter(field, value);
+            this.executableCmdBuilder.intoColumns(field).intoValues(PARAM_PLACEHOLDER);
+            this.executableCmdBuilder.addParameter(field, value);
         }
         return this.getSelf();
     }
@@ -209,10 +171,10 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
     public T setField(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
         if (nativeContentWrapper.isNatives()) {
-            this.getSimpleSQL().set(String.format("%s %s %s", nativeContentWrapper.getActualContent(), SqlOperator.EQ.getCode(), value));
+            this.executableCmdBuilder.set(String.format("%s %s %s", nativeContentWrapper.getActualContent(), SqlOperator.EQ.getCode(), value));
         } else {
-            this.getSimpleSQL().set(String.format("%s %s %s", field, SqlOperator.EQ.getCode(), PARAM_PLACEHOLDER));
-            this.getCommandParameters().addParameter(field, value);
+            this.executableCmdBuilder.set(String.format("%s %s %s", field, SqlOperator.EQ.getCode(), PARAM_PLACEHOLDER));
+            this.executableCmdBuilder.addParameter(field, value);
         }
         return this.getSelf();
     }
@@ -235,15 +197,13 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T where() {
-        this.getSimpleSQL().where();
+        this.executableCmdBuilder.where();
         return this.getSelf();
     }
 
     @Override
     public T where(String field, SqlOperator sqlOperator, Object value) {
-        MultiTuple<String, CommandParameters> pair = this.buildPartStatement(field, sqlOperator, value);
-        this.getSimpleSQL().where(pair.getLeft());
-        this.getCommandParameters().addParameters(pair.getRight().getParameterObjects());
+        this.executableCmdBuilder.where(field, sqlOperator, value);
         return this.getSelf();
     }
 
@@ -254,102 +214,101 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public <E, R> T where(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        LambdaField lambdaField = LambdaHelper.getLambdaClass(function);
-        String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
-        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
-        return this.where(field, sqlOperator, value);
-    }
-
-    @Override
-    public T where(SqlPart sqlPart) {
-        List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
-        StringBuilder partSql = new StringBuilder("(");
-        CommandParameters partParameters = new CommandParameters();
-        for (SqlPart.PartStatement partStatement : partStatements) {
-            if (StrUtils.isNotBlank(partStatement.getLogical())) {
-                partSql.append(partStatement.getLogical());
-            }
-            MultiTuple<String, CommandParameters> pair = this.buildPartStatement(partStatement);
-            partSql.append(pair.getLeft());
-            partParameters.addParameters(pair.getRight().getParameterObjects());
-        }
-        partSql.append(")");
-        this.getSimpleSQL().where(partSql.toString());
-        this.commandParameters.addParameters(partParameters.getParameterObjects());
+        this.executableCmdBuilder.where(function, sqlOperator, value);
         return this.getSelf();
     }
 
-    protected MultiTuple<String, CommandParameters> buildPartStatement(String field, SqlOperator sqlOperator, Object value) {
-        StringBuilder conditionSql = new StringBuilder();
-        CommandParameters conditionParameters = new CommandParameters();
-        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
+//    @Override
+//    public T where(SqlPart sqlPart) {
+//        List<SqlPart.PartStatement> partStatements = sqlPart.getPartStatements();
+//        StringBuilder partSql = new StringBuilder("(");
+//        CommandParameters partParameters = new CommandParameters();
+//        for (SqlPart.PartStatement partStatement : partStatements) {
+//            if (StrUtils.isNotBlank(partStatement.getLogical())) {
+//                partSql.append(partStatement.getLogical());
+//            }
+//            MultiTuple<String, CommandParameters> pair = this.buildPartStatement(partStatement);
+//            partSql.append(pair.getLeft());
+//            partParameters.addParameters(pair.getRight().getParameterObjects());
+//        }
+//        partSql.append(")");
+//        this.getSimpleSQL().where(partSql.toString());
+//        this.commandParameters.addParameters(partParameters.getParameterObjects());
+//        return this.getSelf();
+//    }
 
-        if (value == null) {
-            conditionSql.append(field).append(SPACE)
-                    .append(sqlOperator.getCode()).append(SPACE).append(NULL);
-        } else if (nativeContentWrapper.isNatives()) {
-            conditionSql.append(nativeContentWrapper.getActualContent()).append(SPACE)
-                    .append(sqlOperator.getCode()).append(SPACE)
-                    .append(value);
-        } else {
-            if (this.isNamedParameter()) {
-                conditionSql.append(field).append(SPACE)
-                        .append(sqlOperator.getCode()).append(SPACE)
-                        .append(COLON).append(field);
-                conditionParameters.addParameter(field, value);
-            } else {
-                if (value.getClass().isArray()) {
-                    Object[] valArray = (Object[]) value;
-                    StringBuilder paramPlaceholder = new StringBuilder("(");
-                    List<ParameterObject> params = new ArrayList<>(valArray.length);
-                    int count = 1;
-                    for (Object val : valArray) {
-                        paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
-                        params.add(new ParameterObject(field + (count++), val));
-                    }
-                    paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
-                    paramPlaceholder.append(")");
-                    conditionSql.append(field).append(SPACE)
-                            .append(sqlOperator.getCode()).append(SPACE)
-                            .append(paramPlaceholder);
-                    conditionParameters.addParameters(params);
-                } else {
-                    conditionSql.append(field).append(SPACE)
-                            .append(sqlOperator.getCode()).append(SPACE)
-                            .append(PARAM_PLACEHOLDER);
-                    conditionParameters.addParameter(field, value);
-                }
-            }
-        }
-        return new MultiTuple<>(conditionSql.toString(), conditionParameters);
-    }
+//    protected MultiTuple<String, List<SqlParameter>> buildPartStatement(String field, SqlOperator sqlOperator, Object value) {
+//        StringBuilder conditionSql = new StringBuilder();
+//        List<SqlParameter> conditionParameters = new ArrayList<>(16);
+//        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
+//
+//        if (value == null) {
+//            conditionSql.append(field).append(SPACE)
+//                    .append(sqlOperator.getCode()).append(SPACE).append(NULL);
+//        } else if (nativeContentWrapper.isNatives()) {
+//            conditionSql.append(nativeContentWrapper.getActualContent()).append(SPACE)
+//                    .append(sqlOperator.getCode()).append(SPACE)
+//                    .append(value);
+//        } else {
+//            if (this.isNamedParameter()) {
+//                conditionSql.append(field).append(SPACE)
+//                        .append(sqlOperator.getCode()).append(SPACE)
+//                        .append(COLON).append(field);
+//                conditionParameters.add(new SqlParameter(field, value));
+//            } else {
+//                if (value.getClass().isArray()) {
+//                    Object[] valArray = (Object[]) value;
+//                    StringBuilder paramPlaceholder = new StringBuilder("(");
+//                    List<SqlParameter> params = new ArrayList<>(valArray.length);
+//                    int count = 1;
+//                    for (Object val : valArray) {
+//                        paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
+//                        params.add(new SqlParameter(field + (count++), val));
+//                    }
+//                    paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
+//                    paramPlaceholder.append(")");
+//                    conditionSql.append(field).append(SPACE)
+//                            .append(sqlOperator.getCode()).append(SPACE)
+//                            .append(paramPlaceholder);
+//                    conditionParameters.addAll(params);
+//                } else {
+//                    conditionSql.append(field).append(SPACE)
+//                            .append(sqlOperator.getCode()).append(SPACE)
+//                            .append(PARAM_PLACEHOLDER);
+//                    conditionParameters.add(new SqlParameter(field, value));
+//                }
+//            }
+//        }
+//        return new MultiTuple<>(conditionSql.toString(), conditionParameters);
+//    }
 
-    protected MultiTuple<String, CommandParameters> buildPartStatement(SqlPart.PartStatement partStatement) {
-        String field;
-        SqlOperator sqlOperator = partStatement.getSqlOperator();
-        Object value;
-        if (partStatement.getSource() instanceof LambdaField) {
-            LambdaField lambdaField = (LambdaField) partStatement.getSource();
-            String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
-            field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
-        } else {
-            field = ((String) partStatement.getSource());
-        }
-        if (partStatement.getTarget() instanceof LambdaField) {
-            LambdaField lambdaField = (LambdaField) partStatement.getTarget();
-            String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
-            value = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
-        } else {
-            value = partStatement.getTarget();
-        }
-        if (partStatement.isRaw()) {
-            field = CommandBuildHelper.wrapperToNative(field);
-        }
-        return this.buildPartStatement(field, sqlOperator, value);
-    }
+//    protected MultiTuple<String, CommandParameters> buildPartStatement(SqlPart.PartStatement partStatement) {
+//        String field;
+//        SqlOperator sqlOperator = partStatement.getSqlOperator();
+//        Object value;
+//        if (partStatement.getSource() instanceof LambdaField) {
+//            LambdaField lambdaField = (LambdaField) partStatement.getSource();
+//            String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
+//            field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
+//        } else {
+//            field = ((String) partStatement.getSource());
+//        }
+//        if (partStatement.getTarget() instanceof LambdaField) {
+//            LambdaField lambdaField = (LambdaField) partStatement.getTarget();
+//            String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
+//            value = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
+//        } else {
+//            value = partStatement.getTarget();
+//        }
+//        if (partStatement.isRaw()) {
+//            field = CommandBuildHelper.wrapperToNative(field);
+//        }
+//        return this.buildPartStatement(field, sqlOperator, value);
+//    }
 
     @Override
     public T whereForObject(Object object) {
+        //todo alias处理
         Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(object, this.isIgnoreNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             this.where(entry.getKey(), entry.getValue());
@@ -359,83 +318,62 @@ public abstract class AbstractDynamicCommandDetailsBuilder<T extends DynamicComm
 
     @Override
     public T whereAppend(String segment) {
-        this.getSimpleSQL().where(segment);
+        this.executableCmdBuilder.where(segment);
         return this.getSelf();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public T whereAppend(String segment, Object value) {
-        this.getSimpleSQL().where(segment);
-        if (this.isNamedParameter()) {
-            if (!(value instanceof Map)) {
-                throw new SonsureJdbcException("namedParameter模式参数必须为Map类型,key与name对应");
-            }
-            //noinspection unchecked
-            this.getCommandParameters().addParameters((Map<String, Object>) value);
-        } else {
-            if (value.getClass().isArray()) {
-                Object[] valArray = (Object[]) value;
-                for (Object val : valArray) {
-                    //这里的参数名用不到，随机生成
-                    this.getCommandParameters().addParameter(UUIDUtils.getUUID8(), val);
-                }
-            } else {
-                this.getCommandParameters().addParameter(UUIDUtils.getUUID8(), value);
-            }
-        }
-
+    public T whereAppend(String segment, Object params) {
+        this.executableCmdBuilder.where(segment, params);
         return this.getSelf();
     }
 
     @Override
     public T openParen() {
-        this.getSimpleSQL().openParen();
+        this.executableCmdBuilder.openParen();
         return this.getSelf();
     }
 
     @Override
     public T closeParen() {
-        this.getSimpleSQL().closeParen();
+        this.executableCmdBuilder.closeParen();
         return this.getSelf();
     }
 
     @Override
     public T and() {
-        this.getSimpleSQL().and();
+        this.executableCmdBuilder.and();
         return this.getSelf();
     }
 
     @Override
     public T or() {
-        this.getSimpleSQL().or();
+        this.executableCmdBuilder.or();
         return this.getSelf();
     }
 
     @Override
     public T orderBy(String field, OrderBy orderBy) {
-        this.getSimpleSQL().orderBy(String.format("%s %s", field, orderBy.getCode()));
+        this.executableCmdBuilder.orderBy(field, orderBy);
         return this.getSelf();
     }
 
     @Override
     public <E, R> T orderBy(Function<E, R> function, OrderBy orderBy) {
-        LambdaField lambdaField = LambdaHelper.getLambdaClass(function);
-        String tableAlias = this.getTableAliasMapping().get(lambdaField.getSimpleClassName());
-        String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
-        return this.orderBy(field, orderBy);
+        this.executableCmdBuilder.orderBy(function, orderBy);
+        return this.getSelf();
     }
 
     @Override
     public T groupBy(String... fields) {
-        this.getSimpleSQL().groupBy(fields);
+        this.executableCmdBuilder.groupBy(fields);
         return this.getSelf();
     }
 
     @Override
     public <E, R> T groupBy(Function<E, R> function) {
-        String field = LambdaHelper.getFieldName(function);
-        return this.groupBy(field);
+        this.executableCmdBuilder.groupBy(function);
+        return this.getSelf();
     }
 
     @Override

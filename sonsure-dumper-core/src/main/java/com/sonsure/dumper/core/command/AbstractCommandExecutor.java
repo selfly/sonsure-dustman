@@ -13,6 +13,8 @@ package com.sonsure.dumper.core.command;
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pagination;
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilderImpl;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -27,27 +29,29 @@ import java.util.List;
  * The type Abstract command executor.
  *
  * @author liyd
- * @since  17 /4/19
+ * @since 17 /4/19
  */
 @Getter
 @Setter
-public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecutor<E>> implements CommonCommandExecutor<E> {
+public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> implements CommandExecutor<E> {
 
     private JdbcEngineConfig jdbcEngineConfig;
+    private ExecutableCmdBuilder executableCmdBuilder;
 
-    public AbstractCommonCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
+    public AbstractCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
+        this.executableCmdBuilder = new ExecutableCmdBuilderImpl();
     }
 
     @Override
     public E forceNative() {
-        this.getCommandDetailsBuilder().forceNative();
+        this.getExecutableCmdBuilder().forceNative();
         return this.getSelf();
     }
 
     @Override
     public E namedParameter() {
-        this.getCommandDetailsBuilder().namedParameter();
+        this.getExecutableCmdBuilder().namedParameter();
         return this.getSelf();
     }
 
@@ -111,20 +115,10 @@ public abstract class AbstractCommonCommandExecutor<E extends CommonCommandExecu
 
     @SuppressWarnings("unchecked")
     protected E getSelf() {
-        //noinspection unchecked
         return (E) this;
     }
 
-    /**
-     * Gets command details builder.
-     *
-     * @param <T> the type parameter
-     * @return the command details builder
-     */
-    protected abstract <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder();
-
     protected interface PageQueryHandler<T> {
-
         /**
          * Query list.
          *

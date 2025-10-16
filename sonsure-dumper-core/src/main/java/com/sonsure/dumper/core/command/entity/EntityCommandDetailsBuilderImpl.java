@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.*;
+import com.sonsure.dumper.core.command.build.ParamSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.KeyGenerator;
@@ -83,8 +84,8 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
     }
 
     @Override
-    protected CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
-        if (CommandType.isSelectCommandType(commandType) && this.getSimpleSQL().isEmptySelectColumns()) {
+    protected CommandDetails doCustomize(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+        if (CommandType.isSelectCommandType(commandType) && this.executableCmdBuilder.isEmptySelectColumns()) {
             this.addAllColumns();
         }
         CommandDetails commandDetails = new CommandDetails();
@@ -92,7 +93,7 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
         if (CommandType.INSERT == commandType) {
             ModelClassWrapper modelClass = this.getLatestModelClass();
             ModelClassFieldDetails primaryKeyField = modelClass.getPrimaryKeyField();
-            Object primaryKeyValue = this.getCommandParameters().getParameterMap().get(primaryKeyField.getFieldName());
+            Object primaryKeyValue = this.executableCmdBuilder.getParameterMap().get(primaryKeyField.getFieldName());
             GenerateKey generateKey = new GenerateKey();
             if (primaryKeyValue == null) {
                 KeyGenerator keyGenerator = jdbcEngineConfig.getKeyGenerator();
@@ -106,13 +107,13 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
                     }
                     generateKey.setPrimaryKeyParameter(primaryKeyParameter);
                     //主键列
-                    this.getSimpleSQL().intoColumns(primaryKeyField.getFieldName());
+                    this.executableCmdBuilder.intoColumns(primaryKeyField.getFieldName());
                     if (primaryKeyParameter) {
-                        this.getSimpleSQL().intoValues(PARAM_PLACEHOLDER);
-                        this.getCommandParameters().addParameter(primaryKeyField.getFieldName(), generateKeyValue);
+                        this.executableCmdBuilder.intoValues(PARAM_PLACEHOLDER);
+                        this.executableCmdBuilder.addParameter(primaryKeyField.getFieldName(), generateKeyValue);
                     } else {
                         //不传参方式，例如是oracle的序列名
-                        this.getSimpleSQL().intoValues(generateKeyValue.toString());
+                        this.executableCmdBuilder.intoValues(generateKeyValue.toString());
                     }
                 }
             } else {
@@ -122,8 +123,8 @@ public class EntityCommandDetailsBuilderImpl extends AbstractDynamicCommandDetai
             commandDetails.setGenerateKey(generateKey);
         }
 
-        String command = this.getSimpleSQL().toString();
-        commandDetails.setCommand(command);
+        //ParamSql paramSql = this.executableCmdBuilder.build();
+        commandDetails.setCommand(paramSql.getSql());
         commandDetails.setCommandParameters(this.getCommandParameters());
         commandDetails.setForceNative(this.isForceNative());
         commandDetails.setNamedParameter(false);

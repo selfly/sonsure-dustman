@@ -23,7 +23,7 @@ import java.util.List;
  * The interface Select.
  *
  * @author liyd
- * @date 17 /4/12
+ * @since  17 /4/12
  */
 public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCommandExecutor<Select<M>> {
 
@@ -62,12 +62,12 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * include.
      *
-     * @param <E>      the type parameter
+     * @param <T>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
      * @return the select
      */
-    <E, R> Select<M> addColumn(Function<E, R> function);
+    <T, R> Select<M> addColumn(Function<T, R> function);
 
     /**
      * 黑名单
@@ -80,12 +80,15 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * Exclude select.
      *
-     * @param <E>      the type parameter
+     * @param <T>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
      * @return the select
      */
-    <E, R> Select<M> dropColumn(Function<E, R> function);
+    <T, R> Select<M> dropColumn(Function<T, R> function);
+
+    Select<M> join(String table);
+    Select<M> join(Class<?> cls);
 
     /**
      * Inner join select.
@@ -103,6 +106,15 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      */
     Select<M> innerJoin(Class<?> cls);
 
+    Select<M> outerJoin(String table);
+    Select<M> outerJoin(Class<?> cls);
+
+    Select<M> leftJoin(String table);
+    Select<M> leftJoin(Class<?> cls);
+
+    Select<M> rightJoin(String table);
+    Select<M> rightJoin(Class<?> cls);
+
     /**
      * On select.
      *
@@ -114,29 +126,29 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * On select.
      *
-     * @param <E1>        the type parameter
+     * @param <T1>        the type parameter
      * @param <R1>        the type parameter
-     * @param <E2>        the type parameter
+     * @param <T2>        the type parameter
      * @param <R2>        the type parameter
      * @param table1Field the table 1 field
      * @param table2Field the table 2 field
      * @return the select
      */
-    <E1, R1, E2, R2> Select<M> on(Function<E1, R1> table1Field, Function<E2, R2> table2Field);
+    <T1, R1, T2, R2> Select<M> on(Function<T1, R1> table1Field, Function<T2, R2> table2Field);
 
     /**
      * On select.
      *
-     * @param <E1>        the type parameter
+     * @param <T1>        the type parameter
      * @param <R1>        the type parameter
-     * @param <E2>        the type parameter
+     * @param <T2>        the type parameter
      * @param <R2>        the type parameter
      * @param table1Field the table 1 field
      * @param sqlOperator the sql operator
      * @param table2Field the table 2 field
      * @return the select
      */
-    <E1, R1, E2, R2> Select<M> on(Function<E1, R1> table1Field, SqlOperator sqlOperator, Function<E2, R2> table2Field);
+    <T1, R1, T2, R2> Select<M> on(Function<T1, R1> table1Field, SqlOperator sqlOperator, Function<T2, R2> table2Field);
 
     /**
      * On select.
@@ -157,12 +169,12 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * Group by select.
      *
-     * @param <E>      the type parameter
+     * @param <T>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
      * @return the select
      */
-    <E, R> Select<M> groupBy(Function<E, R> function);
+    <T, R> Select<M> groupBy(Function<T, R> function);
 
     /**
      * Order by select.
@@ -176,13 +188,15 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * Order by select.
      *
-     * @param <E>      the type parameter
+     * @param <T>      the type parameter
      * @param <R>      the type parameter
      * @param function the function
      * @param orderBy  the order by
      * @return the select
      */
-    <E, R> Select<M> orderBy(Function<E, R> function, OrderBy orderBy);
+    <T, R> Select<M> orderBy(Function<T, R> function, OrderBy orderBy);
+
+    Select<M> having(String having);
 
     /**
      * Single result m.

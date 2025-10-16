@@ -50,7 +50,7 @@ public class BatchUpdateCommandDetailsBuilderImpl extends AbstractSimpleCommandD
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    protected CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
+    protected CommandDetails doCustomize(JdbcEngineConfig jdbcEngineConfig, CommandType commandType) {
         BatchCommandDetails batchCommandDetails = new BatchCommandDetails();
         batchCommandDetails.setCommand(this.getCommand());
         batchCommandDetails.setCommandParameters(this.getCommandParameters());
