@@ -33,6 +33,7 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
     protected Pagination pagination;
     protected boolean disableCountQuery = false;
     protected boolean forceNative = false;
+    protected boolean updateNull = false;
 
     public ExecutableCmdBuilderImpl() {
         simpleSQL = new SimpleSQL();
@@ -212,39 +213,22 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
         return this;
     }
 
-    @Override
-    public ExecutableCmdBuilder where(String condition) {
-        this.simpleSQL.where(condition);
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public ExecutableCmdBuilder where(String condition, Object params) {
-        this.where(condition);
-        if (this.namedParameter) {
-            if (!(params instanceof Map)) {
-                throw new SonsureJdbcException("namedParameter模式参数必须为Map类型,key与name对应");
-            }
-            this.addParameters((Map<String, ?>) params);
-        } else {
-            if (params.getClass().isArray()) {
-                Object[] valArray = (Object[]) params;
-                for (Object val : valArray) {
-                    //这里的参数名用不到，随机生成
-                    this.addParameter(UUIDUtils.getUUID8(), val);
-                }
-            } else {
-                this.addParameter(UUIDUtils.getUUID8(), params);
-            }
-        }
-
-        return this;
-    }
+//    @Override
+//    public ExecutableCmdBuilder where(String condition) {
+//        this.simpleSQL.where(condition);
+//        return this;
+//    }
+//
+//    @Override
+//    public ExecutableCmdBuilder where(String condition, Object params) {
+//        this.where(condition);
+//        this.processStatementParam(params);
+//        return this;
+//    }
 
     @Override
     public ExecutableCmdBuilder where(String column, SqlOperator sqlOperator, Object value) {
-        MultiTuple<String, List<SqlParameter>> pair = this.buildPartStatement(column, sqlOperator, value);
+        MultiTuple<String, List<SqlParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
         this.simpleSQL.where(pair.getLeft());
         this.addParameters(pair.getRight());
         return this;
@@ -259,17 +243,51 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
     }
 
     @Override
-    public ExecutableCmdBuilder condition(String... conditions) {
-        return null;
+    public ExecutableCmdBuilder condition(String condition) {
+        return this.where(condition);
+    }
+
+    @Override
+    public ExecutableCmdBuilder condition(String condition, Object params) {
+        return this.where(condition, params);
+    }
+
+    @Override
+    public ExecutableCmdBuilder condition(String column, SqlOperator sqlOperator, Object value) {
+        return this.where(column, sqlOperator, value);
+    }
+
+    @Override
+    public <E, R> ExecutableCmdBuilder condition(Function<E, R> function, SqlOperator sqlOperator, Object value) {
+        return this.where(function, sqlOperator, value);
     }
 
     @Override
     public ExecutableCmdBuilder or() {
+        this.simpleSQL.or();
+        return this;
+    }
+
+    @Override
+    public ExecutableCmdBuilder or(String condition) {
+        this.simpleSQL.or(condition);
+        return this;
+    }
+
+    @Override
+    public ExecutableCmdBuilder or(String condition, Object params) {
+        this.simpleSQL.or(condition);
+        this.processStatementParam(params);
+        return this;
+    }
+
+    @Override
+    public ExecutableCmdBuilder or(String column, SqlOperator sqlOperator, Object value) {
         return null;
     }
 
     @Override
-    public ExecutableCmdBuilder or(String... conditions) {
+    public <E, R> ExecutableCmdBuilder or(Function<E, R> function, SqlOperator sqlOperator, Object value) {
         return null;
     }
 
@@ -331,6 +349,12 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
     }
 
     @Override
+    public ExecutableCmdBuilder updateNull() {
+        this.updateNull = true;
+        return this;
+    }
+
+    @Override
     public ExecutableCmdBuilder paginate(int pageNum, int pageSize) {
         this.pagination = new Pagination();
         pagination.setPageSize(pageSize);
@@ -358,18 +382,49 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
     }
 
     @Override
+    public boolean isUpdateNull() {
+        return this.updateNull;
+    }
+
+    @Override
+    public String resolveTableAlias(String table) {
+        return Optional.ofNullable(this.tableAliasMapping.get(table))
+                .orElse("");
+    }
+
+    @Override
     public Map<String, Object> getParameterMap() {
         return this.sqlParameters.stream()
                 .collect(Collectors.toMap(SqlParameter::getName, SqlParameter::getValue));
     }
 
-    protected MultiTuple<String, List<SqlParameter>> buildPartStatement(String field, SqlOperator sqlOperator, Object value) {
+    @SuppressWarnings("unchecked")
+    protected void processStatementParam(Object params) {
+        if (this.namedParameter) {
+            if (!(params instanceof Map)) {
+                throw new SonsureJdbcException("namedParameter模式参数必须为Map类型,key与name对应");
+            }
+            this.addParameters((Map<String, ?>) params);
+        } else {
+            if (params.getClass().isArray()) {
+                Object[] valArray = (Object[]) params;
+                for (Object val : valArray) {
+                    //这里的参数名用不到，随机生成
+                    this.addParameter(UUIDUtils.getUUID8(), val);
+                }
+            } else {
+                this.addParameter(UUIDUtils.getUUID8(), params);
+            }
+        }
+    }
+
+    protected MultiTuple<String, List<SqlParameter>> buildColumnStatement(String column, SqlOperator sqlOperator, Object value) {
         StringBuilder conditionSql = new StringBuilder();
         List<SqlParameter> conditionParameters = new ArrayList<>(16);
-        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
+        NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(column);
 
         if (value == null) {
-            conditionSql.append(field).append(SPACE)
+            conditionSql.append(column).append(SPACE)
                     .append(sqlOperator.getCode()).append(SPACE).append(NULL);
         } else if (nativeContentWrapper.isNatives()) {
             conditionSql.append(nativeContentWrapper.getActualContent()).append(SPACE)
@@ -377,10 +432,10 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
                     .append(value);
         } else {
             if (this.namedParameter) {
-                conditionSql.append(field).append(SPACE)
+                conditionSql.append(column).append(SPACE)
                         .append(sqlOperator.getCode()).append(SPACE)
-                        .append(COLON).append(field);
-                conditionParameters.add(new SqlParameter(field, value));
+                        .append(COLON).append(column);
+                conditionParameters.add(new SqlParameter(column, value));
             } else {
                 if (value.getClass().isArray()) {
                     Object[] valArray = (Object[]) value;
@@ -389,19 +444,19 @@ public class ExecutableCmdBuilderImpl implements ExecutableCmdBuilder {
                     int count = 1;
                     for (Object val : valArray) {
                         paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
-                        params.add(new SqlParameter(field + (count++), val));
+                        params.add(new SqlParameter(column + (count++), val));
                     }
                     paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
                     paramPlaceholder.append(")");
-                    conditionSql.append(field).append(SPACE)
+                    conditionSql.append(column).append(SPACE)
                             .append(sqlOperator.getCode()).append(SPACE)
                             .append(paramPlaceholder);
                     conditionParameters.addAll(params);
                 } else {
-                    conditionSql.append(field).append(SPACE)
+                    conditionSql.append(column).append(SPACE)
                             .append(sqlOperator.getCode()).append(SPACE)
                             .append(PARAM_PLACEHOLDER);
-                    conditionParameters.add(new SqlParameter(field, value));
+                    conditionParameters.add(new SqlParameter(column, value));
                 }
             }
         }

@@ -32,14 +32,21 @@ interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>> extend
   + where(Function<E, R> function, SqlOperator sqlOperator, Object value): E
   + where(Function<E, R> function, Object value): E
   + where(String field, Object value): E
-  + where(SqlPart sqlPart): E
   + whereForObject(Object obj): E
-  + whereAppend(String segment): E
-  + whereAppend(String segment, Object value): E
+  + appendSegment(String segment): E
+  + appendSegment(String segment, Object value): E
   + openParen(): E
   + closeParen(): E
   + and(): E
+  + and(String field, Object value): E
+  + and(String field, SqlOperator sqlOperator, Object value): E
+  + and(Function<T, R> function, Object value): E
+  + and(Function<T, R> function, SqlOperator sqlOperator, Object value): E
   + or(): E
+  + or(String field, Object value): E
+  + or(String field, SqlOperator sqlOperator, Object value): E
+  + or(Function<T, R> function, Object value): E
+  + or(Function<T, R> function, SqlOperator sqlOperator, Object value): E
 }
 
 

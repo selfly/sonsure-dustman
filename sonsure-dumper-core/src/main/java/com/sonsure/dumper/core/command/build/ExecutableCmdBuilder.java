@@ -64,23 +64,41 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder where();
 
-    ExecutableCmdBuilder where(String condition);
-
-    ExecutableCmdBuilder where(String condition, Object params);
-
     ExecutableCmdBuilder where(String column, SqlOperator sqlOperator, Object value);
 
     <E, R> ExecutableCmdBuilder where(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
-    ExecutableCmdBuilder condition(String... conditions);
+    ExecutableCmdBuilder condition(String condition);
+
+    ExecutableCmdBuilder condition(String condition, Object params);
+
+    ExecutableCmdBuilder condition(String column, SqlOperator sqlOperator, Object value);
+
+    <E, R> ExecutableCmdBuilder condition(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
     ExecutableCmdBuilder or();
 
-    ExecutableCmdBuilder or(String... conditions);
+    ExecutableCmdBuilder or(String condition);
+
+    ExecutableCmdBuilder or(String condition, Object params);
+
+    ExecutableCmdBuilder or(String column, SqlOperator sqlOperator, Object value);
+
+    <E, R> ExecutableCmdBuilder or(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
     ExecutableCmdBuilder and();
 
-    ExecutableCmdBuilder and(String... conditions);
+    ExecutableCmdBuilder and(String condition);
+
+    ExecutableCmdBuilder and(String condition, Object params);
+
+    ExecutableCmdBuilder and(String column, SqlOperator sqlOperator, Object value);
+
+    <E, R> ExecutableCmdBuilder and(Function<E, R> function, SqlOperator sqlOperator, Object value);
+
+    ExecutableCmdBuilder appendSegment(String segment);
+
+    ExecutableCmdBuilder appendSegment(String segment, Object params);
 
     ExecutableCmdBuilder openParen();
 
@@ -98,6 +116,8 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder forceNative();
 
+    ExecutableCmdBuilder updateNull();
+
     ExecutableCmdBuilder paginate(int pageNum, int pageSize);
 
     ExecutableCmdBuilder limit(int offset, int size);
@@ -105,6 +125,10 @@ public interface ExecutableCmdBuilder {
     ExecutableCmdBuilder disableCountQuery();
 
     boolean isEmptySelectColumns();
+
+    boolean isUpdateNull();
+
+    String resolveTableAlias(String table);
 
     Map<String, Object> getParameterMap();
 

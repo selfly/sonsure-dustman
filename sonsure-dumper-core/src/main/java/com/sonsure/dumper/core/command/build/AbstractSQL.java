@@ -215,7 +215,6 @@ public abstract class AbstractSQL<T> {
         if (!sql().lastList.isEmpty()) {
             sql().lastList.add(OR);
         }
-
         return getSelf();
     }
 

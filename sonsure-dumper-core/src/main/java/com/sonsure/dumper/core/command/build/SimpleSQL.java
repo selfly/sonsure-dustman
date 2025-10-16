@@ -41,6 +41,11 @@ public class SimpleSQL extends AbstractSQL<SimpleSQL> {
 //        return getSelf();
 //    }
 
+    public SimpleSQL appendSegment(String segment) {
+        this.sql().lastList.add(segment);
+        return getSelf();
+    }
+
     /**
      * Drop select columns command sql.
      *
@@ -61,7 +66,7 @@ public class SimpleSQL extends AbstractSQL<SimpleSQL> {
      * @return the command sql
      */
     public SimpleSQL as(String aliasName, SqlStatementType sqlStatementType) {
-        List<String> list = this.getLatestList(sqlStatementType);
+        List<String> list = this.getStatementLatest(sqlStatementType);
         String last = list.remove(list.size() - 1);
         list.add(last + " " + aliasName);
         return getSelf();
@@ -70,12 +75,12 @@ public class SimpleSQL extends AbstractSQL<SimpleSQL> {
     /**
      * Join on command sql.
      *
-     * @param on           the on
+     * @param on               the on
      * @param sqlStatementType the sql statement
      * @return the command sql
      */
     public SimpleSQL joinStepOn(String on, SqlStatementType sqlStatementType) {
-        List<String> list = this.getLatestList(sqlStatementType);
+        List<String> list = this.getStatementLatest(sqlStatementType);
         String last = list.remove(list.size() - 1);
         list.add(last + " on " + on);
         return getSelf();
@@ -85,7 +90,7 @@ public class SimpleSQL extends AbstractSQL<SimpleSQL> {
         return this.sql().select.isEmpty();
     }
 
-    private List<String> getLatestList(SqlStatementType sqlStatementType) {
+    private List<String> getStatementLatest(SqlStatementType sqlStatementType) {
         List<String> list;
         if (SqlStatementType.JOIN == sqlStatementType) {
             list = this.sql().join;

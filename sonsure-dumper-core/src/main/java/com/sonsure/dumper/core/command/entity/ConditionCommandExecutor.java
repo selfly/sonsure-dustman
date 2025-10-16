@@ -11,7 +11,6 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.SqlOperator;
-import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 /**
@@ -30,6 +29,15 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     E where();
 
     /**
+     * Where c.
+     *
+     * @param field the field
+     * @param value the value
+     * @return the c
+     */
+    E where(String field, Object value);
+
+    /**
      * where 属性条件
      *
      * @param field       the field
@@ -38,6 +46,17 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
      * @return c c
      */
     E where(String field, SqlOperator sqlOperator, Object value);
+
+    /**
+     * Where c.
+     *
+     * @param <T>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return the c
+     */
+    <T, R> E where(Function<T, R> function, Object value);
 
     /**
      * where 属性条件
@@ -52,7 +71,26 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     <T, R> E where(Function<T, R> function, SqlOperator sqlOperator, Object value);
 
     /**
-     * Where c.
+     * condition
+     *
+     * @param field the field
+     * @param value the value
+     * @return the c
+     */
+    E condition(String field, Object value);
+
+    /**
+     * condition 属性条件
+     *
+     * @param field       the field
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
+     */
+    E condition(String field, SqlOperator sqlOperator, Object value);
+
+    /**
+     * condition
      *
      * @param <T>      the type parameter
      * @param <R>      the type parameter
@@ -60,24 +98,19 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
      * @param value    the value
      * @return the c
      */
-    <T, R> E where(Function<T, R> function, Object value);
+    <T, R> E condition(Function<T, R> function, Object value);
 
     /**
-     * Where c.
+     * condition 属性条件
      *
-     * @param field the field
-     * @param value the value
-     * @return the c
+     * @param <T>         the type parameter
+     * @param <R>         the type parameter
+     * @param function    the function
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
      */
-    E where(String field, Object value);
-
-    /**
-     * Where c.
-     *
-     * @param sqlPart the sql part
-     * @return the c
-     */
-    E where(SqlPart sqlPart);
+    <T, R> E condition(Function<T, R> function, SqlOperator sqlOperator, Object value);
 
     /**
      * 实体属性条件
@@ -93,7 +126,7 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
      * @param segment the segment
      * @return the t
      */
-    E whereAppend(String segment);
+    E appendSegment(String segment);
 
     /**
      * Where append t.
@@ -102,7 +135,7 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
      * @param value   the value
      * @return the t
      */
-    E whereAppend(String segment, Object value);
+    E appendSegment(String segment, Object value);
 
     /**
      * Open paren c.
@@ -126,10 +159,94 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     E and();
 
     /**
+     * and
+     *
+     * @param field the field
+     * @param value the value
+     * @return the c
+     */
+    E and(String field, Object value);
+
+    /**
+     * and 属性条件
+     *
+     * @param field       the field
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
+     */
+    E and(String field, SqlOperator sqlOperator, Object value);
+
+    /**
+     * and
+     *
+     * @param <T>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return the c
+     */
+    <T, R> E and(Function<T, R> function, Object value);
+
+    /**
+     * and 属性条件
+     *
+     * @param <T>         the type parameter
+     * @param <R>         the type parameter
+     * @param function    the function
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
+     */
+    <T, R> E and(Function<T, R> function, SqlOperator sqlOperator, Object value);
+
+    /**
      * or
      *
      * @return c
      */
     E or();
+
+    /**
+     * or
+     *
+     * @param field the field
+     * @param value the value
+     * @return the c
+     */
+    E or(String field, Object value);
+
+    /**
+     * or 属性条件
+     *
+     * @param field       the field
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
+     */
+    E or(String field, SqlOperator sqlOperator, Object value);
+
+    /**
+     * or
+     *
+     * @param <T>      the type parameter
+     * @param <R>      the type parameter
+     * @param function the function
+     * @param value    the value
+     * @return the c
+     */
+    <T, R> E or(Function<T, R> function, Object value);
+
+    /**
+     * or 属性条件
+     *
+     * @param <T>         the type parameter
+     * @param <R>         the type parameter
+     * @param function    the function
+     * @param sqlOperator the sql operator
+     * @param value       the value
+     * @return c c
+     */
+    <T, R> E or(Function<T, R> function, SqlOperator sqlOperator, Object value);
 
 }

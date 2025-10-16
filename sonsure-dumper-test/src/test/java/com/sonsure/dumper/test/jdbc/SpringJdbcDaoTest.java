@@ -1179,7 +1179,7 @@ public class SpringJdbcDaoTest {
     @Test
     public void deleteWhereAppendParam() {
         int count = jdbcDao.deleteFrom(UserInfo.class)
-                .whereAppend("userInfoId = ?", 4L)
+                .appendSegment("userInfoId = ?", 4L)
                 .execute();
 
         Assertions.assertEquals(1, count);
@@ -1193,7 +1193,7 @@ public class SpringJdbcDaoTest {
         params.put("userInfoId", 4L);
         int count = jdbcDao.deleteFrom(UserInfo.class)
                 .namedParameter()
-                .whereAppend("userInfoId = :userInfoId", params)
+                .appendSegment("userInfoId = :userInfoId", params)
                 .execute();
 
         Assertions.assertEquals(1, count);
@@ -1206,7 +1206,7 @@ public class SpringJdbcDaoTest {
     public void whereAppendSubSqlParam() {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .where("userAge", SqlOperator.GT, 5)
-                .whereAppend("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
+                .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
                 .singleResult(UserInfo.class);
         Assertions.assertNotNull(userInfo);
     }
@@ -1218,7 +1218,7 @@ public class SpringJdbcDaoTest {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .namedParameter()
                 .where("userAge", SqlOperator.GT, 5)
-                .whereAppend("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
+                .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
                 .singleResult(UserInfo.class);
         Assertions.assertNotNull(userInfo);
     }
