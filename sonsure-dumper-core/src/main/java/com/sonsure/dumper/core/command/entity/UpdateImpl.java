@@ -9,10 +9,16 @@
 
 package com.sonsure.dumper.core.command.entity;
 
+import com.sonsure.dumper.core.command.CommandBuildHelper;
 import com.sonsure.dumper.core.command.ExecutionType;
+import com.sonsure.dumper.core.command.ModelClassFieldDetails;
+import com.sonsure.dumper.core.command.ModelClassWrapper;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
+
+import java.util.Map;
 
 /**
  * The type Update.
@@ -46,29 +52,29 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
     }
 
     @Override
-    public Update setForObjectWherePk(Object object) {
-//        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(object, !this.getExecutableCmdBuilder().isUpdateNull());
-//        ModelClassWrapper uniqueModelClass = this.getLatestModelClass();
-//        ModelClassFieldDetails pkField = uniqueModelClass.getPrimaryKeyField();
-//        //处理主键成where条件
-//        Object pkValue = propMap.get(pkField.getFieldName());
-//        if (pkValue == null) {
-//            throw new SonsureJdbcException("主键属性值不能为空:" + pkField.getFieldName());
-//        }
-//        propMap.remove(pkField.getFieldName());
-//        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-//            //不忽略null，最后构建时根据updateNull设置处理null值
-//            this.setField(entry.getKey(), entry.getValue());
-//        }
-//        this.where(pkField.getFieldName(), pkValue);
-//        return this.getSelf();
-//        this.getExecutableCmdBuilder().setFieldForObjectWherePk(object);
+    public Update setForBeanWherePk(Object bean) {
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, !this.getExecutableCmdBuilder().isUpdateNull());
+        ModelClassWrapper uniqueModelClass = new ModelClassWrapper(bean.getClass());
+        ModelClassFieldDetails pkField = uniqueModelClass.getPrimaryKeyField();
+        //处理主键成where条件
+        Object pkValue = propMap.get(pkField.getFieldName());
+        if (pkValue == null) {
+            throw new SonsureJdbcException("主键属性值不能为空:" + pkField.getFieldName());
+        }
+        propMap.remove(pkField.getFieldName());
+        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
+            this.set(entry.getKey(), entry.getValue());
+        }
+        this.where(pkField.getFieldName(), pkValue);
         return this;
     }
 
     @Override
-    public Update setForObject(Object object) {
-//        this.getEntityCommandDetailsBuilder().setFieldForObject(object);
+    public Update setForBean(Object bean) {
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, !this.getExecutableCmdBuilder().isUpdateNull());
+        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
+            this.set(entry.getKey(), entry.getValue());
+        }
         return this;
     }
 

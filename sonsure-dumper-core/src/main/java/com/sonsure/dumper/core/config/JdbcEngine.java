@@ -55,7 +55,7 @@ public interface JdbcEngine {
      * @param modelClass           the model class
      * @return t t
      */
-    <T extends CommandExecutor, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass);
+    <T extends CommandExecutor<?>, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass);
 
     /**
      * insert对象

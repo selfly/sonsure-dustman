@@ -622,7 +622,7 @@ public class SpringJdbcDaoTest {
         user.setPassword("abc");
         //没有设置where条件，将更新所有
         jdbcDao.update(UserInfo.class)
-                .setForObject(user)
+                .setForBean(user)
                 .execute();
 
         UserInfo user1 = jdbcDao.get(UserInfo.class, 17L);
@@ -637,7 +637,7 @@ public class SpringJdbcDaoTest {
         user.setUserInfoId(17L);
         jdbcDao.update(UserInfo.class)
                 .updateNull()
-                .setForObjectWherePk(user)
+                .setForBeanWherePk(user)
                 .execute();
 
         UserInfo user1 = jdbcDao.get(UserInfo.class, 17L);
@@ -649,15 +649,30 @@ public class SpringJdbcDaoTest {
 
 
     @Test
+    public void updateForEntityAndWhere() {
+        UserInfo user = new UserInfo();
+        String newName = "newName22";
+        user.setLoginName(newName);
+        user.setPassword("abc");
+        int count = jdbcDao.update(UserInfo.class)
+                .setForBean(user)
+                .where(UserInfo::getUserInfoId, 1L)
+                .execute();
+        Assertions.assertEquals(1, count);
+
+        UserInfo user1 = jdbcDao.get(UserInfo.class, 1L);
+        Assertions.assertEquals(newName, user1.getLoginName());
+    }
+
+    @Test
     public void updatePkNull() {
 
         try {
             UserInfo user = new UserInfo();
             user.setLoginName("newName22");
             user.setPassword("abc");
-            //没有设置where条件，将更新所有
             jdbcDao.update(UserInfo.class)
-                    .setForObjectWherePk(user)
+                    .setForBeanWherePk(user)
                     .execute();
         } catch (Exception e) {
             Assertions.assertEquals("主键属性值不能为空:userInfoId", e.getMessage());

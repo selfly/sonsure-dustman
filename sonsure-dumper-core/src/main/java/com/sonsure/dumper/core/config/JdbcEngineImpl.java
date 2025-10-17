@@ -40,7 +40,7 @@ public class JdbcEngineImpl implements JdbcEngine {
     }
 
     @Override
-    public <T extends CommandExecutor, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass) {
+    public <T extends CommandExecutor<?>, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass) {
         return this.jdbcEngineConfig.getCommandExecutorFactory().createCommandExecutor(commandExecutorClass, this.jdbcEngineConfig, modelClass);
     }
 
@@ -138,7 +138,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public int executeUpdate(Object entity) {
-        return this.update(entity.getClass()).setForObjectWherePk(entity).execute();
+        return this.update(entity.getClass()).setForBeanWherePk(entity).execute();
     }
 
     @Override

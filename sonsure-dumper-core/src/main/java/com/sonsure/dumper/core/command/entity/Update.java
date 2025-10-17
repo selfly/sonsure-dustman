@@ -48,18 +48,18 @@ public interface Update extends ConditionCommandExecutor<Update> {
     /**
      * 根据实体类设置属性,主键设置成where条件
      *
-     * @param object the object
-     * @return for object where id
+     * @param bean the bean
+     * @return for bean where id
      */
-    Update setForObjectWherePk(Object object);
+    Update setForBeanWherePk(Object bean);
 
     /**
      * 根据实体类设置属性
      *
-     * @param object the object
-     * @return for object
+     * @param bean the bean
+     * @return for bean
      */
-    Update setForObject(Object object);
+    Update setForBean(Object bean);
 
     /**
      * 更新null值
