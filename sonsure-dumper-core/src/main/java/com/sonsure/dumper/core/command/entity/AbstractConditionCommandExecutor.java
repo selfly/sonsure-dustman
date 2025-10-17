@@ -12,7 +12,6 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.core.command.AbstractCommandExecutor;
 import com.sonsure.dumper.core.command.CommandBuildHelper;
 import com.sonsure.dumper.core.command.SqlOperator;
-import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
@@ -62,8 +61,7 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T condition(String field, Object value) {
-        this.getExecutableCmdBuilder().condition(field, value);
-        return this.getSelf();
+        return this.condition(field, SqlOperator.EQ, value);
     }
 
     @Override
@@ -127,23 +125,25 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
 
     @Override
     public T and(String field, Object value) {
-        this.getExecutableCmdBuilder().and
-        return this.getSelf();
+        return this.and(field, SqlOperator.EQ, value);
     }
 
     @Override
     public T and(String field, SqlOperator sqlOperator, Object value) {
-        return null;
+        this.getExecutableCmdBuilder().and(field, sqlOperator, value);
+        return this.getSelf();
     }
 
     @Override
     public <T1, R> T and(Function<T1, R> function, Object value) {
-        return null;
+        this.and(function, SqlOperator.EQ, value);
+        return this.getSelf();
     }
 
     @Override
     public <T1, R> T and(Function<T1, R> function, SqlOperator sqlOperator, Object value) {
-        return null;
+        this.getExecutableCmdBuilder().and(function, sqlOperator, value);
+        return this.getSelf();
     }
 
     @Override
@@ -152,4 +152,25 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
         return this.getSelf();
     }
 
+    @Override
+    public T or(String field, Object value) {
+        return this.or(field, SqlOperator.EQ, value);
+    }
+
+    @Override
+    public T or(String field, SqlOperator sqlOperator, Object value) {
+        this.getExecutableCmdBuilder().or(field, sqlOperator, value);
+        return this.getSelf();
+    }
+
+    @Override
+    public <T1, R> T or(Function<T1, R> function, Object value) {
+        return this.or(function, SqlOperator.EQ, value);
+    }
+
+    @Override
+    public <T1, R> T or(Function<T1, R> function, SqlOperator sqlOperator, Object value) {
+        this.getExecutableCmdBuilder().or(function, sqlOperator, value);
+        return this.getSelf();
+    }
 }

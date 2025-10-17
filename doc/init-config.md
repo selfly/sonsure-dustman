@@ -14,7 +14,7 @@
 
     <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="commandCase" value="lower"/>
+        <property name="toggleCase" value="lower"/>
     </bean>
 
     <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
@@ -33,7 +33,7 @@
 - persistExecutor 持久化执行器
 - commandConversionHandler command解析转换处理器，默认使用JSqlParser
 - mybatisSqlSessionFactory Mybatis的SqlSessionFactory，整合Mybatis时设置
-- commandCase 最终的sql大小写，`upper`大写，`lower`小写，为空不处理
+- toggleCase 最终的sql大小写，`upper`大写，`lower`小写，为空不处理
 
 ## jdbcDao配置参数说明
 

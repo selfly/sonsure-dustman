@@ -22,10 +22,10 @@
         *
         * @param dialect        the dialect
         * @param commandDetails the command context
-        * @param commandType    the command type
+        * @param executionType    the command type
         * @return the boolean
         */
-        default boolean executeBefore(String dialect, CommandContext commandDetails, CommandType commandType) {
+        default boolean executeBefore(String dialect, CommandContext commandDetails, CommandType executionType) {
             return true;
         }
 
@@ -34,11 +34,11 @@
         *
         * @param dialect        the dialect
         * @param commandDetails the command context
-        * @param commandType    the command type
+        * @param executionType    the command type
         * @param commandResult  the command result
         * @return the object
         */
-        default Object executeAfter(String dialect, CommandContext commandDetails, CommandType commandType, Object commandResult) {
+        default Object executeAfter(String dialect, CommandContext commandDetails, CommandType executionType, Object commandResult) {
             return commandResult;
         }
     }

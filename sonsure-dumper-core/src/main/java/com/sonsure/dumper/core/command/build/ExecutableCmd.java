@@ -1,9 +1,9 @@
 package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.model.Pagination;
-import com.sonsure.dumper.core.command.CommandCase;
-import com.sonsure.dumper.core.command.CommandType;
+import com.sonsure.dumper.core.command.ExecutionType;
 import com.sonsure.dumper.core.command.GenerateKey;
+import com.sonsure.dumper.core.command.ToggleCase;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,12 +25,7 @@ public class ExecutableCmd {
     /**
      * The Command type.
      */
-    private CommandType commandType;
-
-    /**
-     * The Command case.
-     */
-    private CommandCase commandCase;
+    private ExecutionType executionType;
 
     /**
      * 命令，一般指sql
@@ -41,6 +36,14 @@ public class ExecutableCmd {
      * The Parameters.
      */
     private List<SqlParameter> parameters;
+
+    private List<Object> parsedParameterValues;
+    private List<String> parsedParameterNames;
+
+    /**
+     * The Command case.
+     */
+    private ToggleCase toggleCase;
 
     /**
      * The Is native command.

@@ -1,7 +1,6 @@
 package com.sonsure.dumper.core.convert;
 
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandParameters;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,17 +54,16 @@ public class JdbcTypeConverterComposite implements JdbcTypeConverter {
     /**
      * Convert.
      *
-     * @param dialect        the dialect
-     * @param commandDetails the command context
+     * @param dialect       the dialect
+     * @param executableCmd the executable cmd
      */
-    public void convert(String dialect, CommandDetails commandDetails) {
-        CommandParameters commandParameters = commandDetails.getCommandParameters();
-        final List<Object> parameters = commandParameters.getParsedParameterValues();
+    public void convert(String dialect, ExecutableCmd executableCmd) {
+        final List<Object> parameters = executableCmd.getParsedParameterValues();
         final List<Object> newParams = new ArrayList<>();
         for (Object parameter : parameters) {
             final Object value = this.java2DbType(dialect, parameter);
             newParams.add(value);
         }
-        commandParameters.setParsedParameterValues(newParams);
+        executableCmd.setParsedParameterValues(newParams);
     }
 }

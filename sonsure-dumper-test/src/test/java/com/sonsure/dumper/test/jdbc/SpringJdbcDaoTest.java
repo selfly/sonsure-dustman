@@ -234,8 +234,8 @@ public class SpringJdbcDaoTest {
     public void insertForSetStrField() {
 
         Long id = (Long) jdbcDao.insertInto(UserInfo.class)
-                .set("loginName", "name123")
-                .set("password", "123321")
+                .intoField("loginName", "name123")
+                .intoField("password", "123321")
                 .execute();
 
         UserInfo user1 = jdbcDao.get(UserInfo.class, id);
@@ -636,7 +636,7 @@ public class SpringJdbcDaoTest {
         UserInfo user = new UserInfo();
         user.setUserInfoId(17L);
         jdbcDao.update(UserInfo.class)
-                .ignoreNull(false)
+                .updateNull()
                 .setForObjectWherePk(user)
                 .execute();
 

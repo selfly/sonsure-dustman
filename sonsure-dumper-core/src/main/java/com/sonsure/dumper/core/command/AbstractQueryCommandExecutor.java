@@ -11,8 +11,7 @@ package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.entity.Select;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 
@@ -48,13 +47,15 @@ public abstract class AbstractQueryCommandExecutor<E extends AbstractQueryComman
 
     @Override
     public long count() {
-        CommandDetails commandDetails = this.getExecutableCmdBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
+        this.getExecutableCmdBuilder().resultType(Long.class);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         PersistExecutor persistExecutor = this.getJdbcEngineConfig().getPersistExecutor();
-        String countCommand = this.getJdbcEngineConfig().getPageHandler().getCountCommand(commandDetails.getCommand(), persistExecutor.getDialect());
-        CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
-        countCommandDetails.setCommand(countCommand);
-        countCommandDetails.setResultType(Long.class);
-        Object result = persistExecutor.execute(countCommandDetails);
+        String countCommand = this.getJdbcEngineConfig().getPageHandler().getCountCommand(executableCmd.getCommand(), persistExecutor.getDialect());
+        ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
+        countExecutableCmd.setCommand(countCommand);
+        countExecutableCmd.setResultType(Long.class);
+        Object result = persistExecutor.execute(countExecutableCmd);
         return (Long) result;
     }
 
@@ -62,77 +63,86 @@ public abstract class AbstractQueryCommandExecutor<E extends AbstractQueryComman
     @Override
     public <T> T singleResult(Class<T> cls) {
         this.registerClassToMappingHandler(cls);
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_SINGLE_RESULT);
-        commandDetails.setResultType(cls);
-        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_SINGLE_RESULT);
+        this.getExecutableCmdBuilder().resultType(cls);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> singleMapResult() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP);
-        commandDetails.setResultType(Map.class);
-        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP);
+        this.getExecutableCmdBuilder().resultType(Map.class);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T oneColResult(Class<T> clazz) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL);
-        commandDetails.setResultType(clazz);
-        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
+        this.getExecutableCmdBuilder().resultType(clazz);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> oneColList(Class<T> clazz) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL_LIST);
-        commandDetails.setResultType(clazz);
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
+        this.getExecutableCmdBuilder().resultType(clazz);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
         this.registerClassToMappingHandler(cls);
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_LIST);
-        commandDetails.setResultType(cls);
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
+        this.getExecutableCmdBuilder().resultType(cls);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Map<String, Object>> listMaps() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
-        commandDetails.setResultType(List.class);
-        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+        this.getExecutableCmdBuilder().resultType(List.class);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> pageResult(Class<T> cls) {
         this.registerClassToMappingHandler(cls);
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_LIST);
-        commandDetails.setResultType(cls);
-        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
+        this.getExecutableCmdBuilder().resultType(cls);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Page<Map<String, Object>> pageMapResult() {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_FOR_MAP_LIST);
-        commandDetails.setResultType(Page.class);
-        return this.doPageResult(commandDetails, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+        this.getExecutableCmdBuilder().resultType(Page.class);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return this.doPageResult(executableCmd, executableCmd1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Page<T> oneColPageResult(Class<T> clazz) {
-        CommandDetails commandDetails = this.getCommandDetailsBuilder().build(getJdbcEngineConfig(), CommandType.QUERY_ONE_COL_LIST);
-        commandDetails.setResultType(clazz);
-        return this.doPageResult(commandDetails, commandContext1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
+        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
+        this.getExecutableCmdBuilder().resultType(clazz);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
     }
 
 }

@@ -34,7 +34,7 @@ public interface Insert extends CommandExecutor<Insert> {
      * @param value the value
      * @return the insert
      */
-    Insert set(String field, Object value);
+    Insert intoField(String field, Object value);
 
     /**
      * 设置属性值
@@ -45,7 +45,7 @@ public interface Insert extends CommandExecutor<Insert> {
      * @param value    the value
      * @return insert
      */
-    <E, R> Insert set(Function<E, R> function, Object value);
+    <E, R> Insert intoField(Function<E, R> function, Object value);
 
     /**
      * 根据对象设置属性
@@ -53,7 +53,7 @@ public interface Insert extends CommandExecutor<Insert> {
      * @param obj the obj
      * @return insert insert
      */
-    Insert setForObject(Object obj);
+    Insert intoForObject(Object obj);
 
     /**
      * 执行

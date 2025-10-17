@@ -9,10 +9,10 @@
 
 package com.sonsure.dumper.core.command.batch;
 
+import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.core.command.AbstractCommandExecutor;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.CommandDetailsBuilder;
-import com.sonsure.dumper.core.command.CommandType;
+import com.sonsure.dumper.core.command.ExecutionType;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.Collection;
@@ -24,29 +24,22 @@ import java.util.Collection;
  */
 public class BatchUpdateExecutorImpl extends AbstractCommandExecutor<BatchUpdateExecutor> implements BatchUpdateExecutor {
 
-    private final BatchUpdateCommandDetailsBuilder batchUpdateCommandDetailsBuilder;
 
     public BatchUpdateExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.batchUpdateCommandDetailsBuilder = new BatchUpdateCommandDetailsBuilderImpl();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected <T extends CommandDetailsBuilder<T>> T getCommandDetailsBuilder() {
-        //noinspection unchecked
-        return (T) batchUpdateCommandDetailsBuilder;
     }
 
     @Override
     public <T> Object execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
-        this.batchUpdateCommandDetailsBuilder.command(command);
-        batchUpdateCommandDetailsBuilder.batchSize(batchSize);
-        batchUpdateCommandDetailsBuilder.batchData(batchData);
-        batchUpdateCommandDetailsBuilder.parameterizedSetter(parameterizedSetter);
-        CommandDetails commandDetails = this.batchUpdateCommandDetailsBuilder.build(getJdbcEngineConfig(), CommandType.BATCH_UPDATE);
-        commandDetails.setResultType(Object.class);
-        return getJdbcEngineConfig().getPersistExecutor().execute(commandDetails);
+        this.getExecutableCmdBuilder().command(command);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.BATCH_UPDATE);
+        this.getExecutableCmdBuilder().resultType(Object.class);
+        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
+        BatchExecutableCmd<T> batchExecutableCmd = BeanKit.copyProperties(new BatchExecutableCmd<T>(), executableCmd);
+        batchExecutableCmd.setBatchSize(batchSize);
+        batchExecutableCmd.setBatchData(batchData);
+        batchExecutableCmd.setParameterizedSetter(parameterizedSetter);
+        return getJdbcEngineConfig().getPersistExecutor().execute(batchExecutableCmd);
     }
 
 }

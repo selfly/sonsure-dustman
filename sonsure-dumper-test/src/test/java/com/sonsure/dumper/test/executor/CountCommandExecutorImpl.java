@@ -11,7 +11,7 @@
 //
 //import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 //import com.sonsure.dumper.core.command.CommandDetails;
-//import com.sonsure.dumper.core.command.CommandType;
+//import com.sonsure.dumper.core.command.ExecutionType;
 //import com.sonsure.dumper.core.config.JdbcEngineConfig;
 //import com.sonsure.dumper.core.persist.PersistExecutor;
 //
@@ -37,7 +37,7 @@
 //        CommandDetails commandDetails = this.countCommandContextBuilder.build(this.jdbcEngineConfig);
 //        PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
 //        commandDetails.setResultType(Long.class);
-//        Object result = persistExecutor.execute(commandDetails, CommandType.QUERY_ONE_COL);
+//        Object result = persistExecutor.execute(commandDetails, ExecutionType.QUERY_ONE_COL);
 //        return (Long) result;
 //    }
 //

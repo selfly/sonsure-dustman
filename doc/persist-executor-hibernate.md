@@ -19,10 +19,10 @@
          * 执行command
          *
          * @param commandDetails
-         * @param commandType
+         * @param executionType
          * @return
          */
-        Object execute(CommandContext commandDetails, CommandType commandType);
+        Object execute(CommandContext commandDetails, CommandType executionType);
     }
     
 `getDialect`方法是获取数据库方言，特定实现甚至可以是固定或静态配置，就不多讲了。
@@ -36,8 +36,8 @@
         //......
     
         @Override
-        public Object execute(CommandContext commandDetails, CommandType commandType) {
-            switch (commandType) {
+        public Object execute(CommandContext commandDetails, CommandType executionType) {
+            switch (executionType) {
                 case INSERT:
                     return this.insert(commandDetails);
                 case QUERY_FOR_LIST:
@@ -59,7 +59,7 @@
                 case EXECUTE:
                     return this.doExecute(commandDetails);
                 default:
-                    throw new SonsureJdbcException("不支持的CommandType:" + commandType);
+                    throw new SonsureJdbcException("不支持的CommandType:" + executionType);
             }
         }
         //.......

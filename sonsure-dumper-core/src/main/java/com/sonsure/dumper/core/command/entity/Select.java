@@ -13,8 +13,6 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
-import com.sonsure.dumper.core.command.SqlOperator;
-import com.sonsure.dumper.core.command.SqlPart;
 import com.sonsure.dumper.core.command.lambda.Function;
 
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.List;
  * The interface Select.
  *
  * @author liyd
- * @since  17 /4/12
+ * @since 17 /4/12
  */
 public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCommandExecutor<Select<M>> {
 
@@ -88,6 +86,7 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     <T, R> Select<M> dropColumn(Function<T, R> function);
 
     Select<M> join(String table);
+
     Select<M> join(Class<?> cls);
 
     /**
@@ -107,12 +106,15 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     Select<M> innerJoin(Class<?> cls);
 
     Select<M> outerJoin(String table);
+
     Select<M> outerJoin(Class<?> cls);
 
     Select<M> leftJoin(String table);
+
     Select<M> leftJoin(Class<?> cls);
 
     Select<M> rightJoin(String table);
+
     Select<M> rightJoin(Class<?> cls);
 
     /**
@@ -135,28 +137,6 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * @return the select
      */
     <T1, R1, T2, R2> Select<M> on(Function<T1, R1> table1Field, Function<T2, R2> table2Field);
-
-    /**
-     * On select.
-     *
-     * @param <T1>        the type parameter
-     * @param <R1>        the type parameter
-     * @param <T2>        the type parameter
-     * @param <R2>        the type parameter
-     * @param table1Field the table 1 field
-     * @param sqlOperator the sql operator
-     * @param table2Field the table 2 field
-     * @return the select
-     */
-    <T1, R1, T2, R2> Select<M> on(Function<T1, R1> table1Field, SqlOperator sqlOperator, Function<T2, R2> table2Field);
-
-    /**
-     * On select.
-     *
-     * @param sqlPart the sql part
-     * @return the select
-     */
-    Select<M> on(SqlPart sqlPart);
 
     /**
      * 添加 group by属性

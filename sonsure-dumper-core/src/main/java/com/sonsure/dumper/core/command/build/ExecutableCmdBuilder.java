@@ -1,8 +1,11 @@
 package com.sonsure.dumper.core.command.build;
 
+import com.sonsure.dumper.core.command.ExecutionType;
+import com.sonsure.dumper.core.command.GenerateKey;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.List;
 import java.util.Map;
@@ -12,11 +15,21 @@ import java.util.Map;
  */
 public interface ExecutableCmdBuilder {
 
+    ExecutableCmdBuilder jdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig);
+
+    ExecutableCmdBuilder addCustomizer(ExecutableCustomizer customizer);
+
+    ExecutableCmdBuilder command(String command);
+
+    ExecutableCmdBuilder executionType(ExecutionType executionType);
+
+    ExecutableCmdBuilder resultType(Class<?> resultType);
+
     ExecutableCmdBuilder insertInto(String table);
 
     ExecutableCmdBuilder intoColumns(String... columns);
 
-    ExecutableCmdBuilder intoValues(String... values);
+    ExecutableCmdBuilder intoValues(Object... values);
 
     ExecutableCmdBuilder select(String... columns);
 
@@ -30,15 +43,15 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder from(String table);
 
-    ExecutableCmdBuilder join(String... tables);
+    ExecutableCmdBuilder join(String table);
 
     ExecutableCmdBuilder innerJoin(String table);
 
-    ExecutableCmdBuilder outerJoin(String... tables);
+    ExecutableCmdBuilder outerJoin(String table);
 
-    ExecutableCmdBuilder leftOuterJoin(String... tables);
+    ExecutableCmdBuilder leftOuterJoin(String table);
 
-    ExecutableCmdBuilder rightOuterJoin(String... tables);
+    ExecutableCmdBuilder rightOuterJoin(String table);
 
     <E1, R1, E2, R2> ExecutableCmdBuilder joinStepOn(Function<E1, R1> table1Field, Function<E2, R2> table2Field);
 
@@ -46,7 +59,9 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder update(String table);
 
-    ExecutableCmdBuilder set(String... sets);
+    ExecutableCmdBuilder set(String field, Object value);
+
+    <E, R> ExecutableCmdBuilder set(Function<E, R> function, Object value);
 
     ExecutableCmdBuilder deleteFrom(String table);
 
@@ -62,15 +77,17 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder addParameters(Map<String, ?> parameters);
 
+    ExecutableCmdBuilder addParameters(Object... values);
+
     ExecutableCmdBuilder where();
 
     ExecutableCmdBuilder where(String column, SqlOperator sqlOperator, Object value);
 
     <E, R> ExecutableCmdBuilder where(Function<E, R> function, SqlOperator sqlOperator, Object value);
 
-    ExecutableCmdBuilder condition(String condition);
-
-    ExecutableCmdBuilder condition(String condition, Object params);
+//    ExecutableCmdBuilder condition(String condition);
+//
+//    ExecutableCmdBuilder condition(String condition, Object params);
 
     ExecutableCmdBuilder condition(String column, SqlOperator sqlOperator, Object value);
 
@@ -78,9 +95,9 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder or();
 
-    ExecutableCmdBuilder or(String condition);
-
-    ExecutableCmdBuilder or(String condition, Object params);
+//    ExecutableCmdBuilder or(String condition);
+//
+//    ExecutableCmdBuilder or(String condition, Object params);
 
     ExecutableCmdBuilder or(String column, SqlOperator sqlOperator, Object value);
 
@@ -88,9 +105,9 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder and();
 
-    ExecutableCmdBuilder and(String condition);
-
-    ExecutableCmdBuilder and(String condition, Object params);
+//    ExecutableCmdBuilder and(String condition);
+//
+//    ExecutableCmdBuilder and(String condition, Object params);
 
     ExecutableCmdBuilder and(String column, SqlOperator sqlOperator, Object value);
 
@@ -124,9 +141,15 @@ public interface ExecutableCmdBuilder {
 
     ExecutableCmdBuilder disableCountQuery();
 
+    ExecutableCmdBuilder generateKey(GenerateKey generateKey);
+
+//    JdbcEngineConfig getJdbcEngineConfig();
+
     boolean isEmptySelectColumns();
 
     boolean isUpdateNull();
+
+    Class<?> getResultType();
 
     String resolveTableAlias(String table);
 

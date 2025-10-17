@@ -10,14 +10,14 @@
 package com.sonsure.dumper.core.persist;
 
 
-import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 
 /**
  * 持久化执行
  * <p>
  *
  * @author liyd
- * @date 17/4/11
+ * @since 17/4/11
  */
 public interface PersistExecutor {
 
@@ -31,9 +31,9 @@ public interface PersistExecutor {
     /**
      * 执行command
      *
-     * @param commandDetails the command context
-     * @return object
+     * @param executableCmd the executable cmd
+     * @return object object
      */
-    Object execute(CommandDetails commandDetails);
+    Object execute(ExecutableCmd executableCmd);
 
 }

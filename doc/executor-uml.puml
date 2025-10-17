@@ -89,7 +89,7 @@ interface Update extends ConditionCommandExecutor {
   + set(Function<E, R> function, Object value): Update
   + setForObjectWherePk(Object object): Update
   + setForObject(Object object): Update
-  + ignoreNull(boolean ignoreNull): Update
+  + updateNull(): Update
   + execute(): int
 }
 
@@ -100,9 +100,9 @@ interface Delete extends ConditionCommandExecutor {
 
 interface Insert extends CommandExecutor {
   + into(Class<?> cls): Insert
-  + set(String field, Object value): Insert
-  + set(Function<E, R> function, Object value): Insert
-  + setForObject(Object obj): Insert
+  + intoField(String field, Object value): Insert
+  + intoField(Function<E, R> function, Object value): Insert
+  + intoForObject(Object obj): Insert
   + execute(): Object
 }
 

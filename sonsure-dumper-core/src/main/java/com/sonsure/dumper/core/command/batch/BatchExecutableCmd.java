@@ -1,28 +1,20 @@
-/*
- * Copyright (c) 2020. www.sonsure.com Inc. All rights reserved.
- * You may obtain more information at
- *
- *   https://www.sonsure.com
- *
- * Designed By Selfly Lee (selfly@live.com)
- */
-
 package com.sonsure.dumper.core.command.batch;
 
-import com.sonsure.dumper.core.command.CommandDetails;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Collection;
 
 /**
- * The type Batch command context.
+ * The type Batch executable cmd.
  *
- * @author liyd
+ * @author selfly
+ * @param <T> the type parameter
  */
-@Setter
 @Getter
-public class BatchCommandDetails<T> extends CommandDetails {
+@Setter
+public class BatchExecutableCmd<T> extends ExecutableCmd {
 
     /**
      * The Batch data.

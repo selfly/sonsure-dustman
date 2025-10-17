@@ -118,7 +118,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public Object executeInsert(Object entity) {
-        return this.insertInto(entity.getClass()).setForObject(entity).execute();
+        return this.insertInto(entity.getClass()).intoForObject(entity).execute();
     }
 
     @Override

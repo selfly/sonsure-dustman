@@ -13,11 +13,14 @@ package com.sonsure.dumper.core.command;
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pagination;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilderImpl;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
+import com.sonsure.dumper.core.mapping.MappingHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +44,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
     public AbstractCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
         this.executableCmdBuilder = new ExecutableCmdBuilderImpl();
+        this.executableCmdBuilder.jdbcEngineConfig(jdbcEngineConfig);
     }
 
     @Override
@@ -55,27 +59,27 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         return this.getSelf();
     }
 
-    protected <T> Page<T> doPageResult(CommandDetails commandDetails, PageQueryHandler<T> pageQueryHandler) {
-        Pagination pagination = commandDetails.getPagination();
+    protected <T> Page<T> doPageResult(ExecutableCmd executableCmd, PageQueryHandler<T> pageQueryHandler) {
+        Pagination pagination = executableCmd.getPagination();
         if (pagination == null) {
             throw new SonsureJdbcException("查询分页列表请设置分页信息");
         }
         String dialect = getJdbcEngineConfig().getPersistExecutor().getDialect();
         long count = Long.MAX_VALUE;
-        if (!commandDetails.isDisableCountQuery()) {
-            String countCommand = getJdbcEngineConfig().getPageHandler().getCountCommand(commandDetails.getCommand(), dialect);
-            CommandDetails countCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
-            countCommandDetails.setCommand(countCommand);
-            countCommandDetails.setCommandType(CommandType.QUERY_ONE_COL);
-            countCommandDetails.setResultType(Long.class);
-            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countCommandDetails);
+        if (!executableCmd.isDisableCountQuery()) {
+            String countCommand = getJdbcEngineConfig().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);
+            ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
+            countExecutableCmd.setCommand(countCommand);
+            countExecutableCmd.setExecutionType(ExecutionType.QUERY_ONE_COL);
+            countExecutableCmd.setResultType(Long.class);
+            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countExecutableCmd);
             count = (Long) result;
         }
         pagination.setTotalItems((int) count);
-        String pageCommand = getJdbcEngineConfig().getPageHandler().getPageCommand(commandDetails.getCommand(), pagination, dialect);
-        CommandDetails pageCommandDetails = BeanKit.copyProperties(new CommandDetails(), commandDetails);
-        pageCommandDetails.setCommand(pageCommand);
-        List<T> list = pageQueryHandler.queryList(pageCommandDetails);
+        String pageCommand = getJdbcEngineConfig().getPageHandler().getPageCommand(executableCmd.getCommand(), pagination, dialect);
+        ExecutableCmd pageExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
+        pageExecutableCmd.setCommand(pageCommand);
+        List<T> list = pageQueryHandler.queryList(pageExecutableCmd);
 
         return new Page<>(list, pagination);
     }
@@ -118,13 +122,20 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         return (E) this;
     }
 
+    protected void registerClassToMappingHandler(Class<?> cls) {
+        MappingHandler mappingHandler = this.getJdbcEngineConfig().getMappingHandler();
+        if (mappingHandler instanceof AbstractMappingHandler) {
+            ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
+        }
+    }
+
     protected interface PageQueryHandler<T> {
         /**
          * Query list.
          *
-         * @param commandDetails the command context
+         * @param executableCmd the executable cmd
          * @return the list
          */
-        List<T> queryList(CommandDetails commandDetails);
+        List<T> queryList(ExecutableCmd executableCmd);
     }
 }

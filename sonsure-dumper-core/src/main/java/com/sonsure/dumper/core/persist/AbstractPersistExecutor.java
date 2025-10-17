@@ -11,8 +11,8 @@ package com.sonsure.dumper.core.persist;
 
 
 import com.sonsure.dumper.common.utils.StrUtils;
-import com.sonsure.dumper.core.command.CommandDetails;
-import com.sonsure.dumper.core.command.batch.BatchCommandDetails;
+import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.convert.JdbcTypeConverterComposite;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -47,68 +47,68 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
 
 
     @Override
-    public Object execute(CommandDetails commandDetails) {
+    public Object execute(ExecutableCmd executableCmd) {
         if (getJdbcEngineConfig().getJdbcTypeConverters() != null) {
             JdbcTypeConverterComposite jdbcTypeConverterComposite = new JdbcTypeConverterComposite(getJdbcEngineConfig().getJdbcTypeConverters());
             if (jdbcTypeConverterComposite.support(this.getDialect())) {
-                jdbcTypeConverterComposite.convert(this.getDialect(), commandDetails);
+                jdbcTypeConverterComposite.convert(this.getDialect(), executableCmd);
             }
         }
         final List<PersistInterceptor> persistInterceptors = getJdbcEngineConfig().getPersistInterceptors();
         boolean process = true;
         if (persistInterceptors != null) {
             for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                if (!persistInterceptor.executeBefore(this.getDialect(), commandDetails)) {
+                if (!persistInterceptor.executeBefore(this.getDialect(), executableCmd)) {
                     process = false;
                 }
             }
         }
         Object result = null;
         if (process) {
-            switch (commandDetails.getCommandType()) {
+            switch (executableCmd.getExecutionType()) {
                 case INSERT:
-                    result = this.insert(commandDetails);
+                    result = this.insert(executableCmd);
                     break;
                 case QUERY_FOR_LIST:
-                    result = this.queryForList(commandDetails);
+                    result = this.queryForList(executableCmd);
                     break;
                 case QUERY_SINGLE_RESULT:
-                    result = this.querySingleResult(commandDetails);
+                    result = this.querySingleResult(executableCmd);
                     break;
                 case QUERY_FOR_MAP:
-                    result = this.queryForMap(commandDetails);
+                    result = this.queryForMap(executableCmd);
                     break;
                 case QUERY_FOR_MAP_LIST:
-                    result = this.queryForMapList(commandDetails);
+                    result = this.queryForMapList(executableCmd);
                     break;
                 case QUERY_ONE_COL:
-                    result = this.queryOneCol(commandDetails);
+                    result = this.queryOneCol(executableCmd);
                     break;
                 case QUERY_ONE_COL_LIST:
-                    result = this.queryOneColList(commandDetails);
+                    result = this.queryOneColList(executableCmd);
                     break;
                 case UPDATE:
-                    result = this.update(commandDetails);
+                    result = this.update(executableCmd);
                     break;
                 case BATCH_UPDATE:
-                    result = this.batchUpdate(((BatchCommandDetails<?>) commandDetails));
+                    result = this.batchUpdate(((BatchExecutableCmd<?>) executableCmd));
                     break;
                 case DELETE:
-                    result = this.delete(commandDetails);
+                    result = this.delete(executableCmd);
                     break;
                 case EXECUTE:
-                    result = this.doExecute(commandDetails);
+                    result = this.doExecute(executableCmd);
                     break;
                 case EXECUTE_SCRIPT:
-                    result = this.doExecuteScript(commandDetails);
+                    result = this.doExecuteScript(executableCmd);
                     break;
                 default:
-                    throw new SonsureJdbcException("不支持的CommandType:" + commandDetails.getCommandType());
+                    throw new SonsureJdbcException("不支持的CommandType:" + executableCmd.getExecutionType());
             }
         }
         if (persistInterceptors != null) {
             for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                result = persistInterceptor.executeAfter(this.getDialect(), commandDetails, result);
+                result = persistInterceptor.executeAfter(this.getDialect(), executableCmd, result);
             }
         }
         return result;
@@ -118,66 +118,66 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
     /**
      * insert操作，返回主键值
      *
-     * @param commandDetails the command context
-     * @return object
+     * @param executableCmd the executable cmd
+     * @return object object
      */
-    protected abstract Object insert(CommandDetails commandDetails);
+    protected abstract Object insert(ExecutableCmd executableCmd);
 
     /**
      * 列表查询，泛型object为某个实体对象
      *
-     * @param commandDetails the command context
-     * @return list
+     * @param executableCmd the executable cmd
+     * @return list list
      */
-    protected abstract List<?> queryForList(CommandDetails commandDetails);
+    protected abstract List<?> queryForList(ExecutableCmd executableCmd);
 
     /**
      * 查询单个结果对象，返回结果为某个实体对象
      *
-     * @param commandDetails the command context
-     * @return object
+     * @param executableCmd the executable cmd
+     * @return object object
      */
-    protected abstract Object querySingleResult(CommandDetails commandDetails);
+    protected abstract Object querySingleResult(ExecutableCmd executableCmd);
 
     /**
      * 查询单条记录的map结果集，key=列名，value=列值
      *
-     * @param commandDetails the command context
-     * @return map
+     * @param executableCmd the executable cmd
+     * @return map map
      */
-    protected abstract Map<String, Object> queryForMap(CommandDetails commandDetails);
+    protected abstract Map<String, Object> queryForMap(ExecutableCmd executableCmd);
 
     /**
      * 查询列表记录的map结果集，key=列名，value=列值
      *
-     * @param commandDetails the command context
-     * @return list
+     * @param executableCmd the executable cmd
+     * @return list list
      */
-    protected abstract List<Map<String, Object>> queryForMapList(CommandDetails commandDetails);
+    protected abstract List<Map<String, Object>> queryForMapList(ExecutableCmd executableCmd);
 
     /**
      * 查询某一列的值
      *
-     * @param commandDetails the command context
-     * @return object
+     * @param executableCmd the executable cmd
+     * @return object object
      */
-    protected abstract Object queryOneCol(CommandDetails commandDetails);
+    protected abstract Object queryOneCol(ExecutableCmd executableCmd);
 
     /**
      * 查询某一列的值列表
      *
-     * @param commandDetails the command context
-     * @return list list
+     * @param executableCmd the executable cmd
+     * @return list
      */
-    protected abstract List<?> queryOneColList(CommandDetails commandDetails);
+    protected abstract List<?> queryOneColList(ExecutableCmd executableCmd);
 
     /**
      * 更新操作
      *
-     * @param commandDetails the command context
-     * @return int
+     * @param executableCmd the executable cmd
+     * @return int int
      */
-    protected abstract int update(CommandDetails commandDetails);
+    protected abstract int update(ExecutableCmd executableCmd);
 
     /**
      * 批量更新操作
@@ -186,31 +186,31 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param commandContext the command context
      * @return int int
      */
-    protected abstract <T> Object batchUpdate(BatchCommandDetails<T> commandContext);
+    protected abstract <T> Object batchUpdate(BatchExecutableCmd<T> commandContext);
 
     /**
      * 删除操作
      *
-     * @param commandDetails the command context
-     * @return int
+     * @param executableCmd the executable cmd
+     * @return int int
      */
-    protected abstract int delete(CommandDetails commandDetails);
+    protected abstract int delete(ExecutableCmd executableCmd);
 
     /**
      * 执行代码
      *
-     * @param commandDetails the command context
-     * @return object
+     * @param executableCmd the executable cmd
+     * @return object object
      */
-    protected abstract Object doExecute(CommandDetails commandDetails);
+    protected abstract Object doExecute(ExecutableCmd executableCmd);
 
     /**
      * 执行代码
      *
-     * @param commandDetails the command context
-     * @return object
+     * @param executableCmd the executable cmd
+     * @return object object
      */
-    protected abstract Object doExecuteScript(CommandDetails commandDetails);
+    protected abstract Object doExecuteScript(ExecutableCmd executableCmd);
 
 
     /**

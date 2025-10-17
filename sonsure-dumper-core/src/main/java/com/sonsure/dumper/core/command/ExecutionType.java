@@ -13,7 +13,7 @@ package com.sonsure.dumper.core.command;
  * @author selfly
  */
 
-public enum CommandType {
+public enum ExecutionType {
 
     /**
      * Insert command type.
@@ -75,12 +75,12 @@ public enum CommandType {
      */
     EXECUTE_SCRIPT;
 
-    public static boolean isSelectCommandType(CommandType commandType) {
-        return commandType == QUERY_FOR_LIST
-                || commandType == QUERY_SINGLE_RESULT
-                || commandType == QUERY_FOR_MAP
-                || commandType == QUERY_FOR_MAP_LIST
-                || commandType == QUERY_ONE_COL
-                || commandType == QUERY_ONE_COL_LIST;
+    public static boolean isSelectCommandType(ExecutionType executionType) {
+        return executionType == QUERY_FOR_LIST
+                || executionType == QUERY_SINGLE_RESULT
+                || executionType == QUERY_FOR_MAP
+                || executionType == QUERY_FOR_MAP_LIST
+                || executionType == QUERY_ONE_COL
+                || executionType == QUERY_ONE_COL_LIST;
     }
 }

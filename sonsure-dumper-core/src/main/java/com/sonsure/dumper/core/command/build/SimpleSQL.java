@@ -42,7 +42,12 @@ public class SimpleSQL extends AbstractSQL<SimpleSQL> {
 //    }
 
     public SimpleSQL appendSegment(String segment) {
-        this.sql().lastList.add(segment);
+        //默认到 where
+        if (this.sql().lastList.isEmpty()) {
+            this.sql().where.add(segment);
+        } else {
+            this.sql().lastList.add(segment);
+        }
         return getSelf();
     }
 
