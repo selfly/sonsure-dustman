@@ -8,7 +8,7 @@ import lombok.Getter;
  * @author selfly
  */
 @Getter
-public class SqlParameter {
+public class CmdParameter {
 
     /**
      * The Name.
@@ -20,7 +20,7 @@ public class SqlParameter {
      */
     Object value;
 
-    public SqlParameter(String name, Object value) {
+    public CmdParameter(String name, Object value) {
         this.name = name;
         this.value = value;
     }

@@ -33,7 +33,7 @@ public class ExecutableCmd {
     /**
      * The Parameters.
      */
-    private List<SqlParameter> parameters;
+    private List<CmdParameter> parameters;
 
     private List<Object> parsedParameterValues;
     private List<String> parsedParameterNames;

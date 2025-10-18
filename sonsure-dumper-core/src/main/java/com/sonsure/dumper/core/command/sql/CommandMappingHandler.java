@@ -10,6 +10,7 @@
 package com.sonsure.dumper.core.command.sql;
 
 import com.sonsure.dumper.common.utils.StrUtils;
+import com.sonsure.dumper.core.command.build.CmdParameter;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -43,14 +44,14 @@ public class CommandMappingHandler {
     /**
      * 参数本身无任何作用，只在调用mappingHandler时传入，方便分表时确定表名
      */
-    private final Map<String, Object> params;
+    private final List<CmdParameter> parameters;
 
     private final Map<Column, ColumnMapping> mappingColumns = new HashMap<>();
     private final Map<Table, TableMapping> mappingTables = new HashMap<>();
 
-    public CommandMappingHandler(Statement statement, MappingHandler mappingHandler, Map<String, Object> params) {
+    public CommandMappingHandler(Statement statement, MappingHandler mappingHandler, List<CmdParameter> parameters) {
         this.mappingHandler = mappingHandler;
-        this.params = params;
+        this.parameters = parameters;
         this.extractMappings(statement);
     }
 
@@ -278,7 +279,7 @@ public class CommandMappingHandler {
         String tableAliasName = this.getTableAliasName(table);
         mappings.put(tableAliasName, table.getName());
 
-        String mappingName = mappingHandler.getTable(table.getName(), this.params);
+        String mappingName = mappingHandler.getTable(table.getName(), this.parameters);
         TableMapping tableMapping = new TableMapping();
         tableMapping.setTable(table);
         tableMapping.setMappingName(mappingName);

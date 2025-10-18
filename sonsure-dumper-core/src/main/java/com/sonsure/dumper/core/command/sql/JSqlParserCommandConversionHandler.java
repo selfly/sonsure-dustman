@@ -9,6 +9,7 @@
 
 package com.sonsure.dumper.core.command.sql;
 
+import com.sonsure.dumper.core.command.build.CmdParameter;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -16,6 +17,7 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,14 +39,14 @@ public class JSqlParserCommandConversionHandler implements CommandConversionHand
     }
 
     @Override
-    public String convert(String command, Map<String, Object> params) {
+    public String convert(String command, List<CmdParameter> parameters) {
 
         String convertedCommand = CACHE.get(command);
         if (convertedCommand == null) {
             try {
                 StringBuilder buffer = new StringBuilder();
                 Statement statement = CCJSqlParserUtil.parse(command);
-                CommandMappingHandler commandMappingHandler = new CommandMappingHandler(statement, mappingHandler, params);
+                CommandMappingHandler commandMappingHandler = new CommandMappingHandler(statement, mappingHandler, parameters);
                 ExpressionDeParser expressionDeParser = new CommandExpressionDeParser();
                 SelectDeParser selectDeParser = new CommandSelectDeParser(expressionDeParser, buffer, commandMappingHandler);
                 expressionDeParser.setSelectVisitor(selectDeParser);

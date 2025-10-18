@@ -10,34 +10,36 @@
 package com.sonsure.dumper.core.mapping;
 
 
-import java.util.Map;
+import com.sonsure.dumper.core.command.build.CmdParameter;
+
+import java.util.List;
 
 /**
  * 实体映射处理
  * <p>
  *
  * @author liyd
- * @date 17/4/11
+ * @since 17/4/11
  */
 public interface MappingHandler {
 
     /**
      * 根据实体名获取表名
      *
-     * @param className the class name
-     * @param params    the params
+     * @param className  the class name
+     * @param parameters the parameters
      * @return table name
      */
-    String getTable(String className, Map<String, Object> params);
+    String getTable(String className, List<CmdParameter> parameters);
 
     /**
      * 根据实体名获取表名
      *
-     * @param clazz  the clazz
-     * @param params the params
+     * @param clazz      the clazz
+     * @param parameters the parameters
      * @return table name
      */
-    String getTable(Class<?> clazz, Map<String, Object> params);
+    String getTable(Class<?> clazz, List<CmdParameter> parameters);
 
     /**
      * 根据类名获取主键字段名

@@ -56,7 +56,7 @@ public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisEx
             Object parameterObject = boundSql.getParameterObject();
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
             if (parameterMappings != null) {
-                executableCmdBuilder.getSqlParameters().clear();
+                executableCmdBuilder.getCmdParameters().clear();
                 for (ParameterMapping parameterMapping : parameterMappings) {
                     if (parameterMapping.getMode() != ParameterMode.OUT) {
                         Object value;

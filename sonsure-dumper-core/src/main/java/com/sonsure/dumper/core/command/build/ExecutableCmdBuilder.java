@@ -27,7 +27,7 @@ public class ExecutableCmdBuilder {
     public static final String PARAM_PLACEHOLDER = " ? ";
 
     protected final SimpleSQL simpleSQL;
-    protected final List<SqlParameter> sqlParameters;
+    protected final List<CmdParameter> cmdParameters;
     protected String command;
     protected JdbcEngineConfig jdbcEngineConfig;
     protected ExecutionType executionType;
@@ -48,7 +48,7 @@ public class ExecutableCmdBuilder {
 
     public ExecutableCmdBuilder() {
         simpleSQL = new SimpleSQL();
-        sqlParameters = new ArrayList<>(32);
+        cmdParameters = new ArrayList<>(32);
         tableAliasMapping = new HashMap<>(8);
     }
 
@@ -202,12 +202,12 @@ public class ExecutableCmdBuilder {
     }
 
     public ExecutableCmdBuilder addParameter(String name, Object value) {
-        this.sqlParameters.add(new SqlParameter(name, value));
+        this.cmdParameters.add(new CmdParameter(name, value));
         return this;
     }
 
-    public ExecutableCmdBuilder addParameters(List<SqlParameter> parameters) {
-        this.sqlParameters.addAll(parameters);
+    public ExecutableCmdBuilder addParameters(List<CmdParameter> parameters) {
+        this.cmdParameters.addAll(parameters);
         return this;
     }
 
@@ -234,7 +234,7 @@ public class ExecutableCmdBuilder {
     }
 
     public ExecutableCmdBuilder where(String column, SqlOperator sqlOperator, Object value) {
-        MultiTuple<String, List<SqlParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
+        MultiTuple<String, List<CmdParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
         this.simpleSQL.where(pair.getLeft());
         this.addParameters(pair.getRight());
         return this;
@@ -250,7 +250,7 @@ public class ExecutableCmdBuilder {
     }
 
     public ExecutableCmdBuilder or(String column, SqlOperator sqlOperator, Object value) {
-        MultiTuple<String, List<SqlParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
+        MultiTuple<String, List<CmdParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
         this.simpleSQL.or(pair.getLeft());
         this.addParameters(pair.getRight());
         return this;
@@ -262,7 +262,7 @@ public class ExecutableCmdBuilder {
     }
 
     public ExecutableCmdBuilder and(String column, SqlOperator sqlOperator, Object value) {
-        MultiTuple<String, List<SqlParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
+        MultiTuple<String, List<CmdParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
         this.simpleSQL.and(pair.getLeft());
         this.addParameters(pair.getRight());
         return this;
@@ -300,7 +300,7 @@ public class ExecutableCmdBuilder {
     }
 
     public ExecutableCmdBuilder having(String column, SqlOperator sqlOperator, Object value) {
-        MultiTuple<String, List<SqlParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
+        MultiTuple<String, List<CmdParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
         this.simpleSQL.having(pair.getLeft());
         this.addParameters(pair.getRight());
         return this;
@@ -350,8 +350,8 @@ public class ExecutableCmdBuilder {
     }
 
     public Map<String, Object> getParameterMap() {
-        return this.sqlParameters.stream()
-                .collect(Collectors.toMap(SqlParameter::getName, SqlParameter::getValue));
+        return this.cmdParameters.stream()
+                .collect(Collectors.toMap(CmdParameter::getName, CmdParameter::getValue));
     }
 
     @SuppressWarnings("unchecked")
@@ -374,9 +374,9 @@ public class ExecutableCmdBuilder {
         }
     }
 
-    protected MultiTuple<String, List<SqlParameter>> buildColumnStatement(String column, SqlOperator sqlOperator, Object value) {
+    protected MultiTuple<String, List<CmdParameter>> buildColumnStatement(String column, SqlOperator sqlOperator, Object value) {
         StringBuilder conditionSql = new StringBuilder();
-        List<SqlParameter> conditionParameters = new ArrayList<>(16);
+        List<CmdParameter> conditionParameters = new ArrayList<>(16);
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(column);
 
         if (value == null) {
@@ -391,16 +391,16 @@ public class ExecutableCmdBuilder {
                 conditionSql.append(column).append(SPACE)
                         .append(sqlOperator.getCode()).append(SPACE)
                         .append(COLON).append(column);
-                conditionParameters.add(new SqlParameter(column, value));
+                conditionParameters.add(new CmdParameter(column, value));
             } else {
                 if (value.getClass().isArray()) {
                     Object[] valArray = (Object[]) value;
                     StringBuilder paramPlaceholder = new StringBuilder("(");
-                    List<SqlParameter> params = new ArrayList<>(valArray.length);
+                    List<CmdParameter> params = new ArrayList<>(valArray.length);
                     int count = 1;
                     for (Object val : valArray) {
                         paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
-                        params.add(new SqlParameter(column + (count++), val));
+                        params.add(new CmdParameter(column + (count++), val));
                     }
                     paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
                     paramPlaceholder.append(")");
@@ -412,7 +412,7 @@ public class ExecutableCmdBuilder {
                     conditionSql.append(column).append(SPACE)
                             .append(sqlOperator.getCode()).append(SPACE)
                             .append(PARAM_PLACEHOLDER);
-                    conditionParameters.add(new SqlParameter(column, value));
+                    conditionParameters.add(new CmdParameter(column, value));
                 }
             }
         }
@@ -438,7 +438,7 @@ public class ExecutableCmdBuilder {
         executableCmd.setExecutionType(executionType);
         executableCmd.setResultType(this.resultType);
         executableCmd.setCommand(command);
-        executableCmd.setParameters(this.sqlParameters);
+        executableCmd.setParameters(this.cmdParameters);
         executableCmd.setToggleCase(toggleCase);
         executableCmd.setForceNative(this.forceNative);
         executableCmd.setNamedParameter(this.namedParameter);
@@ -448,9 +448,7 @@ public class ExecutableCmdBuilder {
 
 
         if (!this.forceNative) {
-            // todo 需要收集参数信息，待完成
-            Map<String, Object> params = Collections.emptyMap();
-            final String resolvedCommand = jdbcEngineConfig.getCommandConversionHandler().convert(executableCmd.getCommand(), params);
+            final String resolvedCommand = jdbcEngineConfig.getCommandConversionHandler().convert(executableCmd.getCommand(), this.cmdParameters);
             executableCmd.setCommand(resolvedCommand);
         }
 
@@ -458,7 +456,7 @@ public class ExecutableCmdBuilder {
             final ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(executableCmd.getCommand());
             Map<String, Object> paramMap = executableCmd.getParameters()
                     .stream()
-                    .collect(Collectors.toMap(SqlParameter::getName, SqlParameter::getValue));
+                    .collect(Collectors.toMap(CmdParameter::getName, CmdParameter::getValue));
             final String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramMap);
             final Object[] objects = NamedParameterUtils.buildValueArray(parsedSql, paramMap);
             executableCmd.setCommand(sqlToUse);
@@ -466,7 +464,7 @@ public class ExecutableCmdBuilder {
             executableCmd.setParsedParameterValues(Arrays.asList(objects));
         } else {
             List<Object> params = executableCmd.getParameters().stream()
-                    .map(SqlParameter::getValue)
+                    .map(CmdParameter::getValue)
                     .collect(Collectors.toList());
             executableCmd.setParsedParameterValues(params);
         }

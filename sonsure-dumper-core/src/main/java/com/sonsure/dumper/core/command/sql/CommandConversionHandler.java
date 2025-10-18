@@ -10,7 +10,9 @@
 package com.sonsure.dumper.core.command.sql;
 
 
-import java.util.Map;
+import com.sonsure.dumper.core.command.build.CmdParameter;
+
+import java.util.List;
 
 /**
  * @author liyd
@@ -20,11 +22,11 @@ public interface CommandConversionHandler {
     /**
      * command转换
      *
-     * @param command the command
-     * @param params  仅在分表时mappingHandler会用到
+     * @param command    the command
+     * @param parameters the parameters
      * @return string string
      */
-    String convert(String command, Map<String, Object> params);
+    String convert(String command, List<CmdParameter> parameters);
 
 
 }

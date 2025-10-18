@@ -13,6 +13,7 @@ import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
+import com.sonsure.dumper.core.command.build.CmdParameter;
 import com.sonsure.dumper.core.command.build.CommandBuildHelper;
 import com.sonsure.dumper.core.command.build.EntityClassFieldWrapper;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -121,9 +122,9 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     }
 
     @Override
-    public String getTable(String className, Map<String, Object> params) {
+    public String getTable(String className, List<CmdParameter> parameters) {
         Class<?> tableClass = this.getTableClass(className);
-        return tableClass == null ? className : this.getTable(tableClass, params);
+        return tableClass == null ? className : this.getTable(tableClass, parameters);
     }
 
     @Override
@@ -133,7 +134,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     }
 
     @Override
-    public String getTable(Class<?> entityClass, Map<String, Object> params) {
+    public String getTable(Class<?> entityClass, List<CmdParameter> parameters) {
         CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(entityClass);
         Object annotation = entityClassWrapper.getClassAnnotation();
         String tableName;
