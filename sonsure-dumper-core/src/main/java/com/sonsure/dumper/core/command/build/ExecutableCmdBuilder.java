@@ -6,9 +6,6 @@ import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.common.validation.Verifier;
 import com.sonsure.dumper.core.command.*;
-import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaField;
-import com.sonsure.dumper.core.command.lambda.LambdaHelper;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
@@ -117,8 +114,8 @@ public class ExecutableCmdBuilder {
     }
 
 
-    public <E, R> ExecutableCmdBuilder select(Function<E, R> function) {
-        return this.select(lambda2Field(function));
+    public <T> ExecutableCmdBuilder select(GetterFunction<T> getter) {
+        return this.select(lambda2Field(getter));
     }
 
 
@@ -128,8 +125,8 @@ public class ExecutableCmdBuilder {
     }
 
 
-    public <E, R> ExecutableCmdBuilder dropSelectColumn(Function<E, R> function) {
-        return this.dropSelectColumn(lambda2Field(function));
+    public <T> ExecutableCmdBuilder dropSelectColumn(GetterFunction<T> getter) {
+        return this.dropSelectColumn(lambda2Field(getter));
     }
 
 
@@ -187,7 +184,7 @@ public class ExecutableCmdBuilder {
     }
 
 
-    public <E1, R1, E2, R2> ExecutableCmdBuilder joinStepOn(Function<E1, R1> table1Field, Function<E2, R2> table2Field) {
+    public <T1, T2> ExecutableCmdBuilder joinStepOn(GetterFunction<T1> table1Field, GetterFunction<T2> table2Field) {
         String field1 = lambda2Field(table1Field);
         String field2 = lambda2Field(table2Field);
         this.simpleSQL.joinStepOn(String.format("%s %s %s", field1, SqlOperator.EQ.getCode(), field2), this.latestStatement);
@@ -221,8 +218,8 @@ public class ExecutableCmdBuilder {
     }
 
 
-    public <E, R> ExecutableCmdBuilder set(Function<E, R> function, Object value) {
-        return this.set(lambda2Field(function), value);
+    public <T> ExecutableCmdBuilder set(GetterFunction<T> getter, Object value) {
+        return this.set(lambda2Field(getter), value);
     }
 
 
@@ -295,16 +292,16 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <E, R> ExecutableCmdBuilder where(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        return this.where(lambda2Field(function), sqlOperator, value);
+    public <T> ExecutableCmdBuilder where(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
+        return this.where(lambda2Field(getter), sqlOperator, value);
     }
 
     public ExecutableCmdBuilder condition(String column, SqlOperator sqlOperator, Object value) {
         return this.where(column, sqlOperator, value);
     }
 
-    public <E, R> ExecutableCmdBuilder condition(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        return this.where(function, sqlOperator, value);
+    public <T> ExecutableCmdBuilder condition(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
+        return this.where(getter, sqlOperator, value);
     }
 
     public ExecutableCmdBuilder or() {
@@ -319,8 +316,8 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <E, R> ExecutableCmdBuilder or(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        return this.or(lambda2Field(function), sqlOperator, value);
+    public <T> ExecutableCmdBuilder or(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
+        return this.or(lambda2Field(getter), sqlOperator, value);
     }
 
     public ExecutableCmdBuilder and() {
@@ -335,8 +332,8 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <E, R> ExecutableCmdBuilder and(Function<E, R> function, SqlOperator sqlOperator, Object value) {
-        return this.and(lambda2Field(function), sqlOperator, value);
+    public <T> ExecutableCmdBuilder and(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
+        return this.and(lambda2Field(getter), sqlOperator, value);
     }
 
     public ExecutableCmdBuilder appendSegment(String segment) {
@@ -365,8 +362,8 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <E, R> ExecutableCmdBuilder orderBy(Function<E, R> function, OrderBy orderBy) {
-        return this.orderBy(lambda2Field(function), orderBy);
+    public <T> ExecutableCmdBuilder orderBy(GetterFunction<T> getter, OrderBy orderBy) {
+        return this.orderBy(lambda2Field(getter), orderBy);
     }
 
     public ExecutableCmdBuilder groupBy(String... columns) {
@@ -374,8 +371,8 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <E, R> ExecutableCmdBuilder groupBy(Function<E, R> function) {
-        return this.groupBy(lambda2Field(function));
+    public <T> ExecutableCmdBuilder groupBy(GetterFunction<T> getter) {
+        return this.groupBy(lambda2Field(getter));
     }
 
     public ExecutableCmdBuilder having(String... conditions) {
@@ -450,10 +447,10 @@ public class ExecutableCmdBuilder {
         }
     }
 
-    protected <E, R> String lambda2Field(Function<E, R> function) {
-        LambdaField lambdaField = LambdaHelper.getLambdaClass(function);
-        String tableAlias = this.tableAliasMapping.get(lambdaField.getSimpleClassName());
-        return CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaField.getFieldName());
+    protected <T> String lambda2Field(GetterFunction<T> getter) {
+        LambdaGetter lambdaGetter = LambdaHelper.getLambdaGetter(getter);
+        String tableAlias = this.tableAliasMapping.get(lambdaGetter.getSimpleClassName());
+        return CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaGetter.getFieldName());
     }
 
     protected MultiTuple<String, List<SqlParameter>> buildColumnStatement(String column, SqlOperator sqlOperator, Object value) {

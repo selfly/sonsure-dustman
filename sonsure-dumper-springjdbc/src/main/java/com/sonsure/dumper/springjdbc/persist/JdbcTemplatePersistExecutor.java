@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.springjdbc.persist;
 
-import com.sonsure.dumper.core.command.GenerateKey;
+import com.sonsure.dumper.core.command.build.GenerateKey;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;

@@ -10,11 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.*;
-import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
-import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
-import com.sonsure.dumper.core.command.lambda.Function;
-import com.sonsure.dumper.core.command.lambda.LambdaHelper;
+import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.KeyGenerator;
 
@@ -46,8 +42,8 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
     }
 
     @Override
-    public <E, R> Insert intoField(Function<E, R> function, Object value) {
-        String fieldName = LambdaHelper.getFieldName(function);
+    public <T> Insert intoField(GetterFunction<T> getter, Object value) {
+        String fieldName = LambdaHelper.getFieldName(getter);
         return this.intoField(fieldName, value);
     }
 
@@ -87,14 +83,14 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
             if (this.cls == null) {
                 return;
             }
-            ModelClassWrapper modelClass = new ModelClassWrapper(this.cls);
-            ModelClassFieldDetails primaryKeyField = modelClass.getPrimaryKeyField();
+            CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(this.cls);
+            EntityClassFieldWrapper primaryKeyField = entityClassWrapper.getPrimaryKeyField();
             Object primaryKeyValue = executableCmdBuilder.getParameterMap().get(primaryKeyField.getFieldName());
             GenerateKey generateKey = new GenerateKey();
             if (primaryKeyValue == null) {
                 KeyGenerator keyGenerator = jdbcEngineConfig.getKeyGenerator();
                 if (keyGenerator != null) {
-                    Object generateKeyValue = keyGenerator.generateKeyValue(modelClass.getModelClass());
+                    Object generateKeyValue = keyGenerator.generateKeyValue(entityClassWrapper.getEntityClass());
                     generateKey.setValue(generateKeyValue);
                     boolean primaryKeyParameter = true;
                     if (generateKeyValue instanceof String) {

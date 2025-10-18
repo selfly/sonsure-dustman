@@ -14,10 +14,7 @@ import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.validation.Verifier;
 import com.sonsure.dumper.core.command.*;
-import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
-import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 
@@ -52,8 +49,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     public Select<M> addAllColumns() {
         Verifier.init().notNull(this.cls, "class对象不能为空").validate();
         String tableAlias = this.getExecutableCmdBuilder().resolveTableAlias(this.cls.getSimpleName());
-        ModelClassWrapper modelClassWrapper = new ModelClassWrapper(this.cls);
-        String[] fields = modelClassWrapper.getModelFields().stream()
+        CacheEntityClassWrapper cacheEntityClassWrapper = new CacheEntityClassWrapper(this.cls);
+        String[] fields = cacheEntityClassWrapper.getEntityFields().stream()
                 .map(v -> CommandBuildHelper.getTableAliasFieldName(tableAlias, v.getFieldName())).toArray(String[]::new);
         return this.addColumn(fields);
     }
@@ -74,8 +71,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public final <T, R> Select<M> addColumn(Function<T, R> function) {
-        this.getExecutableCmdBuilder().select(function);
+    public final <T> Select<M> addColumn(GetterFunction<T> getter) {
+        this.getExecutableCmdBuilder().select(getter);
         return this;
     }
 
@@ -90,8 +87,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public <T, R> Select<M> dropColumn(Function<T, R> function) {
-        this.getExecutableCmdBuilder().dropSelectColumn(function);
+    public <T> Select<M> dropColumn(GetterFunction<T> getter) {
+        this.getExecutableCmdBuilder().dropSelectColumn(getter);
         return this;
     }
 
@@ -172,7 +169,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public <T1, R1, T2, R2> Select<M> on(Function<T1, R1> table1Field, Function<T2, R2> table2Field) {
+    public <T1, T2> Select<M> on(GetterFunction<T1> table1Field, GetterFunction<T2> table2Field) {
         this.getExecutableCmdBuilder().joinStepOn(table1Field, table2Field);
         return this;
     }
@@ -184,8 +181,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public <T, R> Select<M> groupBy(Function<T, R> function) {
-        this.getExecutableCmdBuilder().groupBy(function);
+    public <T> Select<M> groupBy(GetterFunction<T> getter) {
+        this.getExecutableCmdBuilder().groupBy(getter);
         return this;
     }
 
@@ -196,8 +193,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public <T, R> Select<M> orderBy(Function<T, R> function, OrderBy orderBy) {
-        this.getExecutableCmdBuilder().orderBy(function, orderBy);
+    public <T> Select<M> orderBy(GetterFunction<T> getter, OrderBy orderBy) {
+        this.getExecutableCmdBuilder().orderBy(getter, orderBy);
         return this;
     }
 
@@ -354,9 +351,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
                 return;
             }
             if (executableCmdBuilder.isEmptySelectColumns()) {
-                ModelClassDetails modelClassDetails = new ModelClassDetails(cls);
+                CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(cls);
                 String alias = executableCmdBuilder.resolveTableAlias(cls.getSimpleName());
-                String[] fields = modelClassDetails.getModelFields().stream()
+                String[] fields = entityClassWrapper.getEntityFields().stream()
                         .map(v -> CommandBuildHelper.getTableAliasFieldName(alias, v.getFieldName())).toArray(String[]::new);
                 executableCmdBuilder.select(fields);
             }

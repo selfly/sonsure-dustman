@@ -9,11 +9,11 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.CommandBuildHelper;
+import com.sonsure.dumper.core.command.build.CommandBuildHelper;
 import com.sonsure.dumper.core.command.ExecutionType;
-import com.sonsure.dumper.core.command.ModelClassWrapper;
+import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
 import java.util.Map;
@@ -44,18 +44,18 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
     }
 
     @Override
-    public <E, R> Update set(Function<E, R> function, Object value) {
-        this.getExecutableCmdBuilder().set(function, value);
+    public <T> Update set(GetterFunction<T> getter, Object value) {
+        this.getExecutableCmdBuilder().set(getter, value);
         return this;
     }
 
     @Override
     public Update setForBean(Object bean) {
-        ModelClassWrapper modelClassWrapper = new ModelClassWrapper(bean.getClass());
+        CacheEntityClassWrapper cacheEntityClassWrapper = new CacheEntityClassWrapper(bean.getClass());
         Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, !this.getExecutableCmdBuilder().isUpdateNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             // 主键不更新
-            if (entry.getKey().equals(modelClassWrapper.getPrimaryKeyField().getFieldName())) {
+            if (entry.getKey().equals(cacheEntityClassWrapper.getPrimaryKeyField().getFieldName())) {
                 continue;
             }
             this.set(entry.getKey(), entry.getValue());

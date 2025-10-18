@@ -12,9 +12,9 @@ package com.sonsure.dumper.core.mapping;
 import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
-import com.sonsure.dumper.core.command.CommandBuildHelper;
-import com.sonsure.dumper.core.command.ModelClassDetails;
-import com.sonsure.dumper.core.command.ModelClassFieldDetails;
+import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
+import com.sonsure.dumper.core.command.build.CommandBuildHelper;
+import com.sonsure.dumper.core.command.build.EntityClassFieldWrapper;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 import lombok.Setter;
@@ -134,9 +134,8 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
     @Override
     public String getTable(Class<?> entityClass, Map<String, Object> params) {
-
-        ModelClassDetails classMeta = CommandBuildHelper.getClassDetails(entityClass);
-        Object annotation = classMeta.getAnnotation();
+        CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(entityClass);
+        Object annotation = entityClassWrapper.getClassAnnotation();
         String tableName;
         if (annotation != null) {
             tableName = CommandBuildHelper.getTableAnnotationName(annotation);
@@ -158,32 +157,33 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
 
     @Override
     public String getPkField(Class<?> entityClass) {
-
-        ModelClassDetails classDetails = CommandBuildHelper.getClassDetails(entityClass);
-        return classDetails.getPrimaryKeyField().getFieldName();
+        CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(entityClass);
+        return entityClassWrapper.getPrimaryKeyField().getFieldName();
     }
 
     @Override
     public String getColumn(Class<?> entityClass, String fieldName) {
-        ModelClassFieldDetails classFieldMeta = CommandBuildHelper.getClassFieldMeta(entityClass, fieldName);
+        CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(entityClass);
+        EntityClassFieldWrapper fieldWrapper = entityClassWrapper.getEntityField(fieldName);
 
         //count(*) as num  num是没有的
-        if (classFieldMeta == null) {
+        if (fieldWrapper == null) {
             return fieldName;
         }
 
-        Object columnAnnotation = classFieldMeta.getColumnAnnotation();
+        Object columnAnnotation = fieldWrapper.getColumnAnnotation();
         if (columnAnnotation != null) {
-            return CommandBuildHelper.getColumnAnnotationName(columnAnnotation);
+            return fieldWrapper.getFieldAnnotationColumn();
         }
         return NameUtils.getUnderlineName(fieldName);
     }
 
     @Override
     public String getField(Class<?> clazz, String columnName) {
-        ModelClassFieldDetails mappedFieldMeta = CommandBuildHelper.getMappedFieldMeta(clazz, columnName);
-        if (mappedFieldMeta != null) {
-            return mappedFieldMeta.getFieldName();
+        CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(clazz);
+        EntityClassFieldWrapper mappedFieldWrapper = entityClassWrapper.getMappedField(columnName);
+        if (mappedFieldWrapper != null) {
+            return mappedFieldWrapper.getFieldName();
         }
         return NameUtils.getCamelName(columnName);
     }

@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 
 /**
  *
@@ -39,13 +39,12 @@ public interface Insert extends CommandExecutor<Insert> {
     /**
      * 设置属性值
      *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return insert
+     * @param <T>    the type parameter
+     * @param getter the getter
+     * @param value  the value
+     * @return insert insert
      */
-    <E, R> Insert intoField(Function<E, R> function, Object value);
+    <T> Insert intoField(GetterFunction<T> getter, Object value);
 
     /**
      * 根据对象设置属性

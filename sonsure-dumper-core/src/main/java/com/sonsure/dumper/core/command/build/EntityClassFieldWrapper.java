@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.command;
+package com.sonsure.dumper.core.command.build;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,12 +17,16 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class ModelClassFieldDetails {
+public class EntityClassFieldWrapper {
 
     private String fieldName;
 
     private Object idAnnotation;
 
     private Object columnAnnotation;
+
+    public String getFieldAnnotationColumn() {
+        return CommandBuildHelper.getFieldAnnotationColumn(this.columnAnnotation);
+    }
 
 }

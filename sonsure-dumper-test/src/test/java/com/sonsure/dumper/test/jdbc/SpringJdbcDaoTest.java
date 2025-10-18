@@ -14,7 +14,7 @@ import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.entity.Select;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.Account;
 import com.sonsure.dumper.test.model.AnnotationUserInfo;
@@ -1136,7 +1136,7 @@ public class SpringJdbcDaoTest {
         UserInfo userInfo = new UserInfo();
         userInfo.setLoginName("name-6");
         userInfo.setPassword("123456-6");
-        Function<UserInfo, String> getLoginName = UserInfo::getLoginName;
+        GetterFunction<UserInfo> getLoginName = UserInfo::getLoginName;
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
                 .where(getLoginName, userInfo.getLoginName())
                 .where(UserInfo::getPassword, userInfo.getPassword())

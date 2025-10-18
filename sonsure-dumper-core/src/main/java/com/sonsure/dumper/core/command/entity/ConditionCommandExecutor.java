@@ -11,7 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.SqlOperator;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 
 /**
  * 条件构建接口
@@ -50,25 +50,23 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     /**
      * Where c.
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
+     * @param <T>    the type parameter
+     * @param getter the getter
+     * @param value  the value
      * @return the c
      */
-    <T, R> E where(Function<T, R> function, Object value);
+    <T> E where(GetterFunction<T> getter, Object value);
 
     /**
      * where 属性条件
      *
      * @param <T>         the type parameter
-     * @param <R>         the type parameter
-     * @param function    the function
+     * @param getter      the getter
      * @param sqlOperator the sql operator
      * @param value       the value
      * @return c c
      */
-    <T, R> E where(Function<T, R> function, SqlOperator sqlOperator, Object value);
+    <T> E where(GetterFunction<T> getter, SqlOperator sqlOperator, Object value);
 
     /**
      * condition
@@ -92,25 +90,23 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     /**
      * condition
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
+     * @param <T>    the type parameter
+     * @param getter the getter
+     * @param value  the value
      * @return the c
      */
-    <T, R> E condition(Function<T, R> function, Object value);
+    <T> E condition(GetterFunction<T> getter, Object value);
 
     /**
      * condition 属性条件
      *
      * @param <T>         the type parameter
-     * @param <R>         the type parameter
-     * @param function    the function
+     * @param getter      the getter
      * @param sqlOperator the sql operator
      * @param value       the value
      * @return c c
      */
-    <T, R> E condition(Function<T, R> function, SqlOperator sqlOperator, Object value);
+    <T> E condition(GetterFunction<T> getter, SqlOperator sqlOperator, Object value);
 
     /**
      * 实体属性条件
@@ -188,25 +184,23 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     /**
      * and
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
+     * @param <T>    the type parameter
+     * @param getter the getter
+     * @param value  the value
      * @return the c
      */
-    <T, R> E and(Function<T, R> function, Object value);
+    <T> E and(GetterFunction<T> getter, Object value);
 
     /**
      * and 属性条件
      *
      * @param <T>         the type parameter
-     * @param <R>         the type parameter
-     * @param function    the function
+     * @param getter      the getter
      * @param sqlOperator the sql operator
      * @param value       the value
      * @return c c
      */
-    <T, R> E and(Function<T, R> function, SqlOperator sqlOperator, Object value);
+    <T> E and(GetterFunction<T> getter, SqlOperator sqlOperator, Object value);
 
     /**
      * or
@@ -237,24 +231,22 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     /**
      * or
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
+     * @param <T>    the type parameter
+     * @param getter the getter
+     * @param value  the value
      * @return the c
      */
-    <T, R> E or(Function<T, R> function, Object value);
+    <T> E or(GetterFunction<T> getter, Object value);
 
     /**
      * or 属性条件
      *
      * @param <T>         the type parameter
-     * @param <R>         the type parameter
-     * @param function    the function
+     * @param getter      the getter
      * @param sqlOperator the sql operator
      * @param value       the value
      * @return c c
      */
-    <T, R> E or(Function<T, R> function, SqlOperator sqlOperator, Object value);
+    <T> E or(GetterFunction<T> getter, SqlOperator sqlOperator, Object value);
 
 }

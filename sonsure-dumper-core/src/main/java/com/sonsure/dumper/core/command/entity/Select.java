@@ -13,7 +13,7 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 
 import java.util.List;
 
@@ -60,12 +60,11 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * include.
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
+     * @param <T>    the type parameter
+     * @param getter the getter
      * @return the select
      */
-    <T, R> Select<M> addColumn(Function<T, R> function);
+    <T> Select<M> addColumn(GetterFunction<T> getter);
 
     /**
      * 黑名单
@@ -78,12 +77,11 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * Exclude select.
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
+     * @param <T>    the type parameter
+     * @param getter the getter
      * @return the select
      */
-    <T, R> Select<M> dropColumn(Function<T, R> function);
+    <T> Select<M> dropColumn(GetterFunction<T> getter);
 
     Select<M> join(String table);
 
@@ -129,14 +127,12 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      * On select.
      *
      * @param <T1>        the type parameter
-     * @param <R1>        the type parameter
      * @param <T2>        the type parameter
-     * @param <R2>        the type parameter
      * @param table1Field the table 1 field
      * @param table2Field the table 2 field
      * @return the select
      */
-    <T1, R1, T2, R2> Select<M> on(Function<T1, R1> table1Field, Function<T2, R2> table2Field);
+    <T1, T2> Select<M> on(GetterFunction<T1> table1Field, GetterFunction<T2> table2Field);
 
     /**
      * 添加 group by属性
@@ -149,12 +145,11 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * Group by select.
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
+     * @param <T>    the type parameter
+     * @param getter the getter
      * @return the select
      */
-    <T, R> Select<M> groupBy(Function<T, R> function);
+    <T> Select<M> groupBy(GetterFunction<T> getter);
 
     /**
      * Order by select.
@@ -168,13 +163,12 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
     /**
      * Order by select.
      *
-     * @param <T>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param orderBy  the order by
+     * @param <T>     the type parameter
+     * @param getter  the getter
+     * @param orderBy the order by
      * @return the select
      */
-    <T, R> Select<M> orderBy(Function<T, R> function, OrderBy orderBy);
+    <T> Select<M> orderBy(GetterFunction<T> getter, OrderBy orderBy);
 
     Select<M> having(String having);
 

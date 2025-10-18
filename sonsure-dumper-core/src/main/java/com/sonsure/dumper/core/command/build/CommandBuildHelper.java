@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.command;
+package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
@@ -20,10 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 /**
  * @author selfly
@@ -44,12 +42,7 @@ public class CommandBuildHelper {
      */
     public static final String PRI_FIELD_SUFFIX = "Id";
 
-    private static final Map<Class<?>, ModelClassDetails> CACHE = new WeakHashMap<>();
-
     private static boolean enableJavaxPersistence = false;
-
-    private CommandBuildHelper() {
-    }
 
     static {
         try {
@@ -67,14 +60,6 @@ public class CommandBuildHelper {
         }
     }
 
-    public static ModelClassDetails getClassDetails(Class<?> clazz) {
-        ModelClassDetails modelClassDetails = CACHE.get(clazz);
-        if (modelClassDetails == null) {
-            modelClassDetails = initCache(clazz);
-        }
-        return modelClassDetails;
-    }
-
     public static String getTableAnnotationName(Object annotation) {
         if (annotation instanceof Entity) {
             return ((Entity) annotation).value();
@@ -85,7 +70,7 @@ public class CommandBuildHelper {
         }
     }
 
-    public static String getColumnAnnotationName(Object annotation) {
+    public static String getFieldAnnotationColumn(Object annotation) {
         if (annotation instanceof Column) {
             return ((Column) annotation).value();
         } else if (enableJavaxPersistence && annotation instanceof javax.persistence.Column) {
@@ -93,38 +78,6 @@ public class CommandBuildHelper {
         } else {
             throw new SonsureJdbcException("不支持的注解:" + annotation);
         }
-    }
-
-    /**
-     * 获取class的属性
-     *
-     * @return class fields
-     */
-    public static Collection<ModelClassFieldDetails> getClassFieldMetas(Class<?> clazz) {
-        ModelClassDetails modelClassDetails = getClassDetails(clazz);
-        return modelClassDetails.getModelFields();
-    }
-
-    public static ModelClassFieldDetails getClassFieldMeta(Class<?> clazz, String fieldName) {
-        ModelClassDetails classMeta = getClassDetails(clazz);
-        return classMeta.getModelFieldDetails(fieldName);
-    }
-
-    public static ModelClassFieldDetails getMappedFieldMeta(Class<?> clazz, String columnName) {
-        ModelClassDetails classMeta = getClassDetails(clazz);
-        return classMeta.getMappedFieldDetails(columnName);
-    }
-
-    /**
-     * 初始化实体类缓存
-     *
-     * @param clazz the clazz
-     * @return the model class meta
-     */
-    public static ModelClassDetails initCache(Class<?> clazz) {
-        ModelClassDetails modelClassDetails = new ModelClassDetails(clazz);
-        CACHE.put(clazz, modelClassDetails);
-        return modelClassDetails;
     }
 
     public static Object getEntityAnnotation(Class<?> clazz) {

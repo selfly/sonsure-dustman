@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.command.simple;
 
 
-import com.sonsure.dumper.core.command.BeanParameter;
+import com.sonsure.dumper.core.command.build.BeanParameter;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
 
 import java.io.Serializable;

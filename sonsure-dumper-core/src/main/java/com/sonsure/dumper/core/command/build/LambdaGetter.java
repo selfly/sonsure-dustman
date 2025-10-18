@@ -1,4 +1,4 @@
-package com.sonsure.dumper.core.command.lambda;
+package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -12,13 +12,13 @@ import java.lang.invoke.SerializedLambda;
  */
 @Getter
 @Setter
-public class LambdaField {
+public class LambdaGetter {
     
     private String simpleClassName;
     private String methodName;
     private String fieldName;
 
-    public LambdaField(SerializedLambda serializedLambda) {
+    public LambdaGetter(SerializedLambda serializedLambda) {
         String[] info = serializedLambda.getInstantiatedMethodType().split(";");
         int index = info[0].lastIndexOf("/");
         this.simpleClassName = info[0].substring(index + 1);

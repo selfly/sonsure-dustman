@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.lambda.Function;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 
 /**
  * @author liyd
@@ -37,13 +37,12 @@ public interface Update extends ConditionCommandExecutor<Update> {
     /**
      * 设置属性值
      *
-     * @param <E>      the type parameter
-     * @param <R>      the type parameter
-     * @param function the function
-     * @param value    the value
-     * @return update
+     * @param <T>    the type parameter
+     * @param getter the getter
+     * @param value  the value
+     * @return update update
      */
-    <E, R> Update set(Function<E, R> function, Object value);
+    <T> Update set(GetterFunction<T> getter, Object value);
 
     /**
      * 根据实体类设置属性

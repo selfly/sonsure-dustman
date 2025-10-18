@@ -2,8 +2,6 @@ package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.command.ExecutionType;
-import com.sonsure.dumper.core.command.GenerateKey;
-import com.sonsure.dumper.core.command.ToggleCase;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
 import lombok.Setter;
