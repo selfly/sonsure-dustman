@@ -12,7 +12,6 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
-import com.sonsure.dumper.core.command.build.ExecutableCmdBuilderImpl;
 import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.command.lambda.LambdaHelper;
@@ -84,7 +83,7 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
         }
 
         @Override
-        public void customizeBuilder(ExecutableCmdBuilder executableCmdBuilder) {
+        public void customize(ExecutableCmdBuilder executableCmdBuilder) {
             if (this.cls == null) {
                 return;
             }
@@ -106,7 +105,7 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
                     //主键列
                     executableCmdBuilder.intoColumns(primaryKeyField.getFieldName());
                     if (primaryKeyParameter) {
-                        executableCmdBuilder.intoValues(ExecutableCmdBuilderImpl.PARAM_PLACEHOLDER);
+                        executableCmdBuilder.intoValues(ExecutableCmdBuilder.PARAM_PLACEHOLDER);
                         executableCmdBuilder.addParameter(primaryKeyField.getFieldName(), generateKeyValue);
                     } else {
                         //不传参方式，例如是oracle的序列名

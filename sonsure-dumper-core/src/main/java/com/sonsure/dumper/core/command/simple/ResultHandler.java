@@ -17,8 +17,8 @@ public interface ResultHandler<T> {
     /**
      * 处理结果
      *
-     * @param object
-     * @return
+     * @param object the object
+     * @return t
      */
     T handle(Object object);
 }

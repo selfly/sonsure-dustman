@@ -12,10 +12,8 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.CommandBuildHelper;
-import com.sonsure.dumper.core.command.ExecutionType;
-import com.sonsure.dumper.core.command.ModelClassDetails;
-import com.sonsure.dumper.core.command.OrderBy;
+import com.sonsure.dumper.common.validation.Verifier;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
 import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
@@ -52,10 +50,12 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public Select<M> addAllColumns() {
-//        String[] fields = this.getLatestModelClass().getModelFields().stream()
-//                .map(v -> CommandBuildHelper.getTableAliasFieldName(this.latestTableAlias, v.getFieldName())).toArray(String[]::new);
-//        return this.addSelectFields(fields);
-        return this;
+        Verifier.init().notNull(this.cls, "class对象不能为空").validate();
+        String tableAlias = this.getExecutableCmdBuilder().resolveTableAlias(this.cls.getSimpleName());
+        ModelClassWrapper modelClassWrapper = new ModelClassWrapper(this.cls);
+        String[] fields = modelClassWrapper.getModelFields().stream()
+                .map(v -> CommandBuildHelper.getTableAliasFieldName(tableAlias, v.getFieldName())).toArray(String[]::new);
+        return this.addColumn(fields);
     }
 
     @Override
@@ -81,6 +81,10 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public Select<M> dropColumn(String... fields) {
+        // 如果还没有添加列，则添加所有列
+        if (this.getExecutableCmdBuilder().isEmptySelectColumns()) {
+            this.addAllColumns();
+        }
         this.getExecutableCmdBuilder().dropSelectColumn(fields);
         return this;
     }
@@ -295,7 +299,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -304,7 +308,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
+        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -313,7 +317,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @Override
@@ -345,7 +349,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         }
 
         @Override
-        public void customizeBuilder(ExecutableCmdBuilder executableCmdBuilder) {
+        public void customize(ExecutableCmdBuilder executableCmdBuilder) {
             if (cls == null) {
                 return;
             }

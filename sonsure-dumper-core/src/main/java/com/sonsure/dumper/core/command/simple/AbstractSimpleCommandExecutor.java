@@ -12,6 +12,8 @@ package com.sonsure.dumper.core.command.simple;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
 
@@ -34,6 +36,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     public AbstractSimpleCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
+        this.getExecutableCmdBuilder().addCustomizer(new NativeInsertExecutableCustomizer());
     }
 
     @Override
@@ -175,7 +178,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @Override
@@ -224,5 +227,18 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
             return DefaultResultHandler.newInstance(cls);
         }
         return (ResultHandler<E>) this.resultHandler;
+    }
+
+
+    private static class NativeInsertExecutableCustomizer implements ExecutableCustomizer {
+
+        @Override
+        public void customize(ExecutableCmdBuilder executableCmdBuilder) {
+            if (ExecutionType.INSERT == executableCmdBuilder.getExecutionType()) {
+                GenerateKey generateKey = new GenerateKey();
+                generateKey.setPrimaryKeyParameter(false);
+                executableCmdBuilder.generateKey(generateKey);
+            }
+        }
     }
 }

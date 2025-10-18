@@ -115,10 +115,18 @@ public interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>>
     /**
      * 实体属性条件
      *
-     * @param obj the obj
+     * @param bean the bean
      * @return c c
      */
-    E whereForObject(Object obj);
+    E whereForBean(Object bean);
+
+    /**
+     * Where for bean primary key e.
+     *
+     * @param bean the bean
+     * @return the e
+     */
+    E whereForBeanPrimaryKey(Object bean);
 
     /**
      * Where append t.

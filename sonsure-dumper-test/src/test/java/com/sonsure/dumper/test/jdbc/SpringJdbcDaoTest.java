@@ -413,6 +413,24 @@ public class SpringJdbcDaoTest {
     }
 
     @Test
+    public void selectNotAddAllDropColumn() {
+
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .dropColumn("password")
+                .where("userAge", SqlOperator.LTE, 10)
+                .list();
+        Assertions.assertNotNull(list);
+        Assertions.assertEquals(10, list.size());
+        for (UserInfo user : list) {
+            Assertions.assertNotNull(user.getUserInfoId());
+            Assertions.assertNull(user.getPassword());
+            Assertions.assertNotNull(user.getLoginName());
+            Assertions.assertNotNull(user.getUserAge());
+            Assertions.assertNotNull(user.getGmtCreate());
+        }
+    }
+
+    @Test
     public void select4() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
@@ -498,7 +516,7 @@ public class SpringJdbcDaoTest {
         UserInfo user = new UserInfo();
         user.setUserInfoId(10L);
         user.setLoginName("liyd");
-        select.whereForObject(user);
+        select.whereForBean(user);
 
         List<UserInfo> users = select.list(UserInfo.class);
         Assertions.assertNotNull(users);
@@ -551,6 +569,7 @@ public class SpringJdbcDaoTest {
                 .paginate(1, 10)
                 .pageResult(UserInfo.class);
         Assertions.assertNotNull(userInfoPage.getList());
+        Assertions.assertEquals(10, userInfoPage.getList().size());
         for (UserInfo userInfo : userInfoPage.getList()) {
             Assertions.assertNotNull(userInfo.getLoginName());
             Assertions.assertNull(userInfo.getPassword());
@@ -637,7 +656,8 @@ public class SpringJdbcDaoTest {
         user.setUserInfoId(17L);
         jdbcDao.update(UserInfo.class)
                 .updateNull()
-                .setForBeanWherePk(user)
+                .setForBean(user)
+                .whereForBeanPrimaryKey(user)
                 .execute();
 
         UserInfo user1 = jdbcDao.get(UserInfo.class, 17L);
@@ -672,7 +692,8 @@ public class SpringJdbcDaoTest {
             user.setLoginName("newName22");
             user.setPassword("abc");
             jdbcDao.update(UserInfo.class)
-                    .setForBeanWherePk(user)
+                    .setForBean(user)
+                    .whereForBeanPrimaryKey(user)
                     .execute();
         } catch (Exception e) {
             Assertions.assertEquals("主键属性值不能为空:userInfoId", e.getMessage());

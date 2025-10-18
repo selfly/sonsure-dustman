@@ -15,7 +15,6 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
-import com.sonsure.dumper.core.command.build.ExecutableCmdBuilderImpl;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -43,7 +42,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
 
     public AbstractCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
-        this.executableCmdBuilder = new ExecutableCmdBuilderImpl();
+        this.executableCmdBuilder = new ExecutableCmdBuilder();
         this.executableCmdBuilder.jdbcEngineConfig(jdbcEngineConfig);
     }
 

@@ -72,7 +72,7 @@ public class JdbcEngineImpl implements JdbcEngine {
     public <T> List<T> find(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
         //noinspection unchecked
-        return (List<T>) this.selectFrom(entity.getClass()).whereForObject(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
+        return (List<T>) this.selectFrom(entity.getClass()).whereForBean(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
     }
 
     @SuppressWarnings("unchecked")
@@ -80,12 +80,12 @@ public class JdbcEngineImpl implements JdbcEngine {
     public <T extends Pageable> Page<T> pageResult(T entity) {
         String pkField = this.getJdbcEngineConfig().getMappingHandler().getPkField(entity.getClass());
         //noinspection unchecked
-        return (Page<T>) this.selectFrom(entity.getClass()).whereForObject(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).pageResult(entity.getClass());
+        return (Page<T>) this.selectFrom(entity.getClass()).whereForBean(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).pageResult(entity.getClass());
     }
 
     @Override
     public long findCount(Object entity) {
-        return this.selectFrom(entity.getClass()).whereForObject(entity).count();
+        return this.selectFrom(entity.getClass()).whereForBean(entity).count();
     }
 
     @Override
@@ -96,13 +96,13 @@ public class JdbcEngineImpl implements JdbcEngine {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(T entity) {
-        return (T) this.selectFrom(entity.getClass()).whereForObject(entity).singleResult(entity.getClass());
+        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).singleResult(entity.getClass());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T firstResult(T entity) {
-        return (T) this.selectFrom(entity.getClass()).whereForObject(entity).firstResult(entity.getClass());
+        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).firstResult(entity.getClass());
     }
 
     @Override
@@ -138,7 +138,10 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public int executeUpdate(Object entity) {
-        return this.update(entity.getClass()).setForBeanWherePk(entity).execute();
+        return this.update(entity.getClass())
+                .setForBean(entity)
+                .whereForBeanPrimaryKey(entity)
+                .execute();
     }
 
     @Override
@@ -163,7 +166,7 @@ public class JdbcEngineImpl implements JdbcEngine {
 
     @Override
     public int executeDelete(Object entity) {
-        return this.delete().from(entity.getClass()).whereForObject(entity).execute();
+        return this.delete().from(entity.getClass()).whereForBean(entity).execute();
     }
 
     @Override

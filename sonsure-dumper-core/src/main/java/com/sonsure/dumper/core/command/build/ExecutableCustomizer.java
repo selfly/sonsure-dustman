@@ -5,10 +5,10 @@ package com.sonsure.dumper.core.command.build;
  */
 public interface ExecutableCustomizer {
 
-    default void customizeBuilder(ExecutableCmdBuilder executableCmdBuilder) {
-    }
-
-    default ExecutableCmd customizeCmd(ExecutableCmd executableCmd) {
-        return executableCmd;
-    }
+    /**
+     * Customize.
+     *
+     * @param executableCmdBuilder the executable cmd builder
+     */
+    void customize(ExecutableCmdBuilder executableCmdBuilder);
 }

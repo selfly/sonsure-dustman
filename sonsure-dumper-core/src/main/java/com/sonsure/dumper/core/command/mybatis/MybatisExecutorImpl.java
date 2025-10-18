@@ -10,8 +10,21 @@
 package com.sonsure.dumper.core.command.mybatis;
 
 
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandExecutor;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.ParameterMode;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.TypeHandlerRegistry;
+
+import java.util.List;
 
 /**
  * @author liyd
@@ -21,6 +34,49 @@ public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisEx
 
     public MybatisExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
         super(jdbcEngineConfig);
-        this.getExecutableCmdBuilder().namedParameter();
+        this.getExecutableCmdBuilder()
+                .addCustomizer(new MybatisExecutableCustomizer())
+                .namedParameter();
+    }
+
+    private static class MybatisExecutableCustomizer implements ExecutableCustomizer {
+
+        @Override
+        public void customize(ExecutableCmdBuilder executableCmdBuilder) {
+
+            SqlSessionFactory sqlSessionFactory = executableCmdBuilder.getJdbcEngineConfig().getMybatisSqlSessionFactory();
+            if (sqlSessionFactory == null) {
+                throw new SonsureJdbcException("使用Mybatis请先设置MybatisSqlSessionFactory");
+            }
+            MappedStatement statement = sqlSessionFactory.getConfiguration().getMappedStatement(executableCmdBuilder.getCommand());
+            Configuration configuration = sqlSessionFactory.getConfiguration();
+            TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+            Object params = executableCmdBuilder.getParameterMap();
+            BoundSql boundSql = statement.getBoundSql(params);
+            Object parameterObject = boundSql.getParameterObject();
+            List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+            if (parameterMappings != null) {
+                executableCmdBuilder.getSqlParameters().clear();
+                for (ParameterMapping parameterMapping : parameterMappings) {
+                    if (parameterMapping.getMode() != ParameterMode.OUT) {
+                        Object value;
+                        String propertyName = parameterMapping.getProperty();
+                        if (boundSql.hasAdditionalParameter(propertyName)) {
+                            value = boundSql.getAdditionalParameter(propertyName);
+                        } else if (parameterObject == null) {
+                            value = null;
+                        } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+                            value = parameterObject;
+                        } else {
+                            MetaObject metaObject = configuration.newMetaObject(parameterObject);
+                            value = metaObject.getValue(propertyName);
+                        }
+                        executableCmdBuilder.addParameter(propertyName, value);
+                    }
+                }
+            }
+            executableCmdBuilder.command(boundSql.getSql());
+            executableCmdBuilder.namedParameter(false);
+        }
     }
 }

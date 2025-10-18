@@ -180,7 +180,6 @@ public class CommandBuildHelper {
 
     @SuppressWarnings("unchecked")
     public static Map<String, Object> obj2PropMap(Object obj, boolean ignoreNull) {
-        //noinspection unchecked
         Map<String, Object> propMap = obj instanceof Map ? (Map<String, Object>) obj : ClassUtils.getSelfBeanPropMap(obj, Transient.class);
         Map<String, Object> resultMap = new LinkedHashMap<>(propMap.size());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {

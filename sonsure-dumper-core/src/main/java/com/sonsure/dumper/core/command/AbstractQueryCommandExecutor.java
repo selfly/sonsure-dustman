@@ -124,7 +124,7 @@ public abstract class AbstractQueryCommandExecutor<E extends AbstractQueryComman
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -133,7 +133,7 @@ public abstract class AbstractQueryCommandExecutor<E extends AbstractQueryComman
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, executableCmd1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
+        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -142,7 +142,7 @@ public abstract class AbstractQueryCommandExecutor<E extends AbstractQueryComman
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, executableCmd1 -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd1));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
 }

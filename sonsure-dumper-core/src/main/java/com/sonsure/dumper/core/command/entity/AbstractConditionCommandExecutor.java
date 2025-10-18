@@ -9,9 +9,8 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.AbstractCommandExecutor;
-import com.sonsure.dumper.core.command.CommandBuildHelper;
-import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.common.utils.ClassUtils;
+import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.lambda.Function;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 
@@ -83,14 +82,23 @@ public abstract class AbstractConditionCommandExecutor<T extends ConditionComman
     }
 
     @Override
-    public T whereForObject(Object obj) {
-        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(obj, !getExecutableCmdBuilder().isUpdateNull());
-        String tableAlias = getExecutableCmdBuilder().resolveTableAlias(obj.getClass().getSimpleName());
+    public T whereForBean(Object bean) {
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, !getExecutableCmdBuilder().isUpdateNull());
+        String tableAlias = getExecutableCmdBuilder().resolveTableAlias(bean.getClass().getSimpleName());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, entry.getKey());
             this.where(field, entry.getValue());
         }
         return this.getSelf();
+    }
+
+    @Override
+    public T whereForBeanPrimaryKey(Object bean) {
+        ModelClassWrapper uniqueModelClass = new ModelClassWrapper(bean.getClass());
+        ModelClassFieldDetails pkField = uniqueModelClass.getPrimaryKeyField();
+        String fieldName = pkField.getFieldName();
+        Object value = ClassUtils.getFieldValue(bean, fieldName);
+        return this.where(fieldName, value);
     }
 
     @Override
