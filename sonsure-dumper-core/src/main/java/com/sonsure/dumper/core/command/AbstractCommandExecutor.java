@@ -13,8 +13,7 @@ package com.sonsure.dumper.core.command;
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pagination;
-import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
@@ -114,6 +113,12 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         }
         newPage.setList(resultList);
         return newPage;
+    }
+
+    protected <T> String lambda2Field(GetterFunction<T> getter) {
+        LambdaGetter lambdaGetter = LambdaHelper.getLambdaGetter(getter);
+        String tableAlias = this.getExecutableCmdBuilder().resolveTableAlias(lambdaGetter.getSimpleClassName());
+        return CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaGetter.getFieldName());
     }
 
     @SuppressWarnings("unchecked")

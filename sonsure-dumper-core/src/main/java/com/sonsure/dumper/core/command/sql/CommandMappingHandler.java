@@ -152,6 +152,11 @@ public class CommandMappingHandler {
             }
         }
 
+        Expression having = plainSelect.getHaving();
+        if (having != null) {
+            this.extractExpression(having, mappings);
+        }
+
         List<SelectItem> selectItems = plainSelect.getSelectItems();
         for (SelectItem selectItem : selectItems) {
 

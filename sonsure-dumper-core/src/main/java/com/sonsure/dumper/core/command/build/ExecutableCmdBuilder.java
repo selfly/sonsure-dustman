@@ -46,19 +46,16 @@ public class ExecutableCmdBuilder {
     protected GenerateKey generateKey;
     protected List<ExecutableCustomizer> customizers;
 
-
     public ExecutableCmdBuilder() {
         simpleSQL = new SimpleSQL();
         sqlParameters = new ArrayList<>(32);
         tableAliasMapping = new HashMap<>(8);
     }
 
-
     public ExecutableCmdBuilder jdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
         this.jdbcEngineConfig = jdbcEngineConfig;
         return this;
     }
-
 
     public ExecutableCmdBuilder addCustomizer(ExecutableCustomizer customizer) {
         if (this.customizers == null) {
@@ -68,24 +65,20 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
     public ExecutableCmdBuilder command(String command) {
         this.command = command;
         return this;
     }
-
 
     public ExecutableCmdBuilder executionType(ExecutionType executionType) {
         this.executionType = executionType;
         return this;
     }
 
-
     public ExecutableCmdBuilder resultType(Class<?> resultType) {
         this.resultType = resultType;
         return this;
     }
-
 
     public ExecutableCmdBuilder insertInto(String table) {
         simpleSQL.insertInto(table);
@@ -94,12 +87,10 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
     public ExecutableCmdBuilder intoColumns(String... columns) {
         simpleSQL.intoColumns(columns);
         return this;
     }
-
 
     public ExecutableCmdBuilder intoValues(Object... values) {
         simpleSQL.intoValues(PARAM_PLACEHOLDER);
@@ -107,34 +98,20 @@ public class ExecutableCmdBuilder {
         return null;
     }
 
-
     public ExecutableCmdBuilder select(String... columns) {
         simpleSQL.select(columns);
         return this;
     }
-
-
-    public <T> ExecutableCmdBuilder select(GetterFunction<T> getter) {
-        return this.select(lambda2Field(getter));
-    }
-
 
     public ExecutableCmdBuilder dropSelectColumn(String... columns) {
         simpleSQL.dropSelectColumns(columns);
         return this;
     }
 
-
-    public <T> ExecutableCmdBuilder dropSelectColumn(GetterFunction<T> getter) {
-        return this.dropSelectColumn(lambda2Field(getter));
-    }
-
-
     public ExecutableCmdBuilder selectDistinct(String... columns) {
         simpleSQL.selectDistinct(columns);
         return this;
     }
-
 
     public ExecutableCmdBuilder from(String table) {
         simpleSQL.from(table);
@@ -143,14 +120,12 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
     public ExecutableCmdBuilder join(String table) {
         simpleSQL.join(table);
         this.latestTable = table;
         latestStatement = SqlStatementType.JOIN;
         return this;
     }
-
 
     public ExecutableCmdBuilder innerJoin(String table) {
         simpleSQL.innerJoin(table);
@@ -159,14 +134,12 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
     public ExecutableCmdBuilder outerJoin(String table) {
         simpleSQL.outerJoin(table);
         this.latestTable = table;
         latestStatement = SqlStatementType.OUTER_JOIN;
         return this;
     }
-
 
     public ExecutableCmdBuilder leftOuterJoin(String table) {
         simpleSQL.leftOuterJoin(table);
@@ -175,7 +148,6 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
     public ExecutableCmdBuilder rightOuterJoin(String table) {
         simpleSQL.rightOuterJoin(table);
         this.latestTable = table;
@@ -183,20 +155,10 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
-    public <T1, T2> ExecutableCmdBuilder joinStepOn(GetterFunction<T1> table1Field, GetterFunction<T2> table2Field) {
-        String field1 = lambda2Field(table1Field);
-        String field2 = lambda2Field(table2Field);
-        this.simpleSQL.joinStepOn(String.format("%s %s %s", field1, SqlOperator.EQ.getCode(), field2), this.latestStatement);
-        return this;
-    }
-
-
     public ExecutableCmdBuilder joinStepOn(String on) {
         simpleSQL.joinStepOn(on, this.latestStatement);
         return this;
     }
-
 
     public ExecutableCmdBuilder update(String table) {
         simpleSQL.update(table);
@@ -204,7 +166,6 @@ public class ExecutableCmdBuilder {
         latestStatement = SqlStatementType.TABLE;
         return this;
     }
-
 
     public ExecutableCmdBuilder set(String field, Object value) {
         NativeContentWrapper nativeContentWrapper = new NativeContentWrapper(field);
@@ -217,19 +178,12 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
-    public <T> ExecutableCmdBuilder set(GetterFunction<T> getter, Object value) {
-        return this.set(lambda2Field(getter), value);
-    }
-
-
     public ExecutableCmdBuilder deleteFrom(String table) {
         simpleSQL.deleteFrom(table);
         this.latestTable = table;
         latestStatement = SqlStatementType.TABLE;
         return this;
     }
-
 
     public ExecutableCmdBuilder as(String alias) {
         this.simpleSQL.as(alias, this.latestStatement);
@@ -238,29 +192,24 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-
     public ExecutableCmdBuilder namedParameter() {
         return this.namedParameter(true);
     }
-
 
     public ExecutableCmdBuilder namedParameter(boolean namedParameter) {
         this.namedParameter = namedParameter;
         return this;
     }
 
-
     public ExecutableCmdBuilder addParameter(String name, Object value) {
         this.sqlParameters.add(new SqlParameter(name, value));
         return this;
     }
 
-
     public ExecutableCmdBuilder addParameters(List<SqlParameter> parameters) {
         this.sqlParameters.addAll(parameters);
         return this;
     }
-
 
     public ExecutableCmdBuilder addParameters(Map<String, ?> parameters) {
         for (Map.Entry<String, ?> entry : parameters.entrySet()) {
@@ -268,7 +217,6 @@ public class ExecutableCmdBuilder {
         }
         return this;
     }
-
 
     public ExecutableCmdBuilder addParameters(Object... values) {
         if (this.namedParameter) {
@@ -292,16 +240,8 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <T> ExecutableCmdBuilder where(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        return this.where(lambda2Field(getter), sqlOperator, value);
-    }
-
     public ExecutableCmdBuilder condition(String column, SqlOperator sqlOperator, Object value) {
         return this.where(column, sqlOperator, value);
-    }
-
-    public <T> ExecutableCmdBuilder condition(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        return this.where(getter, sqlOperator, value);
     }
 
     public ExecutableCmdBuilder or() {
@@ -316,10 +256,6 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <T> ExecutableCmdBuilder or(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        return this.or(lambda2Field(getter), sqlOperator, value);
-    }
-
     public ExecutableCmdBuilder and() {
         this.simpleSQL.and();
         return this;
@@ -330,10 +266,6 @@ public class ExecutableCmdBuilder {
         this.simpleSQL.and(pair.getLeft());
         this.addParameters(pair.getRight());
         return this;
-    }
-
-    public <T> ExecutableCmdBuilder and(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        return this.and(lambda2Field(getter), sqlOperator, value);
     }
 
     public ExecutableCmdBuilder appendSegment(String segment) {
@@ -362,21 +294,16 @@ public class ExecutableCmdBuilder {
         return this;
     }
 
-    public <T> ExecutableCmdBuilder orderBy(GetterFunction<T> getter, OrderBy orderBy) {
-        return this.orderBy(lambda2Field(getter), orderBy);
-    }
-
     public ExecutableCmdBuilder groupBy(String... columns) {
         this.simpleSQL.groupBy(columns);
         return this;
     }
 
-    public <T> ExecutableCmdBuilder groupBy(GetterFunction<T> getter) {
-        return this.groupBy(lambda2Field(getter));
-    }
-
-    public ExecutableCmdBuilder having(String... conditions) {
-        return null;
+    public ExecutableCmdBuilder having(String column, SqlOperator sqlOperator, Object value) {
+        MultiTuple<String, List<SqlParameter>> pair = this.buildColumnStatement(column, sqlOperator, value);
+        this.simpleSQL.having(pair.getLeft());
+        this.addParameters(pair.getRight());
+        return this;
     }
 
     public ExecutableCmdBuilder forceNative() {
@@ -445,12 +372,6 @@ public class ExecutableCmdBuilder {
                 this.addParameter(UUIDUtils.getUUID8(), params);
             }
         }
-    }
-
-    protected <T> String lambda2Field(GetterFunction<T> getter) {
-        LambdaGetter lambdaGetter = LambdaHelper.getLambdaGetter(getter);
-        String tableAlias = this.tableAliasMapping.get(lambdaGetter.getSimpleClassName());
-        return CommandBuildHelper.getTableAliasFieldName(tableAlias, lambdaGetter.getFieldName());
     }
 
     protected MultiTuple<String, List<SqlParameter>> buildColumnStatement(String column, SqlOperator sqlOperator, Object value) {

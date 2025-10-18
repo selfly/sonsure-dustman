@@ -53,18 +53,22 @@ public class SpringJdbcDaoTest {
             user.setLoginName("name-" + i);
             user.setPassword("123456-" + i);
             user.setUserAge(i);
+            user.setStatus("" + i);
+            user.setUserType(String.valueOf(i % 5));
             user.setGmtCreate(new Date());
 
             users.add(user);
         }
 
-        String sql = "insert into UserInfo(userInfoId,loginName,password,userAge,gmtCreate) values(?,?,?,?,?)";
+        String sql = "insert into UserInfo(userInfoId,loginName,password,userAge,status,userType,gmtCreate) values(?,?,?,?,?,?,?)";
         Object count = jdbcDao.executeBatchUpdate(sql, users, users.size(), (ps, paramNames, argument) -> {
             ps.setLong(1, argument.getUserInfoId());
             ps.setString(2, argument.getLoginName());
             ps.setString(3, argument.getPassword());
             ps.setInt(4, argument.getUserAge());
-            ps.setObject(5, argument.getGmtCreate());
+            ps.setString(5, argument.getStatus());
+            ps.setString(6, argument.getUserType());
+            ps.setObject(7, argument.getGmtCreate());
         });
         Assertions.assertNotNull(count);
     }
@@ -1425,4 +1429,33 @@ public class SpringJdbcDaoTest {
         Assertions.assertEquals(40, users.get(0).getUserAge());
     }
 
+    @Test
+    public void testHavingStr() {
+        String userType = "3";
+        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn(UserInfo::getUserType)
+                .addColumn("count(*) as num")
+                .groupBy(UserInfo::getUserType)
+                .having("num", SqlOperator.GTE, 5)
+                .and(UserInfo::getUserType, SqlOperator.EQ, userType)
+                .listMaps();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(10L, (Long) list.get(0).get("num"));
+        Assertions.assertEquals(userType, list.get(0).get("user_type"));
+    }
+
+    @Test
+    public void testHavingLambda() {
+        String userType = "3";
+        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn(UserInfo::getUserType)
+                .addColumn("count(*) as num")
+                .groupBy(UserInfo::getUserType)
+                .having(UserInfo::getUserType, SqlOperator.EQ, userType)
+                .and("num", SqlOperator.GTE, 5)
+                .listMaps();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(10L, (Long) list.get(0).get("num"));
+        Assertions.assertEquals(userType, list.get(0).get("user_type"));
+    }
 }

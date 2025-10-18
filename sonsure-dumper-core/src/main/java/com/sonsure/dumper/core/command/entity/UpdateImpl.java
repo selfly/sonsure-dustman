@@ -45,8 +45,7 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
 
     @Override
     public <T> Update set(GetterFunction<T> getter, Object value) {
-        this.getExecutableCmdBuilder().set(getter, value);
-        return this;
+        return this.set(lambda2Field(getter), value);
     }
 
     @Override

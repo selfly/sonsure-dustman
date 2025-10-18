@@ -72,8 +72,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public final <T> Select<M> addColumn(GetterFunction<T> getter) {
-        this.getExecutableCmdBuilder().select(getter);
-        return this;
+        return this.addColumn(lambda2Field(getter));
     }
 
     @Override
@@ -88,8 +87,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public <T> Select<M> dropColumn(GetterFunction<T> getter) {
-        this.getExecutableCmdBuilder().dropSelectColumn(getter);
-        return this;
+        return this.dropColumn(lambda2Field(getter));
     }
 
     @Override
@@ -158,11 +156,6 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public Select<M> having(String having) {
-        return null;
-    }
-
-    @Override
     public Select<M> on(String on) {
         this.getExecutableCmdBuilder().joinStepOn(on);
         return this;
@@ -170,7 +163,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public <T1, T2> Select<M> on(GetterFunction<T1> table1Field, GetterFunction<T2> table2Field) {
-        this.getExecutableCmdBuilder().joinStepOn(table1Field, table2Field);
+        String field1 = lambda2Field(table1Field);
+        String field2 = lambda2Field(table2Field);
+        this.on(String.format("%s %s %s", field1, SqlOperator.EQ.getCode(), field2));
         return this;
     }
 
@@ -182,8 +177,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public <T> Select<M> groupBy(GetterFunction<T> getter) {
-        this.getExecutableCmdBuilder().groupBy(getter);
-        return this;
+        return this.groupBy(lambda2Field(getter));
     }
 
     @Override
@@ -194,8 +188,18 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @Override
     public <T> Select<M> orderBy(GetterFunction<T> getter, OrderBy orderBy) {
-        this.getExecutableCmdBuilder().orderBy(getter, orderBy);
+        return this.orderBy(lambda2Field(getter), orderBy);
+    }
+
+    @Override
+    public Select<M> having(String having, SqlOperator sqlOperator, Object value) {
+        this.getExecutableCmdBuilder().having(having, sqlOperator, value);
         return this;
+    }
+
+    @Override
+    public <T> Select<M> having(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
+        return this.having(lambda2Field(getter), sqlOperator, value);
     }
 
     @Override

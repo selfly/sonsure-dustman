@@ -13,6 +13,7 @@ package com.sonsure.dumper.core.command.entity;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.OrderBy;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
+import com.sonsure.dumper.core.command.SqlOperator;
 import com.sonsure.dumper.core.command.build.GetterFunction;
 
 import java.util.List;
@@ -170,7 +171,9 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      */
     <T> Select<M> orderBy(GetterFunction<T> getter, OrderBy orderBy);
 
-    Select<M> having(String having);
+    Select<M> having(String having, SqlOperator sqlOperator, Object value);
+
+    <T> Select<M> having(GetterFunction<T> getter, SqlOperator sqlOperator, Object value);
 
     /**
      * Single result m.

@@ -46,8 +46,7 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public <T> E where(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        this.getExecutableCmdBuilder().where(getter, sqlOperator, value);
-        return this.getSelf();
+        return this.where(lambda2Field(getter), sqlOperator, value);
     }
 
     @Override
@@ -68,8 +67,7 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public <T> E condition(GetterFunction<T> getter, Object value) {
-        this.getExecutableCmdBuilder().condition(getter, SqlOperator.EQ, value);
-        return this.getSelf();
+        return this.condition(lambda2Field(getter), SqlOperator.EQ, value);
     }
 
     @Override
@@ -80,8 +78,7 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public <T> E condition(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        this.getExecutableCmdBuilder().condition(getter, sqlOperator, value);
-        return this.getSelf();
+        return this.condition(lambda2Field(getter), sqlOperator, value);
     }
 
     @Override
@@ -153,8 +150,7 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public <T> E and(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        this.getExecutableCmdBuilder().and(getter, sqlOperator, value);
-        return this.getSelf();
+        return this.and(lambda2Field(getter), sqlOperator, value);
     }
 
     @Override
@@ -181,7 +177,6 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public <T> E or(GetterFunction<T> getter, SqlOperator sqlOperator, Object value) {
-        this.getExecutableCmdBuilder().or(getter, sqlOperator, value);
-        return this.getSelf();
+        return this.or(lambda2Field(getter), sqlOperator, value);
     }
 }
