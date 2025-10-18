@@ -145,7 +145,7 @@ public final class XmlParser {
     public static Document readXml(Resource resource, Map<String, String> properties) {
 
         try {
-            SAXReader saxReader = new SAXReader();
+            SAXReader saxReader = SAXReader.createDefault();
             Document document = saxReader.read(new InputSource(resource.getInputStream()));
             if (properties == null || properties.isEmpty()) {
                 return document;

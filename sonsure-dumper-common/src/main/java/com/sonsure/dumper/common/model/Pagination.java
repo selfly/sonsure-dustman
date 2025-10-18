@@ -352,21 +352,6 @@ public class Pagination implements Serializable, Cloneable {
     }
 
     /**
-     * 创建复本。
-     *
-     * @return 复本
-     */
-    @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            //ignore
-            return null;
-        }
-    }
-
-    /**
      * 转换成字符串表示。
      *
      * @return 字符串表示。

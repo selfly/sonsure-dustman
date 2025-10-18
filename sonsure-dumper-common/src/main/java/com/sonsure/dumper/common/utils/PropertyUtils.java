@@ -14,6 +14,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -182,10 +183,10 @@ public final class PropertyUtils {
      * @return properties resource map
      */
     private static Map<String, String> getPropertiesResourceMap(URL url) {
-        try {
+        try (InputStream is = url.openStream()) {
             Map<String, String> propMap = new HashMap<>();
             Properties prop = new Properties();
-            prop.load(url.openStream());
+            prop.load(is);
 
             for (Map.Entry<Object, Object> entry : prop.entrySet()) {
                 propMap.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
