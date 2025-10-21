@@ -9,7 +9,8 @@
 
 package com.sonsure.dumper.core.mapping;
 
-import com.sonsure.dumper.common.utils.ClassUtils;
+import com.sonsure.dumper.common.utility.GenericResourcePatternResolver;
+import com.sonsure.dumper.common.utility.GenericResourcePatternResolverImpl;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
@@ -41,6 +42,8 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
      * 主键属性后缀
      */
     protected static final String PRI_FIELD_SUFFIX = CommandBuildHelper.PRI_FIELD_SUFFIX;
+
+    private static final GenericResourcePatternResolver genericResourcePatternResolver = new GenericResourcePatternResolverImpl();
 
     /**
      * class不存在时是否失败 (抛出异常)
@@ -238,7 +241,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
         }
         String[] pks = StrUtils.split(modelPackages, ",");
         for (String pk : pks) {
-            List<Class<?>> classes = ClassUtils.scanClasses(pk);
+            List<Class<?>> classes = genericResourcePatternResolver.getResourcesClasses(pk);
             for (Class<?> clazz : classes) {
                 String simpleName = clazz.getSimpleName();
                 if (classMapping.containsKey(simpleName)) {

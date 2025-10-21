@@ -1,4 +1,4 @@
-package com.sonsure.dumper.common.spring;
+package com.sonsure.dumper.common.utility;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +8,7 @@ import java.io.InputStream;
  * 
  * @author selfly
  */
-public interface Resource {
+public interface GenericResource {
     
     /**
      * 获取资源的输入流

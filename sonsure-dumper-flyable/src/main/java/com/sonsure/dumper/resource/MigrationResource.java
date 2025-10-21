@@ -1,7 +1,7 @@
 package com.sonsure.dumper.resource;
 
 import com.sonsure.dumper.common.parse.GenericTokenParser;
-import com.sonsure.dumper.common.spring.Resource;
+import com.sonsure.dumper.common.utility.GenericResource;
 import com.sonsure.dumper.common.utils.EncryptUtils;
 import com.sonsure.dumper.common.utils.FileIOUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
@@ -23,7 +23,7 @@ public class MigrationResource {
     private static final String GROUP_DELIMITER = "_";
     private static final String SUFFIX_DELIMITER = ".";
 
-    private final Resource resource;
+    private final GenericResource genericResource;
 
     private final String prefix;
 
@@ -39,10 +39,10 @@ public class MigrationResource {
 
     private final Map<String, String> variables;
 
-    public MigrationResource(Resource resource) {
-        this.resource = resource;
+    public MigrationResource(GenericResource genericResource) {
+        this.genericResource = genericResource;
         this.variables = new HashMap<>(8);
-        String filename = resource.getFilename();
+        String filename = genericResource.getFilename();
         this.prefix = filename.substring(0, 1);
         int versionIndex = filename.indexOf(VERSION_DELIMITER);
         this.version = filename.substring(1, versionIndex);
@@ -53,11 +53,11 @@ public class MigrationResource {
         int suffixIndex = filename.lastIndexOf(SUFFIX_DELIMITER);
         this.description = filename.substring(groupIndex + GROUP_DELIMITER.length(), suffixIndex);
 
-        this.init(resource);
+        this.init(genericResource);
     }
 
     @SneakyThrows
-    private void init(Resource rs) {
+    private void init(GenericResource rs) {
         try (InputStream is = rs.getInputStream()) {
             this.resourceBytes = FileIOUtils.toByteArray(is);
             String minify = StrUtils.minify(new String(this.resourceBytes));
@@ -79,6 +79,6 @@ public class MigrationResource {
     }
 
     public String getFilename() {
-        return resource.getFilename();
+        return genericResource.getFilename();
     }
 }

@@ -12,7 +12,6 @@ package com.sonsure.dumper.common.utils;
 import com.sonsure.dumper.common.bean.BeanFieldCache;
 import com.sonsure.dumper.common.bean.IntrospectionCache;
 import com.sonsure.dumper.common.exception.SonsureBeanException;
-import com.sonsure.dumper.common.exception.SonsureCommonsException;
 import com.sonsure.dumper.common.exception.SonsureException;
 import com.sonsure.dumper.common.model.BaseProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -27,19 +26,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.chrono.Chronology;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.stream.Stream;
 
 /**
  * 类辅助
@@ -519,192 +511,6 @@ public class ClassUtils {
         for (Class<?> anIf : ifs) {
             getInterfaces(anIf, interfaces);
             interfaces.add(anIf);
-        }
-    }
-
-    /**
-     * 扫描指定包下的所有类（包括子包）
-     * <p>
-     * 功能特性：
-     * <ul>
-     * <li>支持从文件系统扫描类</li>
-     * <li>支持从jar包扫描类</li>
-     * <li>自动过滤内部类和匿名类（包含$符号的类）</li>
-     * <li>使用懒加载模式（Class.forName第二个参数为false），不会初始化类</li>
-     * <li>自动去重，返回LinkedHashSet保证顺序</li>
-     * </ul>
-     * <p>
-     * 使用示例：
-     *
-     * <pre>{@code
-     * // 扫描指定包及其子包下的所有类
-     * List<Class<?>> classes = ClassUtils.scanClasses("com.example.service");
-     *
-     * // 只扫描当前包，不扫描子包
-     * List<Class<?>> classes = ClassUtils.scanClasses("com.example.service", false);
-     *
-     * // 过滤特定类型的类
-     * List<Class<?>> serviceClasses = ClassUtils.scanClasses("com.example.service")
-     *         .stream()
-     *         .filter(cls -> cls.isAnnotationPresent(Service.class))
-     *         .collect(Collectors.toList());
-     * }</pre>
-     *
-     * @param packageName 包名，如: com.example.service
-     * @return 扫描到的类列表，不会返回null
-     * @throws IllegalArgumentException 如果包名为空
-     */
-    public static List<Class<?>> scanClasses(String packageName) {
-        return scanClasses(packageName, true);
-    }
-
-    /**
-     * 扫描指定包下的类
-     *
-     * @param packageName 包名，如: com.example.service
-     * @param recursive   是否递归扫描子包，true-扫描子包，false-只扫描当前包
-     * @return 扫描到的类列表 ，不会返回null
-     * @throws IllegalArgumentException 如果包名为空
-     */
-    public static List<Class<?>> scanClasses(String packageName, boolean recursive) {
-        if (packageName == null || packageName.trim().isEmpty()) {
-            throw new IllegalArgumentException("包名不能为空");
-        }
-        ClassLoader classLoader = getDefaultClassLoader();
-        Set<Class<?>> classes = new LinkedHashSet<>();
-        try {
-            String path = packageName.replace('.', '/');
-            Enumeration<URL> resources = classLoader.getResources(path);
-            while (resources.hasMoreElements()) {
-                URL resource = resources.nextElement();
-                String protocol = resource.getProtocol();
-                try {
-                    if ("file".equals(protocol)) {
-                        // 处理文件系统中的类
-                        scanClassesFromFileSystem(resource, packageName, recursive, classes);
-                    } else if ("jar".equals(protocol)) {
-                        // 处理jar包中的类
-                        scanClassesFromJar(resource, packageName, recursive, classes);
-                    } else {
-                        log.debug("不支持的协议类型: {}, 资源: {}", protocol, resource);
-                    }
-                } catch (Exception e) {
-                    log.warn("扫描资源失败: {}, 错误: {}", resource, e.getMessage());
-                }
-            }
-        } catch (IOException e) {
-            log.error("扫描失败:{}", packageName, e);
-            throw new SonsureCommonsException("扫描失败", e);
-        }
-        return new ArrayList<>(classes);
-    }
-
-    /**
-     * 从文件系统扫描类
-     */
-    private static void scanClassesFromFileSystem(URL resource, String packageName,
-                                                  boolean recursive, Set<Class<?>> classes) {
-        try {
-            String filePath = URLDecoder.decode(resource.getFile(), StandardCharsets.UTF_8.name());
-            Path directory = Paths.get(filePath);
-
-            if (!Files.exists(directory) || !Files.isDirectory(directory)) {
-                return;
-            }
-
-            int maxDepth = recursive ? Integer.MAX_VALUE : 1;
-
-            try (Stream<Path> paths = Files.walk(directory, maxDepth)) {
-                paths.filter(Files::isRegularFile)
-                        .filter(path -> path.toString().endsWith(".class"))
-                        .forEach(path -> {
-                            String className = toClassName(directory, path, packageName);
-                            loadClass(className, classes);
-                        });
-            }
-        } catch (Exception e) {
-            log.warn("文件系统扫描失败: {}, 错误: {}", resource, e.getMessage());
-        }
-    }
-
-    /**
-     * 从jar包扫描类
-     */
-    private static void scanClassesFromJar(URL resource, String packageName,
-                                           boolean recursive, Set<Class<?>> classes) {
-        try {
-            String jarPath = resource.getPath();
-            // 提取jar文件路径: jar:file:/path/to/jar.jar!/package/path
-            int separatorIndex = jarPath.indexOf("!/");
-            if (separatorIndex == -1) {
-                return;
-            }
-
-            // 去掉 "file:"
-            String jarFilePath = jarPath.substring(5, separatorIndex);
-            jarFilePath = URLDecoder.decode(jarFilePath, StandardCharsets.UTF_8.name());
-
-            String packagePath = packageName.replace('.', '/');
-
-            try (JarFile jarFile = new JarFile(jarFilePath)) {
-                Enumeration<JarEntry> entries = jarFile.entries();
-
-                while (entries.hasMoreElements()) {
-                    JarEntry entry = entries.nextElement();
-                    String entryName = entry.getName();
-
-                    // 过滤：1.是class文件 2.在指定包路径下 3.不是目录
-                    if (!entry.isDirectory() && entryName.endsWith(".class") &&
-                            entryName.startsWith(packagePath)) {
-
-                        // 检查是否递归扫描子包
-                        if (!recursive) {
-                            String subPath = entryName.substring(packagePath.length() + 1);
-                            if (subPath.contains("/")) {
-                                continue; // 跳过子包
-                            }
-                        }
-
-                        // 转换为类名: com/example/MyClass.class -> com.example.MyClass
-                        String className = entryName.substring(0, entryName.length() - 6)
-                                .replace('/', '.');
-                        loadClass(className, classes);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.warn("Jar包扫描失败: {}", resource, e);
-        }
-    }
-
-    /**
-     * 将文件路径转换为类名
-     */
-    private static String toClassName(Path baseDir, Path classFile, String basePackage) {
-        Path relativePath = baseDir.relativize(classFile);
-        String pathStr = relativePath.toString().replace(File.separatorChar, '.');
-        // 移除 .class 后缀
-        String className = pathStr.substring(0, pathStr.length() - 6);
-        return basePackage + "." + className;
-    }
-
-    /**
-     * 加载类并添加到集合中
-     */
-    private static void loadClass(String className, Set<Class<?>> classes) {
-        try {
-            // 过滤掉内部类和匿名类（可选）
-            if (className.contains("$")) {
-                return;
-            }
-
-            Class<?> clazz = Class.forName(className, false, getDefaultClassLoader());
-            classes.add(clazz);
-        } catch (ClassNotFoundException | LinkageError e) {
-            // 跳过无法加载的类（LinkageError包含NoClassDefFoundError等）
-            log.debug("类加载失败: {}, 原因: {}", className, e.getMessage());
-        } catch (Exception e) {
-            log.warn("类加载异常: {}, 错误: {}", className, e.getMessage());
         }
     }
 

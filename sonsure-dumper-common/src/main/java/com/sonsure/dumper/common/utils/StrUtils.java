@@ -184,6 +184,14 @@ public class StrUtils {
         return result.toArray(new String[0]);
     }
 
+    public static boolean startsWith(String str, String prefix) {
+        return str != null && str.startsWith(prefix);
+    }
+
+    public static boolean endsWith(String str, String suffix) {
+        return str != null && str.endsWith(suffix);
+    }
+
     public static String substringBefore(String str, String separator) {
         if (isBlank(str) || separator == null) {
             return str;
