@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.command.build;
 
-import com.sonsure.dumper.common.spring.ReflectionUtils;
+import com.sonsure.dumper.common.utils.ClassUtils;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
@@ -39,8 +39,7 @@ public class LambdaHelper {
     }
 
     private static SerializedLambda getSerializedLambda(Object lambda) {
-        Method writeReplace = ReflectionUtils.findMethod(lambda.getClass(), "writeReplace");
-        ReflectionUtils.makeAccessible(writeReplace);
-        return (SerializedLambda) ReflectionUtils.invokeMethod(writeReplace, lambda);
+        Method writeReplace = ClassUtils.getDeclaredMethod(lambda.getClass(), "writeReplace");
+        return (SerializedLambda) ClassUtils.invokeMethod(writeReplace, lambda);
     }
 }

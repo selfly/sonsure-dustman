@@ -13,8 +13,9 @@ import java.io.Serializable;
 
 /**
  * 分页器。
+ * @author selfly
  */
-public class Pagination implements Serializable, Cloneable {
+public class Pagination implements Serializable {
 
     private static final long serialVersionUID = 7440088907736399271L;
 

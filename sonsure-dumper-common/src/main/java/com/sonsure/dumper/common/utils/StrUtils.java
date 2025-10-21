@@ -10,11 +10,12 @@
 package com.sonsure.dumper.common.utils;
 
 import com.sonsure.dumper.common.exception.SonsureException;
-import com.sonsure.dumper.common.spring.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 字符文本操作
@@ -22,7 +23,7 @@ import java.util.Arrays;
  * <p/>
  *
  * @author liyd
- * @date 2015-8-14
+ * @since 2015-8-14
  */
 public class StrUtils {
 
@@ -50,8 +51,8 @@ public class StrUtils {
      * @return string
      */
     public static String convertHtmlSpecialChars(String str) {
-        if (StringUtils.hasText(str)) {
-            return null;
+        if (isBlank(str)) {
+            return "";
         }
         //最后一个中文全角空格换成英文，防止string的trim方法失效
         String[][] chars = new String[][]{{"&", "&amp;"}, {"<", "&lt;"}, {">", "&gt;"}, {"\"", "&quot;"}, {"　", " "}};
@@ -65,8 +66,8 @@ public class StrUtils {
      * @return string
      */
     public static String reverseHtmlSpecialChars(String str) {
-        if (!StringUtils.hasText(str)) {
-            return null;
+        if (isBlank(str)) {
+            return "";
         }
         String[][] chars = new String[][]{{"&amp;", "&"}, {"&lt;", "<"}, {"&gt;", ">"}, {"&quot;", "\""}, {"　", " "}};
         return replaceChars(str, chars);
@@ -101,7 +102,7 @@ public class StrUtils {
      */
     public static String substringForByte(String text, int length, boolean isConvertSpecialChars) {
 
-        if (!StringUtils.hasText(text) || length < 1) {
+        if (isNotBlank(text) || length < 1) {
             return text;
         }
         //转换特殊字符，页面显示时非常有用
@@ -156,15 +157,15 @@ public class StrUtils {
     }
 
     public static boolean isBlank(String str) {
-        return !StringUtils.hasText(str);
+        return str == null || str.trim().isEmpty();
     }
 
     public static boolean isNotBlank(String str) {
-        return StringUtils.hasText(str);
+        return !isBlank(str);
     }
 
     public static String replace(String inString, String oldPattern, String newPattern) {
-        return StringUtils.replace(inString, oldPattern, newPattern);
+        return inString == null ? null : inString.replace(oldPattern, newPattern);
     }
 
     public static boolean contains(String str, String subStr) {
@@ -172,11 +173,15 @@ public class StrUtils {
     }
 
     public static String[] split(String toSplit, String delimiter) {
-        String[] split = StringUtils.split(toSplit, delimiter);
-        if (split == null) {
-            return toSplit == null ? new String[0] : new String[]{toSplit};
+        List<String> result = new ArrayList<>();
+        int start = 0;
+        int index;
+        while ((index = toSplit.indexOf(delimiter, start)) != -1) {
+            result.add(toSplit.substring(start, index));
+            start = index + delimiter.length();
         }
-        return split;
+        result.add(toSplit.substring(start));
+        return result.toArray(new String[0]);
     }
 
     public static String substringBefore(String str, String separator) {

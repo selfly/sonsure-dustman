@@ -16,7 +16,7 @@
 
 package com.sonsure.dumper.core.command.named;
 
-import com.sonsure.dumper.common.spring.Assert;
+import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 
 import java.util.*;
@@ -189,7 +189,9 @@ public abstract class NamedParameterUtils {
      * @return the parsed statement, represented as ParsedSql instance
      */
     public static ParsedSql parseSqlStatement(final String sql) {
-        Assert.notNull(sql, "SQL must not be null");
+        if (StrUtils.isBlank(sql)) {
+            throw new SonsureJdbcException("SQL语句不能为空");
+        }
 
         Set<String> namedParameters = new HashSet<>();
         String sqlToUse = sql;

@@ -10,14 +10,12 @@
 package com.sonsure.dumper.common.utils;
 
 import com.sonsure.dumper.common.exception.SonsureException;
-import com.sonsure.dumper.common.spring.encrypt.BCrypt;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.util.regex.Pattern;
 
 /**
@@ -80,7 +78,7 @@ public class EncryptUtils {
      * @return md5
      */
     public static String getMD5(byte[] bytes) {
-        return getMD5(bytes, null, 1);
+        return getMD5(bytes, "", 1);
     }
 
     /**
@@ -97,15 +95,12 @@ public class EncryptUtils {
         try {
 
             // 生成一个MD5加密计算摘要
-            
+
             MessageDigest md = MessageDigest.getInstance("MD5");
 
             if (StrUtils.isNotBlank(salt)) {
                 md.update(salt.getBytes());
             }
-            // 计算md5函数
-//            md.update(str.getBytes());
-
             byte[] hashed = md.digest(bytes);
 
             for (int i = 0; i < hashIterations - 1; i++) {
@@ -125,68 +120,68 @@ public class EncryptUtils {
         }
     }
 
-
-    /**
-     * BCrypt加密
-     *
-     * @param str the str
-     * @return string string
-     */
-    public static String encodeBCrypt(String str) {
-        return encodeBCrypt(str, 10, null);
-    }
-
-    /**
-     * BCrypt加密
-     *
-     * @param str      the str
-     * @param strength the strength
-     * @return string string
-     */
-    public static String encodeBCrypt(String str, int strength) {
-        return encodeBCrypt(str, strength, null);
-    }
-
-    /**
-     * BCrypt加密
-     *
-     * @param charSequence the char sequence
-     * @param strength     the strength
-     * @param random       the random
-     * @return string
-     */
-    public static String encodeBCrypt(CharSequence charSequence, int strength, SecureRandom random) {
-        String salt;
-        if (strength > 0) {
-            if (random != null) {
-                salt = BCrypt.gensalt(strength, random);
-            } else {
-                salt = BCrypt.gensalt(strength);
-            }
-        } else {
-            salt = BCrypt.gensalt();
-        }
-        return BCrypt.hashpw(charSequence.toString(), salt);
-    }
-
-    /**
-     * 检查加密的字符串
-     *
-     * @param charSequence the char sequence
-     * @param encodedStr   the encoded str
-     * @return boolean
-     */
-    public static boolean matchesBCrypt(CharSequence charSequence, String encodedStr) {
-        if (encodedStr == null || encodedStr.isEmpty()) {
-            return false;
-        }
-
-        if (!BCRYPT_PATTERN.matcher(encodedStr).matches()) {
-            return false;
-        }
-
-        return BCrypt.checkpw(charSequence.toString(), encodedStr);
-    }
+//
+//    /**
+//     * BCrypt加密
+//     *
+//     * @param str the str
+//     * @return string string
+//     */
+//    public static String encodeBCrypt(String str) {
+//        return encodeBCrypt(str, 10, null);
+//    }
+//
+//    /**
+//     * BCrypt加密
+//     *
+//     * @param str      the str
+//     * @param strength the strength
+//     * @return string string
+//     */
+//    public static String encodeBCrypt(String str, int strength) {
+//        return encodeBCrypt(str, strength, null);
+//    }
+//
+//    /**
+//     * BCrypt加密
+//     *
+//     * @param charSequence the char sequence
+//     * @param strength     the strength
+//     * @param random       the random
+//     * @return string
+//     */
+//    public static String encodeBCrypt(CharSequence charSequence, int strength, SecureRandom random) {
+//        String salt;
+//        if (strength > 0) {
+//            if (random != null) {
+//                salt = BCrypt.gensalt(strength, random);
+//            } else {
+//                salt = BCrypt.gensalt(strength);
+//            }
+//        } else {
+//            salt = BCrypt.gensalt();
+//        }
+//        return BCrypt.hashpw(charSequence.toString(), salt);
+//    }
+//
+//    /**
+//     * 检查加密的字符串
+//     *
+//     * @param charSequence the char sequence
+//     * @param encodedStr   the encoded str
+//     * @return boolean
+//     */
+//    public static boolean matchesBCrypt(CharSequence charSequence, String encodedStr) {
+//        if (encodedStr == null || encodedStr.isEmpty()) {
+//            return false;
+//        }
+//
+//        if (!BCRYPT_PATTERN.matcher(encodedStr).matches()) {
+//            return false;
+//        }
+//
+//        return BCrypt.checkpw(charSequence.toString(), encodedStr);
+//    }
 
     /**
      * 使用 HMAC-SHA1 签名方法对对encryptText进行签名

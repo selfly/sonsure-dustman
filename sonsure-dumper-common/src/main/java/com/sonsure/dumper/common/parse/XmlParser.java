@@ -9,15 +9,17 @@
 
 package com.sonsure.dumper.common.parse;
 
+import com.sonsure.dumper.common.exception.SonsureCommonsException;
 import com.sonsure.dumper.common.exception.SonsureException;
-import com.sonsure.dumper.common.spring.ClassPathResource;
-import com.sonsure.dumper.common.spring.Resource;
+import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.common.utils.PropertyUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -29,28 +31,28 @@ public final class XmlParser {
     /**
      * 解析xml
      *
-     * @param resource     the resource
+     * @param is           the is
      * @param propertyFile the property file
      * @return xml node
      */
-    public static XmlNode parse(Resource resource, String propertyFile) {
+    public static XmlNode parse(InputStream is, String propertyFile) {
 
         Map<String, String> properties = null;
         if (StrUtils.isNotBlank(propertyFile)) {
             properties = PropertyUtils.getProperties(propertyFile);
         }
-        Document document = readXml(resource, properties);
+        Document document = readXml(is, properties);
         return parse(document.asXML(), properties);
     }
 
     /**
      * 解析xml
      *
-     * @param resource the resource
+     * @param is the is
      * @return xml node
      */
-    public static XmlNode parse(Resource resource) {
-        Document document = readXml(resource);
+    public static XmlNode parse(InputStream is) {
+        Document document = readXml(is);
         Element rootElement = document.getRootElement();
         return parseElement(rootElement, null);
     }
@@ -100,9 +102,13 @@ public final class XmlParser {
         Iterator<Element> iter = null;
         if ("include".equals(element.getName())) {
             Attribute attr = element.attribute("file");
-            Document document = readXml(new ClassPathResource(attr.getValue()), properties);
-            Element rootElement = document.getRootElement();
-            iter = rootElement.elementIterator();
+            try (InputStream is = ClassUtils.getDefaultClassLoader().getResourceAsStream(attr.getValue())) {
+                Document document = readXml(is, properties);
+                Element rootElement = document.getRootElement();
+                iter = rootElement.elementIterator();
+            } catch (IOException e) {
+                throw new SonsureCommonsException("加载资源失败:" + attr.getValue(), e);
+            }
         } else {
             iter = element.elementIterator();
         }
@@ -128,25 +134,25 @@ public final class XmlParser {
     /**
      * 解析xml
      *
-     * @param resource the resource
-     * @return document
+     * @param is the is
+     * @return document document
      */
-    public static Document readXml(Resource resource) {
-        return readXml(resource, null);
+    public static Document readXml(InputStream is) {
+        return readXml(is, null);
     }
 
     /**
      * 解析xml
      *
-     * @param resource   the resource
+     * @param is         the is
      * @param properties the properties
-     * @return document
+     * @return document document
      */
-    public static Document readXml(Resource resource, Map<String, String> properties) {
+    public static Document readXml(InputStream is, Map<String, String> properties) {
 
         try {
             SAXReader saxReader = SAXReader.createDefault();
-            Document document = saxReader.read(new InputSource(resource.getInputStream()));
+            Document document = saxReader.read(new InputSource(is));
             if (properties == null || properties.isEmpty()) {
                 return document;
             }

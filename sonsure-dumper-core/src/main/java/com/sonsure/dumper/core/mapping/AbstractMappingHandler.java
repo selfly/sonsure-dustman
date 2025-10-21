@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.core.mapping;
 
-import com.sonsure.dumper.common.spring.scan.ClassPathBeanScanner;
+import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
@@ -238,17 +238,13 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
         }
         String[] pks = StrUtils.split(modelPackages, ",");
         for (String pk : pks) {
-            List<String> classes = ClassPathBeanScanner.scanClasses(pk, getClassLoader());
-            for (String clazz : classes) {
-
-                int index = clazz.lastIndexOf(".");
-                String simpleName = clazz.substring(index + 1);
-
+            List<Class<?>> classes = ClassUtils.scanClasses(pk);
+            for (Class<?> clazz : classes) {
+                String simpleName = clazz.getSimpleName();
                 if (classMapping.containsKey(simpleName)) {
                     log.warn("短类名相同，使用时请自定义短类名或使用完整类名:class1:{},class2:{}", classMapping.get(simpleName), clazz);
                 } else {
-                    Class<?> aClass = this.loadClass(clazz);
-                    classMapping.put(simpleName, aClass);
+                    classMapping.put(simpleName, clazz);
                 }
             }
         }
