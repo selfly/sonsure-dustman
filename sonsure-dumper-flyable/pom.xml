@@ -11,6 +11,11 @@
 
     <artifactId>sonsure-dumper-flyable</artifactId>
 
+    <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
+        </sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.sonsure</groupId>
