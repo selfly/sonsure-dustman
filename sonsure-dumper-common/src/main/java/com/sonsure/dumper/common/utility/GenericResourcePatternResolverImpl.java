@@ -404,14 +404,15 @@ public class GenericResourcePatternResolverImpl implements GenericResourcePatter
         @Override
         public InputStream getInputStream() throws IOException {
             // 安全检查：限制文件大小，防止ZIP炸弹攻击
-            if (entry.getSize() > MAX_FILE_SIZE) {
-                throw new IOException("File too large: " + entryName + " (size: " + entry.getSize() + ")");
+            long size = entry.getSize();
+            if (size > MAX_FILE_SIZE) {
+                throw new IOException("File too large: " + entryName + " (size: " + size + ")");
             }
 
             // 检查压缩比例，防止ZIP炸弹
             long compressedSize = entry.getCompressedSize();
-            if (compressedSize > 0 && entry.getSize() > 0) {
-                double compressionRatio = (double) entry.getSize() / compressedSize;
+            if (compressedSize > 0 && size > 0) {
+                double compressionRatio = (double) size / compressedSize;
                 // 压缩比例超过100:1认为是可疑的
                 if (compressionRatio > 100) {
                     throw new IOException("Suspicious compression ratio detected for: " + entryName);
