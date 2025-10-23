@@ -108,60 +108,6 @@ public class BeanKitInst {
      *
      * @param <T>       the type parameter
      * @param <R>       the type parameter
-     * @param map       the map
-     * @param beanClass the bean class
-     * @return t r
-     */
-    public <T extends Map<String, ?>, R> R underlineKeyMapToBean(T map, Class<R> beanClass) {
-        return mapToBean(map, beanClass, '_', null);
-    }
-
-    /**
-     * map转为bean
-     *
-     * @param <T>       the type parameter
-     * @param <R>       the type parameter
-     * @param map       the map
-     * @param beanClass the bean class
-     * @param consumer  the consumer
-     * @return t r
-     */
-    public <T extends Map<String, ?>, R> R underlineKeyMapToBean(T map, Class<R> beanClass, BiConsumer<T, R> consumer) {
-        return mapToBean(map, beanClass, '_', consumer);
-    }
-
-    /**
-     * map转为bean，key名为下划线命名方式
-     *
-     * @param <T>       the type parameter
-     * @param <R>       the type parameter
-     * @param mapList   the map list
-     * @param beanClass the bean class
-     * @return t list
-     */
-    public <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(Collection<T> mapList, Class<R> beanClass) {
-        return mapToBean(mapList, beanClass, '_', null);
-    }
-
-    /**
-     * map转为bean，key名为下划线命名方式
-     *
-     * @param <T>       the type parameter
-     * @param <R>       the type parameter
-     * @param mapList   the map list
-     * @param beanClass the bean class
-     * @param consumer  the consumer
-     * @return t list
-     */
-    public <T extends Map<String, ?>, R> List<R> underlineKeyMapToBean(Collection<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
-        return mapToBean(mapList, beanClass, '_', consumer);
-    }
-
-    /**
-     * map转为bean
-     *
-     * @param <T>       the type parameter
-     * @param <R>       the type parameter
      * @param mapList   the map list
      * @param beanClass the bean class
      * @return t list
@@ -200,20 +146,6 @@ public class BeanKitInst {
             beanList.add(r);
         }
         return beanList;
-    }
-
-    /**
-     * map转为bean，key名为bean属性名
-     *
-     * @param <T>       the type parameter
-     * @param <R>       the type parameter
-     * @param mapList   the map list
-     * @param beanClass the bean class
-     * @param consumer  the consumer
-     * @return t list
-     */
-    public <T extends Map<String, ?>, R> List<R> mapToBean(Collection<T> mapList, Class<R> beanClass, BiConsumer<T, R> consumer) {
-        return mapToBean(mapList, beanClass, null, consumer);
     }
 
     /**

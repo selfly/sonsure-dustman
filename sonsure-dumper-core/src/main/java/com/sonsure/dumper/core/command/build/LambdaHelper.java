@@ -29,15 +29,6 @@ public class LambdaHelper {
         return lambdaGetter.getFieldName();
     }
 
-    @SafeVarargs
-    public static <T> String[] getFieldNames(GetterFunction<T>... functions) {
-        String[] fields = new String[functions.length];
-        for (int i = 0; i < functions.length; i++) {
-            fields[i] = getFieldName(functions[i]);
-        }
-        return fields;
-    }
-
     private static SerializedLambda getSerializedLambda(Object lambda) {
         Method writeReplace = ClassUtils.getDeclaredMethod(lambda.getClass(), "writeReplace");
         return (SerializedLambda) ClassUtils.invokeMethod(writeReplace, lambda);

@@ -74,13 +74,4 @@ public enum ExecutionType {
      * Execute script command type.
      */
     EXECUTE_SCRIPT;
-
-    public static boolean isSelectCommandType(ExecutionType executionType) {
-        return executionType == QUERY_FOR_LIST
-                || executionType == QUERY_SINGLE_RESULT
-                || executionType == QUERY_FOR_MAP
-                || executionType == QUERY_FOR_MAP_LIST
-                || executionType == QUERY_ONE_COL
-                || executionType == QUERY_ONE_COL_LIST;
-    }
 }

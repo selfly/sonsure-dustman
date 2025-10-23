@@ -28,10 +28,6 @@ public class BeanKit {
      */
     private static final BeanKitInst INSTANCE = new BeanKitInst();
 
-    public static BeanKitInst getInstance() {
-        return new BeanKitInst();
-    }
-
     /**
      * 拷贝属性值
      *
