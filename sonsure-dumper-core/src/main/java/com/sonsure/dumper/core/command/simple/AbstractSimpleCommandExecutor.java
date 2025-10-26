@@ -10,13 +10,13 @@
 package com.sonsure.dumper.core.command.simple;
 
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.*;
+import com.sonsure.dumper.core.command.AbstractCommandExecutor;
+import com.sonsure.dumper.core.command.ExecutionType;
 import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -161,13 +161,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        Page<Map<String, Object>> page = this.doPageResult(executableCmd, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
-        Page<Map<String, Object>> resultPage = new Page<>(page.getPagination());
-        if (page.getList() != null) {
-            List<Map<String, Object>> list = new ArrayList<>(page.getList());
-            resultPage.setList(list);
-        }
-        return resultPage;
+        return this.doPageResult(executableCmd, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
     }
 
     @SuppressWarnings("unchecked")

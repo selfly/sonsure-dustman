@@ -35,11 +35,13 @@ public class BeanKitInst {
     private final List<TypeConverter> typeConverters = new ArrayList<>();
 
     public BeanKitInst() {
-        typeConverters.add(new EnumConverter.BaseEnum2StringConverter());
-        typeConverters.add(new EnumConverter.String2DynamicEnumConverter());
-        typeConverters.add(new DateTimeConverter.Date2LocalDateTimeConverter());
-        typeConverters.add(new DateTimeConverter.LocalDateTime2DateConverter());
-        typeConverters.add(new NumberConverter());
+        this.registerConverter(
+                new EnumConverter.BaseEnum2StringConverter(),
+                new EnumConverter.String2DynamicEnumConverter(),
+                new DateTimeConverter.Date2LocalDateTimeConverter(),
+                new DateTimeConverter.LocalDateTime2DateConverter(),
+                new NumberConverter()
+        );
     }
 
     /**
@@ -526,7 +528,7 @@ public class BeanKitInst {
         if (value == null) {
             return null;
         }
-        for (TypeConverter typeConverter : this.typeConverters) {
+        for (TypeConverter typeConverter : this.getConverters()) {
             if (typeConverter.supportSourceType(value.getClass()) && typeConverter.supportTargetType(targetPd.getPropertyType())) {
                 return typeConverter.convert(targetPd, value);
             }
@@ -540,8 +542,11 @@ public class BeanKitInst {
      * @param converter the converter
      * @return the bean kit inst
      */
-    public BeanKitInst registerConverter(TypeConverter converter) {
-        this.typeConverters.add(converter);
+    public BeanKitInst registerConverter(TypeConverter... converter) {
+        if (converter == null) {
+            return this;
+        }
+        this.typeConverters.addAll(Arrays.asList(converter));
         return this;
     }
 
@@ -553,16 +558,6 @@ public class BeanKitInst {
      */
     public BeanKitInst unregisterConverter(TypeConverter converter) {
         this.typeConverters.remove(converter);
-        return this;
-    }
-
-    /**
-     * 清空注册的转换器
-     *
-     * @return the bean kit inst
-     */
-    public BeanKitInst clearConverter() {
-        this.typeConverters.clear();
         return this;
     }
 
