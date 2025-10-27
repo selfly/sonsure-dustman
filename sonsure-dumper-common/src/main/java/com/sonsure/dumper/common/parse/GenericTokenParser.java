@@ -12,7 +12,9 @@ package com.sonsure.dumper.common.parse;
 import lombok.Getter;
 
 /**
- * Created by liyd on 2015-11-24.
+ *
+ * @author liyd
+ * @since 2015-11-24
  */
 @Getter
 public class GenericTokenParser {

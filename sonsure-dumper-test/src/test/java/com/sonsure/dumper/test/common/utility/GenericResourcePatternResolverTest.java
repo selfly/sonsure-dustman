@@ -1,4 +1,4 @@
-package com.sonsure.dumper.test.common;
+package com.sonsure.dumper.test.common.utility;
 
 import com.sonsure.dumper.common.utility.GenericResource;
 import com.sonsure.dumper.common.utility.GenericResourcePatternResolverImpl;

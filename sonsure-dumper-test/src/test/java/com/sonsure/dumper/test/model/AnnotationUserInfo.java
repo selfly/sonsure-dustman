@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.test.model;
 
-import com.sonsure.dumper.common.model.BaseEntity;
+import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.annotation.Column;
 import com.sonsure.dumper.core.annotation.Entity;
 import com.sonsure.dumper.core.annotation.Id;
@@ -28,7 +28,7 @@ import java.util.Date;
 @Setter
 @Getter
 @Entity("sm_user_info")
-public class AnnotationUserInfo extends BaseEntity {
+public class AnnotationUserInfo extends Pageable {
 
     private static final long serialVersionUID = 8166785520231287816L;
 
