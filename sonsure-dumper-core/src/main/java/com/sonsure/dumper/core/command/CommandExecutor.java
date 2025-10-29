@@ -9,14 +9,23 @@
 
 package com.sonsure.dumper.core.command;
 
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+
 /**
  * 执行标识接口
  * <p>
  *
  * @author liyd
- * @since  17/4/11
+ * @since 17/4/11
  */
 public interface CommandExecutor<E extends CommandExecutor<E>> {
+
+    /**
+     * Gets executable cmd builder.
+     *
+     * @return the executable cmd builder
+     */
+    ExecutableCmdBuilder getExecutableCmdBuilder();
 
     /**
      * 是否禁止转换，command不做任何加工

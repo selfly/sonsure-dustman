@@ -13,8 +13,8 @@ import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author liyd
@@ -22,26 +22,26 @@ import java.util.List;
 @Setter
 public class CommandExecutorFactoryImpl implements CommandExecutorFactory {
 
-    protected List<CommandExecutorBuilder> commandExecutorBuilders;
+    protected Map<Class<?>, CommandExecutorCreator> commandExecutorCreators;
 
     public CommandExecutorFactoryImpl() {
-        commandExecutorBuilders = new ArrayList<>();
-        commandExecutorBuilders.add(new CommandExecutorBuilderImpl());
+        commandExecutorCreators = new LinkedHashMap<>(8);
+        this.registerCommandExecutorCreator(new InternalCommandExecutorCreatorImpl());
     }
 
     @Override
-    public <T extends CommandExecutor> T createCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
-        for (CommandExecutorBuilder commandExecutorBuilder : this.commandExecutorBuilders) {
-            T executor = commandExecutorBuilder.build(commandExecutorClass, jdbcEngineConfig, params);
-            if (executor != null) {
-                return executor;
-            }
+    public <T extends CommandExecutor<?>> T createCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
+        CommandExecutorCreator commandExecutorCreator = commandExecutorCreators.get(commandExecutorClass);
+        if (commandExecutorCreator == null) {
+            throw new SonsureJdbcException(String.format("没有找到对应的CommandExecutorCreator,commandExecutorClass:%s", commandExecutorClass.getName()));
         }
-        throw new SonsureJdbcException(String.format("没有找到对应的CommandExecutorBuilder,commandExecutorClass:%s", commandExecutorClass.getName()));
+        return commandExecutorCreator.create(commandExecutorClass, jdbcEngineConfig, params);
     }
 
-    public void addCommandExecutorBuilder(CommandExecutorBuilder commandExecutorBuilder) {
-        this.commandExecutorBuilders.add(commandExecutorBuilder);
+    public void registerCommandExecutorCreator(CommandExecutorCreator commandExecutorCreator) {
+        for (Class<?> commandExecutorClass : commandExecutorCreator.getCommandExecutorClasses()) {
+            commandExecutorCreators.put(commandExecutorClass, commandExecutorCreator);
+        }
     }
 
 }

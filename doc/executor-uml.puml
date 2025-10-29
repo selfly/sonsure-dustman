@@ -2,6 +2,7 @@
 title Executor类图
 
 interface CommandExecutor<E extends CommandExecutor<E>> {
+  + getExecutableCmdBuilder(): ExecutableCmdBuilder
   + forceNative(): E
   + namedParameter(): E
 }

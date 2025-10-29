@@ -1,15 +1,5 @@
-/*
- * Copyright (c) 2020. www.sonsure.com Inc. All rights reserved.
- * You may obtain more information at
- *
- *   http://www.sonsure.com
- *
- * Designed By Selfly Lee (selfly@live.com)
- */
-
 package com.sonsure.dumper.core.config;
 
-import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutorImpl;
 import com.sonsure.dumper.core.command.entity.*;
@@ -19,31 +9,39 @@ import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutorImpl;
 
 /**
- * The type Command executor builder.
- *
- * @author liyd
+ * @author selfly
  */
-public class CommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
+public class InternalCommandExecutorCreatorImpl implements CommandExecutorCreator {
+
+    @Override
+    public Class<?>[] getCommandExecutorClasses() {
+        return new Class<?>[]{Insert.class, Select.class, Update.class, Delete.class, NativeExecutor.class, MybatisExecutor.class, BatchUpdateExecutor.class};
+    }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
+    public <T> T create(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
         if (Insert.class == commandExecutorClass) {
             return (T) new InsertImpl(jdbcEngineConfig);
-        } else if (Select.class == commandExecutorClass) {
-            return (T) new SelectImpl<>(jdbcEngineConfig, params);
-        } else if (Update.class == commandExecutorClass) {
-            return (T) new UpdateImpl(jdbcEngineConfig);
-        } else if (Delete.class == commandExecutorClass) {
-            return (T) new DeleteImpl(jdbcEngineConfig);
-        } else if (NativeExecutor.class == commandExecutorClass) {
-            return (T) new NativeExecutorImpl(jdbcEngineConfig);
-        } else if (MybatisExecutor.class == commandExecutorClass) {
-            return (T) new MybatisExecutorImpl(jdbcEngineConfig);
-        } else if (BatchUpdateExecutor.class == commandExecutorClass) {
-            return (T) new BatchUpdateExecutorImpl(jdbcEngineConfig);
-        } else {
-            return null;
         }
+        if (Select.class == commandExecutorClass) {
+            return (T) new SelectImpl<>(jdbcEngineConfig, params);
+        }
+        if (Update.class == commandExecutorClass) {
+            return (T) new UpdateImpl(jdbcEngineConfig);
+        }
+        if (Delete.class == commandExecutorClass) {
+            return (T) new DeleteImpl(jdbcEngineConfig);
+        }
+        if (NativeExecutor.class == commandExecutorClass) {
+            return (T) new NativeExecutorImpl(jdbcEngineConfig);
+        }
+        if (MybatisExecutor.class == commandExecutorClass) {
+            return (T) new MybatisExecutorImpl(jdbcEngineConfig);
+        }
+        if (BatchUpdateExecutor.class == commandExecutorClass) {
+            return (T) new BatchUpdateExecutorImpl(jdbcEngineConfig);
+        }
+        return null;
     }
 }

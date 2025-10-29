@@ -89,8 +89,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
      */
     protected ToggleCase toggleCase = ToggleCase.NONE;
 
-    protected boolean initialized = false;
-
     @Override
     public CommandExecutorFactory getCommandExecutorFactory() {
         if (commandExecutorFactory == null) {

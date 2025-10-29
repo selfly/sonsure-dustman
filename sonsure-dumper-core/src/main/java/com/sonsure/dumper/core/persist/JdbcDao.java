@@ -254,7 +254,7 @@ public interface JdbcDao {
      * @param executor the executor
      * @return t
      */
-    <T extends CommandExecutor> T executor(Class<T> executor);
+    <T extends CommandExecutor<?>> T executor(Class<T> executor);
 
     /**
      * Gets data source.

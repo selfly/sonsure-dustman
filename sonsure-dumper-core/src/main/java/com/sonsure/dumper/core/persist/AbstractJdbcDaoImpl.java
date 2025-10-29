@@ -183,7 +183,7 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     }
 
     @Override
-    public <T extends CommandExecutor> T executor(Class<T> executor) {
+    public <T extends CommandExecutor<?>> T executor(Class<T> executor) {
         return this.getDefaultJdbcEngine().createExecutor(executor, null);
     }
 

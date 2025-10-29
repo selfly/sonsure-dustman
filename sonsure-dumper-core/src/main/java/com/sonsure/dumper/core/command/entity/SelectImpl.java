@@ -203,24 +203,6 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public Select<M> paginate(int pageNum, int pageSize) {
-        this.getExecutableCmdBuilder().paginate(pageNum, pageSize);
-        return this;
-    }
-
-    @Override
-    public Select<M> limit(int offset, int size) {
-        this.getExecutableCmdBuilder().limit(offset, size);
-        return this;
-    }
-
-    @Override
-    public Select<M> disableCount() {
-        this.getExecutableCmdBuilder().disableCountQuery();
-        return this;
-    }
-
-    @Override
     public long count() {
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
         this.getExecutableCmdBuilder().resultType(Long.class);
@@ -245,34 +227,6 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Map<String, Object> singleMapResult() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP);
-        this.getExecutableCmdBuilder().resultType(Map.class);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Map<String, Object>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T oneColResult(Class<T> clazz) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
-        this.getExecutableCmdBuilder().resultType(clazz);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (T) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> List<T> oneColList(Class<T> clazz) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
-        this.getExecutableCmdBuilder().resultType(clazz);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> list(Class<T> cls) {
@@ -281,16 +235,6 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Map<String, Object>> listMaps() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
-        this.getExecutableCmdBuilder().resultType(List.class);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")

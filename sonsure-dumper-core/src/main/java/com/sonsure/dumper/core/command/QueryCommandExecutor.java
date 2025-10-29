@@ -11,6 +11,8 @@ package com.sonsure.dumper.core.command;
 
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
+import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,11 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param pageSize the page size
      * @return c
      */
-    E paginate(int pageNum, int pageSize);
+    @SuppressWarnings("unchecked")
+    default E paginate(int pageNum, int pageSize) {
+        this.getExecutableCmdBuilder().paginate(pageNum, pageSize);
+        return (E) this;
+    }
 
     /**
      * 指定偏移量和页大小，返回所在页数据
@@ -36,37 +42,36 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param size   the size
      * @return select select
      */
-    E limit(int offset, int size);
+    @SuppressWarnings("unchecked")
+    default E limit(int offset, int size) {
+        this.getExecutableCmdBuilder().limit(offset, size);
+        return (E) this;
+    }
 
     /**
      * 禁用count查询
      *
      * @return select c
      */
-    E disableCount();
-
-    /**
-     * count查询
-     *
-     * @return long
-     */
-    long count();
-
-    /**
-     * 单个结果
-     *
-     * @param <T> the type parameter
-     * @param cls the cls
-     * @return t
-     */
-    <T> T singleResult(Class<T> cls);
+    @SuppressWarnings("unchecked")
+    default E disableCount() {
+        this.getExecutableCmdBuilder().disableCountQuery();
+        return (E) this;
+    }
 
     /**
      * 单个结果
      *
      * @return t object
      */
-    Map<String, Object> singleMapResult();
+    @SuppressWarnings("unchecked")
+    default Map<String, Object> singleMapResult() {
+        ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
+        executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP);
+        executableCmdBuilder.resultType(Map.class);
+        ExecutableCmd executableCmd = executableCmdBuilder.build();
+        return (Map<String, Object>) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+    }
 
     /**
      * 简单查询，返回单一的结果，例如Long、Integer、String等
@@ -75,7 +80,14 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param clazz the clazz
      * @return t
      */
-    <T> T oneColResult(Class<T> clazz);
+    @SuppressWarnings("unchecked")
+    default <T> T oneColResult(Class<T> clazz) {
+        ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
+        executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL);
+        executableCmdBuilder.resultType(clazz);
+        ExecutableCmd executableCmd = executableCmdBuilder.build();
+        return (T) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+    }
 
     /**
      * 查询结果，返回单一的结果列表，例如List<Long>
@@ -84,49 +96,28 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param clazz the clazz
      * @return list
      */
-    <T> List<T> oneColList(Class<T> clazz);
+    @SuppressWarnings("unchecked")
+    default <T> List<T> oneColList(Class<T> clazz) {
+        ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
+        executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL_LIST);
+        executableCmdBuilder.resultType(clazz);
+        ExecutableCmd executableCmd = executableCmdBuilder.build();
+        return (List<T>) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+    }
 
     /**
      * 列表查询
      *
-     * @param <T> the type parameter
-     * @param cls the cls
      * @return list
      */
-    <T> List<T> list(Class<T> cls);
-
-    /**
-     * 列表查询
-     *
-     * @return list
-     */
-    List<Map<String, Object>> listMaps();
-
-    /**
-     * 分页列表查询
-     *
-     * @param <T> the type parameter
-     * @param cls the cls
-     * @return page
-     */
-    <T> Page<T> pageResult(Class<T> cls);
-
-    /**
-     * 分页列表查询
-     *
-     * @return page
-     */
-    Page<Map<String, Object>> pageMapResult();
-
-    /**
-     * singleColumnList分页查询
-     *
-     * @param <T>   the type parameter
-     * @param clazz the clazz
-     * @return page list
-     */
-    <T> Page<T> oneColPageResult(Class<T> clazz);
-
+    @SuppressWarnings("unchecked")
+    default List<Map<String, Object>> listMaps() {
+        ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
+        executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+        executableCmdBuilder.resultType(List.class);
+        ExecutableCmd executableCmd = executableCmdBuilder.build();
+        return (List<Map<String, Object>>) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+    }
 
     /**
      * 分页信息
@@ -175,4 +166,55 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
                 .oneColPageResult(clazz);
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
+
+
+    /**
+     * 分页列表查询
+     *
+     * @param <T> the type parameter
+     * @param cls the cls
+     * @return page
+     */
+    <T> Page<T> pageResult(Class<T> cls);
+
+    /**
+     * 分页列表查询
+     *
+     * @return page
+     */
+    Page<Map<String, Object>> pageMapResult();
+
+    /**
+     * singleColumnList分页查询
+     *
+     * @param <T>   the type parameter
+     * @param clazz the clazz
+     * @return page list
+     */
+    <T> Page<T> oneColPageResult(Class<T> clazz);
+
+    /**
+     * count查询
+     *
+     * @return long
+     */
+    long count();
+
+    /**
+     * 单个结果
+     *
+     * @param <T> the type parameter
+     * @param cls the cls
+     * @return t
+     */
+    <T> T singleResult(Class<T> cls);
+
+    /**
+     * 列表查询
+     *
+     * @param <T> the type parameter
+     * @param cls the cls
+     * @return list
+     */
+    <T> List<T> list(Class<T> cls);
 }

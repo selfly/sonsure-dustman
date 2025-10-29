@@ -68,12 +68,6 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     }
 
     @Override
-    public C disableCount() {
-        this.getExecutableCmdBuilder().disableCountQuery();
-        return this.getSelf();
-    }
-
-    @Override
     public long count() {
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
         this.getExecutableCmdBuilder().resultType(Long.class);
@@ -88,54 +82,6 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         Object result = getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
         return this.handleResult(result, getResultHandler(cls));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Map<String, Object> singleMapResult() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP);
-        this.getExecutableCmdBuilder().resultType(Map.class);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Map<String, Object>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T oneColResult(Class<T> clazz) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
-        this.getExecutableCmdBuilder().resultType(clazz);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (T) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Map<String, Object>> listMaps() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
-        this.getExecutableCmdBuilder().resultType(List.class);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
-    }
-
-    @Override
-    public C paginate(int pageNum, int pageSize) {
-        this.getExecutableCmdBuilder().paginate(pageNum, pageSize);
-        return this.getSelf();
-    }
-
-    @Override
-    public C limit(int offset, int size) {
-        this.getExecutableCmdBuilder().limit(offset, size);
-        return this.getSelf();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> List<T> oneColList(Class<T> clazz) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
-        this.getExecutableCmdBuilder().resultType(clazz);
-        ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (List<T>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
@@ -157,11 +103,10 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     @SuppressWarnings("unchecked")
     @Override
     public Page<Map<String, Object>> pageMapResult() {
-
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, commandContext1 -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(commandContext1));
+        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
