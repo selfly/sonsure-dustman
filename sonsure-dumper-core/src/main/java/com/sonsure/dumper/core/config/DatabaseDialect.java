@@ -1,8 +1,11 @@
 package com.sonsure.dumper.core.config;
 
+import lombok.Getter;
+
 /**
  * @author selfly
  */
+@Getter
 public enum DatabaseDialect {
 
     /**
@@ -30,7 +33,4 @@ public enum DatabaseDialect {
         return dialect.toLowerCase().contains(this.getCode());
     }
 
-    public String getCode() {
-        return code;
-    }
 }

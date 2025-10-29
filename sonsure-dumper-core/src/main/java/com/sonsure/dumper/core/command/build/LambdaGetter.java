@@ -3,7 +3,6 @@ package com.sonsure.dumper.core.command.build;
 import com.sonsure.dumper.common.utils.NameUtils;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.lang.invoke.SerializedLambda;
 
@@ -11,12 +10,11 @@ import java.lang.invoke.SerializedLambda;
  * @author selfly
  */
 @Getter
-@Setter
 public class LambdaGetter {
     
-    private String simpleClassName;
-    private String methodName;
-    private String fieldName;
+    private final String simpleClassName;
+    private final String methodName;
+    private final String fieldName;
 
     public LambdaGetter(SerializedLambda serializedLambda) {
         String[] info = serializedLambda.getInstantiatedMethodType().split(";");

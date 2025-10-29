@@ -1,18 +1,17 @@
 package com.sonsure.dumper.resource;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.sonsure.dumper.common.parse.GenericTokenParser;
 import com.sonsure.dumper.common.utility.GenericResource;
 import com.sonsure.dumper.common.utils.EncryptUtils;
 import com.sonsure.dumper.common.utils.FileIOUtils;
 import com.sonsure.dumper.common.utils.StrUtils;
-
 import lombok.Getter;
 import lombok.SneakyThrows;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author selfly
@@ -62,7 +61,7 @@ public class MigrationResource {
         try (InputStream is = rs.getInputStream()) {
             this.resourceBytes = FileIOUtils.toByteArray(is);
             String minify = StrUtils.minify(new String(this.resourceBytes));
-            this.checksum = EncryptUtils.getMD5(minify);
+            this.checksum = EncryptUtils.getCRC32(minify);
         }
     }
 

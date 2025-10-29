@@ -13,7 +13,6 @@ package com.sonsure.dumper.core.config;
 import com.sonsure.dumper.core.command.build.ToggleCase;
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
 import com.sonsure.dumper.core.command.sql.JSqlParserCommandConversionHandler;
-import com.sonsure.dumper.core.convert.JdbcTypeConverter;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import com.sonsure.dumper.core.mapping.DefaultMappingHandler;
@@ -62,11 +61,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
      * 默认持久化处理
      */
     protected PersistExecutor persistExecutor;
-
-    /**
-     * 类型转换器
-     */
-    protected List<JdbcTypeConverter> jdbcTypeConverters;
 
     /**
      * 拦截器
@@ -186,10 +180,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public void setJdbcTypeConverters(List<JdbcTypeConverter> jdbcTypeConverters) {
-        this.jdbcTypeConverters = jdbcTypeConverters;
     }
 
     @Override

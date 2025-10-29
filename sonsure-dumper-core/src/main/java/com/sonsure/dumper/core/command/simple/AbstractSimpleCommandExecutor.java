@@ -58,7 +58,8 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     @Override
     public C parameter(BeanParameter beanParameter) {
-        throw new UnsupportedOperationException("暂不支持");
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(beanParameter.getBean(), !getExecutableCmdBuilder().isUpdateNull());
+        return this.parameters(propMap);
     }
 
     @Override

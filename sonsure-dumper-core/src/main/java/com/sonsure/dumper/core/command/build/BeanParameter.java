@@ -10,19 +10,14 @@
 package com.sonsure.dumper.core.command.build;
 
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author liyd
  */
-@Setter
 @Getter
 public class BeanParameter {
 
-    private Object bean;
-
-    public BeanParameter() {
-    }
+    private final Object bean;
 
     public BeanParameter(Object bean) {
         this.bean = bean;

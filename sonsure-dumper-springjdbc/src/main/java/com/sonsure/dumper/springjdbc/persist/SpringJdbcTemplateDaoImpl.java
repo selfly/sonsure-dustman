@@ -11,19 +11,14 @@ package com.sonsure.dumper.springjdbc.persist;
 
 
 import com.sonsure.dumper.core.config.JdbcEngineImpl;
-import com.sonsure.dumper.core.convert.JdbcTypeConverter;
-import com.sonsure.dumper.core.convert.SqliteCompatibleLocalDateTimeConverter;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.AbstractJdbcDaoImpl;
 import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author liyd
- * @date 17/4/12
+ * @since 17/4/12
  */
 public class SpringJdbcTemplateDaoImpl extends AbstractJdbcDaoImpl implements InitializingBean {
 
@@ -35,8 +30,6 @@ public class SpringJdbcTemplateDaoImpl extends AbstractJdbcDaoImpl implements In
             }
             JdbcTemplateEngineConfigImpl jdbcTemplateEngineConfig = new JdbcTemplateEngineConfigImpl();
             jdbcTemplateEngineConfig.setDataSource(getDataSource());
-            final List<JdbcTypeConverter> jdbcTypeConverters = Collections.singletonList(new SqliteCompatibleLocalDateTimeConverter());
-            jdbcTemplateEngineConfig.setJdbcTypeConverters(jdbcTypeConverters);
             defaultJdbcEngine = new JdbcEngineImpl(jdbcTemplateEngineConfig);
         }
     }
