@@ -14,12 +14,14 @@ import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.config.JdbcEngineConfig;
-import com.sonsure.dumper.core.convert.JdbcTypeConverterComposite;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
+import com.sonsure.dumper.core.interceptor.InterceptorChain;
+import com.sonsure.dumper.core.interceptor.PersistContext;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +35,17 @@ import java.util.Map;
 @Setter
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
-    protected JdbcEngineConfig jdbcEngineConfig;
+    private final JdbcEngineConfig jdbcEngineConfig;
+    protected List<PersistInterceptor> interceptors = new ArrayList<>(8);
 
     protected String dialect;
+
+    public AbstractPersistExecutor(JdbcEngineConfig jdbcEngineConfig) {
+        this.jdbcEngineConfig = jdbcEngineConfig;
+        if (jdbcEngineConfig.getPersistInterceptors() != null) {
+            this.interceptors.addAll(jdbcEngineConfig.getPersistInterceptors());
+        }
+    }
 
     @Override
     public String getDialect() {
@@ -45,26 +55,15 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
         return dialect;
     }
 
-
     @Override
     public Object execute(ExecutableCmd executableCmd) {
-        if (getJdbcEngineConfig().getJdbcTypeConverters() != null) {
-            JdbcTypeConverterComposite jdbcTypeConverterComposite = new JdbcTypeConverterComposite(getJdbcEngineConfig().getJdbcTypeConverters());
-            if (jdbcTypeConverterComposite.support(this.getDialect())) {
-                jdbcTypeConverterComposite.convert(this.getDialect(), executableCmd);
-            }
-        }
-        final List<PersistInterceptor> persistInterceptors = getJdbcEngineConfig().getPersistInterceptors();
-        boolean process = true;
-        if (persistInterceptors != null) {
-            for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                if (!persistInterceptor.executeBefore(this.getDialect(), executableCmd)) {
-                    process = false;
-                }
-            }
-        }
-        Object result = null;
-        if (process) {
+        PersistContext persistContext = new PersistContext(this.getDialect(), executableCmd);
+        InterceptorChain interceptorChain = new InterceptorChain(this.getInterceptors());
+        interceptorChain.doBefore(persistContext);
+        Object result;
+        if (persistContext.isSkipExecution()) {
+            result = persistContext.getResult();
+        } else {
             switch (executableCmd.getExecutionType()) {
                 case INSERT:
                     result = this.insert(executableCmd);
@@ -106,11 +105,8 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                     throw new SonsureJdbcException("不支持的CommandType:" + executableCmd.getExecutionType());
             }
         }
-        if (persistInterceptors != null) {
-            for (PersistInterceptor persistInterceptor : persistInterceptors) {
-                result = persistInterceptor.executeAfter(this.getDialect(), executableCmd, result);
-            }
-        }
+        interceptorChain.reset();
+        interceptorChain.doAfter(persistContext);
         return result;
     }
 

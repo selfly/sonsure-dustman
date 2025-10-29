@@ -1,7 +1,5 @@
 package com.sonsure.dumper.core.interceptor;
 
-import com.sonsure.dumper.core.command.build.ExecutableCmd;
-
 /**
  * @author selfly
  */
@@ -10,23 +8,16 @@ public interface PersistInterceptor {
     /**
      * 执行前调用
      *
-     * @param dialect       the dialect
-     * @param executableCmd the executable cmd
-     * @return the boolean
+     * @param persistContext the interceptor context
      */
-    default boolean executeBefore(String dialect, ExecutableCmd executableCmd) {
-        return true;
+    default void executeBefore(PersistContext persistContext) {
     }
 
     /**
      * 执行后调用,返回结果将替换实际查询结果
      *
-     * @param dialect       the dialect
-     * @param executableCmd the executable cmd
-     * @param commandResult the command result
-     * @return the object
+     * @param persistContext the persist context
      */
-    default Object executeAfter(String dialect, ExecutableCmd executableCmd, Object commandResult) {
-        return commandResult;
+    default void executeAfter(PersistContext persistContext) {
     }
 }

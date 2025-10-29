@@ -13,6 +13,7 @@ import com.sonsure.dumper.core.command.build.GenerateKey;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
+import com.sonsure.dumper.core.config.JdbcEngineConfig;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
@@ -38,7 +39,8 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     private final JdbcOperations jdbcOperations;
 
-    public JdbcTemplatePersistExecutor(JdbcOperations jdbcOperations) {
+    public JdbcTemplatePersistExecutor(JdbcEngineConfig jdbcEngineConfig, JdbcOperations jdbcOperations) {
+        super(jdbcEngineConfig);
         this.jdbcOperations = jdbcOperations;
     }
 

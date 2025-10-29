@@ -20,7 +20,6 @@ import com.sonsure.dumper.core.mapping.DefaultMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.page.NegotiatingPageHandler;
 import com.sonsure.dumper.core.page.PageHandler;
-import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import com.sonsure.dumper.core.persist.KeyGenerator;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -139,9 +138,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
                 throw new SonsureJdbcException("persistExecutor不能为空");
             }
         }
-        if ((persistExecutor instanceof AbstractPersistExecutor) && ((AbstractPersistExecutor) persistExecutor).getJdbcEngineConfig() == null) {
-            ((AbstractPersistExecutor) persistExecutor).setJdbcEngineConfig(this);
-        }
         return persistExecutor;
     }
 
@@ -190,11 +186,6 @@ public abstract class AbstractJdbcEngineConfig implements JdbcEngineConfig {
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    @Override
-    public List<JdbcTypeConverter> getJdbcTypeConverters() {
-        return jdbcTypeConverters;
     }
 
     public void setJdbcTypeConverters(List<JdbcTypeConverter> jdbcTypeConverters) {

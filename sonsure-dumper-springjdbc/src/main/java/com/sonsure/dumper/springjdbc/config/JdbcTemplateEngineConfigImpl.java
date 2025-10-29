@@ -19,7 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author liyd
- * @date 17/4/12
+ * @since 17/4/12
  */
 @Setter
 @Getter
@@ -32,7 +32,7 @@ public class JdbcTemplateEngineConfigImpl extends AbstractJdbcEngineConfig {
         if (jdbcOperations == null) {
             jdbcOperations = new JdbcTemplate(dataSource);
         }
-        return new JdbcTemplatePersistExecutor(this.jdbcOperations);
+        return new JdbcTemplatePersistExecutor(this, this.jdbcOperations);
     }
 
 }

@@ -12,7 +12,6 @@ package com.sonsure.dumper.core.config;
 
 import com.sonsure.dumper.core.command.build.ToggleCase;
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
-import com.sonsure.dumper.core.convert.JdbcTypeConverter;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.page.PageHandler;
@@ -76,13 +75,6 @@ public interface JdbcEngineConfig {
      * @return persist executor
      */
     PersistExecutor getPersistExecutor();
-
-    /**
-     * Gets jdbc type converters.
-     *
-     * @return the jdbc type converters
-     */
-    List<JdbcTypeConverter> getJdbcTypeConverters();
 
     /**
      * Gets persist interceptors.
