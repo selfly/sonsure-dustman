@@ -10,9 +10,9 @@
 package com.sonsure.dumper.core.command.entity;
 
 
-import com.sonsure.dumper.core.command.ExecutionType;
+import com.sonsure.dumper.core.command.build.ExecutionType;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 
 /**
  * The type Delete.
@@ -22,8 +22,8 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
  */
 public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> implements Delete {
 
-    public DeleteImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public DeleteImpl(JdbcExecutorConfig jdbcExecutorConfig) {
+        super(jdbcExecutorConfig);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DeleteImpl extends AbstractConditionCommandExecutor<Delete> impleme
         this.getExecutableCmdBuilder().executionType(ExecutionType.DELETE);
         this.getExecutableCmdBuilder().resultType(Integer.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (Integer) getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
 }

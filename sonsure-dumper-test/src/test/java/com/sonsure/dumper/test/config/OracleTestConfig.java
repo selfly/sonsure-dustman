@@ -1,11 +1,11 @@
 package com.sonsure.dumper.test.config;
 
-import com.sonsure.dumper.core.config.JdbcEngine;
+import com.sonsure.dumper.core.config.JdbcExecutor;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.core.persist.KeyGenerator;
 import com.sonsure.dumper.core.persist.OracleKeyGenerator;
-import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean;
+import com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean;
 import com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +24,8 @@ public class OracleTestConfig {
     }
 
     @Bean
-    public JdbcTemplateEngineFactoryBean oracleJdbcTemplateEngine(DataSource dataSource, MappingHandler mappingHandler) {
-        JdbcTemplateEngineFactoryBean jdbcTemplateEngineFactoryBean = new JdbcTemplateEngineFactoryBean();
+    public JdbcTemplateExecutorFactoryBean oracleJdbcTemplateEngine(DataSource dataSource, MappingHandler mappingHandler) {
+        JdbcTemplateExecutorFactoryBean jdbcTemplateEngineFactoryBean = new JdbcTemplateExecutorFactoryBean();
         jdbcTemplateEngineFactoryBean.setDataSource(dataSource);
         jdbcTemplateEngineFactoryBean.setMappingHandler(mappingHandler);
         jdbcTemplateEngineFactoryBean.setKeyGenerator(oracleKeyGenerator());
@@ -33,9 +33,9 @@ public class OracleTestConfig {
     }
 
     @Bean
-    public JdbcDao oracleJdbcDao(@Qualifier("oracleJdbcTemplateEngine") JdbcEngine jdbcEngine) {
+    public JdbcDao oracleJdbcDao(@Qualifier("oracleJdbcTemplateEngine") JdbcExecutor jdbcExecutor) {
         SpringJdbcTemplateDaoImpl jdbcDao = new SpringJdbcTemplateDaoImpl();
-        jdbcDao.setDefaultJdbcEngine(jdbcEngine);
+        jdbcDao.setDefaultJdbcExecutor(jdbcExecutor);
         return jdbcDao;
     }
 }

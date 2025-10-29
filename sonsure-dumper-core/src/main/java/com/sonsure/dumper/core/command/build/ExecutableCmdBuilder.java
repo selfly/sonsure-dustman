@@ -5,10 +5,9 @@ import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.common.validation.Verifier;
-import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 
@@ -29,7 +28,7 @@ public class ExecutableCmdBuilder {
     protected final SimpleSQL simpleSQL;
     protected final List<CmdParameter> cmdParameters;
     protected String command;
-    protected JdbcEngineConfig jdbcEngineConfig;
+    protected JdbcExecutorConfig jdbcExecutorConfig;
     protected ExecutionType executionType;
     protected boolean namedParameter = false;
     protected Map<String, String> tableAliasMapping;
@@ -41,7 +40,6 @@ public class ExecutableCmdBuilder {
     protected boolean disableCountQuery = false;
     protected boolean forceNative = false;
     protected boolean updateNull = false;
-    protected ToggleCase toggleCase;
     protected Class<?> resultType;
     protected GenerateKey generateKey;
     protected List<ExecutableCustomizer> customizers;
@@ -52,8 +50,8 @@ public class ExecutableCmdBuilder {
         tableAliasMapping = new HashMap<>(8);
     }
 
-    public ExecutableCmdBuilder jdbcEngineConfig(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
+    public ExecutableCmdBuilder jdbcExecutorConfig(JdbcExecutorConfig jdbcExecutorConfig) {
+        this.jdbcExecutorConfig = jdbcExecutorConfig;
         return this;
     }
 
@@ -421,7 +419,7 @@ public class ExecutableCmdBuilder {
 
 
     public ExecutableCmd build() {
-        Verifier.init().notNull(jdbcEngineConfig, "jdbc配置不能为空")
+        Verifier.init().notNull(jdbcExecutorConfig, "jdbc配置不能为空")
                 .notNull(executionType, "执行类型不能为空")
                 .notNull(resultType, "结果类型不能为空")
                 .validate();
@@ -434,12 +432,12 @@ public class ExecutableCmdBuilder {
             this.command = simpleSQL.toString();
         }
         ExecutableCmd executableCmd = new ExecutableCmd();
-        executableCmd.setJdbcEngineConfig(jdbcEngineConfig);
+        executableCmd.setJdbcExecutorConfig(jdbcExecutorConfig);
         executableCmd.setExecutionType(executionType);
         executableCmd.setResultType(this.resultType);
         executableCmd.setCommand(command);
         executableCmd.setParameters(this.cmdParameters);
-        executableCmd.setToggleCase(toggleCase);
+        executableCmd.setCaseStyle(jdbcExecutorConfig.getCaseStyle());
         executableCmd.setForceNative(this.forceNative);
         executableCmd.setNamedParameter(this.namedParameter);
         executableCmd.setGenerateKey(this.generateKey);
@@ -448,7 +446,7 @@ public class ExecutableCmdBuilder {
 
 
         if (!this.forceNative) {
-            final String resolvedCommand = jdbcEngineConfig.getCommandConversionHandler().convert(executableCmd.getCommand(), this.cmdParameters);
+            final String resolvedCommand = jdbcExecutorConfig.getCommandConversionHandler().convert(executableCmd.getCommand(), this.cmdParameters);
             executableCmd.setCommand(resolvedCommand);
         }
 
@@ -468,17 +466,17 @@ public class ExecutableCmdBuilder {
                     .collect(Collectors.toList());
             executableCmd.setParsedParameterValues(params);
         }
-        if (this.toggleCase != null) {
-            String caseCommand = this.convertCase(executableCmd.getCommand(), this.toggleCase);
+        if (executableCmd.getCaseStyle() != null) {
+            String caseCommand = this.convertCase(executableCmd.getCommand(), executableCmd.getCaseStyle());
             executableCmd.setCommand(caseCommand);
         }
         return executableCmd;
     }
 
-    protected String convertCase(String content, ToggleCase toggleCase) {
-        if (ToggleCase.UPPER == toggleCase) {
+    protected String convertCase(String content, CaseStyle caseStyle) {
+        if (CaseStyle.UPPERCASE == caseStyle) {
             content = content.toUpperCase();
-        } else if (ToggleCase.LOWER == toggleCase) {
+        } else if (CaseStyle.LOWERCASE == caseStyle) {
             content = content.toLowerCase();
         }
         return content;

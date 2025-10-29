@@ -43,14 +43,14 @@ CountCommandExecutor 类代码：
 
     public class CountCommandExecutorImpl implements CountCommandExecutor {
     
-        private JdbcEngineConfig jdbcEngineConfig;
+        private JdbcEngineConfig jdbcExecutorConfig;
     
         private CommandContextBuilder commandContextBuilder;
     
         private CountExecutorContext countExecutorContext;
     
-        public CountCommandExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-            this.jdbcEngineConfig = jdbcEngineConfig;
+        public CountCommandExecutorImpl(JdbcEngineConfig jdbcExecutorConfig) {
+            this.jdbcExecutorConfig = jdbcExecutorConfig;
             countExecutorContext = new CountExecutorContext();
         }
     
@@ -62,8 +62,8 @@ CountCommandExecutor 类代码：
     
         @Override
         public long getCount() {
-            CommandContext commandDetails = this.commandContextBuilder.build(this.countExecutorContext, this.jdbcEngineConfig);
-            PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
+            CommandContext commandDetails = this.commandContextBuilder.build(this.countExecutorContext, this.jdbcExecutorConfig);
+            PersistExecutor persistExecutor = this.jdbcExecutorConfig.getPersistExecutor();
             commandDetails.setResultType(Long.class);
             Object result = persistExecutor.execute(commandDetails, CommandType.QUERY_ONE_COL);
             return (Long) result;
@@ -79,14 +79,14 @@ CountCommandExecutorBuilderImpl 代码：
     public class CountCommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
     
         @Override
-        public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
+        public boolean support(Class<? extends CommandExecutor> commandExecutorClass, JdbcEngineConfig jdbcExecutorConfig) {
             return commandExecutorClass == CountCommandExecutor.class;
         }
     
         @SuppressWarnings("unchecked")
         @Override
-        public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig) {
-            CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcEngineConfig);
+        public <T extends CommandExecutor> T build(Class<T> commandExecutorClass, JdbcEngineConfig jdbcExecutorConfig) {
+            CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcExecutorConfig);
             return (T) commandExecutor;
         }
     }
@@ -100,7 +100,7 @@ CountCommandContextBuilder 代码：
         }
     
         @Override
-        public CommandContext doBuild(JdbcEngineConfig jdbcEngineConfig) {
+        public CommandContext doBuild(JdbcEngineConfig jdbcExecutorConfig) {
             Class<?> clazz = this.getCommandContextBuilderContext().getUniqueModelClass();
             CommandContext commandDetails = new CommandContext();
             commandDetails.setCommand("select count(*) from " + clazz.getSimpleName());
@@ -120,7 +120,7 @@ CountCommandContextBuilder 代码：
         </property>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="commandExecutorFactory" ref="commandExecutorFactory"/>
     </bean>

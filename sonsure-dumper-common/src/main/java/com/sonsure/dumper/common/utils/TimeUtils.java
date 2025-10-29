@@ -17,7 +17,7 @@ import java.util.Date;
 
 /**
  * @author liyd
- * @date 7/30/14
+ * @since 7/30/14
  */
 public class TimeUtils {
 

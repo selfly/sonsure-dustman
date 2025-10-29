@@ -13,7 +13,7 @@ package com.sonsure.dumper.core.persist;
 import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.interceptor.InterceptorChain;
 import com.sonsure.dumper.core.interceptor.PersistContext;
@@ -35,15 +35,15 @@ import java.util.Map;
 @Setter
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
-    private final JdbcEngineConfig jdbcEngineConfig;
+    private final JdbcExecutorConfig jdbcExecutorConfig;
     protected List<PersistInterceptor> interceptors = new ArrayList<>(8);
 
     protected String dialect;
 
-    public AbstractPersistExecutor(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
-        if (jdbcEngineConfig.getPersistInterceptors() != null) {
-            this.interceptors.addAll(jdbcEngineConfig.getPersistInterceptors());
+    public AbstractPersistExecutor(JdbcExecutorConfig jdbcExecutorConfig) {
+        this.jdbcExecutorConfig = jdbcExecutorConfig;
+        if (jdbcExecutorConfig.getPersistInterceptors() != null) {
+            this.interceptors.addAll(jdbcExecutorConfig.getPersistInterceptors());
         }
     }
 

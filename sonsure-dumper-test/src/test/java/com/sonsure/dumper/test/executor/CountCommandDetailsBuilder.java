@@ -12,7 +12,7 @@
 //import com.sonsure.dumper.core.command.AbstractCommonCommandDetailsBuilder;
 //import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 //import com.sonsure.dumper.core.command.CommandDetails;
-//import com.sonsure.dumper.core.config.JdbcEngineConfig;
+//import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 //
 //public class CountCommandDetailsBuilder extends AbstractCommonCommandDetailsBuilder {
 //
@@ -21,7 +21,7 @@
 //    }
 //
 //    @Override
-//    public CommandDetails doBuild(JdbcEngineConfig jdbcEngineConfig) {
+//    public CommandDetails doBuild(JdbcExecutorConfig jdbcExecutorConfig) {
 //        Class<?> clazz = this.getCommandContextBuilderContext().getUniqueModelClass();
 //        CommandDetails commandDetails = new CommandDetails();
 //        commandDetails.setCommand("select count(*) from " + clazz.getSimpleName());

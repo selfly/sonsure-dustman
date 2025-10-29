@@ -9,9 +9,15 @@
 
 package com.sonsure.dumper.core.config;
 
+import com.sonsure.dumper.core.persist.PersistExecutor;
+
 /**
  * @author liyd
  */
-public class JdbcEngineConfigImpl extends AbstractJdbcEngineConfig {
+public class JdbcExecutorConfigImpl extends AbstractJdbcExecutorConfig {
 
+    @Override
+    protected PersistExecutor initPersistExecutor() {
+        return null;
+    }
 }

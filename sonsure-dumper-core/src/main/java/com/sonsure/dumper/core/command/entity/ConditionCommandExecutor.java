@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
-import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.build.SqlOperator;
 import com.sonsure.dumper.core.command.build.GetterFunction;
 
 /**

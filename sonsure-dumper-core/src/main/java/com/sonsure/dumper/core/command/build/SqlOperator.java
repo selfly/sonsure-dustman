@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.core.command;
+package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;

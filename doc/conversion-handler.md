@@ -35,7 +35,7 @@ CommandConversionHandler的定义就一个方法：
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="commandConversionHandler" ref="jSqlParserCommandConversionHandler"/>

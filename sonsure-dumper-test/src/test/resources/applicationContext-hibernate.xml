@@ -85,18 +85,18 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <bean id="jdbcEngineConfig" class="com.sonsure.dumper.core.config.JdbcEngineConfigImpl">
+    <bean id="jdbcExecutorConfig" class="com.sonsure.dumper.core.config.JdbcExecutorConfigImpl">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="persistExecutor" ref="hibernatePersistExecutor"/>
     </bean>
 
-    <bean id="jdbcEngine" class="com.sonsure.dumper.core.config.JdbcEngineImpl">
-        <property name="jdbcEngineConfig" ref="jdbcEngineConfig"/>
+    <bean id="jdbcExecutor" class="com.sonsure.dumper.core.config.JdbcExecutorImpl">
+        <property name="jdbcExecutorConfig" ref="jdbcExecutorConfig"/>
     </bean>
 
     <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.JdbcDaoImpl">
-        <property name="defaultJdbcEngine" ref="jdbcEngine"/>
+        <property name="defaultJdbcEngine" ref="jdbcExecutor"/>
     </bean>
 
 </beans>

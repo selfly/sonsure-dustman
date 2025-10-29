@@ -10,8 +10,8 @@
 package com.sonsure.dumper.core.command.sql;
 
 import com.sonsure.dumper.core.command.build.CmdParameter;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.mapping.MappingHandler;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
@@ -27,26 +27,26 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JSqlParserCommandConversionHandler implements CommandConversionHandler {
 
-    protected Map<String, String> CACHE = new WeakHashMap<>(new ConcurrentHashMap<>());
+    protected final Map<String, String> cache = new WeakHashMap<>(new ConcurrentHashMap<>());
 
     /**
      * 映射处理器
      */
-    protected MappingHandler mappingHandler;
+    protected final JdbcExecutorConfig jdbcExecutorConfig;
 
-    public JSqlParserCommandConversionHandler(MappingHandler mappingHandler) {
-        this.mappingHandler = mappingHandler;
+    public JSqlParserCommandConversionHandler(JdbcExecutorConfig jdbcExecutorConfig) {
+        this.jdbcExecutorConfig = jdbcExecutorConfig;
     }
 
     @Override
     public String convert(String command, List<CmdParameter> parameters) {
 
-        String convertedCommand = CACHE.get(command);
+        String convertedCommand = cache.get(command);
         if (convertedCommand == null) {
             try {
                 StringBuilder buffer = new StringBuilder();
                 Statement statement = CCJSqlParserUtil.parse(command);
-                CommandMappingHandler commandMappingHandler = new CommandMappingHandler(statement, mappingHandler, parameters);
+                CommandMappingHandler commandMappingHandler = new CommandMappingHandler(statement, this.jdbcExecutorConfig.getMappingHandler(), parameters);
                 ExpressionDeParser expressionDeParser = new CommandExpressionDeParser();
                 SelectDeParser selectDeParser = new CommandSelectDeParser(expressionDeParser, buffer, commandMappingHandler);
                 expressionDeParser.setSelectVisitor(selectDeParser);
@@ -60,11 +60,4 @@ public class JSqlParserCommandConversionHandler implements CommandConversionHand
         return convertedCommand;
     }
 
-    public MappingHandler getMappingHandler() {
-        return mappingHandler;
-    }
-
-    public void setMappingHandler(MappingHandler mappingHandler) {
-        this.mappingHandler = mappingHandler;
-    }
 }

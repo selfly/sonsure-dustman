@@ -1,7 +1,7 @@
 package com.sonsure.dumper.flyable;
 
 import com.sonsure.dumper.common.utils.VersionUtils;
-import com.sonsure.dumper.core.command.OrderBy;
+import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.mapping.TablePrefixSupportHandler;
 import com.sonsure.dumper.core.persist.AbstractJdbcDaoImpl;
@@ -85,7 +85,7 @@ public class FlyableExecutor {
         if (!(jdbcDao instanceof AbstractJdbcDaoImpl)) {
             return;
         }
-        MappingHandler mappingHandler = ((AbstractJdbcDaoImpl) jdbcDao).getDefaultJdbcEngine().getJdbcEngineConfig().getMappingHandler();
+        MappingHandler mappingHandler = ((AbstractJdbcDaoImpl) jdbcDao).getDefaultJdbcExecutor().getConfig().getMappingHandler();
         if (mappingHandler instanceof TablePrefixSupportHandler) {
             this.flyablePrefix = ((TablePrefixSupportHandler) mappingHandler).getTablePrefix(FlyableHistory.class.getName());
         }

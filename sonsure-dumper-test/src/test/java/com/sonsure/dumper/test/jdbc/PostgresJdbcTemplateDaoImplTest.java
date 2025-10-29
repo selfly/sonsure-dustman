@@ -10,7 +10,7 @@
 package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.OrderBy;
+import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;

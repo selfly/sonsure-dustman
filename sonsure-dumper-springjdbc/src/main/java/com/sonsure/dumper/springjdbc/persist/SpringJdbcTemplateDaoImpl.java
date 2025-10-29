@@ -10,10 +10,10 @@
 package com.sonsure.dumper.springjdbc.persist;
 
 
-import com.sonsure.dumper.core.config.JdbcEngineImpl;
+import com.sonsure.dumper.core.config.JdbcExecutorImpl;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.persist.AbstractJdbcDaoImpl;
-import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineConfigImpl;
+import com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -24,13 +24,13 @@ public class SpringJdbcTemplateDaoImpl extends AbstractJdbcDaoImpl implements In
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (defaultJdbcEngine == null) {
+        if (defaultJdbcExecutor == null) {
             if (dataSource == null) {
-                throw new SonsureJdbcException("defaultJdbcEngine和dataSource不能同时为空");
+                throw new SonsureJdbcException("defaultJdbcExecutor和dataSource不能同时为空");
             }
-            JdbcTemplateEngineConfigImpl jdbcTemplateEngineConfig = new JdbcTemplateEngineConfigImpl();
-            jdbcTemplateEngineConfig.setDataSource(getDataSource());
-            defaultJdbcEngine = new JdbcEngineImpl(jdbcTemplateEngineConfig);
+            JdbcTemplateExecutorConfigImpl jdbcTemplateExecutorConfig = new JdbcTemplateExecutorConfigImpl();
+            jdbcTemplateExecutorConfig.setDataSource(getDataSource());
+            defaultJdbcExecutor = new JdbcExecutorImpl(jdbcTemplateExecutorConfig);
         }
     }
 }

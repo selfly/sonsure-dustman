@@ -15,7 +15,7 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
@@ -36,13 +36,13 @@ import java.util.List;
 @Setter
 public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> implements CommandExecutor<E> {
 
-    private JdbcEngineConfig jdbcEngineConfig;
+    private JdbcExecutorConfig jdbcExecutorConfig;
     private ExecutableCmdBuilder executableCmdBuilder;
 
-    public AbstractCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
-        this.jdbcEngineConfig = jdbcEngineConfig;
+    public AbstractCommandExecutor(JdbcExecutorConfig jdbcExecutorConfig) {
+        this.jdbcExecutorConfig = jdbcExecutorConfig;
         this.executableCmdBuilder = new ExecutableCmdBuilder();
-        this.executableCmdBuilder.jdbcEngineConfig(jdbcEngineConfig);
+        this.executableCmdBuilder.jdbcExecutorConfig(jdbcExecutorConfig);
     }
 
     @Override
@@ -62,19 +62,19 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         if (pagination == null) {
             throw new SonsureJdbcException("查询分页列表请设置分页信息");
         }
-        String dialect = getJdbcEngineConfig().getPersistExecutor().getDialect();
+        String dialect = getJdbcExecutorConfig().getPersistExecutor().getDialect();
         long count = Long.MAX_VALUE;
         if (!executableCmd.isDisableCountQuery()) {
-            String countCommand = getJdbcEngineConfig().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);
+            String countCommand = getJdbcExecutorConfig().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);
             ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
             countExecutableCmd.setCommand(countCommand);
             countExecutableCmd.setExecutionType(ExecutionType.QUERY_ONE_COL);
             countExecutableCmd.setResultType(Long.class);
-            Object result = getJdbcEngineConfig().getPersistExecutor().execute(countExecutableCmd);
+            Object result = getJdbcExecutorConfig().getPersistExecutor().execute(countExecutableCmd);
             count = (Long) result;
         }
         pagination.setTotalItems((int) count);
-        String pageCommand = getJdbcEngineConfig().getPageHandler().getPageCommand(executableCmd.getCommand(), pagination, dialect);
+        String pageCommand = getJdbcExecutorConfig().getPageHandler().getPageCommand(executableCmd.getCommand(), pagination, dialect);
         ExecutableCmd pageExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
         pageExecutableCmd.setCommand(pageCommand);
         List<T> list = pageQueryHandler.queryList(pageExecutableCmd);
@@ -127,7 +127,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
     }
 
     protected void registerClassToMappingHandler(Class<?> cls) {
-        MappingHandler mappingHandler = this.getJdbcEngineConfig().getMappingHandler();
+        MappingHandler mappingHandler = this.getJdbcExecutorConfig().getMappingHandler();
         if (mappingHandler instanceof AbstractMappingHandler) {
             ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
         }

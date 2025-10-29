@@ -9,23 +9,23 @@
 
 package com.sonsure.dumper.springjdbc.config;
 
-import com.sonsure.dumper.core.config.JdbcEngine;
-import com.sonsure.dumper.core.config.JdbcEngineImpl;
+import com.sonsure.dumper.core.config.JdbcExecutor;
+import com.sonsure.dumper.core.config.JdbcExecutorImpl;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * @author liyd
  */
-public class JdbcTemplateEngineFactoryBean extends JdbcTemplateEngineConfigImpl implements FactoryBean<JdbcEngine> {
+public class JdbcTemplateExecutorFactoryBean extends JdbcTemplateExecutorConfigImpl implements FactoryBean<JdbcExecutor> {
 
     @Override
-    public JdbcEngine getObject() throws Exception {
-        return new JdbcEngineImpl(this);
+    public JdbcExecutor getObject() throws Exception {
+        return new JdbcExecutorImpl(this);
     }
 
     @Override
     public Class<?> getObjectType() {
-        return JdbcEngine.class;
+        return JdbcExecutor.class;
     }
 
 }

@@ -20,7 +20,7 @@ import lombok.Getter;
  * <p/>
  *
  * @author liyd
- * @date 6/27/14
+ * @since 6/27/14
  */
 @Getter
 public class SonsureException extends RuntimeException {

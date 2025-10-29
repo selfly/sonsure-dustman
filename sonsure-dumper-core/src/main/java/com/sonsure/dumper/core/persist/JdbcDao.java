@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * @author liyd
- * @date 17/4/12
+ * @since 17/4/12
  */
 public interface JdbcDao {
 

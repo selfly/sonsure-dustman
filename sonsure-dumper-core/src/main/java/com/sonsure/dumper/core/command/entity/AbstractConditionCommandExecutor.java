@@ -11,11 +11,8 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.common.utils.ClassUtils;
 import com.sonsure.dumper.core.command.*;
-import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
-import com.sonsure.dumper.core.command.build.CommandBuildHelper;
-import com.sonsure.dumper.core.command.build.GetterFunction;
-import com.sonsure.dumper.core.command.build.EntityClassFieldWrapper;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.command.build.*;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 
 import java.util.Map;
 
@@ -28,8 +25,8 @@ import java.util.Map;
  */
 public abstract class AbstractConditionCommandExecutor<E extends ConditionCommandExecutor<E>> extends AbstractCommandExecutor<E> implements ConditionCommandExecutor<E> {
 
-    public AbstractConditionCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public AbstractConditionCommandExecutor(JdbcExecutorConfig jdbcExecutorConfig) {
+        super(jdbcExecutorConfig);
     }
 
     @Override

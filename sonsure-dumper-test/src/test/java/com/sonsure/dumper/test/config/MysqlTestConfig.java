@@ -1,9 +1,9 @@
 package com.sonsure.dumper.test.config;
 
-import com.sonsure.dumper.core.config.JdbcEngine;
+import com.sonsure.dumper.core.config.JdbcExecutor;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import com.sonsure.dumper.core.persist.JdbcDao;
-import com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean;
+import com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean;
 import com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl;
 import com.sonsure.dumper.test.flyable.FlyableInitializer;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -17,8 +17,8 @@ import javax.sql.DataSource;
 public class MysqlTestConfig {
 
     @Bean
-    public JdbcTemplateEngineFactoryBean jdbcTemplateEngine(DataSource dataSource, MappingHandler mappingHandler, SqlSessionFactory sqlSessionFactory) {
-        JdbcTemplateEngineFactoryBean jdbcTemplateEngineFactoryBean = new JdbcTemplateEngineFactoryBean();
+    public JdbcTemplateExecutorFactoryBean jdbcTemplateEngine(DataSource dataSource, MappingHandler mappingHandler, SqlSessionFactory sqlSessionFactory) {
+        JdbcTemplateExecutorFactoryBean jdbcTemplateEngineFactoryBean = new JdbcTemplateExecutorFactoryBean();
         jdbcTemplateEngineFactoryBean.setDataSource(dataSource);
         jdbcTemplateEngineFactoryBean.setMappingHandler(mappingHandler);
         jdbcTemplateEngineFactoryBean.setMybatisSqlSessionFactory(sqlSessionFactory);
@@ -26,9 +26,9 @@ public class MysqlTestConfig {
     }
 
     @Bean
-    public JdbcDao mysqlJdbcDao(@Qualifier("jdbcTemplateEngine") JdbcEngine jdbcEngine) {
+    public JdbcDao mysqlJdbcDao(@Qualifier("jdbcTemplateEngine") JdbcExecutor jdbcExecutor) {
         SpringJdbcTemplateDaoImpl jdbcDao = new SpringJdbcTemplateDaoImpl();
-        jdbcDao.setDefaultJdbcEngine(jdbcEngine);
+        jdbcDao.setDefaultJdbcExecutor(jdbcExecutor);
         return jdbcDao;
     }
 

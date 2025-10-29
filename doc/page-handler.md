@@ -62,7 +62,7 @@
 非常的简单，然后将它配置到`JdbcEngine`中即可使用：
 
     <bean id="postgresqlPageHandler" class="com.sonsure.dumper.core.page.PostgresqlPageHandler"/>
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <!-- ... -->
         <property name="pageHandler" ref="postgresqlPageHandler"/>
     </bean>
@@ -83,7 +83,7 @@
         </property>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <!-- ... -->
         <property name="pageHandler" ref="negotiatingPageHandler"/>
     </bean>

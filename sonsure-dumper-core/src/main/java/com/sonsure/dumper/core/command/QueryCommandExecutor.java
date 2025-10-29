@@ -13,6 +13,7 @@ import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
+import com.sonsure.dumper.core.command.build.ExecutionType;
 
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP);
         executableCmdBuilder.resultType(Map.class);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (Map<String, Object>) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (Map<String, Object>) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     /**
@@ -86,7 +87,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL);
         executableCmdBuilder.resultType(clazz);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (T) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (T) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     /**
@@ -102,7 +103,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL_LIST);
         executableCmdBuilder.resultType(clazz);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (List<T>) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (List<T>) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     /**
@@ -116,7 +117,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         executableCmdBuilder.resultType(List.class);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (List<Map<String, Object>>) executableCmdBuilder.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (List<Map<String, Object>>) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     /**

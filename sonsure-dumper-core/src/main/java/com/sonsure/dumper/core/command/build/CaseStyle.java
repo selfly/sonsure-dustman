@@ -3,14 +3,14 @@ package com.sonsure.dumper.core.command.build;
 /**
  * @author selfly
  */
-public enum ToggleCase {
+public enum CaseStyle {
 
     /**
      * Upper toggle case.
      */
-    UPPER,
+    UPPERCASE,
 
-    LOWER,
+    LOWERCASE,
 
     NONE;
 }

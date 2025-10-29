@@ -16,7 +16,7 @@
 
 package com.sonsure.dumper.springjdbc.persist;
 
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
 
     private String dialect;
 
-    private JdbcEngineConfig jdbcEngineConfig;
+    private JdbcExecutorConfig jdbcExecutorConfig;
 
     /**
      * The class we are mapping to
@@ -94,12 +94,12 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * which allows for specifying the mapped type once only.
      *
      * @param dialect          the dialect
-     * @param jdbcEngineConfig the jdbc engine config
+     * @param jdbcExecutorConfig the jdbc engine config
      * @param mappedClass      the class that each row should be mapped to
      */
-    public JdbcRowMapper(String dialect, JdbcEngineConfig jdbcEngineConfig, Class<T> mappedClass) {
+    public JdbcRowMapper(String dialect, JdbcExecutorConfig jdbcExecutorConfig, Class<T> mappedClass) {
         this.dialect = dialect.toLowerCase();
-        this.jdbcEngineConfig = jdbcEngineConfig;
+        this.jdbcExecutorConfig = jdbcExecutorConfig;
         this.mappedClass = mappedClass;
         this.mappedFields = new HashMap<>();
         this.mappedProperties = new HashSet<>();
@@ -179,7 +179,7 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
         ResultSetMetaData rsmd = rs.getMetaData();
         int columnCount = rsmd.getColumnCount();
         Set<String> populatedProperties = (isCheckFullyPopulated() ? new HashSet<>() : null);
-        final MappingHandler mappingHandler = this.jdbcEngineConfig.getMappingHandler();
+        final MappingHandler mappingHandler = this.jdbcExecutorConfig.getMappingHandler();
         for (int index = 1; index <= columnCount; index++) {
             String column = JdbcUtils.lookupColumnName(rsmd, index);
             String field = column.replaceAll(" ", "");
@@ -255,12 +255,12 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      *
      * @param <T>              the type parameter
      * @param dialect          the dialect
-     * @param jdbcEngineConfig the jdbc engine config
+     * @param jdbcExecutorConfig the jdbc engine config
      * @param mappedClass      the class that each row should be mapped to
      * @return the jdbc row mapper
      */
-    public static <T> JdbcRowMapper<T> newInstance(String dialect, JdbcEngineConfig jdbcEngineConfig, Class<T> mappedClass) {
-        return new JdbcRowMapper<>(dialect, jdbcEngineConfig, mappedClass);
+    public static <T> JdbcRowMapper<T> newInstance(String dialect, JdbcExecutorConfig jdbcExecutorConfig, Class<T> mappedClass) {
+        return new JdbcRowMapper<>(dialect, jdbcExecutorConfig, mappedClass);
     }
 
 }

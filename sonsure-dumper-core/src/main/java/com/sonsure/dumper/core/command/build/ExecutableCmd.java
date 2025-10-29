@@ -1,8 +1,7 @@
 package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.model.Pagination;
-import com.sonsure.dumper.core.command.ExecutionType;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +17,7 @@ public class ExecutableCmd {
     /**
      * The Jdbc engine config.
      */
-    private JdbcEngineConfig jdbcEngineConfig;
+    private JdbcExecutorConfig jdbcExecutorConfig;
 
     /**
      * The Command type.
@@ -41,7 +40,7 @@ public class ExecutableCmd {
     /**
      * The Command case.
      */
-    private ToggleCase toggleCase;
+    private CaseStyle caseStyle;
 
     /**
      * The Is native command.

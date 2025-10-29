@@ -17,9 +17,9 @@ public interface CommandExecutorCreator {
      *
      * @param <T>                  the type parameter
      * @param commandExecutorClass the command executor class
-     * @param jdbcEngineConfig     the jdbc engine config
+     * @param jdbcExecutorConfig     the jdbc engine config
      * @param params               the params
      * @return the t
      */
-    <T> T create(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params);
+    <T> T create(Class<T> commandExecutorClass, JdbcExecutorConfig jdbcExecutorConfig, Object... params);
 }

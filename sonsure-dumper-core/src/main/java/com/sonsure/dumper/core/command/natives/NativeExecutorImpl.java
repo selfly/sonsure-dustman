@@ -11,7 +11,7 @@ package com.sonsure.dumper.core.command.natives;
 
 
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandExecutor;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 
 /**
  * The type Native executor.
@@ -22,8 +22,8 @@ import com.sonsure.dumper.core.config.JdbcEngineConfig;
 public class NativeExecutorImpl extends AbstractSimpleCommandExecutor<NativeExecutor> implements NativeExecutor {
 
 
-    public NativeExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public NativeExecutorImpl(JdbcExecutorConfig jdbcExecutorConfig) {
+        super(jdbcExecutorConfig);
     }
 
     @Override

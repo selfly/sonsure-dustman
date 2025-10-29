@@ -1,4 +1,4 @@
-package com.sonsure.dumper.core.command;
+package com.sonsure.dumper.core.command.build;
 
 import lombok.Getter;
 

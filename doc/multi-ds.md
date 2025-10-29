@@ -8,14 +8,14 @@
         <constructor-arg name="modelPackages" value="com.sonsure.dumper.test.model.**"/>
     </bean>
 
-    <bean id="mysqlJdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="mysqlJdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="mysqlDataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
     <bean id="oracleKeyGenerator" class="com.sonsure.dumper.core.persist.OracleKeyGenerator"/>
 
-    <bean id="oracleJdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="oracleJdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="oracleDataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="keyGenerator" ref="oracleKeyGenerator"/>

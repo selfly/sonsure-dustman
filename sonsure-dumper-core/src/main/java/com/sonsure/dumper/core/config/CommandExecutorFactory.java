@@ -22,10 +22,10 @@ public interface CommandExecutorFactory {
      *
      * @param <T>                  the type parameter
      * @param commandExecutorClass the command executor class
-     * @param jdbcEngineConfig     the jdbc engine config
+     * @param jdbcExecutorConfig     the jdbc engine config
      * @param params               the params
      * @return command executor
      */
-    <T extends CommandExecutor<?>> T createCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params);
+    <T extends CommandExecutor<?>> T createCommandExecutor(Class<T> commandExecutorClass, JdbcExecutorConfig jdbcExecutorConfig, Object... params);
 
 }

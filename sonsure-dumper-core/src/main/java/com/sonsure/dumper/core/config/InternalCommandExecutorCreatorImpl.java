@@ -20,27 +20,27 @@ public class InternalCommandExecutorCreatorImpl implements CommandExecutorCreato
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T create(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
+    public <T> T create(Class<T> commandExecutorClass, JdbcExecutorConfig jdbcExecutorConfig, Object... params) {
         if (Insert.class == commandExecutorClass) {
-            return (T) new InsertImpl(jdbcEngineConfig);
+            return (T) new InsertImpl(jdbcExecutorConfig);
         }
         if (Select.class == commandExecutorClass) {
-            return (T) new SelectImpl<>(jdbcEngineConfig, params);
+            return (T) new SelectImpl<>(jdbcExecutorConfig, params);
         }
         if (Update.class == commandExecutorClass) {
-            return (T) new UpdateImpl(jdbcEngineConfig);
+            return (T) new UpdateImpl(jdbcExecutorConfig);
         }
         if (Delete.class == commandExecutorClass) {
-            return (T) new DeleteImpl(jdbcEngineConfig);
+            return (T) new DeleteImpl(jdbcExecutorConfig);
         }
         if (NativeExecutor.class == commandExecutorClass) {
-            return (T) new NativeExecutorImpl(jdbcEngineConfig);
+            return (T) new NativeExecutorImpl(jdbcExecutorConfig);
         }
         if (MybatisExecutor.class == commandExecutorClass) {
-            return (T) new MybatisExecutorImpl(jdbcEngineConfig);
+            return (T) new MybatisExecutorImpl(jdbcExecutorConfig);
         }
         if (BatchUpdateExecutor.class == commandExecutorClass) {
-            return (T) new BatchUpdateExecutorImpl(jdbcEngineConfig);
+            return (T) new BatchUpdateExecutorImpl(jdbcExecutorConfig);
         }
         return null;
     }

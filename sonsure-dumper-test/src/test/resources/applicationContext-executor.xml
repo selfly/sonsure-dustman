@@ -64,7 +64,7 @@
         </property>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="commandExecutorFactory" ref="commandExecutorFactory"/>
     </bean>

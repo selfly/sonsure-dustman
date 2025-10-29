@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.config;
 
 
-import com.sonsure.dumper.core.command.build.ToggleCase;
+import com.sonsure.dumper.core.command.build.CaseStyle;
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import com.sonsure.dumper.core.mapping.MappingHandler;
@@ -29,7 +29,7 @@ import java.util.List;
  * @author liyd
  * @since 17/4/11
  */
-public interface JdbcEngineConfig {
+public interface JdbcExecutorConfig {
 
     /**
      * Gets data source.
@@ -102,6 +102,6 @@ public interface JdbcEngineConfig {
      *
      * @return command case
      */
-    ToggleCase getCommandCase();
+    CaseStyle getCaseStyle();
 
 }

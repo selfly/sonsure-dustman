@@ -11,7 +11,7 @@ package com.sonsure.dumper.core.command.entity;
 
 import com.sonsure.dumper.core.command.*;
 import com.sonsure.dumper.core.command.build.*;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.persist.KeyGenerator;
 
 import java.util.Map;
@@ -22,15 +22,15 @@ import java.util.Map;
  */
 public class InsertImpl extends AbstractCommandExecutor<Insert> implements Insert {
 
-    public InsertImpl(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public InsertImpl(JdbcExecutorConfig jdbcExecutorConfig) {
+        super(jdbcExecutorConfig);
     }
 
     @Override
     public Insert into(Class<?> cls) {
         this.registerClassToMappingHandler(cls);
         this.getExecutableCmdBuilder().insertInto(cls.getSimpleName())
-                .addCustomizer(new InsertExecutableCustomizer(getJdbcEngineConfig(), cls));
+                .addCustomizer(new InsertExecutableCustomizer(getJdbcExecutorConfig(), cls));
         return this;
     }
 
@@ -65,16 +65,16 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
         this.getExecutableCmdBuilder().executionType(ExecutionType.INSERT);
         this.getExecutableCmdBuilder().resultType(Object.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     private static class InsertExecutableCustomizer implements ExecutableCustomizer {
 
-        private final JdbcEngineConfig jdbcEngineConfig;
+        private final JdbcExecutorConfig jdbcExecutorConfig;
         private final Class<?> cls;
 
-        public InsertExecutableCustomizer(JdbcEngineConfig jdbcEngineConfig, Class<?> cls) {
-            this.jdbcEngineConfig = jdbcEngineConfig;
+        public InsertExecutableCustomizer(JdbcExecutorConfig jdbcExecutorConfig, Class<?> cls) {
+            this.jdbcExecutorConfig = jdbcExecutorConfig;
             this.cls = cls;
         }
 
@@ -88,7 +88,7 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
             Object primaryKeyValue = executableCmdBuilder.getParameterMap().get(primaryKeyField.getFieldName());
             GenerateKey generateKey = new GenerateKey();
             if (primaryKeyValue == null) {
-                KeyGenerator keyGenerator = jdbcEngineConfig.getKeyGenerator();
+                KeyGenerator keyGenerator = jdbcExecutorConfig.getKeyGenerator();
                 if (keyGenerator != null) {
                     Object generateKeyValue = keyGenerator.generateKeyValue(entityClassWrapper.getEntityClass());
                     generateKey.setValue(generateKeyValue);

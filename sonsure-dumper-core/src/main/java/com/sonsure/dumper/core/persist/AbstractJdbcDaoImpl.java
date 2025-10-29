@@ -12,6 +12,7 @@ package com.sonsure.dumper.core.persist;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.CommandExecutor;
+import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.entity.Delete;
@@ -20,7 +21,7 @@ import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.entity.Update;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
-import com.sonsure.dumper.core.config.JdbcEngine;
+import com.sonsure.dumper.core.config.JdbcExecutor;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,138 +34,151 @@ import java.util.Map;
 
 /**
  * @author liyd
- * @date 17/4/13
+ * @since 17/4/13
  */
 @Setter
 public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     protected DataSource dataSource;
 
-    protected JdbcEngine defaultJdbcEngine;
+    protected JdbcExecutor defaultJdbcExecutor;
 
     @Getter
-    protected Map<String, JdbcEngine> jdbcEngineMap;
+    protected Map<String, JdbcExecutor> jdbcExecutorMap;
 
     @Override
     public JdbcDao use(String name) {
-        if (jdbcEngineMap == null) {
-            throw new SonsureJdbcException("使用多数据源模式请先初始化jdbcEngineMap属性");
+        if (jdbcExecutorMap == null) {
+            throw new SonsureJdbcException("使用多数据源模式请先初始化jdbcExecutorMap属性");
         }
-        JdbcEngine jdbcEngine = jdbcEngineMap.get(name);
-        if (jdbcEngine == null) {
+        JdbcExecutor jdbcExecutor = jdbcExecutorMap.get(name);
+        if (jdbcExecutor == null) {
             throw new SonsureJdbcException("指定的数据源操作对象不存在");
         }
-        return new FlexibleJdbcDaoImpl(jdbcEngine);
+        return new FlexibleJdbcDaoImpl(jdbcExecutor);
     }
 
     @Override
     public <T> T get(Class<T> entityClass, Serializable id) {
-        return this.getDefaultJdbcEngine().get(entityClass, id);
+        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entityClass);
+        return this.selectFrom(entityClass).where(pkField, id).singleResult(entityClass);
     }
 
     @Override
     public <T> List<T> find(Class<T> entityClass) {
-        return this.getDefaultJdbcEngine().find(entityClass);
+        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entityClass);
+        return this.selectFrom(entityClass).orderBy(pkField, OrderBy.DESC).list(entityClass);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> find(T entity) {
-        return this.getDefaultJdbcEngine().find(entity);
+        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entity.getClass());
+        return (List<T>) this.selectFrom(entity.getClass()).whereForBean(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Pageable> Page<T> pageResult(T entity) {
-        return this.getDefaultJdbcEngine().pageResult(entity);
+        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entity.getClass());
+        return (Page<T>) this.selectFrom(entity.getClass()).whereForBean(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).pageResult(entity.getClass());
     }
 
     @Override
     public long findCount(Object entity) {
-        return this.getDefaultJdbcEngine().findCount(entity);
+        return this.selectFrom(entity.getClass()).whereForBean(entity).count();
     }
 
     @Override
     public long findCount(Class<?> cls) {
-        return this.getDefaultJdbcEngine().findCount(cls);
+        return this.selectFrom(cls).count();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T singleResult(T entity) {
-        return this.getDefaultJdbcEngine().singleResult(entity);
+        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).singleResult(entity.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T firstResult(T entity) {
-        return this.getDefaultJdbcEngine().firstResult(entity);
+        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).firstResult(entity.getClass());
     }
 
     @Override
     public Object executeInsert(Object entity) {
-        return this.getDefaultJdbcEngine().executeInsert(entity);
+        return this.insertInto(entity.getClass()).intoForObject(entity).execute();
     }
 
     @Override
     public Insert insertInto(Class<?> cls) {
-        return this.getDefaultJdbcEngine().insertInto(cls);
+        return this.insert().into(cls);
     }
 
     @Override
     public int executeDelete(Class<?> entityClass, Serializable id) {
-        return this.getDefaultJdbcEngine().executeDelete(entityClass, id);
+        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entityClass);
+        return this.deleteFrom(entityClass).where(pkField, id).execute();
     }
 
     @Override
     public int executeDelete(Object entity) {
-        return this.getDefaultJdbcEngine().executeDelete(entity);
+        return this.delete().from(entity.getClass()).whereForBean(entity).execute();
     }
 
     @Override
     public int executeDelete(Class<?> cls) {
-        return this.getDefaultJdbcEngine().executeDelete(cls);
+        return this.delete().from(cls).execute();
     }
 
     @Override
     public int executeUpdate(Object entity) {
-        return this.getDefaultJdbcEngine().executeUpdate(entity);
+        return this.update(entity.getClass())
+                .setForBean(entity)
+                .whereForBeanPrimaryKey(entity)
+                .execute();
     }
 
     @Override
     public Update update(Class<?> cls) {
-        return this.getDefaultJdbcEngine().update(cls);
+        return this.update().table(cls);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <M> Select<M> selectFrom(Class<M> cls) {
-        return this.getDefaultJdbcEngine().selectFrom(cls);
+        return this.getDefaultJdbcExecutor().createExecutor(Select.class, cls);
     }
 
     @Override
     public Insert insert() {
-        return this.getDefaultJdbcEngine().insert();
+        return this.getDefaultJdbcExecutor().createExecutor(Insert.class, null);
     }
 
     @Override
     public Delete delete() {
-        return this.getDefaultJdbcEngine().delete();
+        return this.getDefaultJdbcExecutor().createExecutor(Delete.class, null);
     }
 
     @Override
     public Delete deleteFrom(Class<?> cls) {
-        return this.getDefaultJdbcEngine().deleteFrom(cls);
+        return this.delete().from(cls);
     }
 
     @Override
     public Update update() {
-        return this.getDefaultJdbcEngine().update();
+        return this.getDefaultJdbcExecutor().createExecutor(Update.class, null);
     }
 
     @Override
     public BatchUpdateExecutor batchUpdate() {
-        return this.getDefaultJdbcEngine().batchUpdate();
+        return this.getDefaultJdbcExecutor().createExecutor(BatchUpdateExecutor.class, null);
     }
 
     @Override
     public <T> Object executeBatchUpdate(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
-        return this.getDefaultJdbcEngine().executeBatchUpdate(command, batchData, batchSize, parameterizedSetter);
+        return this.batchUpdate().execute(command, batchData, batchSize, parameterizedSetter);
     }
 
     @Override
@@ -174,17 +188,17 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     @Override
     public NativeExecutor nativeExecutor() {
-        return this.getDefaultJdbcEngine().createExecutor(NativeExecutor.class, null);
+        return this.getDefaultJdbcExecutor().createExecutor(NativeExecutor.class, null);
     }
 
     @Override
     public MybatisExecutor myBatisExecutor() {
-        return this.getDefaultJdbcEngine().createExecutor(MybatisExecutor.class, null);
+        return this.getDefaultJdbcExecutor().createExecutor(MybatisExecutor.class, null);
     }
 
     @Override
     public <T extends CommandExecutor<?>> T executor(Class<T> executor) {
-        return this.getDefaultJdbcEngine().createExecutor(executor, null);
+        return this.getDefaultJdbcExecutor().createExecutor(executor, null);
     }
 
     @Override
@@ -192,19 +206,19 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
         if (this.dataSource != null) {
             return this.dataSource;
         }
-        return this.getDefaultJdbcEngine().getDataSource();
+        return this.getDefaultJdbcExecutor().getDataSource();
     }
 
     @Override
     public String getDatabaseProduct() {
-        return this.getDefaultJdbcEngine().getDatabaseProduct();
+        return this.getDefaultJdbcExecutor().getDatabaseProduct();
     }
 
-    public JdbcEngine getDefaultJdbcEngine() {
-        if (this.defaultJdbcEngine == null) {
-            throw new SonsureJdbcException("jdbcEngine不能为空");
+    public JdbcExecutor getDefaultJdbcExecutor() {
+        if (this.defaultJdbcExecutor == null) {
+            throw new SonsureJdbcException("jdbcExecutor不能为空");
         }
-        return this.defaultJdbcEngine;
+        return this.defaultJdbcExecutor;
     }
 
 }

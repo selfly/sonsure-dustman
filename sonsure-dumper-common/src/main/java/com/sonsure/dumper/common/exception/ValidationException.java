@@ -11,7 +11,7 @@ package com.sonsure.dumper.common.exception;
 
 /**
  * @author liyd
- * @date 17/7/10
+ * @since 17/7/10
  */
 public class ValidationException extends SonsureException {
 

@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  *
  * @author liyd
- * @date 2016-1-4
+ * @since 2016-1-4
  */
 @Target({ FIELD })
 @Retention(RUNTIME)

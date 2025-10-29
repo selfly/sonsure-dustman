@@ -17,13 +17,13 @@ sql中的表名以及列名都是对应实体类的类名和属性名，会自�
         <constructor-arg name="modelPackages" value="com.sonsure.dumper.test.model.**"/>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateEngineFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
     <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
-        <property name="jdbcEngine" ref="jdbcTemplateEngine"/>
+        <property name="jdbcExecutor" ref="jdbcTemplateEngine"/>
     </bean>
     
 这样，我们就可以使用短名称来执行sql了：

@@ -12,7 +12,7 @@ package com.sonsure.dumper.core.persist;
 /**
  *
  * @author liyd
- * @date 17/4/12
+ * @since 17/4/12
  */
 public interface KeyGenerator {
 

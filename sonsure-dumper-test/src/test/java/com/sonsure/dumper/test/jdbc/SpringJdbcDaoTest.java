@@ -11,8 +11,8 @@ package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
-import com.sonsure.dumper.core.command.OrderBy;
-import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.build.OrderBy;
+import com.sonsure.dumper.core.command.build.SqlOperator;
 import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.persist.JdbcDao;

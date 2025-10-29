@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
  * <p>
  *
  * @author liyd
- * @date 8/10/14
+ * @since 8/10/14
  */
 public class EnumConverter {
 

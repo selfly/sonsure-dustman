@@ -11,6 +11,7 @@ package com.sonsure.dumper.test.sql;
 
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
 import com.sonsure.dumper.core.command.sql.JSqlParserCommandConversionHandler;
+import com.sonsure.dumper.core.config.JdbcExecutorConfigImpl;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.mapping.DefaultMappingHandler;
 import com.sonsure.dumper.test.model.UserInfo;
@@ -36,7 +37,9 @@ public class JSqlParserCommandConversionHandlerTest {
         customClassMapping.put("Series", Series.class);
         customClassMapping.put("RelSeries", RelSeries.class);
         mappingHandler.setCustomClassMapping(customClassMapping);
-        commandConversionHandler = new JSqlParserCommandConversionHandler(mappingHandler);
+        JdbcExecutorConfigImpl config = new JdbcExecutorConfigImpl();
+        config.setMappingHandler(mappingHandler);
+        commandConversionHandler = new JSqlParserCommandConversionHandler(config);
     }
 
     @Test
@@ -171,7 +174,9 @@ public class JSqlParserCommandConversionHandlerTest {
     public void commandToSql15() {
         DefaultMappingHandler mh = new DefaultMappingHandler();
         mh.setFailOnMissingClass(false);
-        JSqlParserCommandConversionHandler cch = new JSqlParserCommandConversionHandler(mh);
+        JdbcExecutorConfigImpl config = new JdbcExecutorConfigImpl();
+        config.setMappingHandler(mh);
+        JSqlParserCommandConversionHandler cch = new JSqlParserCommandConversionHandler(config);
         String command3 = "select loginName, password from UnUserInfo where userInfoId = ?";
         String sql3 = cch.convert(command3, null);
         Assertions.assertEquals(command3.toLowerCase(), sql3.toLowerCase());
@@ -179,9 +184,7 @@ public class JSqlParserCommandConversionHandlerTest {
 
     @Test
     public void commandToSql16() {
-        DefaultMappingHandler mh = new DefaultMappingHandler();
-        mh.setFailOnMissingClass(false);
-        JSqlParserCommandConversionHandler cch = new JSqlParserCommandConversionHandler(mh);
+        JSqlParserCommandConversionHandler cch = new JSqlParserCommandConversionHandler(new JdbcExecutorConfigImpl());
         String command3 = "SELECT * FROM articles WHERE MATCH (tags) AGAINST ('哈哈' IN BOOLEAN MODE)";
         String sql3 = cch.convert(command3, null);
         Assertions.assertEquals(command3.toLowerCase(), sql3.toLowerCase());

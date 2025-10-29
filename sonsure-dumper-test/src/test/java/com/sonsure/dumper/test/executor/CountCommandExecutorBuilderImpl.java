@@ -11,13 +11,13 @@
 //
 //import com.sonsure.dumper.core.command.CommandExecutor;
 //import com.sonsure.dumper.core.config.AbstractCommandExecutorBuilder;
-//import com.sonsure.dumper.core.config.JdbcEngineConfig;
+//import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 //
 //public class CountCommandExecutorBuilderImpl extends AbstractCommandExecutorBuilder {
 //
 //    @Override
-//    public <T extends CommandExecutor, M> T build(Class<T> commandExecutorClass, Class<M> modelClass, JdbcEngineConfig jdbcEngineConfig) {
-//        CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcEngineConfig);
+//    public <T extends CommandExecutor, M> T build(Class<T> commandExecutorClass, Class<M> modelClass, JdbcExecutorConfig jdbcExecutorConfig) {
+//        CountCommandExecutorImpl commandExecutor = new CountCommandExecutorImpl(jdbcExecutorConfig);
 //        //noinspection unchecked
 //        return (T) commandExecutor;
 //    }

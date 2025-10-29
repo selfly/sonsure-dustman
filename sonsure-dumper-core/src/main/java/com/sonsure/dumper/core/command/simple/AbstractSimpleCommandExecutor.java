@@ -11,9 +11,9 @@ package com.sonsure.dumper.core.command.simple;
 
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.core.command.AbstractCommandExecutor;
-import com.sonsure.dumper.core.command.ExecutionType;
+import com.sonsure.dumper.core.command.build.ExecutionType;
 import com.sonsure.dumper.core.command.build.*;
-import com.sonsure.dumper.core.config.JdbcEngineConfig;
+import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -32,8 +32,8 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     protected ResultHandler<?> resultHandler;
 
-    public AbstractSimpleCommandExecutor(JdbcEngineConfig jdbcEngineConfig) {
-        super(jdbcEngineConfig);
+    public AbstractSimpleCommandExecutor(JdbcExecutorConfig jdbcExecutorConfig) {
+        super(jdbcExecutorConfig);
         this.getExecutableCmdBuilder().addCustomizer(new NativeInsertExecutableCustomizer());
     }
 
@@ -73,7 +73,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Long) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (Long) getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @Override
@@ -81,7 +81,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP);
         this.getExecutableCmdBuilder().resultType(Map.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        Object result = getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        Object result = getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
         return this.handleResult(result, getResultHandler(cls));
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(List.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        List<Map<String, Object>> mapList = (List<Map<String, Object>>) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        List<Map<String, Object>> mapList = (List<Map<String, Object>>) this.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
         return this.handleResult(mapList, getResultHandler(cls));
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
+        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcExecutorConfig().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -116,7 +116,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcEngineConfig().getPersistExecutor().execute(cmd));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcExecutorConfig().getPersistExecutor().execute(cmd));
     }
 
     @Override
@@ -124,7 +124,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.INSERT);
         this.getExecutableCmdBuilder().resultType(Object.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Serializable) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (Serializable) getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @Override
@@ -132,7 +132,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.INSERT);
         this.getExecutableCmdBuilder().resultType(Object.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Serializable) this.getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (Serializable) this.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @Override
@@ -140,7 +140,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.UPDATE);
         this.getExecutableCmdBuilder().resultType(Integer.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Integer) getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        return (Integer) getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @Override
@@ -148,7 +148,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.EXECUTE);
         this.getExecutableCmdBuilder().resultType(Void.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @Override
@@ -156,7 +156,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.EXECUTE_SCRIPT);
         this.getExecutableCmdBuilder().resultType(Void.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        getJdbcEngineConfig().getPersistExecutor().execute(executableCmd);
+        getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")

@@ -11,9 +11,9 @@ package com.sonsure.dumper.core.command.entity;
 
 
 import com.sonsure.dumper.common.model.Page;
-import com.sonsure.dumper.core.command.OrderBy;
+import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.QueryCommandExecutor;
-import com.sonsure.dumper.core.command.SqlOperator;
+import com.sonsure.dumper.core.command.build.SqlOperator;
 import com.sonsure.dumper.core.command.build.GetterFunction;
 
 import java.util.List;

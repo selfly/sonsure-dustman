@@ -11,18 +11,18 @@
 //
 //import com.sonsure.dumper.core.command.CommandContextBuilderContext;
 //import com.sonsure.dumper.core.command.CommandDetails;
-//import com.sonsure.dumper.core.command.ExecutionType;
-//import com.sonsure.dumper.core.config.JdbcEngineConfig;
+//import com.sonsure.dumper.core.command.build.ExecutionType;
+//import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 //import com.sonsure.dumper.core.persist.PersistExecutor;
 //
 //public class CountCommandExecutorImpl implements CountCommandExecutor {
 //
-//    private JdbcEngineConfig jdbcEngineConfig;
+//    private JdbcExecutorConfig jdbcExecutorConfig;
 //
 //    private CountCommandDetailsBuilder countCommandContextBuilder;
 //
-//    public CountCommandExecutorImpl(JdbcEngineConfig jdbcEngineConfig) {
-//        this.jdbcEngineConfig = jdbcEngineConfig;
+//    public CountCommandExecutorImpl(JdbcExecutorConfig jdbcExecutorConfig) {
+//        this.jdbcExecutorConfig = jdbcExecutorConfig;
 //        this.countCommandContextBuilder = new CountCommandDetailsBuilder(new CommandContextBuilderContext());
 //    }
 //
@@ -34,8 +34,8 @@
 //
 //    @Override
 //    public long getCount() {
-//        CommandDetails commandDetails = this.countCommandContextBuilder.build(this.jdbcEngineConfig);
-//        PersistExecutor persistExecutor = this.jdbcEngineConfig.getPersistExecutor();
+//        CommandDetails commandDetails = this.countCommandContextBuilder.build(this.jdbcExecutorConfig);
+//        PersistExecutor persistExecutor = this.jdbcExecutorConfig.getPersistExecutor();
 //        commandDetails.setResultType(Long.class);
 //        Object result = persistExecutor.execute(commandDetails, ExecutionType.QUERY_ONE_COL);
 //        return (Long) result;

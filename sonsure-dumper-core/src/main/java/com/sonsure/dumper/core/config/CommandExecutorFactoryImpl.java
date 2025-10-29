@@ -30,12 +30,12 @@ public class CommandExecutorFactoryImpl implements CommandExecutorFactory {
     }
 
     @Override
-    public <T extends CommandExecutor<?>> T createCommandExecutor(Class<T> commandExecutorClass, JdbcEngineConfig jdbcEngineConfig, Object... params) {
+    public <T extends CommandExecutor<?>> T createCommandExecutor(Class<T> commandExecutorClass, JdbcExecutorConfig jdbcExecutorConfig, Object... params) {
         CommandExecutorCreator commandExecutorCreator = commandExecutorCreators.get(commandExecutorClass);
         if (commandExecutorCreator == null) {
             throw new SonsureJdbcException(String.format("没有找到对应的CommandExecutorCreator,commandExecutorClass:%s", commandExecutorClass.getName()));
         }
-        return commandExecutorCreator.create(commandExecutorClass, jdbcEngineConfig, params);
+        return commandExecutorCreator.create(commandExecutorClass, jdbcExecutorConfig, params);
     }
 
     public void registerCommandExecutorCreator(CommandExecutorCreator commandExecutorCreator) {

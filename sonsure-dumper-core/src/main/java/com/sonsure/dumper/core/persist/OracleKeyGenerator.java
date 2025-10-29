@@ -15,7 +15,7 @@ import com.sonsure.dumper.common.utils.NameUtils;
 /**
  *
  * @author liyd
- * @date 16/8/25
+ * @since 16/8/25
  */
 public class OracleKeyGenerator implements KeyGenerator {
 

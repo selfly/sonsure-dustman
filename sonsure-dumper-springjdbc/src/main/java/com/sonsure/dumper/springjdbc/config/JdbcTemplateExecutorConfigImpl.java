@@ -9,7 +9,7 @@
 
 package com.sonsure.dumper.springjdbc.config;
 
-import com.sonsure.dumper.core.config.AbstractJdbcEngineConfig;
+import com.sonsure.dumper.core.config.AbstractJdbcExecutorConfig;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 import com.sonsure.dumper.springjdbc.persist.JdbcTemplatePersistExecutor;
 import lombok.Getter;
@@ -23,7 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @Setter
 @Getter
-public class JdbcTemplateEngineConfigImpl extends AbstractJdbcEngineConfig {
+public class JdbcTemplateExecutorConfigImpl extends AbstractJdbcExecutorConfig {
 
     private JdbcOperations jdbcOperations;
 
