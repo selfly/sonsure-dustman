@@ -23,4 +23,8 @@ public class BeanParameter {
         this.bean = bean;
     }
 
+    public static BeanParameter of(Object bean) {
+        return new BeanParameter(bean);
+    }
+
 }

@@ -14,6 +14,7 @@ import com.sonsure.dumper.core.command.AbstractCommandExecutor;
 import com.sonsure.dumper.core.command.build.ExecutionType;
 import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -58,6 +59,9 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     @Override
     public C parameter(BeanParameter beanParameter) {
+        if (!this.getExecutableCmdBuilder().isNamedParameter()) {
+            throw new SonsureJdbcException("BeanParameter需要named方式传参");
+        }
         Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(beanParameter.getBean(), !getExecutableCmdBuilder().isUpdateNull());
         return this.parameters(propMap);
     }

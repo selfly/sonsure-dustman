@@ -11,12 +11,14 @@ package com.sonsure.dumper.test.jdbc;
 
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
+import com.sonsure.dumper.core.command.build.BeanParameter;
 import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.build.SqlOperator;
 import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.basic.BaseTest;
+import com.sonsure.dumper.test.config.DumperTestConfig;
 import com.sonsure.dumper.test.model.Account;
 import com.sonsure.dumper.test.model.AnnotationUserInfo;
 import com.sonsure.dumper.test.model.UserInfo;
@@ -782,6 +784,22 @@ public class SpringJdbcDaoTest extends BaseTest {
         Assertions.assertEquals("newName", user.getLoginName());
     }
 
+
+    @Test
+    public void nativeExecutorBeanParam() {
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(39L);
+        user.setLoginName("name-bean");
+        int count = jdbcDao.nativeExecutor()
+                .command("update UserInfo set loginName = :loginName where userInfoId = :userInfoId")
+                .namedParameter()
+                .parameter(BeanParameter.of(user))
+                .update();
+        Assertions.assertEquals(1, count);
+        UserInfo user2 = jdbcDao.get(UserInfo.class, 39L);
+        Assertions.assertEquals("name-bean", user2.getLoginName());
+    }
+
     @Test
     public void nativeExecutorForceNativeAndNamed() {
         int count = jdbcDao.nativeExecutor()
@@ -1456,5 +1474,16 @@ public class SpringJdbcDaoTest extends BaseTest {
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals(10L, (Long) list.get(0).get("num"));
         Assertions.assertEquals(userType, list.get(0).get("user_type"));
+    }
+
+    @Test
+    public void testInterceptor() {
+        //sql不执行通过拦截器返回数据
+        List<UserInfo> list = jdbcDao.nativeExecutor()
+                .command(DumperTestConfig.TestInterceptor.SQL)
+                .list(UserInfo.class);
+
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals("interceptorUser", list.get(0).getLoginName());
     }
 }

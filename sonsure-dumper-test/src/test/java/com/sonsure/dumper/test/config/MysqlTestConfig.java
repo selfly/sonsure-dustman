@@ -12,21 +12,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 
 @Configuration
 public class MysqlTestConfig {
 
+
     @Bean
-    public JdbcTemplateExecutorFactoryBean jdbcTemplateEngine(DataSource dataSource, MappingHandler mappingHandler, SqlSessionFactory sqlSessionFactory) {
+    public JdbcTemplateExecutorFactoryBean jdbcTemplateExecutor(DataSource dataSource, MappingHandler mappingHandler, SqlSessionFactory sqlSessionFactory) {
         JdbcTemplateExecutorFactoryBean jdbcTemplateEngineFactoryBean = new JdbcTemplateExecutorFactoryBean();
         jdbcTemplateEngineFactoryBean.setDataSource(dataSource);
         jdbcTemplateEngineFactoryBean.setMappingHandler(mappingHandler);
         jdbcTemplateEngineFactoryBean.setMybatisSqlSessionFactory(sqlSessionFactory);
+        jdbcTemplateEngineFactoryBean.setPersistInterceptors(Collections.singletonList(new DumperTestConfig.TestInterceptor()));
         return jdbcTemplateEngineFactoryBean;
     }
 
     @Bean
-    public JdbcDao mysqlJdbcDao(@Qualifier("jdbcTemplateEngine") JdbcExecutor jdbcExecutor) {
+    public JdbcDao mysqlJdbcDao(@Qualifier("jdbcTemplateExecutor") JdbcExecutor jdbcExecutor) {
         SpringJdbcTemplateDaoImpl jdbcDao = new SpringJdbcTemplateDaoImpl();
         jdbcDao.setDefaultJdbcExecutor(jdbcExecutor);
         return jdbcDao;
@@ -36,4 +39,5 @@ public class MysqlTestConfig {
     public FlyableInitializer flyableInitializer(@Qualifier("mysqlJdbcDao") JdbcDao jdbcDao) {
         return new FlyableInitializer(jdbcDao);
     }
+
 }

@@ -89,7 +89,7 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     protected Map<String, Class<?>> customClassMapping;
 
     public AbstractMappingHandler(String modelPackages, ClassLoader classLoader) {
-        this.failOnMissingClass = true;
+        this.failOnMissingClass = false;
         loadedClass = new ConcurrentHashMap<>();
         classMapping = new ConcurrentHashMap<>();
         customClassMapping = new ConcurrentHashMap<>();
