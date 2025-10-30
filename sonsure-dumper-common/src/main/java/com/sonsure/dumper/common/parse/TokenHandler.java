@@ -10,7 +10,9 @@
 package com.sonsure.dumper.common.parse;
 
 /**
- * Created by liyd on 2015-11-24.
+ *
+ * @author liyd
+ * @since 2015-11-24
  */
 public interface TokenHandler {
 
@@ -20,5 +22,5 @@ public interface TokenHandler {
      * @param content the content
      * @return the string
      */
-    String handleToken(String content, GenericTokenParser parser);
+    String handleToken(String content);
 }

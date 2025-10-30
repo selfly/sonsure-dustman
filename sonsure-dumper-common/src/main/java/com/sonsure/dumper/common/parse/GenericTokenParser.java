@@ -9,10 +9,10 @@
 
 package com.sonsure.dumper.common.parse;
 
+import com.sonsure.dumper.common.utils.StrUtils;
 import lombok.Getter;
 
 /**
- *
  * @author liyd
  * @since 2015-11-24
  */
@@ -58,7 +58,10 @@ public class GenericTokenParser {
                         builder.append(src, offset, start - offset);
                         offset = start + openToken.length();
                         String content = new String(src, offset, end - offset);
-                        builder.append(handler.handleToken(content, this));
+                        if (StrUtils.contains(content, openToken) && StrUtils.contains(content, closeToken)) {
+                            content = this.parse(content);
+                        }
+                        builder.append(handler.handleToken(content));
                         offset = end + closeToken.length();
                     }
                 }

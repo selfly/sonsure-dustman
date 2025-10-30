@@ -72,7 +72,7 @@ public class MigrationResource {
     public String getResourceContent(Charset charset) {
         String text = new String(this.resourceBytes, charset);
         if (!this.variables.isEmpty()) {
-            GenericTokenParser parser = new GenericTokenParser("${", "}", (content, tokenParser) -> variables.get(content));
+            GenericTokenParser parser = new GenericTokenParser("${", "}", variables::get);
             text = parser.parse(text);
         }
         return text;
