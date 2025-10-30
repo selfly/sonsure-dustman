@@ -51,7 +51,7 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
     @Override
     public Update setForBean(Object bean) {
         CacheEntityClassWrapper cacheEntityClassWrapper = new CacheEntityClassWrapper(bean.getClass());
-        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, !this.getExecutableCmdBuilder().isUpdateNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, this.getExecutableCmdBuilder().isUpdateNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             // 主键不更新
             if (entry.getKey().equals(cacheEntityClassWrapper.getPrimaryKeyField().getFieldName())) {

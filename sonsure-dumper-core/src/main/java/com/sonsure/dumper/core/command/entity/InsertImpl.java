@@ -49,7 +49,7 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
 
     @Override
     public Insert intoForObject(Object obj) {
-        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(obj, !this.getExecutableCmdBuilder().isUpdateNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(obj, this.getExecutableCmdBuilder().isUpdateNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             this.intoField(entry.getKey(), entry.getValue());
         }

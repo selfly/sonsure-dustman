@@ -1,5 +1,6 @@
 package com.sonsure.dumper.test.config;
 
+import com.sonsure.dumper.core.interceptor.InterceptorChain;
 import com.sonsure.dumper.core.interceptor.PersistContext;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import com.sonsure.dumper.core.mapping.DefaultMappingHandler;
@@ -37,19 +38,21 @@ public class DumperTestConfig {
         public static final String SQL = "select loginName, pwd from user_info";
 
         @Override
-        public void executeBefore(PersistContext persistContext) {
-            PersistInterceptor.super.executeBefore(persistContext);
+        public void executeBefore(PersistContext persistContext, InterceptorChain chain) {
+            PersistInterceptor.super.executeBefore(persistContext, chain);
             if (SQL.equalsIgnoreCase(persistContext.getExecutableCmd().getCommand())) {
                 UserInfo userInfo = new UserInfo();
                 userInfo.setLoginName("interceptorUser");
                 persistContext.setResult(Collections.singletonList(userInfo));
                 persistContext.setSkipExecution(true);
             }
+            chain.doBefore(persistContext);
         }
 
         @Override
-        public void executeAfter(PersistContext persistContext) {
-            PersistInterceptor.super.executeAfter(persistContext);
+        public void executeAfter(PersistContext persistContext, InterceptorChain chain) {
+            PersistInterceptor.super.executeAfter(persistContext, chain);
+            chain.doAfter(persistContext);
         }
     }
 

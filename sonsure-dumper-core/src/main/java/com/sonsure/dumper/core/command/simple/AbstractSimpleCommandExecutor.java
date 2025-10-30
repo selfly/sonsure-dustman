@@ -62,7 +62,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         if (!this.getExecutableCmdBuilder().isNamedParameter()) {
             throw new SonsureJdbcException("BeanParameter需要named方式传参");
         }
-        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(beanParameter.getBean(), !getExecutableCmdBuilder().isUpdateNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(beanParameter.getBean(), getExecutableCmdBuilder().isUpdateNull());
         return this.parameters(propMap);
     }
 

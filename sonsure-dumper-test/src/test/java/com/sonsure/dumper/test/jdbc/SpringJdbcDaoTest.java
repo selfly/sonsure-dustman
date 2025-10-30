@@ -347,7 +347,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void selectWhereAndSqlPart() {
+    public void selectWhereAndSqlParen() {
 
         jdbcDao.executeDelete(UserInfo.class);
         for (int i = 1; i < 3; i++) {
@@ -366,11 +366,6 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .or()
                 .where(UserInfo::getPassword, SqlOperator.EQ, "123456-5")
                 .closeParen()
-//                .where(
-//                        SqlPart.of("loginName").eq("whereAnd")
-//                                .or(UserInfo::getPassword).eq("123456-5")
-////                        SqlPart.of("loginName", "whereAnd").or(UserInfo::getPassword, "123456-5")
-//                )
                 .and()
                 .where(UserInfo::getUserInfoId, 2L)
                 .singleResult(UserInfo.class);

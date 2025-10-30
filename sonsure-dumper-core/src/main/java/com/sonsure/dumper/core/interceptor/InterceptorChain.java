@@ -18,10 +18,6 @@ public class InterceptorChain {
                 .orElse(Collections.emptyList());
     }
 
-    public void addInterceptor(PersistInterceptor interceptor) {
-        this.interceptors.add(interceptor);
-    }
-
     public void reset() {
         this.currentPosition = 0;
     }
@@ -32,7 +28,7 @@ public class InterceptorChain {
         }
         PersistInterceptor persistInterceptor = this.interceptors.get(this.currentPosition);
         this.currentPosition++;
-        persistInterceptor.executeBefore(context);
+        persistInterceptor.executeBefore(context, this);
     }
 
     public void doAfter(PersistContext context) {
@@ -41,6 +37,6 @@ public class InterceptorChain {
         }
         PersistInterceptor persistInterceptor = this.interceptors.get(this.currentPosition);
         this.currentPosition++;
-        persistInterceptor.executeAfter(context);
+        persistInterceptor.executeAfter(context, this);
     }
 }

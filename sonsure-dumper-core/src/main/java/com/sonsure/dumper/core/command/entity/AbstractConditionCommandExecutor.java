@@ -80,7 +80,7 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public E whereForBean(Object bean) {
-        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, !getExecutableCmdBuilder().isUpdateNull());
+        Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(bean, getExecutableCmdBuilder().isUpdateNull());
         String tableAlias = getExecutableCmdBuilder().resolveTableAlias(bean.getClass().getSimpleName());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String field = CommandBuildHelper.getTableAliasFieldName(tableAlias, entry.getKey());
