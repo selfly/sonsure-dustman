@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <item>Item 1</item>
+    <item>Item 2</item>
+    <item>Item 3</item>
+    <node type="A">Node A</node>
+    <node type="B">Node B</node>
+    <node type="A">Another Node A</node>
+</root>
+

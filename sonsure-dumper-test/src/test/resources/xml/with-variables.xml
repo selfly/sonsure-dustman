@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <database>
+        <driver>${db.driver}</driver>
+        <url>${db.url}</url>
+        <username>${db.username}</username>
+        <password>${db.password}</password>
+    </database>
+    <server port="${server.port}" host="${server.host}">
+        <name>${app.name}</name>
+    </server>
+</root>
+

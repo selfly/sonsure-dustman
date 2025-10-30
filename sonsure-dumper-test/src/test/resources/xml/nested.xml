@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <level1>
+        <level2>
+            <level3>deep nested content</level3>
+        </level2>
+    </level1>
+    <level1>
+        <level2 attr="test">another branch</level2>
+    </level1>
+</root>
+

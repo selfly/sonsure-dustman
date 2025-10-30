@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root id="1" name="test" enabled="true">
+    <item id="1" name="item1" value="value1">Item 1 content</item>
+    <item id="2" name="item2" value="value2">Item 2 content</item>
+    <item id="3" name="item3">Item 3 without value</item>
+</root>
+

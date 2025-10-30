@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <before>Before include</before>
+    <include file="xml/included.xml"/>
+    <after>After include</after>
+</root>
+
