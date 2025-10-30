@@ -139,7 +139,7 @@ public class GenericResourcePatternResolverTest {
         Assertions.assertEquals(6, resources.size());
 
         resources = resolver.getResources(prefix + "/src/test/resources/**.xml");
-        Assertions.assertEquals(8, resources.size());
+        Assertions.assertEquals(19, resources.size());
         
         resources = resolver.getResources("file:src/test/env/mysql/application.yml");
         Assertions.assertFalse(resources.isEmpty());

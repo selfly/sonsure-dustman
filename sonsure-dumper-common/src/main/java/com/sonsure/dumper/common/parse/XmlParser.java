@@ -103,6 +103,9 @@ public final class XmlParser {
         if ("include".equals(element.getName())) {
             Attribute attr = element.attribute("file");
             try (InputStream is = ClassUtils.getDefaultClassLoader().getResourceAsStream(attr.getValue())) {
+                if (is == null) {
+                    throw new SonsureCommonsException("加载资源失败:" + attr.getValue());
+                }
                 Document document = readXml(is, properties);
                 Element rootElement = document.getRootElement();
                 iter = rootElement.elementIterator();

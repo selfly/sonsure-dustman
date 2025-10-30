@@ -119,10 +119,6 @@ public class CommandBuildHelper {
         return tableAlias + DOT + field;
     }
 
-    public static String wrapperToNative(String name) {
-        return NATIVE_OPEN_TOKEN + name + NATIVE_CLOSE_TOKEN;
-    }
-
     public static boolean isNativeContent(String content) {
         return content.startsWith(NATIVE_OPEN_TOKEN) && content.endsWith(NATIVE_CLOSE_TOKEN);
     }
@@ -132,12 +128,12 @@ public class CommandBuildHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> obj2PropMap(Object obj, boolean ignoreNull) {
+    public static Map<String, Object> obj2PropMap(Object obj, boolean updateNull) {
         Map<String, Object> propMap = obj instanceof Map ? (Map<String, Object>) obj : ClassUtils.getSelfBeanPropMap(obj, Transient.class);
         Map<String, Object> resultMap = new LinkedHashMap<>(propMap.size());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             Object value = entry.getValue();
-            if (value != null || !ignoreNull) {
+            if (value != null || updateNull) {
                 resultMap.put(entry.getKey(), value);
             }
         }

@@ -51,10 +51,6 @@ public class InsertImpl extends AbstractCommandExecutor<Insert> implements Inser
     public Insert intoForObject(Object obj) {
         Map<String, Object> propMap = CommandBuildHelper.obj2PropMap(obj, !this.getExecutableCmdBuilder().isUpdateNull());
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-            //忽略掉null
-            if (entry.getValue() == null) {
-                continue;
-            }
             this.intoField(entry.getKey(), entry.getValue());
         }
         return this.getSelf();
