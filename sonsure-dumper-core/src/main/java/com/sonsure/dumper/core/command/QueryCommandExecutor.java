@@ -71,7 +71,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP);
         executableCmdBuilder.resultType(Map.class);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (Map<String, Object>) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (Map<String, Object>) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     /**
@@ -87,7 +87,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL);
         executableCmdBuilder.resultType(clazz);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (T) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (T) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     /**
@@ -103,7 +103,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL_LIST);
         executableCmdBuilder.resultType(clazz);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (List<T>) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (List<T>) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     /**
@@ -117,7 +117,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
         executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         executableCmdBuilder.resultType(List.class);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
-        return (List<Map<String, Object>>) executableCmdBuilder.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (List<Map<String, Object>>) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     /**

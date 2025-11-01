@@ -32,14 +32,14 @@ Mybatis是一个优秀的框架，但也有它的不足之处。
         <property name="dataSource" ref="dataSource"/>
     </bean>
     
-然后将`sqlSessionFactory`注入到我们的`jdbcExecutor`就可以了：
+然后将`sqlSessionFactory`注入到我们的`jdbcContext`就可以了：
 
     <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="mybatisSqlSessionFactory" ref="sqlSessionFactory"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
  
-从以上可以看出，我们只是需要拿到Mybatis的`sqlSessionFactory`注入到`jdbcExecutor`就可以了，至于Mybatis其它的东西并不关心。
+从以上可以看出，我们只是需要拿到Mybatis的`sqlSessionFactory`注入到`jdbcContext`就可以了，至于Mybatis其它的东西并不关心。
 
 这也就表示Mybatis原生使用的方法和接口都不受影响。
 

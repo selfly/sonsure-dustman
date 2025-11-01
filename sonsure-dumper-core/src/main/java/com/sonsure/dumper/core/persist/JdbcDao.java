@@ -20,8 +20,8 @@ import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.entity.Update;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
+import com.sonsure.dumper.core.config.JdbcContext;
 
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -254,19 +254,12 @@ public interface JdbcDao {
      * @param executor the executor
      * @return t
      */
-    <T extends CommandExecutor<?>> T executor(Class<T> executor);
+    <T extends CommandExecutor<?>> T createExecutor(Class<T> executor, Object... params);
 
     /**
-     * Gets data source.
+     * Gets jdbc context.
      *
-     * @return the data source
+     * @return the jdbc context
      */
-    DataSource getDataSource();
-
-    /**
-     * Gets database product.
-     *
-     * @return the database product
-     */
-    String getDatabaseProduct();
+    JdbcContext getJdbcContext();
 }

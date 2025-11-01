@@ -10,7 +10,7 @@
 package com.sonsure.dumper.core.command.sql;
 
 import com.sonsure.dumper.core.command.build.CmdParameter;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -29,24 +29,15 @@ public class JSqlParserCommandConversionHandler implements CommandConversionHand
 
     protected final Map<String, String> cache = new WeakHashMap<>(new ConcurrentHashMap<>());
 
-    /**
-     * 映射处理器
-     */
-    protected final JdbcExecutorConfig jdbcExecutorConfig;
-
-    public JSqlParserCommandConversionHandler(JdbcExecutorConfig jdbcExecutorConfig) {
-        this.jdbcExecutorConfig = jdbcExecutorConfig;
-    }
-
     @Override
-    public String convert(String command, List<CmdParameter> parameters) {
+    public String convert(String command, List<CmdParameter> parameters, JdbcContext jdbcContext) {
 
         String convertedCommand = cache.get(command);
         if (convertedCommand == null) {
             try {
                 StringBuilder buffer = new StringBuilder();
                 Statement statement = CCJSqlParserUtil.parse(command);
-                CommandMappingHandler commandMappingHandler = new CommandMappingHandler(statement, this.jdbcExecutorConfig.getMappingHandler(), parameters);
+                CommandMappingHandler commandMappingHandler = new CommandMappingHandler(statement, jdbcContext.getMappingHandler(), parameters);
                 ExpressionDeParser expressionDeParser = new CommandExpressionDeParser();
                 SelectDeParser selectDeParser = new CommandSelectDeParser(expressionDeParser, buffer, commandMappingHandler);
                 expressionDeParser.setSelectVisitor(selectDeParser);

@@ -8,7 +8,7 @@
  */
 package com.sonsure.dumper.core.persist;
 
-import com.sonsure.dumper.core.config.JdbcExecutor;
+import com.sonsure.dumper.core.config.JdbcContext;
 
 /**
  * The type Flexible dao template.
@@ -17,8 +17,8 @@ import com.sonsure.dumper.core.config.JdbcExecutor;
  */
 public class FlexibleJdbcDaoImpl extends AbstractJdbcDaoImpl {
 
-    public FlexibleJdbcDaoImpl(JdbcExecutor jdbcExecutor) {
-        this.setDefaultJdbcExecutor(jdbcExecutor);
+    public FlexibleJdbcDaoImpl(JdbcContext jdbcContext) {
+        this.setJdbcContext(jdbcContext);
     }
 
     @Override

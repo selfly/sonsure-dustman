@@ -23,7 +23,7 @@ sql中的表名以及列名都是对应实体类的类名和属性名，会自�
     </bean>
 
     <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
-        <property name="jdbcExecutor" ref="jdbcTemplateEngine"/>
+        <property name="jdbcContext" ref="jdbcTemplateEngine"/>
     </bean>
     
 这样，我们就可以使用短名称来执行sql了：

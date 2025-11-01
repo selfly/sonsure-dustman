@@ -9,12 +9,8 @@
 
 package com.sonsure.dumper.core.command.entity;
 
-import com.sonsure.dumper.core.command.build.CommandBuildHelper;
-import com.sonsure.dumper.core.command.build.ExecutionType;
-import com.sonsure.dumper.core.command.build.CacheEntityClassWrapper;
-import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.command.build.GetterFunction;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.command.build.*;
+import com.sonsure.dumper.core.config.JdbcContext;
 
 import java.util.Map;
 
@@ -26,8 +22,8 @@ import java.util.Map;
  */
 public class UpdateImpl extends AbstractConditionCommandExecutor<Update> implements Update {
 
-    public UpdateImpl(JdbcExecutorConfig jdbcExecutorConfig) {
-        super(jdbcExecutorConfig);
+    public UpdateImpl(JdbcContext jdbcContext) {
+        super(jdbcContext);
     }
 
     @Override
@@ -73,7 +69,7 @@ public class UpdateImpl extends AbstractConditionCommandExecutor<Update> impleme
         this.getExecutableCmdBuilder().executionType(ExecutionType.UPDATE);
         this.getExecutableCmdBuilder().resultType(Integer.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Integer) this.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (Integer) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
 }

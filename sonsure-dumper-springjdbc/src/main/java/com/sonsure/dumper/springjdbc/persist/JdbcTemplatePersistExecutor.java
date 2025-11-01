@@ -9,11 +9,11 @@
 
 package com.sonsure.dumper.springjdbc.persist;
 
-import com.sonsure.dumper.core.command.build.GenerateKey;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.command.build.GenerateKey;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
@@ -37,15 +37,12 @@ import java.util.Optional;
  */
 public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
-    private final JdbcOperations jdbcOperations;
-
-    public JdbcTemplatePersistExecutor(JdbcExecutorConfig jdbcExecutorConfig, JdbcOperations jdbcOperations) {
-        super(jdbcExecutorConfig);
+    public JdbcTemplatePersistExecutor(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
     }
 
     @Override
-    protected String doGetDialect() {
+    public String getDatabaseProduct() {
         return jdbcOperations.execute((ConnectionCallback<String>) con -> {
             final DatabaseMetaData metaData = con.getMetaData();
             return metaData.getDatabaseProductName().toLowerCase() + "/" + metaData.getDatabaseProductVersion();
@@ -82,13 +79,13 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     @Override
     public List<?> queryForList(ExecutableCmd executableCmd) {
-        return jdbcOperations.query(executableCmd.getCommand(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcExecutorConfig(), executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
+        return jdbcOperations.query(executableCmd.getCommand(), JdbcRowMapper.newInstance(this.getDatabaseProduct(), this.getJdbcContext(), executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
     }
 
     @Override
     public Object querySingleResult(ExecutableCmd executableCmd) {
         //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
-        List<?> list = jdbcOperations.query(executableCmd.getCommand(), JdbcRowMapper.newInstance(this.getDialect(), this.getJdbcExecutorConfig(), executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
+        List<?> list = jdbcOperations.query(executableCmd.getCommand(), JdbcRowMapper.newInstance(this.getDatabaseProduct(), this.getJdbcContext(), executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
         return DataAccessUtils.singleResult(list);
     }
 

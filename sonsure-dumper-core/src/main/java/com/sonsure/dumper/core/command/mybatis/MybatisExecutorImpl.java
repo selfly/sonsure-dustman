@@ -13,7 +13,7 @@ package com.sonsure.dumper.core.command.mybatis;
 import com.sonsure.dumper.core.command.build.ExecutableCmdBuilder;
 import com.sonsure.dumper.core.command.build.ExecutableCustomizer;
 import com.sonsure.dumper.core.command.simple.AbstractSimpleCommandExecutor;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -32,8 +32,8 @@ import java.util.List;
  */
 public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisExecutor> implements MybatisExecutor {
 
-    public MybatisExecutorImpl(JdbcExecutorConfig jdbcExecutorConfig) {
-        super(jdbcExecutorConfig);
+    public MybatisExecutorImpl(JdbcContext jdbcContext) {
+        super(jdbcContext);
         this.getExecutableCmdBuilder()
                 .addCustomizer(new MybatisExecutableCustomizer())
                 .namedParameter();
@@ -44,7 +44,7 @@ public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisEx
         @Override
         public void customize(ExecutableCmdBuilder executableCmdBuilder) {
 
-            SqlSessionFactory sqlSessionFactory = executableCmdBuilder.getJdbcExecutorConfig().getMybatisSqlSessionFactory();
+            SqlSessionFactory sqlSessionFactory = executableCmdBuilder.getJdbcContext().getMybatisSqlSessionFactory();
             if (sqlSessionFactory == null) {
                 throw new SonsureJdbcException("使用Mybatis请先设置MybatisSqlSessionFactory");
             }

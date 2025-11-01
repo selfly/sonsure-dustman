@@ -12,21 +12,20 @@ package com.sonsure.dumper.core.persist;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.CommandExecutor;
-import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
+import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.entity.Delete;
 import com.sonsure.dumper.core.command.entity.Insert;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.command.entity.Update;
 import com.sonsure.dumper.core.command.mybatis.MybatisExecutor;
 import com.sonsure.dumper.core.command.natives.NativeExecutor;
-import com.sonsure.dumper.core.config.JdbcExecutor;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -39,48 +38,46 @@ import java.util.Map;
 @Setter
 public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
-    protected DataSource dataSource;
-
-    protected JdbcExecutor defaultJdbcExecutor;
+    protected JdbcContext jdbcContext;
 
     @Getter
-    protected Map<String, JdbcExecutor> jdbcExecutorMap;
+    protected Map<String, JdbcContext> jdbcContextMap;
 
     @Override
     public JdbcDao use(String name) {
-        if (jdbcExecutorMap == null) {
-            throw new SonsureJdbcException("使用多数据源模式请先初始化jdbcExecutorMap属性");
+        if (jdbcContextMap == null) {
+            throw new SonsureJdbcException("使用多数据源模式请先初始化jdbcContextMap属性");
         }
-        JdbcExecutor jdbcExecutor = jdbcExecutorMap.get(name);
-        if (jdbcExecutor == null) {
-            throw new SonsureJdbcException("指定的数据源操作对象不存在");
+        JdbcContext jdbcContext = jdbcContextMap.get(name);
+        if (jdbcContext == null) {
+            throw new SonsureJdbcException("指定的数据源上下文对象不存在");
         }
-        return new FlexibleJdbcDaoImpl(jdbcExecutor);
+        return new FlexibleJdbcDaoImpl(jdbcContext);
     }
 
     @Override
     public <T> T get(Class<T> entityClass, Serializable id) {
-        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entityClass);
+        String pkField = this.getJdbcContext().getMappingHandler().getPkField(entityClass);
         return this.selectFrom(entityClass).where(pkField, id).singleResult(entityClass);
     }
 
     @Override
     public <T> List<T> find(Class<T> entityClass) {
-        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entityClass);
+        String pkField = this.getJdbcContext().getMappingHandler().getPkField(entityClass);
         return this.selectFrom(entityClass).orderBy(pkField, OrderBy.DESC).list(entityClass);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> find(T entity) {
-        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entity.getClass());
+        String pkField = this.getJdbcContext().getMappingHandler().getPkField(entity.getClass());
         return (List<T>) this.selectFrom(entity.getClass()).whereForBean(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Pageable> Page<T> pageResult(T entity) {
-        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entity.getClass());
+        String pkField = this.getJdbcContext().getMappingHandler().getPkField(entity.getClass());
         return (Page<T>) this.selectFrom(entity.getClass()).whereForBean(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).pageResult(entity.getClass());
     }
 
@@ -118,7 +115,7 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     @Override
     public int executeDelete(Class<?> entityClass, Serializable id) {
-        String pkField = this.getDefaultJdbcExecutor().getConfig().getMappingHandler().getPkField(entityClass);
+        String pkField = this.getJdbcContext().getMappingHandler().getPkField(entityClass);
         return this.deleteFrom(entityClass).where(pkField, id).execute();
     }
 
@@ -148,17 +145,17 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     @SuppressWarnings("unchecked")
     @Override
     public <M> Select<M> selectFrom(Class<M> cls) {
-        return this.getDefaultJdbcExecutor().createExecutor(Select.class, cls);
+        return this.createExecutor(Select.class, cls);
     }
 
     @Override
     public Insert insert() {
-        return this.getDefaultJdbcExecutor().createExecutor(Insert.class, null);
+        return this.createExecutor(Insert.class);
     }
 
     @Override
     public Delete delete() {
-        return this.getDefaultJdbcExecutor().createExecutor(Delete.class, null);
+        return this.createExecutor(Delete.class);
     }
 
     @Override
@@ -168,12 +165,12 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     @Override
     public Update update() {
-        return this.getDefaultJdbcExecutor().createExecutor(Update.class, null);
+        return this.createExecutor(Update.class);
     }
 
     @Override
     public BatchUpdateExecutor batchUpdate() {
-        return this.getDefaultJdbcExecutor().createExecutor(BatchUpdateExecutor.class, null);
+        return this.createExecutor(BatchUpdateExecutor.class);
     }
 
     @Override
@@ -188,37 +185,27 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
 
     @Override
     public NativeExecutor nativeExecutor() {
-        return this.getDefaultJdbcExecutor().createExecutor(NativeExecutor.class, null);
+        return this.createExecutor(NativeExecutor.class);
     }
 
     @Override
     public MybatisExecutor myBatisExecutor() {
-        return this.getDefaultJdbcExecutor().createExecutor(MybatisExecutor.class, null);
+        return this.createExecutor(MybatisExecutor.class);
     }
 
     @Override
-    public <T extends CommandExecutor<?>> T executor(Class<T> executor) {
-        return this.getDefaultJdbcExecutor().createExecutor(executor, null);
+    public <T extends CommandExecutor<?>> T createExecutor(Class<T> executor, Object... params) {
+        return this.getJdbcContext()
+                .getCommandExecutorFactory()
+                .createCommandExecutor(getJdbcContext(), executor, params);
     }
 
     @Override
-    public DataSource getDataSource() {
-        if (this.dataSource != null) {
-            return this.dataSource;
+    public JdbcContext getJdbcContext() {
+        if (this.jdbcContext == null) {
+            throw new SonsureJdbcException("jdbcContext不能为空");
         }
-        return this.getDefaultJdbcExecutor().getDataSource();
-    }
-
-    @Override
-    public String getDatabaseProduct() {
-        return this.getDefaultJdbcExecutor().getDatabaseProduct();
-    }
-
-    public JdbcExecutor getDefaultJdbcExecutor() {
-        if (this.defaultJdbcExecutor == null) {
-            throw new SonsureJdbcException("jdbcExecutor不能为空");
-        }
-        return this.defaultJdbcExecutor;
+        return this.jdbcContext;
     }
 
 }

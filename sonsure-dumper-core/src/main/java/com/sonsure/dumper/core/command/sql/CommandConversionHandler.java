@@ -11,6 +11,7 @@ package com.sonsure.dumper.core.command.sql;
 
 
 import com.sonsure.dumper.core.command.build.CmdParameter;
+import com.sonsure.dumper.core.config.JdbcContext;
 
 import java.util.List;
 
@@ -22,11 +23,12 @@ public interface CommandConversionHandler {
     /**
      * command转换
      *
-     * @param command    the command
-     * @param parameters the parameters
+     * @param command     the command
+     * @param parameters  the parameters
+     * @param jdbcContext the jdbc context
      * @return string string
      */
-    String convert(String command, List<CmdParameter> parameters);
+    String convert(String command, List<CmdParameter> parameters, JdbcContext jdbcContext);
 
 
 }

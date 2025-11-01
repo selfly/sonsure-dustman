@@ -11,7 +11,7 @@ package com.sonsure.dumper.test.persist;
 
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
 import lombok.Setter;
 import org.hibernate.Session;
@@ -32,12 +32,12 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
 
     private SessionFactory sessionFactory;
 
-    public HibernatePersistExecutor(JdbcExecutorConfig jdbcExecutorConfig) {
-        super(jdbcExecutorConfig);
+    public HibernatePersistExecutor(JdbcContext jdbcContext) {
+        super(jdbcContext);
     }
 
     @Override
-    protected String doGetDialect() {
+    public String getDatabaseProduct() {
         Session session = sessionFactory.openSession();
         String dialect = session.doReturningWork(new ReturningWork<String>() {
             @Override

@@ -11,9 +11,9 @@ package com.sonsure.dumper.core.command.batch;
 
 import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.core.command.AbstractCommandExecutor;
-import com.sonsure.dumper.core.command.build.ExecutionType;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.command.build.ExecutionType;
+import com.sonsure.dumper.core.config.JdbcContext;
 
 import java.util.Collection;
 
@@ -25,8 +25,8 @@ import java.util.Collection;
 public class BatchUpdateExecutorImpl extends AbstractCommandExecutor<BatchUpdateExecutor> implements BatchUpdateExecutor {
 
 
-    public BatchUpdateExecutorImpl(JdbcExecutorConfig jdbcExecutorConfig) {
-        super(jdbcExecutorConfig);
+    public BatchUpdateExecutorImpl(JdbcContext jdbcContext) {
+        super(jdbcContext);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class BatchUpdateExecutorImpl extends AbstractCommandExecutor<BatchUpdate
         batchExecutableCmd.setBatchSize(batchSize);
         batchExecutableCmd.setBatchData(batchData);
         batchExecutableCmd.setParameterizedSetter(parameterizedSetter);
-        return getJdbcExecutorConfig().getPersistExecutor().execute(batchExecutableCmd);
+        return getJdbcContext().getPersistExecutor().execute(batchExecutableCmd);
     }
 
 }

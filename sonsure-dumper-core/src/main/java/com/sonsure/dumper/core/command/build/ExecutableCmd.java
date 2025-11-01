@@ -1,7 +1,7 @@
 package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.model.Pagination;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.config.JdbcContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ public class ExecutableCmd {
     /**
      * The Jdbc engine config.
      */
-    private JdbcExecutorConfig jdbcExecutorConfig;
+    private JdbcContext jdbcContext;
 
     /**
      * The Command type.

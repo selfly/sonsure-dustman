@@ -10,10 +10,8 @@
 package com.sonsure.dumper.core.persist;
 
 
-import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import com.sonsure.dumper.core.interceptor.InterceptorChain;
 import com.sonsure.dumper.core.interceptor.PersistContext;
@@ -21,7 +19,6 @@ import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,31 +32,12 @@ import java.util.Map;
 @Setter
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
-    private final JdbcExecutorConfig jdbcExecutorConfig;
-    protected List<PersistInterceptor> interceptors = new ArrayList<>(8);
-
-    protected String dialect;
-
-    public AbstractPersistExecutor(JdbcExecutorConfig jdbcExecutorConfig) {
-        this.jdbcExecutorConfig = jdbcExecutorConfig;
-        if (jdbcExecutorConfig.getPersistInterceptors() != null) {
-            this.interceptors.addAll(jdbcExecutorConfig.getPersistInterceptors());
-        }
-    }
-
-    @Override
-    public String getDialect() {
-        if (StrUtils.isBlank(dialect)) {
-            dialect = this.doGetDialect();
-        }
-        return dialect;
-    }
-
     @Override
     public Object execute(ExecutableCmd executableCmd) {
-        PersistContext persistContext = new PersistContext(this.getDialect(), executableCmd);
-        InterceptorChain interceptorChain = new InterceptorChain(this.getInterceptors());
-        interceptorChain.doBefore(persistContext);
+        List<PersistInterceptor> persistInterceptors = executableCmd.getJdbcContext().getPersistInterceptors();
+        PersistContext persistContext = new PersistContext(this.getDatabaseProduct(), executableCmd);
+        InterceptorChain interceptorChain = new InterceptorChain(persistInterceptors);
+        interceptorChain.execute(persistContext);
         Object result;
         if (persistContext.isSkipExecution()) {
             result = persistContext.getResult();
@@ -105,8 +83,8 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                     throw new SonsureJdbcException("不支持的CommandType:" + executableCmd.getExecutionType());
             }
         }
-        interceptorChain.reset();
-        interceptorChain.doAfter(persistContext);
+        interceptorChain.reset(InterceptorChain.EXECUTION_AFTER);
+        interceptorChain.execute(persistContext);
         return result;
     }
 
@@ -207,13 +185,5 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @return object object
      */
     protected abstract Object doExecuteScript(ExecutableCmd executableCmd);
-
-
-    /**
-     * Do get dialect string.
-     *
-     * @return the string
-     */
-    protected abstract String doGetDialect();
 
 }

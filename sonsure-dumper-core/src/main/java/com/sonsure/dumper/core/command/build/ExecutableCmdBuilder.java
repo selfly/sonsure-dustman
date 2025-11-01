@@ -7,7 +7,7 @@ import com.sonsure.dumper.common.utils.UUIDUtils;
 import com.sonsure.dumper.common.validation.Verifier;
 import com.sonsure.dumper.core.command.named.NamedParameterUtils;
 import com.sonsure.dumper.core.command.named.ParsedSql;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
 import lombok.Getter;
 
@@ -28,7 +28,7 @@ public class ExecutableCmdBuilder {
     protected final SimpleSQL simpleSQL;
     protected final List<CmdParameter> cmdParameters;
     protected String command;
-    protected JdbcExecutorConfig jdbcExecutorConfig;
+    protected JdbcContext jdbcContext;
     protected ExecutionType executionType;
     protected boolean namedParameter = false;
     protected Map<String, String> tableAliasMapping;
@@ -50,8 +50,8 @@ public class ExecutableCmdBuilder {
         tableAliasMapping = new HashMap<>(8);
     }
 
-    public ExecutableCmdBuilder jdbcExecutorConfig(JdbcExecutorConfig jdbcExecutorConfig) {
-        this.jdbcExecutorConfig = jdbcExecutorConfig;
+    public ExecutableCmdBuilder jdbcContext(JdbcContext jdbcContext) {
+        this.jdbcContext = jdbcContext;
         return this;
     }
 
@@ -419,7 +419,7 @@ public class ExecutableCmdBuilder {
 
 
     public ExecutableCmd build() {
-        Verifier.init().notNull(jdbcExecutorConfig, "jdbc配置不能为空")
+        Verifier.init().notNull(jdbcContext, "jdbc配置不能为空")
                 .notNull(executionType, "执行类型不能为空")
                 .notNull(resultType, "结果类型不能为空")
                 .validate();
@@ -432,12 +432,12 @@ public class ExecutableCmdBuilder {
             this.command = simpleSQL.toString();
         }
         ExecutableCmd executableCmd = new ExecutableCmd();
-        executableCmd.setJdbcExecutorConfig(jdbcExecutorConfig);
+        executableCmd.setJdbcContext(jdbcContext);
         executableCmd.setExecutionType(executionType);
         executableCmd.setResultType(this.resultType);
         executableCmd.setCommand(command);
         executableCmd.setParameters(this.cmdParameters);
-        executableCmd.setCaseStyle(jdbcExecutorConfig.getCaseStyle());
+        executableCmd.setCaseStyle(jdbcContext.getCaseStyle());
         executableCmd.setForceNative(this.forceNative);
         executableCmd.setNamedParameter(this.namedParameter);
         executableCmd.setGenerateKey(this.generateKey);
@@ -446,7 +446,7 @@ public class ExecutableCmdBuilder {
 
 
         if (!this.forceNative) {
-            final String resolvedCommand = jdbcExecutorConfig.getCommandConversionHandler().convert(executableCmd.getCommand(), this.cmdParameters);
+            final String resolvedCommand = jdbcContext.getCommandConversionHandler().convert(executableCmd.getCommand(), this.cmdParameters, this.jdbcContext);
             executableCmd.setCommand(resolvedCommand);
         }
 

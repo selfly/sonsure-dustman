@@ -149,7 +149,7 @@ public class MultiDsJdbcDaoTest {
     @Test
     public void getDataSource() {
 
-        DataSource dataSource = ((FlexibleJdbcDaoImpl) jdbcDao.use("oracle")).getDefaultJdbcExecutor().getDataSource();
+        DataSource dataSource = ((FlexibleJdbcDaoImpl) jdbcDao.use("oracle")).getJdbcContext().getDataSource();
         Assertions.assertNotNull(dataSource);
     }
 }

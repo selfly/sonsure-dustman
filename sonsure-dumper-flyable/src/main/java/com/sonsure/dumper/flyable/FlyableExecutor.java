@@ -85,14 +85,14 @@ public class FlyableExecutor {
         if (!(jdbcDao instanceof AbstractJdbcDaoImpl)) {
             return;
         }
-        MappingHandler mappingHandler = ((AbstractJdbcDaoImpl) jdbcDao).getDefaultJdbcExecutor().getConfig().getMappingHandler();
+        MappingHandler mappingHandler = jdbcDao.getJdbcContext().getMappingHandler();
         if (mappingHandler instanceof TablePrefixSupportHandler) {
             this.flyablePrefix = ((TablePrefixSupportHandler) mappingHandler).getTablePrefix(FlyableHistory.class.getName());
         }
     }
 
     protected String getDatabaseProduct() {
-        return jdbcDao.getDatabaseProduct();
+        return jdbcDao.getJdbcContext().getDatabaseProduct();
     }
 
     protected void updateMigrate(List<MigrationResource> resources, String migrationGroup, boolean flyableHistoryInitialized, MigrationTaskExecutor migrationTaskExecutor) {

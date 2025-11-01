@@ -30,7 +30,7 @@ public interface DatabaseMigrationTaskExecutor extends MigrationTaskExecutor {
      */
     @SneakyThrows
     default boolean existFlyableHistoryTable(JdbcDao jdbcDao, String flyableHistory) {
-        try (Connection conn = jdbcDao.getDataSource().getConnection()) {
+        try (Connection conn = jdbcDao.getJdbcContext().getDataSource().getConnection()) {
             return conn.getMetaData()
                     .getTables(null, null, flyableHistory, new String[]{"TABLE"}).next();
         }

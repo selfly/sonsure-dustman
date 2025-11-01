@@ -143,12 +143,12 @@
         <property name="persistExecutor" ref="hibernatePersistExecutor"/>
     </bean>
 
-    <bean id="jdbcExecutor" class="com.sonsure.dumper.core.config.JdbcExecutorImpl">
+    <bean id="jdbcContext" class="com.sonsure.dumper.core.config.JdbcContextImpl">
         <property name="jdbcExecutorConfig" ref="jdbcExecutorConfig"/>
     </bean>
 
     <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.JdbcDaoImpl">
-        <property name="defaultJdbcEngine" ref="jdbcExecutor"/>
+        <property name="defaultJdbcEngine" ref="jdbcContext"/>
     </bean>
     
 同样使用`jdbcDao`调用：

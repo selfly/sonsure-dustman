@@ -48,7 +48,7 @@ public class CustomExecutorTest {
     @Test
     public void countExecutorTest() {
 
-        long count = jdbcDao.executor(CountCommandExecutor.class)
+        long count = jdbcDao.createExecutor(CountCommandExecutor.class)
                 .clazz(UserInfo.class)
                 .getCount();
 

@@ -14,7 +14,7 @@ import com.sonsure.dumper.common.bean.BeanKit;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.validation.Verifier;
 import com.sonsure.dumper.core.command.build.*;
-import com.sonsure.dumper.core.config.JdbcExecutorConfig;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.persist.PersistExecutor;
 
 import java.util.List;
@@ -29,8 +29,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     private final Class<M> cls;
 
     @SuppressWarnings("unchecked")
-    public SelectImpl(JdbcExecutorConfig jdbcExecutorConfig, Object... params) {
-        super(jdbcExecutorConfig);
+    public SelectImpl(JdbcContext jdbcContext, Object... params) {
+        super(jdbcContext);
         this.cls = (Class<M>) params[0];
         this.registerClassToMappingHandler(cls);
         this.getExecutableCmdBuilder()
@@ -206,8 +206,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        PersistExecutor persistExecutor = this.getJdbcExecutorConfig().getPersistExecutor();
-        String countCommand = this.getJdbcExecutorConfig().getPageHandler().getCountCommand(executableCmd.getCommand(), persistExecutor.getDialect());
+        PersistExecutor persistExecutor = this.getJdbcContext().getPersistExecutor();
+        String countCommand = this.getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), persistExecutor.getDatabaseProduct());
         ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
         countExecutableCmd.setCommand(countCommand);
         countExecutableCmd.setResultType(Long.class);
@@ -223,7 +223,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_SINGLE_RESULT);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (T) this.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (T) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
@@ -233,7 +233,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (List<T>) this.getJdbcExecutorConfig().getPersistExecutor().execute(executableCmd);
+        return (List<T>) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     @SuppressWarnings("unchecked")
@@ -243,7 +243,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcExecutorConfig().getPersistExecutor().execute(cmd));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcContext().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -252,7 +252,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcExecutorConfig().getPersistExecutor().execute(cmd));
+        return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcContext().getPersistExecutor().execute(cmd));
     }
 
     @SuppressWarnings("unchecked")
@@ -261,7 +261,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcExecutorConfig().getPersistExecutor().execute(cmd));
+        return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcContext().getPersistExecutor().execute(cmd));
     }
 
     @Override

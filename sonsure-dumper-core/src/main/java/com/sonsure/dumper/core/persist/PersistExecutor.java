@@ -26,7 +26,7 @@ public interface PersistExecutor {
      *
      * @return dialect
      */
-    String getDialect();
+    String getDatabaseProduct();
 
     /**
      * 执行command
