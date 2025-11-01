@@ -62,7 +62,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         if (pagination == null) {
             throw new SonsureJdbcException("查询分页列表请设置分页信息");
         }
-        String dialect = getJdbcContext().getDatabaseProduct();
+        String dialect = getJdbcContext().getPersistExecutor().getDatabaseProduct();
         long count = Long.MAX_VALUE;
         if (!executableCmd.isDisableCountQuery()) {
             String countCommand = getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);

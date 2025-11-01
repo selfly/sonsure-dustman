@@ -14,6 +14,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class DumperTestConfig {
@@ -33,7 +34,7 @@ public class DumperTestConfig {
         return sqlSessionFactoryBean;
     }
 
-    public static class TestInterceptor implements PersistInterceptor {
+    public static class TestBeforeInterceptor implements PersistInterceptor {
 
         public static final String SQL = "select loginName, pwd from user_info";
 
@@ -46,13 +47,29 @@ public class DumperTestConfig {
                 persistContext.setResult(Collections.singletonList(userInfo));
                 persistContext.setSkipExecution(true);
             }
-            chain.doBefore(persistContext);
+            chain.execute(persistContext);
         }
+    }
+
+    public static class TestAfterInterceptor implements PersistInterceptor {
 
         @Override
         public void executeAfter(PersistContext persistContext, InterceptorChain chain) {
-            PersistInterceptor.super.executeAfter(persistContext, chain);
-            chain.doAfter(persistContext);
+            Object result = persistContext.getResult();
+
+            if (result instanceof List) {
+                List<?> list = (List<?>) result;
+                if (!list.isEmpty()) {
+                    Object next = list.iterator().next();
+                    if (next instanceof UserInfo) {
+                        UserInfo userInfo = (UserInfo) next;
+                        if ("interceptorUser".equals(userInfo.getLoginName())) {
+                            userInfo.setLoginName("interceptorUserAfter");
+                        }
+                    }
+                }
+            }
+            chain.execute(persistContext);
         }
     }
 

@@ -50,8 +50,6 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      */
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String dialect;
-
     private JdbcContext jdbcContext;
 
     /**
@@ -93,12 +91,10 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * <p>Consider using the {@link #newInstance} factory method instead,
      * which allows for specifying the mapped type once only.
      *
-     * @param dialect     the dialect
      * @param jdbcContext the jdbc context
      * @param mappedClass the class that each row should be mapped to
      */
-    public JdbcRowMapper(String dialect, JdbcContext jdbcContext, Class<T> mappedClass) {
-        this.dialect = dialect.toLowerCase();
+    public JdbcRowMapper(JdbcContext jdbcContext, Class<T> mappedClass) {
         this.jdbcContext = jdbcContext;
         this.mappedClass = mappedClass;
         this.mappedFields = new HashMap<>();
@@ -254,13 +250,12 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      * (with the mapped class specified only once).
      *
      * @param <T>         the type parameter
-     * @param dialect     the dialect
      * @param jdbcContext the jdbc context
      * @param mappedClass the class that each row should be mapped to
      * @return the jdbc row mapper
      */
-    public static <T> JdbcRowMapper<T> newInstance(String dialect, JdbcContext jdbcContext, Class<T> mappedClass) {
-        return new JdbcRowMapper<>(dialect, jdbcContext, mappedClass);
+    public static <T> JdbcRowMapper<T> newInstance(JdbcContext jdbcContext, Class<T> mappedClass) {
+        return new JdbcRowMapper<>(jdbcContext, mappedClass);
     }
 
 }

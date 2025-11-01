@@ -23,6 +23,7 @@ import com.sonsure.dumper.core.command.natives.NativeExecutor;
 import com.sonsure.dumper.core.config.JdbcContext;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public interface JdbcDao {
      * 根据实体条件查询记录数
      *
      * @param cls the cls
-     * @return long long
+     * @return long
      */
     long findCount(Class<?> cls);
 
@@ -234,6 +235,15 @@ public interface JdbcDao {
     void executeScript(String script);
 
     /**
+     * Execute in connection t.
+     *
+     * @param <T>      the type parameter
+     * @param function the function
+     * @return the t
+     */
+    <T> T executeInConnection(ExecutionFunction<Connection, T> function);
+
+    /**
      * 创建native executor对象
      *
      * @return native executor
@@ -252,7 +262,8 @@ public interface JdbcDao {
      *
      * @param <T>      the type parameter
      * @param executor the executor
-     * @return t
+     * @param params   the params
+     * @return t t
      */
     <T extends CommandExecutor<?>> T createExecutor(Class<T> executor, Object... params);
 

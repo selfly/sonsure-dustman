@@ -18,8 +18,7 @@ public class InterceptorChain {
     private int execution = EXECUTION_BEFORE;
 
     public InterceptorChain(List<PersistInterceptor> interceptors) {
-        this.interceptors = Optional.ofNullable(interceptors)
-                .orElse(Collections.emptyList());
+        this.interceptors = Optional.ofNullable(interceptors).orElse(Collections.emptyList());
     }
 
     public void reset(int execution) {
@@ -36,7 +35,7 @@ public class InterceptorChain {
         if (this.execution == EXECUTION_BEFORE) {
             persistInterceptor.executeBefore(context, this);
         } else {
-            persistInterceptor.executeBefore(context, this);
+            persistInterceptor.executeAfter(context, this);
         }
     }
 }

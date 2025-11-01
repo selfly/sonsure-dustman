@@ -12,6 +12,7 @@ public interface PersistInterceptor {
      * @param chain          the chain
      */
     default void executeBefore(PersistContext persistContext, InterceptorChain chain) {
+        chain.execute(persistContext);
     }
 
     /**
@@ -21,5 +22,6 @@ public interface PersistInterceptor {
      * @param chain          the chain
      */
     default void executeAfter(PersistContext persistContext, InterceptorChain chain) {
+        chain.execute(persistContext);
     }
 }

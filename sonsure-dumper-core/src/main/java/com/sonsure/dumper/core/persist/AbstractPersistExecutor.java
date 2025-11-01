@@ -32,16 +32,24 @@ import java.util.Map;
 @Setter
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
+    private String databaseProduct;
+
+    @Override
+    public String getDatabaseProduct() {
+        if (this.databaseProduct == null) {
+            this.databaseProduct = PersistExecutor.super.getDatabaseProduct();
+        }
+        return this.databaseProduct;
+    }
+
     @Override
     public Object execute(ExecutableCmd executableCmd) {
         List<PersistInterceptor> persistInterceptors = executableCmd.getJdbcContext().getPersistInterceptors();
-        PersistContext persistContext = new PersistContext(this.getDatabaseProduct(), executableCmd);
+        PersistContext persistContext = new PersistContext(executableCmd);
         InterceptorChain interceptorChain = new InterceptorChain(persistInterceptors);
         interceptorChain.execute(persistContext);
-        Object result;
-        if (persistContext.isSkipExecution()) {
-            result = persistContext.getResult();
-        } else {
+        if (!persistContext.isSkipExecution()) {
+            Object result;
             switch (executableCmd.getExecutionType()) {
                 case INSERT:
                     result = this.insert(executableCmd);
@@ -82,12 +90,12 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                 default:
                     throw new SonsureJdbcException("不支持的CommandType:" + executableCmd.getExecutionType());
             }
+            persistContext.setResult(result);
         }
         interceptorChain.reset(InterceptorChain.EXECUTION_AFTER);
         interceptorChain.execute(persistContext);
-        return result;
+        return persistContext.getResult();
     }
-
 
     /**
      * insert操作，返回主键值
@@ -101,7 +109,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * 列表查询，泛型object为某个实体对象
      *
      * @param executableCmd the executable cmd
-     * @return list list
+     * @return list
      */
     protected abstract List<?> queryForList(ExecutableCmd executableCmd);
 
@@ -125,7 +133,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * 查询列表记录的map结果集，key=列名，value=列值
      *
      * @param executableCmd the executable cmd
-     * @return list list
+     * @return list
      */
     protected abstract List<Map<String, Object>> queryForMapList(ExecutableCmd executableCmd);
 

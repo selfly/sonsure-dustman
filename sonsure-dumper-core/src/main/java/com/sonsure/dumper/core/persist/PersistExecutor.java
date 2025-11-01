@@ -12,6 +12,9 @@ package com.sonsure.dumper.core.persist;
 
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
 /**
  * 持久化执行
  * <p>
@@ -22,11 +25,25 @@ import com.sonsure.dumper.core.command.build.ExecutableCmd;
 public interface PersistExecutor {
 
     /**
-     * 获取数据库方言
+     * Gets database product.
      *
-     * @return dialect
+     * @return the database product
      */
-    String getDatabaseProduct();
+    default String getDatabaseProduct() {
+        return this.executeInConnection(connection -> {
+            final DatabaseMetaData metaData = connection.getMetaData();
+            return metaData.getDatabaseProductName().toLowerCase() + "/" + metaData.getDatabaseProductVersion();
+        });
+    }
+
+    /**
+     * Execute t.
+     *
+     * @param <R>      the type parameter
+     * @param function the function
+     * @return the t
+     */
+    <R> R executeInConnection(ExecutionFunction<Connection, R> function);
 
     /**
      * 执行command

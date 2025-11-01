@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.ibatis.session.SqlSessionFactory;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 /**
@@ -35,11 +34,6 @@ import java.util.List;
 @Getter
 @Setter
 public class JdbcContextImpl implements JdbcContext {
-
-    /**
-     * 数据源
-     */
-    protected DataSource dataSource;
 
     /**
      * 执行器构建factory
@@ -92,33 +86,5 @@ public class JdbcContextImpl implements JdbcContext {
         this.pageHandler = new NegotiatingPageHandler();
         this.commandConversionHandler = new JSqlParserCommandConversionHandler();
     }
-
-//    @Override
-//    public PersistExecutor getPersistExecutor() {
-//        if (persistExecutor == null) {
-//            persistExecutor = this.initPersistExecutor();
-//            if (persistExecutor == null) {
-//                throw new SonsureJdbcException("persistExecutor不能为空");
-//            }
-//        }
-//        return persistExecutor;
-//    }
-
-
-//    /**
-//     * 初始化persistExecutor，具体由选型的子类重写
-//     */
-//    protected abstract PersistExecutor initPersistExecutor();
-
-    @Override
-    public String getDatabaseProduct() {
-        return this.getPersistExecutor().getDatabaseProduct();
-    }
-
-
-//    @Override
-//    public <T extends CommandExecutor<?>, M> T createExecutor(Class<T> commandExecutorClass, Class<M> modelClass) {
-//        return this.jdbcExecutorConfig.getCommandExecutorFactory().createCommandExecutor(commandExecutorClass, this.jdbcExecutorConfig, modelClass);
-//    }
 
 }

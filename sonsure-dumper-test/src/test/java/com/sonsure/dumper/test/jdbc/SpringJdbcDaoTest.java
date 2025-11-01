@@ -1475,10 +1475,10 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void testInterceptor() {
         //sql不执行通过拦截器返回数据
         List<UserInfo> list = jdbcDao.nativeExecutor()
-                .command(DumperTestConfig.TestInterceptor.SQL)
+                .command(DumperTestConfig.TestBeforeInterceptor.SQL)
                 .list(UserInfo.class);
 
         Assertions.assertEquals(1, list.size());
-        Assertions.assertEquals("interceptorUser", list.get(0).getLoginName());
+        Assertions.assertEquals("interceptorUserAfter", list.get(0).getLoginName());
     }
 }

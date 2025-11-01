@@ -9,7 +9,6 @@
 
 package com.sonsure.dumper.test.jdbc;
 
-import com.sonsure.dumper.core.persist.FlexibleJdbcDaoImpl;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.model.OracleUser;
 import com.sonsure.dumper.test.model.UserInfo;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.sql.DataSource;
 import java.util.Date;
 
 /**
@@ -99,7 +97,7 @@ public class MultiDsJdbcDaoTest {
             jdbcDao.executeInsert(user);
         }
         long count = jdbcDao.findCount(UserInfo.class);
-        Assertions.assertEquals(count, 5);
+        Assertions.assertEquals(5, count);
     }
 
     @Test
@@ -117,7 +115,7 @@ public class MultiDsJdbcDaoTest {
             jdbcDao.use("mysql").executeInsert(user);
         }
         long count = jdbcDao.use("mysql").findCount(UserInfo.class);
-        Assertions.assertEquals(count, 5);
+        Assertions.assertEquals(5, count);
     }
 
     @Test
@@ -133,7 +131,7 @@ public class MultiDsJdbcDaoTest {
             jdbcDao.use("oracle").executeInsert(oracleUser);
         }
         long count = jdbcDao.use("oracle").findCount(OracleUser.class);
-        Assertions.assertEquals(count, 5);
+        Assertions.assertEquals(5, count);
     }
 
     @Test
@@ -146,10 +144,4 @@ public class MultiDsJdbcDaoTest {
         }
     }
 
-    @Test
-    public void getDataSource() {
-
-        DataSource dataSource = ((FlexibleJdbcDaoImpl) jdbcDao.use("oracle")).getJdbcContext().getDataSource();
-        Assertions.assertNotNull(dataSource);
-    }
 }

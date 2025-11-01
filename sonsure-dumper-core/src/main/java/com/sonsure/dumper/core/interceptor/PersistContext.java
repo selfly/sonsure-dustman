@@ -11,13 +11,11 @@ import lombok.Setter;
 @Setter
 public class PersistContext {
 
-    private final String dialect;
     private final ExecutableCmd executableCmd;
     private boolean skipExecution;
     private Object result;
 
-    public PersistContext(String dialect, ExecutableCmd executableCmd) {
-        this.dialect = dialect;
+    public PersistContext(ExecutableCmd executableCmd) {
         this.executableCmd = executableCmd;
     }
 }

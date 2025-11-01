@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,12 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     @Override
     public void executeScript(String script) {
         this.nativeExecutor().command(script).forceNative().executeScript();
+    }
+
+    @Override
+    public <T> T executeInConnection(ExecutionFunction<Connection, T> function) {
+        return this.getJdbcContext().getPersistExecutor()
+                .executeInConnection(function);
     }
 
     @Override

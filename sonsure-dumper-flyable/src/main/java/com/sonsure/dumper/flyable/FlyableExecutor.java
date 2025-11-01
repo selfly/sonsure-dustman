@@ -92,7 +92,7 @@ public class FlyableExecutor {
     }
 
     protected String getDatabaseProduct() {
-        return jdbcDao.getJdbcContext().getDatabaseProduct();
+        return jdbcDao.getJdbcContext().getPersistExecutor().getDatabaseProduct();
     }
 
     protected void updateMigrate(List<MigrationResource> resources, String migrationGroup, boolean flyableHistoryInitialized, MigrationTaskExecutor migrationTaskExecutor) {
