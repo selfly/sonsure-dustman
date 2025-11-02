@@ -3,7 +3,6 @@ package com.sonsure.dumper.flyable;
 import com.sonsure.dumper.common.utils.VersionUtils;
 import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.mapping.MappingHandler;
-import com.sonsure.dumper.core.mapping.TablePrefixSupportHandler;
 import com.sonsure.dumper.core.persist.AbstractJdbcDaoImpl;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.database.DatabaseMigrationTaskExecutor;
@@ -86,9 +85,7 @@ public class FlyableExecutor {
             return;
         }
         MappingHandler mappingHandler = jdbcDao.getJdbcContext().getMappingHandler();
-        if (mappingHandler instanceof TablePrefixSupportHandler) {
-            this.flyablePrefix = ((TablePrefixSupportHandler) mappingHandler).getTablePrefix(FlyableHistory.class.getName());
-        }
+        this.flyablePrefix = mappingHandler.getTablePrefix(FlyableHistory.class);
     }
 
     protected String getDatabaseProduct() {

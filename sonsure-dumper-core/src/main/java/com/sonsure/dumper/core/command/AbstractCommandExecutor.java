@@ -17,7 +17,6 @@ import com.sonsure.dumper.core.command.build.*;
 import com.sonsure.dumper.core.command.simple.ResultHandler;
 import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import com.sonsure.dumper.core.mapping.AbstractMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,9 +127,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
 
     protected void registerClassToMappingHandler(Class<?> cls) {
         MappingHandler mappingHandler = this.getJdbcContext().getMappingHandler();
-        if (mappingHandler instanceof AbstractMappingHandler) {
-            ((AbstractMappingHandler) mappingHandler).addClassMapping(cls);
-        }
+        mappingHandler.registerClassMapping(cls);
     }
 
     protected interface PageQueryHandler<T> {

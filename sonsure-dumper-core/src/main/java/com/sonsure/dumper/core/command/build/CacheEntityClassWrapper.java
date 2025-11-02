@@ -21,8 +21,8 @@ public class CacheEntityClassWrapper {
         return this.entityClassWrapper.getEntityClass();
     }
 
-    public Object getClassAnnotation() {
-        return this.entityClassWrapper.getClassAnnotation();
+    public Object getEntityAnnotation() {
+        return this.entityClassWrapper.getEntityAnnotation();
     }
 
     public Collection<EntityClassFieldWrapper> getEntityFields() {

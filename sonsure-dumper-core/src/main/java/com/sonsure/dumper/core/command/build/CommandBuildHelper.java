@@ -37,10 +37,6 @@ public class CommandBuildHelper {
     public static final String NATIVE_CLOSE_TOKEN = "}}";
 
     public static final String DOT = ".";
-    /**
-     * 主键属性后缀
-     */
-    public static final String PRI_FIELD_SUFFIX = "Id";
 
     private static boolean enableJavaxPersistence = false;
 

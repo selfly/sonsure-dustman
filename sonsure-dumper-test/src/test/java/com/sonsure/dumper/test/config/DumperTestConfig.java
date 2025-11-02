@@ -3,8 +3,8 @@ package com.sonsure.dumper.test.config;
 import com.sonsure.dumper.core.interceptor.InterceptorChain;
 import com.sonsure.dumper.core.interceptor.PersistContext;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
-import com.sonsure.dumper.core.mapping.DefaultMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
+import com.sonsure.dumper.core.mapping.MappingHandlerImpl;
 import com.sonsure.dumper.flyable.FlyableHistory;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -21,9 +21,10 @@ public class DumperTestConfig {
 
     @Bean
     public MappingHandler defaultMappingHandler() {
-        DefaultMappingHandler defaultMappingHandler = new DefaultMappingHandler("com.sonsure.dumper.test.model.**");
-        defaultMappingHandler.addTablePrefix("sd_", FlyableHistory.class.getPackage().getName(), "com.sonsure.dumper.test.model");
-        return defaultMappingHandler;
+        MappingHandlerImpl mappingHandler = new MappingHandlerImpl();
+        mappingHandler.addScanPackages("com.sonsure.dumper.test.model");
+        mappingHandler.registerTablePrefix("sd_", FlyableHistory.class.getPackage().getName(), "com.sonsure.dumper.test.model");
+        return mappingHandler;
     }
 
     @Bean

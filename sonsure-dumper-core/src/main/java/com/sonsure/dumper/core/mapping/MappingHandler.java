@@ -24,6 +24,39 @@ import java.util.List;
 public interface MappingHandler {
 
     /**
+     * Register class mapping.
+     *
+     * @param clazz the clazz
+     */
+    void registerClassMapping(Class<?> clazz);
+
+    /**
+     * Register table prefix.
+     *
+     * @param prefix   the prefix
+     * @param packages the packages
+     */
+    void registerTablePrefix(String prefix, String... packages);
+
+    /**
+     * Gets table prefix.
+     *
+     * @param referenceClassName the reference class name
+     * @return the table prefix
+     */
+    String getTablePrefix(String referenceClassName);
+
+    /**
+     * Gets table prefix.
+     *
+     * @param entityClass the entity class
+     * @return the table prefix
+     */
+    default String getTablePrefix(Class<?> entityClass) {
+        return this.getTablePrefix(entityClass.getName());
+    }
+
+    /**
      * 根据实体名获取表名
      *
      * @param className  the class name

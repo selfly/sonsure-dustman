@@ -13,8 +13,8 @@ import com.sonsure.dumper.core.command.build.CaseStyle;
 import com.sonsure.dumper.core.command.sql.CommandConversionHandler;
 import com.sonsure.dumper.core.command.sql.JSqlParserCommandConversionHandler;
 import com.sonsure.dumper.core.interceptor.PersistInterceptor;
-import com.sonsure.dumper.core.mapping.DefaultMappingHandler;
 import com.sonsure.dumper.core.mapping.MappingHandler;
+import com.sonsure.dumper.core.mapping.MappingHandlerImpl;
 import com.sonsure.dumper.core.page.NegotiatingPageHandler;
 import com.sonsure.dumper.core.page.PageHandler;
 import com.sonsure.dumper.core.persist.KeyGenerator;
@@ -82,7 +82,7 @@ public class JdbcContextImpl implements JdbcContext {
 
     public JdbcContextImpl() {
         this.commandExecutorFactory = new CommandExecutorFactoryImpl();
-        this.mappingHandler = new DefaultMappingHandler();
+        this.mappingHandler = new MappingHandlerImpl();
         this.pageHandler = new NegotiatingPageHandler();
         this.commandConversionHandler = new JSqlParserCommandConversionHandler();
     }

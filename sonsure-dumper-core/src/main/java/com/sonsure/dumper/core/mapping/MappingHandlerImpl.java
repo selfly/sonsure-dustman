@@ -22,84 +22,48 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author liyd
  */
 @Slf4j
-public abstract class AbstractMappingHandler implements MappingHandler, TablePrefixSupportHandler {
+@Getter
+@Setter
+public class MappingHandlerImpl implements MappingHandler {
 
     /**
-     * value需要native内容前后包围符号
+     * 全类名需要前后包围符号
      */
     public static final String REFERENCE_CLASS_TOKEN = "`";
+    public static final String DOT = ".";
 
-    /**
-     * 主键属性后缀
-     */
-    protected static final String PRI_FIELD_SUFFIX = CommandBuildHelper.PRI_FIELD_SUFFIX;
-
-    private static final GenericResourcePatternResolver genericResourcePatternResolver = new GenericResourcePatternResolverImpl();
+    private static final GenericResourcePatternResolver CLASS_RESOLVER = new GenericResourcePatternResolverImpl();
 
     /**
      * class不存在时是否失败 (抛出异常)
      */
-    @Setter
-    @Getter
-    protected boolean failOnMissingClass;
-
-    /**
-     * 表前缀定义, 如 com.sonsure 开头的class表名统一加ss_  com.sonsure.User -> ss_user
-     */
-    @Getter
-    @Setter
-    protected Map<String, String> tablePrefixMap;
-
-    /**
-     * The Class loader.
-     */
-    @Getter
-    protected ClassLoader classLoader;
-
-    /**
-     * load的class
-     */
-    protected Map<String, Class<?>> loadedClass;
+    protected boolean failOnMissingClass = false;
 
     /**
      * 扫描的包
      */
-    protected String modelPackages;
+    protected Set<String> scanPackages = new HashSet<>(16);
+
+    /**
+     * 表前缀定义, 如 com.sonsure 开头的class表名统一加ss_  com.sonsure.User -> ss_user
+     */
+    protected Map<String, String> tablePrefixMapping = new ConcurrentHashMap<>(16);
 
     /**
      * 类名称映射
      */
-    @Getter
     protected Map<String, Class<?>> classMapping;
 
-    /**
-     * 自定义类名称映射
-     */
-    @Getter
-    @Setter
-    protected Map<String, Class<?>> customClassMapping;
-
-    public AbstractMappingHandler(String modelPackages, ClassLoader classLoader) {
-        this.failOnMissingClass = false;
-        loadedClass = new ConcurrentHashMap<>();
-        classMapping = new ConcurrentHashMap<>();
-        customClassMapping = new ConcurrentHashMap<>();
-        tablePrefixMap = new ConcurrentHashMap<>();
-        this.modelPackages = modelPackages;
-        this.classLoader = classLoader == null ? getClass().getClassLoader() : classLoader;
-        this.scanClassMapping();
-    }
-
-    public void addClassMapping(Class<?> clazz) {
+    @Override
+    public void registerClassMapping(Class<?> clazz) {
+        this.initScanClassMapping();
         final String name = clazz.getSimpleName();
         final Class<?> existCls = classMapping.get(name);
         if (existCls == null) {
@@ -109,19 +73,8 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
         }
     }
 
-    public void addClassMapping(Set<Class<?>> classes) {
-        if (classes == null || classes.isEmpty()) {
-            return;
-        }
-        for (Class<?> aClass : classes) {
-            this.addClassMapping(aClass);
-        }
-    }
-
-    public void addTablePrefix(String prefix, String... packages) {
-        for (String aPackage : packages) {
-            this.tablePrefixMap.put(aPackage, prefix);
-        }
+    public void addScanPackages(String... scanPackages) {
+        Collections.addAll(this.scanPackages, scanPackages);
     }
 
     @Override
@@ -139,22 +92,13 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     @Override
     public String getTable(Class<?> entityClass, List<CmdParameter> parameters) {
         CacheEntityClassWrapper entityClassWrapper = new CacheEntityClassWrapper(entityClass);
-        Object annotation = entityClassWrapper.getClassAnnotation();
+        Object annotation = entityClassWrapper.getEntityAnnotation();
         String tableName;
         if (annotation != null) {
             tableName = CommandBuildHelper.getTableAnnotationName(annotation);
         } else {
-            if (tablePrefixMap == null) {
-                //默认Java属性的骆驼命名法转换回数据库下划线“_”分隔的格式
-                tableName = NameUtils.getUnderlineName(entityClass.getSimpleName());
-            } else {
-                String tablePreFix = this.getTablePrefix(entityClass.getName());
-                tableName = tablePreFix + NameUtils.getUnderlineName(entityClass.getSimpleName());
-            }
-        }
-
-        if (StrUtils.isBlank(tableName)) {
-            throw new SonsureJdbcException("没有找到对应的表名:" + entityClass);
+            String tablePreFix = this.getTablePrefix(entityClass);
+            tableName = tablePreFix + NameUtils.getUnderlineName(entityClass.getSimpleName());
         }
         return tableName;
     }
@@ -193,9 +137,16 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
     }
 
     @Override
-    public String getTablePrefix(String classPackage) {
-        for (Map.Entry<String, String> entry : tablePrefixMap.entrySet()) {
-            if (classPackage.startsWith(entry.getKey())) {
+    public void registerTablePrefix(String prefix, String... packages) {
+        for (String pkg : packages) {
+            this.tablePrefixMapping.put(pkg, prefix);
+        }
+    }
+
+    @Override
+    public String getTablePrefix(String className) {
+        for (Map.Entry<String, String> entry : tablePrefixMapping.entrySet()) {
+            if (className.startsWith(entry.getKey())) {
                 return entry.getValue();
             }
         }
@@ -207,41 +158,38 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
         if (StrUtils.isBlank(className)) {
             throw new SonsureJdbcException("className不能为空");
         }
+        if (this.classMapping == null) {
+            this.initScanClassMapping();
+        }
         if (className.startsWith(REFERENCE_CLASS_TOKEN) && className.endsWith(REFERENCE_CLASS_TOKEN)) {
             className = className.substring(REFERENCE_CLASS_TOKEN.length(), className.length() - REFERENCE_CLASS_TOKEN.length());
         }
-        Class<?> clazz = null;
-        if (className.contains(".")) {
-            clazz = loadedClass.get(className);
-            if (clazz == null) {
-                clazz = this.loadClass(className);
-                loadedClass.put(className, clazz);
-            }
+        String name = className;
+        int index = className.lastIndexOf(DOT);
+        if (index != -1) {
+            name = className.substring(index + 1);
         }
-        if (clazz == null && !customClassMapping.isEmpty()) {
-            clazz = customClassMapping.get(className);
-        }
-        if (clazz == null && !classMapping.isEmpty()) {
-            clazz = classMapping.get(className);
-        }
+        Class<?> clazz = classMapping.get(name);
         if (clazz == null && this.isFailOnMissingClass()) {
             throw new SonsureJdbcException("没有找到对应的class:" + className);
         }
-
         return clazz;
     }
 
     /**
-     * 初始化类，容忍多次初始化无不良后果，并不需要严格的线程安全，
+     * 初始化类，容忍多次初始化不需要严格的线程安全，
      */
-    protected void scanClassMapping() {
+    protected void initScanClassMapping() {
 
-        if (StrUtils.isBlank(this.modelPackages)) {
+        if (this.scanPackages == null) {
             return;
         }
-        String[] pks = StrUtils.split(modelPackages, ",");
-        for (String pk : pks) {
-            List<Class<?>> classes = genericResourcePatternResolver.getResourcesClasses(pk);
+        if (this.classMapping != null) {
+            return;
+        }
+        this.classMapping = new ConcurrentHashMap<>(32);
+        for (String pk : this.scanPackages) {
+            List<Class<?>> classes = CLASS_RESOLVER.getResourcesClasses(pk);
             for (Class<?> clazz : classes) {
                 String simpleName = clazz.getSimpleName();
                 if (classMapping.containsKey(simpleName)) {
@@ -250,14 +198,6 @@ public abstract class AbstractMappingHandler implements MappingHandler, TablePre
                     classMapping.put(simpleName, clazz);
                 }
             }
-        }
-    }
-
-    protected Class<?> loadClass(String className) {
-        try {
-            return getClassLoader().loadClass(className);
-        } catch (ClassNotFoundException e) {
-            throw new SonsureJdbcException("加载class失败:" + className);
         }
     }
 

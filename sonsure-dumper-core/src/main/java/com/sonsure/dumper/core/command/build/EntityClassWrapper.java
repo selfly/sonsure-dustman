@@ -29,6 +29,11 @@ import java.util.Map;
 public class EntityClassWrapper {
 
     /**
+     * 主键属性后缀
+     */
+    public static final String PRIMARY_KEY_FIELD_SUFFIX = "Id";
+
+    /**
      * The Entity class.
      */
     private Class<?> entityClass;
@@ -36,7 +41,7 @@ public class EntityClassWrapper {
     /**
      * 注解
      */
-    private Object classAnnotation;
+    private Object entityAnnotation;
 
     /**
      * 主键field
@@ -60,7 +65,7 @@ public class EntityClassWrapper {
         mappedFieldMap = new LinkedHashMap<>(16);
 
         Object entityAnnotation = CommandBuildHelper.getEntityAnnotation(this.entityClass);
-        this.setClassAnnotation(entityAnnotation);
+        this.setEntityAnnotation(entityAnnotation);
 
         Field[] beanFields = ClassUtils.getSelfOrBaseFields(this.entityClass);
         for (Field field : beanFields) {
@@ -80,7 +85,7 @@ public class EntityClassWrapper {
         }
         if (this.getPrimaryKeyField() == null) {
             String firstLowerName = NameUtils.getFirstLowerName(this.getEntityClass().getSimpleName());
-            String pkFieldName = firstLowerName + CommandBuildHelper.PRI_FIELD_SUFFIX;
+            String pkFieldName = firstLowerName + PRIMARY_KEY_FIELD_SUFFIX;
             this.primaryKeyField = this.getClassFieldMap().get(pkFieldName);
         }
         if (this.getPrimaryKeyField() == null) {
