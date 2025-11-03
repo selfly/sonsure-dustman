@@ -62,9 +62,8 @@ public class MappingHandlerImpl implements MappingHandler {
     protected Map<String, Class<?>> classMapping;
 
     @Override
-    public void registerClassMapping(Class<?> clazz) {
+    public void registerClassMapping(String name, Class<?> clazz) {
         this.initScanClassMapping();
-        final String name = clazz.getSimpleName();
         final Class<?> existCls = classMapping.get(name);
         if (existCls == null) {
             classMapping.put(name, clazz);
@@ -97,7 +96,7 @@ public class MappingHandlerImpl implements MappingHandler {
         if (annotation != null) {
             tableName = CommandBuildHelper.getTableAnnotationName(annotation);
         } else {
-            String tablePreFix = this.getTablePrefix(entityClass);
+            String tablePreFix = this.getTablePrefix(entityClass.getName());
             tableName = tablePreFix + NameUtils.getUnderlineName(entityClass.getSimpleName());
         }
         return tableName;
@@ -137,14 +136,13 @@ public class MappingHandlerImpl implements MappingHandler {
     }
 
     @Override
-    public void registerTablePrefix(String prefix, String... packages) {
+    public void registerTablePrefixMapping(String prefix, String... packages) {
         for (String pkg : packages) {
             this.tablePrefixMapping.put(pkg, prefix);
         }
     }
 
-    @Override
-    public String getTablePrefix(String className) {
+    protected String getTablePrefix(String className) {
         for (Map.Entry<String, String> entry : tablePrefixMapping.entrySet()) {
             if (className.startsWith(entry.getKey())) {
                 return entry.getValue();

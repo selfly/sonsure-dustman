@@ -26,9 +26,10 @@ public interface MappingHandler {
     /**
      * Register class mapping.
      *
+     * @param name  the name
      * @param clazz the clazz
      */
-    void registerClassMapping(Class<?> clazz);
+    void registerClassMapping(String name, Class<?> clazz);
 
     /**
      * Register table prefix.
@@ -36,25 +37,7 @@ public interface MappingHandler {
      * @param prefix   the prefix
      * @param packages the packages
      */
-    void registerTablePrefix(String prefix, String... packages);
-
-    /**
-     * Gets table prefix.
-     *
-     * @param referenceClassName the reference class name
-     * @return the table prefix
-     */
-    String getTablePrefix(String referenceClassName);
-
-    /**
-     * Gets table prefix.
-     *
-     * @param entityClass the entity class
-     * @return the table prefix
-     */
-    default String getTablePrefix(Class<?> entityClass) {
-        return this.getTablePrefix(entityClass.getName());
-    }
+    void registerTablePrefixMapping(String prefix, String... packages);
 
     /**
      * 根据实体名获取表名

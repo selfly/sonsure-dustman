@@ -127,7 +127,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
 
     protected void registerClassToMappingHandler(Class<?> cls) {
         MappingHandler mappingHandler = this.getJdbcContext().getMappingHandler();
-        mappingHandler.registerClassMapping(cls);
+        mappingHandler.registerClassMapping(cls.getSimpleName(), cls);
     }
 
     protected interface PageQueryHandler<T> {
