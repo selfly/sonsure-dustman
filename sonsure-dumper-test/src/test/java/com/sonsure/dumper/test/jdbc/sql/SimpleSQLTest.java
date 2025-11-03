@@ -1,4 +1,4 @@
-package com.sonsure.dumper.test.sql;
+package com.sonsure.dumper.test.jdbc.sql;
 
 import com.sonsure.dumper.common.utils.StrUtils;
 import com.sonsure.dumper.core.command.build.SimpleSQL;

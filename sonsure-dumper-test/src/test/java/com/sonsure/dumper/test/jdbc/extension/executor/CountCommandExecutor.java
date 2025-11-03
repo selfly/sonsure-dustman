@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.executor;
+package com.sonsure.dumper.test.jdbc.extension.executor;
 
 import com.sonsure.dumper.core.command.CommandExecutor;
 

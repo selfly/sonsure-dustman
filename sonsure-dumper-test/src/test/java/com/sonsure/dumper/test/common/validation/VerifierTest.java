@@ -1,4 +1,4 @@
-package com.sonsure.dumper.test.validation;
+package com.sonsure.dumper.test.common.validation;
 
 import com.sonsure.dumper.common.exception.ValidationException;
 import com.sonsure.dumper.common.validation.ValidationError;

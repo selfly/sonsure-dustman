@@ -7,15 +7,10 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.sql;
+package com.sonsure.dumper.test.jdbc.sql;
 
-import java.util.Date;
+public class Series {
 
-public class Tag {
-    private Long tagId;
-    private String tagName;
-    private String tagType;
-    private Date gmtCreate;
-
+    private Long seriesId;
 
 }

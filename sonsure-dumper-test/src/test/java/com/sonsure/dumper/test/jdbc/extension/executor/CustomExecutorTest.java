@@ -7,10 +7,9 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.jdbc;
+package com.sonsure.dumper.test.jdbc.extension.executor;
 
 import com.sonsure.dumper.core.persist.JdbcDao;
-import com.sonsure.dumper.test.executor.CountCommandExecutor;
 import com.sonsure.dumper.test.model.UserInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

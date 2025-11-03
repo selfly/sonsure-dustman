@@ -19,6 +19,7 @@ import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.basic.BaseTest;
 import com.sonsure.dumper.test.config.DumperTestConfig;
+import com.sonsure.dumper.test.jdbc.extension.executor.CustomResultHandler;
 import com.sonsure.dumper.test.model.Account;
 import com.sonsure.dumper.test.model.AnnotationUserInfo;
 import com.sonsure.dumper.test.model.UserInfo;

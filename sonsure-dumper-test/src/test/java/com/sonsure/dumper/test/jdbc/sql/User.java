@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.sql;
+package com.sonsure.dumper.test.jdbc.sql;
 
 import com.sonsure.dumper.common.model.Pageable;
 

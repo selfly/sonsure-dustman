@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.utils;
+package com.sonsure.dumper.test.common.utils;
 
 import com.sonsure.dumper.common.utils.PropertyUtils;
 import org.junit.jupiter.api.Assertions;

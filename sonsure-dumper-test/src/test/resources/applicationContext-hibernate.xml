@@ -81,7 +81,7 @@
         <constructor-arg name="modelPackages" value="com.sonsure.dumper.test.model.**"/>
     </bean>
 
-    <bean id="hibernatePersistExecutor" class="com.sonsure.dumper.test.persist.HibernatePersistExecutor">
+    <bean id="hibernatePersistExecutor" class="com.sonsure.dumper.test.jdbc.extension.executor.HibernatePersistExecutor">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 

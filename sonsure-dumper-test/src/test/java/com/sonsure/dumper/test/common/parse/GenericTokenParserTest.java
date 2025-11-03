@@ -7,7 +7,7 @@
  * Designed By Selfly Lee (selfly@live.com)
  */
 
-package com.sonsure.dumper.test.parse;
+package com.sonsure.dumper.test.common.parse;
 
 import com.sonsure.dumper.common.parse.GenericTokenParser;
 import com.sonsure.dumper.common.parse.TokenHandler;

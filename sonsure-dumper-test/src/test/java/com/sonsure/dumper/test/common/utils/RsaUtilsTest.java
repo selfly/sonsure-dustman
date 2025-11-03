@@ -1,4 +1,4 @@
-package com.sonsure.dumper.test.utils;
+package com.sonsure.dumper.test.common.utils;
 
 import com.sonsure.dumper.common.exception.SonsureCommonsException;
 import com.sonsure.dumper.common.utils.RsaUtils;
