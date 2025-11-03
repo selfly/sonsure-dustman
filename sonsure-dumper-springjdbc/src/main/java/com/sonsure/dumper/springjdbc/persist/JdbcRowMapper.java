@@ -18,6 +18,8 @@ package com.sonsure.dumper.springjdbc.persist;
 
 import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.mapping.MappingHandler;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
@@ -50,40 +52,39 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
      */
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private JdbcContext jdbcContext;
+    private final JdbcContext jdbcContext;
 
     /**
      * The class we are mapping to
      */
-    private Class<T> mappedClass;
+    private final Class<T> mappedClass;
+
+    /**
+     * Map of the fields we provide mapping for
+     */
+    private final Map<String, PropertyDescriptor> mappedFields;
+
+    /**
+     * Set of bean properties we provide mapping for
+     */
+    private final Set<String> mappedProperties;
 
     /**
      * Whether we're strictly validating
+     * -- GETTER --
+     * Return whether we're strictly validating that all bean properties have been
+     * mapped from corresponding database fields.
      */
+    @Getter
+    @Setter
     private boolean checkFullyPopulated = false;
 
     /**
      * Whether we're defaulting primitives when mapping a null value
      */
+    @Getter
+    @Setter
     private boolean primitivesDefaultedForNullValue = false;
-
-    /**
-     * Map of the fields we provide mapping for
-     */
-    private Map<String, PropertyDescriptor> mappedFields;
-
-    /**
-     * Set of bean properties we provide mapping for
-     */
-    private Set<String> mappedProperties;
-
-    /**
-     * Create a new {@code BeanPropertyRowMapper} for bean-style configuration.
-     *
-     * @see #setCheckFullyPopulated
-     */
-    public JdbcRowMapper() {
-    }
 
     /**
      * Create a new {@code BeanPropertyRowMapper}, accepting unpopulated
@@ -97,42 +98,9 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
     public JdbcRowMapper(JdbcContext jdbcContext, Class<T> mappedClass) {
         this.jdbcContext = jdbcContext;
         this.mappedClass = mappedClass;
-        this.mappedFields = new HashMap<>();
-        this.mappedProperties = new HashSet<>();
+        this.mappedFields = new HashMap<>(32);
+        this.mappedProperties = new HashSet<>(32);
         initialize();
-    }
-
-    /**
-     * Get the class that we are mapping to.
-     */
-    public final Class<T> getMappedClass() {
-        return this.mappedClass;
-    }
-
-    /**
-     * Set whether we're strictly validating that all bean properties have been mapped
-     * from corresponding database fields.
-     * <p>Default is {@code false}, accepting unpopulated properties in the target bean.
-     */
-    public void setCheckFullyPopulated(boolean checkFullyPopulated) {
-        this.checkFullyPopulated = checkFullyPopulated;
-    }
-
-    /**
-     * Return whether we're strictly validating that all bean properties have been
-     * mapped from corresponding database fields.
-     */
-    public boolean isCheckFullyPopulated() {
-        return this.checkFullyPopulated;
-    }
-
-    /**
-     * Set whether we're defaulting Java primitives in the case of mapping a null value
-     * from corresponding database fields.
-     * <p>Default is {@code false}, throwing an exception when nulls are mapped to Java primitives.
-     */
-    public void setPrimitivesDefaultedForNullValue(boolean primitivesDefaultedForNullValue) {
-        this.primitivesDefaultedForNullValue = primitivesDefaultedForNullValue;
     }
 
     /**
@@ -185,18 +153,14 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
                 try {
                     Object value = getColumnValue(rs, index, pd);
                     if (rowNumber == 0 && logger.isDebugEnabled()) {
-                        logger.debug("Mapping column '" + column + "' to property '" + pd.getName() + "' of type ["
-                                + ClassUtils.getQualifiedName(pd.getPropertyType()) + "]");
+                        logger.debug("Mapping column '{}' to property '{}' of type [{}]", column, pd.getName(), ClassUtils.getQualifiedName(pd.getPropertyType()));
                     }
                     try {
                         bw.setPropertyValue(pd.getName(), value);
                     } catch (TypeMismatchException ex) {
                         if (value == null && this.primitivesDefaultedForNullValue) {
                             if (logger.isDebugEnabled()) {
-                                logger.debug("Intercepted TypeMismatchException for row " + rowNumber + " and column '"
-                                        + column + "' with null value when setting property '" + pd.getName()
-                                        + "' of type [" + ClassUtils.getQualifiedName(pd.getPropertyType())
-                                        + "] on object: " + mappedObject, ex);
+                                logger.debug("Intercepted TypeMismatchException for row {} and column '{}' with null value when setting property '{}' of type [{}] on object: {}", rowNumber, column, pd.getName(), ClassUtils.getQualifiedName(pd.getPropertyType()), mappedObject, ex);
                             }
                         } else {
                             throw ex;
@@ -212,7 +176,7 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
             } else {
                 // No PropertyDescriptor found
                 if (rowNumber == 0 && logger.isDebugEnabled()) {
-                    logger.debug("No property found for column '" + column + "' mapped to field '" + field + "'");
+                    logger.debug("No property found for column '{}' mapped to field '{}'", column, field);
                 }
             }
         }
