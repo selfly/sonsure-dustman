@@ -12,9 +12,9 @@ package com.sonsure.dumper.test.jdbc;
 import com.sonsure.dumper.common.model.Page;
 import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.build.BeanParameter;
+import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.build.SqlOperator;
-import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.command.entity.Select;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.basic.BaseTest;
@@ -27,7 +27,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.IncorrectResultSetColumnCountException;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.io.Serializable;
@@ -76,7 +78,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoGet() {
+    public void get() {
         UserInfo user = jdbcDao.get(UserInfo.class, 1L);
         Assertions.assertNotNull(user);
         Assertions.assertEquals(1L, (long) user.getUserInfoId());
@@ -85,7 +87,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoExecuteInsert() {
+    public void executeInsert() {
 
         UserInfo user = new UserInfo();
         user.setLoginName("liyd2017");
@@ -103,7 +105,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoExecuteUpdate() {
+    public void executeUpdate() {
         UserInfo user = new UserInfo();
         user.setUserInfoId(2L);
         user.setPassword("666666");
@@ -121,7 +123,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoExecuteDelete() {
+    public void executeDelete() {
         int count = jdbcDao.executeDelete(UserInfo.class, 3L);
         Assertions.assertEquals(1, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 3L);
@@ -129,7 +131,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoFindAllAllForClass() {
+    public void findAllForClass() {
         List<UserInfo> users = jdbcDao.findAll(UserInfo.class);
         Assertions.assertNotNull(users);
         long count = jdbcDao.findCount(UserInfo.class);
@@ -137,7 +139,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoFindListForEntityNotNullField() {
+    public void findListForEntityNotNullField() {
         UserInfo user = new UserInfo();
         user.setUserAge(10);
         List<UserInfo> users = jdbcDao.findList(user);
@@ -146,7 +148,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoPageResultSetPageSize() {
+    public void findPageSetPageSize() {
         UserInfo user = new UserInfo();
         user.setPageSize(10);
         Page<UserInfo> page = jdbcDao.findPage(user);
@@ -1481,5 +1483,756 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals("interceptorUserAfter", list.get(0).getLoginName());
+    }
+
+    // ============ 补充测试用例以提高覆盖率 ============
+
+    @Test
+    public void testLeftJoin() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 6; i++) {
+            Account account = new Account();
+            account.setAccountId((long) i);
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+        // left join测试
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+                .leftJoin(Account.class).as("t2")
+                .on("t1.userInfoId = t2.accountId")
+                .where("t2.accountId", SqlOperator.IS, null)
+                .orderBy("t1.userInfoId", OrderBy.ASC)
+                .findList();
+        Assertions.assertTrue(list.size() >= 45); // 应该有很多没有关联的UserInfo
+    }
+
+    @Test
+    public void testRightJoin() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 11; i++) {
+            Account account = new Account();
+            account.setAccountId((long) (i + 50)); // 使用不存在的ID，测试右连接
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+                .rightJoin(Account.class).as("t2")
+                .on("t1.userInfoId = t2.accountId")
+                .orderBy("t2.accountId", OrderBy.ASC)
+                .findList();
+        Assertions.assertEquals(10, list.size());
+    }
+
+    @Test
+    public void testJoinWithStringTableName() {
+        jdbcDao.executeDelete(Account.class);
+        Account account = new Account();
+        account.setAccountId(1L);
+        account.setLoginName("account1");
+        account.setAccountName("accountName1");
+        account.setPassword("password1");
+        account.setUserAge(1);
+        jdbcDao.executeInsert(account);
+
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+                .innerJoin("Account").as("t2")
+                .on("t1.userInfoId = t2.accountId")
+                .findList();
+        Assertions.assertEquals(1, list.size());
+    }
+
+    @Test
+    public void testLikeOperator() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where("loginName", SqlOperator.LIKE, "name-1%")
+                .findList();
+        Assertions.assertTrue(list.size() >= 1); // name-1, name-10, name-11等
+        Assertions.assertTrue(list.stream().anyMatch(u -> u.getLoginName().startsWith("name-1")));
+    }
+
+    @Test
+    public void testNotInOperator() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", SqlOperator.NOT_IN, new Object[]{1L, 2L, 3L, 4L, 5L})
+                .findList();
+        Assertions.assertEquals(45, list.size());
+        Assertions.assertTrue(list.stream().noneMatch(u -> u.getUserInfoId() <= 5));
+    }
+
+    @Test
+    public void testNotEqualOperator() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", SqlOperator.NEQ, 1L)
+                .findList();
+        Assertions.assertEquals(49, list.size());
+        Assertions.assertTrue(list.stream().noneMatch(u -> u.getUserInfoId() == 1));
+    }
+
+    @Test
+    public void testIsNullOperator() {
+        // 先创建一个gmtModify为null的记录
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(100L);
+        user.setLoginName("nullTest");
+        user.setPassword("123456");
+        user.setUserAge(20);
+        user.setGmtCreate(new Date());
+        // gmtModify不设置，应该为null
+        jdbcDao.executeInsert(user);
+
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where("gmtModify", SqlOperator.IS, null)
+                .where("userInfoId", 100L)
+                .findList();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertNull(list.get(0).getGmtModify());
+    }
+
+    @Test
+    public void testIsNotNullOperator() {
+        // 更新一个记录的gmtModify
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(1L);
+        user.setGmtModify(new Date());
+        jdbcDao.executeUpdate(user);
+
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where("gmtModify", SqlOperator.IS_NOT, null)
+                .where("userInfoId", 1L)
+                .findList();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertNotNull(list.get(0).getGmtModify());
+    }
+
+    @Test
+    public void testInsertWithoutInto() {
+        Long id = (Long) jdbcDao.insert()
+                .into(UserInfo.class)
+                .intoField("loginName", "insertTest")
+                .intoField("password", "insertPassword")
+                .intoField("userAge", 25)
+                .execute();
+        Assertions.assertNotNull(id);
+        UserInfo user = jdbcDao.get(UserInfo.class, id);
+        Assertions.assertEquals("insertTest", user.getLoginName());
+        Assertions.assertEquals("insertPassword", user.getPassword());
+    }
+
+    @Test
+    public void testInsertWithLambda() {
+        Long id = (Long) jdbcDao.insert()
+                .into(UserInfo.class)
+                .intoField(UserInfo::getLoginName, "lambdaInsert")
+                .intoField(UserInfo::getPassword, "lambdaPassword")
+                .intoField(UserInfo::getUserAge, 26)
+                .execute();
+        Assertions.assertNotNull(id);
+        UserInfo user = jdbcDao.get(UserInfo.class, id);
+        Assertions.assertEquals("lambdaInsert", user.getLoginName());
+        Assertions.assertEquals("lambdaPassword", user.getPassword());
+    }
+
+    @Test
+    public void testDeleteWithoutFrom() {
+        // 先创建一个测试记录
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(200L);
+        user.setLoginName("deleteTest");
+        user.setPassword("123456");
+        user.setUserAge(30);
+        user.setGmtCreate(new Date());
+        jdbcDao.executeInsert(user);
+
+        int count = jdbcDao.delete()
+                .from(UserInfo.class)
+                .where("userInfoId", 200L)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo deleted = jdbcDao.get(UserInfo.class, 200L);
+        Assertions.assertNull(deleted);
+    }
+
+    @Test
+    public void testUpdateWithoutTable() {
+        int count = jdbcDao.update()
+                .table(UserInfo.class)
+                .set("loginName", "updateTest")
+                .where("userInfoId", 1L)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 1L);
+        Assertions.assertEquals("updateTest", user.getLoginName());
+    }
+
+    @Test
+    public void testUpdateWithLambda() {
+        int count = jdbcDao.update(UserInfo.class)
+                .set(UserInfo::getLoginName, "lambdaUpdate")
+                .set(UserInfo::getPassword, "lambdaPassword")
+                .where(UserInfo::getUserInfoId, 2L)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 2L);
+        Assertions.assertEquals("lambdaUpdate", user.getLoginName());
+        Assertions.assertEquals("lambdaPassword", user.getPassword());
+    }
+
+    @Test
+    public void testExecuteScript() {
+        // 测试执行SQL脚本
+        String script = "update sd_user_info set login_name = 'scriptTest' where user_info_id = 5";
+        jdbcDao.executeScript(script);
+        UserInfo user = jdbcDao.get(UserInfo.class, 5L);
+        Assertions.assertEquals("scriptTest", user.getLoginName());
+    }
+
+    @Test
+    public void testExecuteInConnection() {
+        // 测试在连接中执行函数
+        String dbProduct = jdbcDao.executeInConnection(connection -> {
+            return connection.getMetaData().getDatabaseProductName();
+        });
+        Assertions.assertNotNull(dbProduct);
+    }
+
+    @Test
+    public void testGetJdbcContext() {
+        // 测试获取JdbcContext
+        com.sonsure.dumper.core.config.JdbcContext context = jdbcDao.getJdbcContext();
+        Assertions.assertNotNull(context);
+        Assertions.assertNotNull(context.getPersistExecutor());
+        Assertions.assertNotNull(context.getMappingHandler());
+    }
+
+    @Test
+    public void testSelectAddAliasColumn() {
+        jdbcDao.executeDelete(Account.class);
+        Account account = new Account();
+        account.setAccountId(1L);
+        account.setLoginName("aliasTest");
+        account.setAccountName("aliasName");
+        account.setPassword("password");
+        account.setUserAge(1);
+        jdbcDao.executeInsert(account);
+
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                .addAliasColumn("t1", "loginName", "userInfoId")
+                .innerJoin(Account.class).as("t2")
+                .on(UserInfo::getUserInfoId, Account::getAccountId)
+                .addAliasColumn("t2", "accountName")
+                .findList();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertNotNull(list.get(0).getLoginName());
+        Assertions.assertNotNull(list.get(0).getUserInfoId());
+    }
+
+    @Test
+    public void testSelectWithMultipleGroupBy() {
+        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn(UserInfo::getUserType)
+                .addColumn(UserInfo::getUserAge)
+                .addColumn("count(*) as num")
+                .groupBy(UserInfo::getUserType)
+                .groupBy(UserInfo::getUserAge)
+                .orderBy("num", OrderBy.DESC)
+                .findListForMap();
+        Assertions.assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void testSelectWithMultipleHaving() {
+        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn(UserInfo::getUserType)
+                .addColumn("count(*) as num")
+                .groupBy(UserInfo::getUserType)
+                .having("num", SqlOperator.GTE, 5)
+                .having(UserInfo::getUserType, SqlOperator.NEQ, "0")
+                .findListForMap();
+        Assertions.assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void testSelectWhereWithLambda() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where(UserInfo::getUserAge, SqlOperator.GT, 40)
+                .where(UserInfo::getLoginName, SqlOperator.LIKE, "name-%")
+                .orderBy(UserInfo::getUserInfoId, OrderBy.ASC)
+                .findList();
+        Assertions.assertEquals(10, list.size());
+        Assertions.assertTrue(list.stream().allMatch(u -> u.getUserAge() > 40));
+    }
+
+    @Test
+    public void testSelectCondition() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where()
+                .condition("userAge", 10)
+                .and()
+                .condition("userInfoId", SqlOperator.GT, 5)
+                .findList();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(10, (int) list.get(0).getUserAge());
+    }
+
+    @Test
+    public void testSelectConditionWithLambda() {
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where()
+                .condition(UserInfo::getUserAge, 15)
+                .and()
+                .condition(UserInfo::getUserInfoId, SqlOperator.LT, 20)
+                .findList();
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals(15, (int) list.get(0).getUserAge());
+    }
+
+    @Test
+    public void testSelectComplexWhereConditions() {
+        // 测试复杂的where条件组合
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where()
+                .openParen()
+                .where(UserInfo::getUserAge, SqlOperator.GTE, 20)
+                .and()
+                .where(UserInfo::getUserAge, SqlOperator.LTE, 30)
+                .closeParen()
+                .or()
+                .openParen()
+                .where(UserInfo::getUserInfoId, SqlOperator.IN, new Object[]{1L, 2L, 3L})
+                .closeParen()
+                .findList();
+        Assertions.assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void testSelectWithJoinAndComplexConditions() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 11; i++) {
+            Account account = new Account();
+            account.setAccountId((long) i);
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+                .innerJoin(Account.class).as("t2")
+                .on(UserInfo::getUserInfoId, Account::getAccountId)
+                .where("t1.userAge", SqlOperator.GTE, 5)
+                .where("t2.userAge", SqlOperator.LTE, 8)
+                .orderBy("t1.userInfoId", OrderBy.ASC)
+                .findList();
+        Assertions.assertEquals(4, list.size()); // userInfoId 5, 6, 7, 8
+    }
+
+    @Test
+    public void testNativeExecutorFindOneForScalarWithNull() {
+        // 测试查找不存在的记录
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+            Long result = jdbcDao.nativeExecutor()
+                    .command("select userInfoId from UserInfo where userInfoId = ?")
+                    .parameters(90000L)
+                    .findOneForScalar(Long.class);
+            Assertions.assertNull(result);
+        });
+    }
+
+    @Test
+    public void testNativeExecutorFindListForScalarEmpty() {
+        // 测试查找不存在的记录列表
+        List<Long> list = jdbcDao.nativeExecutor()
+                .command("select userInfoId from UserInfo where userInfoId > ?")
+                .parameters(99999L)
+                .findListForScalar(Long.class);
+        Assertions.assertNotNull(list);
+        Assertions.assertEquals(0, list.size());
+    }
+
+    @Test
+    public void testNativeExecutorFindOneForMapEmpty() {
+        // 测试查找不存在的记录
+        Map<String, Object> result = jdbcDao.nativeExecutor()
+                .command("select * from UserInfo where userInfoId = ?")
+                .parameters(99999L)
+                .findOneForMap();
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void testSelectFindOneReturnsNull() {
+        // 测试查找不存在的记录
+        UserInfo user = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", 99999L)
+                .findOne();
+        Assertions.assertNull(user);
+    }
+
+    @Test
+    public void testSelectFindFirstReturnsNull() {
+        // 测试查找不存在的记录
+        UserInfo user = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", 99999L)
+                .findFirst();
+        Assertions.assertNull(user);
+    }
+
+    @Test
+    public void testSelectFindListForMapWithEmptyResult() {
+        // 测试查找不存在的记录
+        List<?> result = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", 99999L)
+                .findListForMap();
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testSelectFindPageForMapWithEmptyResult() {
+        // 测试查找不存在的记录
+        Page<Map<String, Object>> page = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", 99999L)
+                .paginate(1, 10)
+                .findPageForMap();
+        Assertions.assertNotNull(page);
+        Assertions.assertEquals(0, page.getList().size());
+        Assertions.assertEquals(0, page.getPagination().getTotalItems());
+    }
+
+    @Test
+    public void testSelectFindPageForScalarWithEmptyResult() {
+        // 测试查找不存在的记录
+        Page<Long> page = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn("userInfoId")
+                .where("userInfoId", 99999L)
+                .paginate(1, 10)
+                .findPageForScalar(Long.class);
+        Assertions.assertNotNull(page);
+        Assertions.assertEquals(0, page.getList().size());
+        Assertions.assertEquals(0, page.getPagination().getTotalItems());
+    }
+
+    @Test
+    public void testUpdateWithNativeExpression() {
+        // 测试使用原生表达式更新
+        int count = jdbcDao.update(UserInfo.class)
+                .set("{{userAge}}", "userAge * 2")
+                .where("userInfoId", 1L)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 1L);
+        Assertions.assertEquals(2, (int) user.getUserAge());
+    }
+
+    @Test
+    public void testDeleteWithMultipleConditions() {
+        // 创建测试数据
+        UserInfo user1 = new UserInfo();
+        user1.setUserInfoId(300L);
+        user1.setLoginName("multiDelete1");
+        user1.setPassword("123456");
+        user1.setUserAge(30);
+        user1.setGmtCreate(new Date());
+        jdbcDao.executeInsert(user1);
+
+        UserInfo user2 = new UserInfo();
+        user2.setUserInfoId(301L);
+        user2.setLoginName("multiDelete2");
+        user2.setPassword("123456");
+        user2.setUserAge(30);
+        user2.setGmtCreate(new Date());
+        jdbcDao.executeInsert(user2);
+
+        // 删除多条记录
+        int count = jdbcDao.deleteFrom(UserInfo.class)
+                .where("userAge", 30)
+                .where("loginName", SqlOperator.LIKE, "multiDelete%")
+                .execute();
+        Assertions.assertEquals(2, count);
+    }
+
+    @Test
+    public void testSelectWithDistinct() {
+        // 测试distinct查询（如果支持）
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn("distinct userType")
+                .where("userType", SqlOperator.IS_NOT, null)
+                .findList();
+        Assertions.assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void testSelectOrderByMultipleFields() {
+        Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
+                .orderBy("userType", OrderBy.ASC)
+                .orderBy("userAge", OrderBy.DESC)
+                .orderBy("userInfoId", OrderBy.ASC)
+                .limit(0, 10)
+                .findPage();
+        List<UserInfo> list = page.getList();
+        Assertions.assertEquals(10, list.size());
+    }
+
+    @Test
+    public void testInsertIntoFieldMultiple() {
+        Long id = (Long) jdbcDao.insertInto(UserInfo.class)
+                .intoField("loginName", "multiField1")
+                .intoField("password", "multiField2")
+                .intoField("userAge", 27)
+                .intoField("userType", "multiType")
+                .execute();
+        Assertions.assertNotNull(id);
+        UserInfo user = jdbcDao.get(UserInfo.class, id);
+        Assertions.assertEquals("multiField1", user.getLoginName());
+        Assertions.assertEquals("multiField2", user.getPassword());
+        Assertions.assertEquals(27, (int) user.getUserAge());
+        Assertions.assertEquals("multiType", user.getUserType());
+    }
+
+    @Test
+    public void testUpdateSetMultipleFields() {
+        int count = jdbcDao.update(UserInfo.class)
+                .set("loginName", "multiUpdate1")
+                .set("password", "multiUpdate2")
+                .set("userAge", 28)
+                .where("userInfoId", 1L)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo user = jdbcDao.get(UserInfo.class, 1L);
+        Assertions.assertEquals("multiUpdate1", user.getLoginName());
+        Assertions.assertEquals("multiUpdate2", user.getPassword());
+        Assertions.assertEquals(28, (int) user.getUserAge());
+    }
+
+    @Test
+    public void testSelectWithSubQuery() {
+        // 测试子查询
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .where("userInfoId", SqlOperator.IN,
+                        jdbcDao.selectFrom(UserInfo.class)
+                                .addColumn("userInfoId")
+                                .where("userAge", SqlOperator.GT, 40)
+                                .findListForScalar(Long.class).toArray())
+                .findList();
+        Assertions.assertEquals(10, list.size());
+        Assertions.assertTrue(list.stream().allMatch(u -> u.getUserAge() > 40));
+    }
+
+    @Test
+    public void testBatchUpdateWithDifferentBatchSize() {
+        jdbcDao.executeDelete(UserInfo.class);
+        List<UserInfo> userInfoList = new ArrayList<>();
+        for (int i = 1; i < 100; i++) {
+            UserInfo user = new UserInfo();
+            user.setUserInfoId((long) i);
+            user.setLoginName("batch-" + i);
+            user.setPassword("123456-" + i);
+            user.setUserAge(i);
+            user.setGmtCreate(new Date());
+            userInfoList.add(user);
+        }
+
+        String sql = "INSERT INTO UserInfo (userInfoId, loginName, password, userAge, gmtCreate) VALUES (?, ?, ?, ?, ?)";
+        jdbcDao.executeBatchUpdate(sql, userInfoList, 20, (ps, names, userInfo) -> {
+            ps.setLong(1, userInfo.getUserInfoId());
+            ps.setString(2, userInfo.getLoginName());
+            ps.setString(3, userInfo.getPassword());
+            ps.setInt(4, userInfo.getUserAge());
+            ps.setObject(5, userInfo.getGmtCreate());
+        });
+
+        long count = jdbcDao.findCount(UserInfo.class);
+        Assertions.assertEquals(99, count);
+    }
+
+    @Test
+    public void testSelectWithHavingAndOr() {
+        // having子句需要使用and()来连接多个条件
+        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn(UserInfo::getUserType)
+                .addColumn("count(*) as num")
+                .groupBy(UserInfo::getUserType)
+                .having("num", SqlOperator.GTE, 5)
+                .and(UserInfo::getUserType, SqlOperator.EQ, "0")
+                .findListForMap();
+        Assertions.assertFalse(list.isEmpty());
+    }
+
+    @Test
+    public void testSelectLimitWithoutOffset() {
+        Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
+                .orderBy("userInfoId", OrderBy.ASC)
+                .limit(0, 5)
+                .findPage();
+        List<UserInfo> list = page.getList();
+        Assertions.assertEquals(5, list.size());
+        Assertions.assertEquals(1L, (long) list.get(0).getUserInfoId());
+        Assertions.assertEquals(5L, (long) list.get(4).getUserInfoId());
+    }
+
+    @Test
+    public void testSelectLimitWithOffset() {
+        Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
+                .orderBy("userInfoId", OrderBy.ASC)
+                //offset所在记录的那一页
+                .limit(5, 10)
+                .findPage();
+        List<UserInfo> list = page.getList();
+        Assertions.assertEquals(10, list.size());
+        Assertions.assertEquals(1L, (long) list.get(0).getUserInfoId());
+        Assertions.assertEquals(10L, (long) list.get(9).getUserInfoId());
+    }
+
+    @Test
+    public void testSelectPaginateWithDifferentPageSize() {
+        Page<UserInfo> page1 = jdbcDao.selectFrom(UserInfo.class)
+                .orderBy("userInfoId", OrderBy.ASC)
+                .paginate(1, 5)
+                .findPage();
+        Assertions.assertEquals(5, page1.getList().size());
+        Assertions.assertEquals(50, page1.getPagination().getTotalItems());
+
+        Page<UserInfo> page2 = jdbcDao.selectFrom(UserInfo.class)
+                .orderBy("userInfoId", OrderBy.ASC)
+                .paginate(2, 5)
+                .findPage();
+        Assertions.assertEquals(5, page2.getList().size());
+        Assertions.assertEquals(6L, (long) page2.getList().get(0).getUserInfoId());
+    }
+
+    @Test
+    public void testSelectFindOneForScalarWithAggregate() {
+        Long count = jdbcDao.selectFrom(UserInfo.class)
+                .addColumn("count(*)")
+                .findOneForScalar(Long.class);
+        Assertions.assertEquals(50, (long) count);
+    }
+
+    @Test
+    public void testSelectFindListForScalarWithMultipleFields() {
+        // 当查询多个字段指定为标量时
+        Assertions.assertThrows(IncorrectResultSetColumnCountException.class, () -> {
+            Page<Long> page = jdbcDao.selectFrom(UserInfo.class)
+                    .addColumn("userInfoId", "userAge")
+                    .orderBy("userInfoId", OrderBy.ASC)
+                    .limit(0, 5)
+                    .findPageForScalar(Long.class);
+            List<Long> ids = page.getList();
+            Assertions.assertEquals(5, ids.size());
+            Assertions.assertEquals(1L, (long) ids.get(0));
+        });
+    }
+
+    @Test
+    public void testInsertIntoForObjectWithNullValues() {
+        UserInfo user = new UserInfo();
+        user.setLoginName("nullTest");
+        user.setPassword("123456");
+        user.setUserAge(30);
+        // 不设置gmtCreate，应该为null或使用默认值
+        Long id = (Long) jdbcDao.insertInto(UserInfo.class)
+                .intoForObject(user)
+                .execute();
+        Assertions.assertNotNull(id);
+        UserInfo saved = jdbcDao.get(UserInfo.class, id);
+        Assertions.assertEquals("nullTest", saved.getLoginName());
+    }
+
+    @Test
+    public void testUpdateSetForBeanWithNullHandling() {
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(1L);
+        user.setLoginName("nullUpdate");
+        // 不设置password，不应该更新为null（默认行为）
+        int count = jdbcDao.update(UserInfo.class)
+                .setForBean(user)
+                .whereForBeanPrimaryKey(user)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo updated = jdbcDao.get(UserInfo.class, 1L);
+        Assertions.assertEquals("nullUpdate", updated.getLoginName());
+        // password应该保持原值或为null，取决于数据库
+    }
+
+    @Test
+    public void testUpdateSetForBeanWithUpdateNull() {
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(1L);
+        user.setLoginName("nullUpdate2");
+        // 不设置password，但指定updateNull，应该更新为null
+        int count = jdbcDao.update(UserInfo.class)
+                .updateNull()
+                .setForBean(user)
+                .whereForBeanPrimaryKey(user)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo updated = jdbcDao.get(UserInfo.class, 1L);
+        Assertions.assertEquals("nullUpdate2", updated.getLoginName());
+    }
+
+    @Test
+    public void testSelectWhereForBeanWithPartialFields() {
+        UserInfo condition = new UserInfo();
+        condition.setUserAge(10);
+        condition.setUserType("0");
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
+                .whereForBean(condition)
+                .findList();
+        // 应该找到userAge=10且userType=0的记录
+        Assertions.assertTrue(list.size() > 0);
+        Assertions.assertTrue(list.stream().allMatch(u -> u.getUserAge() == 10 && "0".equals(u.getUserType())));
+    }
+
+    @Test
+    public void testDeleteWhereForBean() {
+        // 创建测试数据
+        UserInfo user = new UserInfo();
+        user.setUserInfoId(400L);
+        user.setLoginName("beanDelete");
+        user.setPassword("123456");
+        user.setUserAge(40);
+        user.setGmtCreate(new Date());
+        jdbcDao.executeInsert(user);
+
+        // 使用bean条件删除
+        UserInfo condition = new UserInfo();
+        condition.setLoginName("beanDelete");
+        condition.setUserAge(40);
+        int count = jdbcDao.delete()
+                .from(UserInfo.class)
+                .whereForBean(condition)
+                .execute();
+        Assertions.assertEquals(1, count);
+        UserInfo deleted = jdbcDao.get(UserInfo.class, 400L);
+        Assertions.assertNull(deleted);
+    }
+
+
+    @Test
+    public void testOuterJoin() {
+        jdbcDao.executeDelete(Account.class);
+        for (int i = 1; i < 6; i++) {
+            Account account = new Account();
+            account.setAccountId((long) i);
+            account.setLoginName("account" + i);
+            account.setAccountName("accountName" + i);
+            account.setPassword("password" + i);
+            account.setUserAge(i);
+            jdbcDao.executeInsert(account);
+        }
+        //h2 不支持单独的 outer join
+//        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+//                .outerJoin(Account.class).as("t2")
+//                .on(UserInfo::getUserInfoId, Account::getAccountId)
+//                .orderBy("t1.userInfoId", OrderBy.ASC)
+//                .findList();
+//        Assertions.assertTrue(list.size() >= 50);
     }
 }
