@@ -202,8 +202,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public long count() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
+    public long findCount() {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_ONE_FOR_SCALAR);
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         PersistExecutor persistExecutor = this.getJdbcContext().getPersistExecutor();
@@ -219,9 +219,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T singleResult(Class<T> cls) {
+    public <T> T findOne(Class<T> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_SINGLE_RESULT);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_ONE);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return (T) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -229,9 +229,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> list(Class<T> cls) {
+    public <T> List<T> findList(Class<T> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return (List<T>) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -239,9 +239,9 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Page<T> pageResult(Class<T> cls) {
+    public <T> Page<T> findPage(Class<T> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_LIST);
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST);
         this.getExecutableCmdBuilder().resultType(cls);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcContext().getPersistExecutor().execute(cmd));
@@ -249,8 +249,8 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @SuppressWarnings("unchecked")
     @Override
-    public Page<Map<String, Object>> pageMapResult() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+    public Page<Map<String, Object>> findPageForMap() {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST_FOR_MAP);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcContext().getPersistExecutor().execute(cmd));
@@ -258,31 +258,31 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Page<T> oneColPageResult(Class<T> clazz) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
+    public <T> Page<T> findPageForScalar(Class<T> clazz) {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST_FOR_SCALAR);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcContext().getPersistExecutor().execute(cmd));
     }
 
     @Override
-    public M singleResult() {
-        return this.singleResult(this.cls);
+    public M findOne() {
+        return this.findOne(this.cls);
     }
 
     @Override
-    public M firstResult() {
-        return this.firstResult(this.cls);
+    public M findFirst() {
+        return this.findFirst(this.cls);
     }
 
     @Override
-    public List<M> list() {
-        return this.list(cls);
+    public List<M> findList() {
+        return this.findList(cls);
     }
 
     @Override
-    public Page<M> pageResult() {
-        return this.pageResult(cls);
+    public Page<M> findPage() {
+        return this.findPage(cls);
     }
 
     private static class SelectExecutableCustomizer implements ExecutableCustomizer {

@@ -35,7 +35,7 @@ public class OracleJdbcTemplateDaoImplTest {
         OracleUser oracleUser = new OracleUser();
         oracleUser.setUsername("liyd");
 
-        Long id = (Long) jdbcDao.executeInsert(oracleUser);
+        Long id = jdbcDao.executeInsert(oracleUser);
 
         Assertions.assertNotNull(id);
     }

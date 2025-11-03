@@ -31,8 +31,8 @@ public class HibernateJdbcDaoTest {
     private JdbcDao jdbcDao;
 
     @Test
-    public void findList() {
-        List<HbUserInfo> userInfos = jdbcDao.find(HbUserInfo.class);
+    public void findAllList() {
+        List<HbUserInfo> userInfos = jdbcDao.findAll(HbUserInfo.class);
         Assertions.assertNotNull(userInfos);
     }
 }

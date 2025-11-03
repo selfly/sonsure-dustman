@@ -21,34 +21,34 @@ public enum ExecutionType {
     INSERT,
 
     /**
-     * Query for list command type.
+     * fin for list command type.
      */
-    QUERY_FOR_LIST,
+    FIND_LIST,
 
     /**
      * Query single result command type.
      */
-    QUERY_SINGLE_RESULT,
+    FIND_ONE,
 
     /**
      * Query for map command type.
      */
-    QUERY_FOR_MAP,
+    FIND_ONE_FOR_MAP,
 
     /**
      * Query for map list command type.
      */
-    QUERY_FOR_MAP_LIST,
+    FIND_LIST_FOR_MAP,
 
     /**
      * Query one col command type.
      */
-    QUERY_ONE_COL,
+    FIND_ONE_FOR_SCALAR,
 
     /**
      * Query one col list command type.
      */
-    QUERY_ONE_COL_LIST,
+    FIND_LIST_FOR_SCALAR,
 
     /**
      * Update command type.

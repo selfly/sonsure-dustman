@@ -59,54 +59,55 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     @Override
     public <T> T get(Class<T> entityClass, Serializable id) {
         String pkField = this.getJdbcContext().getMappingHandler().getPkField(entityClass);
-        return this.selectFrom(entityClass).where(pkField, id).singleResult(entityClass);
+        return this.selectFrom(entityClass).where(pkField, id).findOne(entityClass);
     }
 
     @Override
-    public <T> List<T> find(Class<T> entityClass) {
+    public <T> List<T> findAll(Class<T> entityClass) {
         String pkField = this.getJdbcContext().getMappingHandler().getPkField(entityClass);
-        return this.selectFrom(entityClass).orderBy(pkField, OrderBy.DESC).list(entityClass);
+        return this.selectFrom(entityClass).orderBy(pkField, OrderBy.DESC).findList(entityClass);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> find(T entity) {
+    public <T> List<T> findList(T entity) {
         String pkField = this.getJdbcContext().getMappingHandler().getPkField(entity.getClass());
-        return (List<T>) this.selectFrom(entity.getClass()).whereForBean(entity).orderBy(pkField, OrderBy.DESC).list(entity.getClass());
+        return (List<T>) this.selectFrom(entity.getClass()).whereForBean(entity).orderBy(pkField, OrderBy.DESC).findList(entity.getClass());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Pageable> Page<T> pageResult(T entity) {
+    public <T extends Pageable> Page<T> findPage(T entity) {
         String pkField = this.getJdbcContext().getMappingHandler().getPkField(entity.getClass());
-        return (Page<T>) this.selectFrom(entity.getClass()).whereForBean(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).pageResult(entity.getClass());
+        return (Page<T>) this.selectFrom(entity.getClass()).whereForBean(entity).paginate(entity).orderBy(pkField, OrderBy.DESC).findPage(entity.getClass());
     }
 
     @Override
     public long findCount(Object entity) {
-        return this.selectFrom(entity.getClass()).whereForBean(entity).count();
+        return this.selectFrom(entity.getClass()).whereForBean(entity).findCount();
     }
 
     @Override
     public long findCount(Class<?> cls) {
-        return this.selectFrom(cls).count();
+        return this.selectFrom(cls).findCount();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T singleResult(T entity) {
-        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).singleResult(entity.getClass());
+    public <T> T findOne(T entity) {
+        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).findOne(entity.getClass());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T firstResult(T entity) {
-        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).firstResult(entity.getClass());
+    public <T> T findFirst(T entity) {
+        return (T) this.selectFrom(entity.getClass()).whereForBean(entity).findFirst(entity.getClass());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object executeInsert(Object entity) {
-        return this.insertInto(entity.getClass()).intoForObject(entity).execute();
+    public <T, R> R executeInsert(T entity) {
+        return (R) this.insertInto(entity.getClass()).intoForObject(entity).execute();
     }
 
     @Override

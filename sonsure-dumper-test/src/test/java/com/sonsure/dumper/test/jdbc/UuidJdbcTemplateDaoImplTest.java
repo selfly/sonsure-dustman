@@ -34,7 +34,7 @@ public class UuidJdbcTemplateDaoImplTest {
         UuidUser user = new UuidUser();
         user.setLoginName("liyd");
         user.setPassword("123456");
-        String id = (String) jdbcDao.executeInsert(user);
+        String id = jdbcDao.executeInsert(user);
         Assertions.assertNotNull(id);
     }
 

@@ -67,7 +67,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
             String countCommand = getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);
             ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
             countExecutableCmd.setCommand(countCommand);
-            countExecutableCmd.setExecutionType(ExecutionType.QUERY_ONE_COL);
+            countExecutableCmd.setExecutionType(ExecutionType.FIND_ONE_FOR_SCALAR);
             countExecutableCmd.setResultType(Long.class);
             Object result = getJdbcContext().getPersistExecutor().execute(countExecutableCmd);
             count = (Long) result;

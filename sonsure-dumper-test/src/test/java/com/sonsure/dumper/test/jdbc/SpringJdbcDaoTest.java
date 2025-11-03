@@ -93,7 +93,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         user.setUserAge(18);
         user.setGmtCreate(new Date());
 
-        Long id = (Long) jdbcDao.executeInsert(user);
+        Long id = jdbcDao.executeInsert(user);
         Assertions.assertTrue(id > 0);
 
         UserInfo userInfo = jdbcDao.get(UserInfo.class, id);
@@ -129,18 +129,18 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoFindAllForClass() {
-        List<UserInfo> users = jdbcDao.find(UserInfo.class);
+    public void jdbcDaoFindAllAllForClass() {
+        List<UserInfo> users = jdbcDao.findAll(UserInfo.class);
         Assertions.assertNotNull(users);
         long count = jdbcDao.findCount(UserInfo.class);
         Assertions.assertEquals(count, users.size());
     }
 
     @Test
-    public void jdbcDaoFindForEntityNotNullField() {
+    public void jdbcDaoFindListForEntityNotNullField() {
         UserInfo user = new UserInfo();
         user.setUserAge(10);
-        List<UserInfo> users = jdbcDao.find(user);
+        List<UserInfo> users = jdbcDao.findList(user);
         Assertions.assertNotNull(users);
         Assertions.assertEquals(1, users.size());
     }
@@ -149,28 +149,28 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void jdbcDaoPageResultSetPageSize() {
         UserInfo user = new UserInfo();
         user.setPageSize(10);
-        Page<UserInfo> page = jdbcDao.pageResult(user);
+        Page<UserInfo> page = jdbcDao.findPage(user);
         Assertions.assertNotNull(page);
         Assertions.assertEquals(10, page.getList().size());
     }
 
 
     @Test
-    public void jdbcDaoPageResultEntityNotNullFieldCondition() {
+    public void jdbcDaoFindPageEntityNotNullFieldCondition() {
         UserInfo user = new UserInfo();
         user.setPageSize(10);
         user.setUserAge(10);
-        Page<UserInfo> page = jdbcDao.pageResult(user);
+        Page<UserInfo> page = jdbcDao.findPage(user);
         Assertions.assertNotNull(page);
         Assertions.assertEquals(1, page.getList().size());
     }
 
     @Test
-    public void jdbcDaoPageResultSetLimit() {
+    public void jdbcDaoFindPageSetLimit() {
         Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
                 .orderBy("userInfoId", OrderBy.ASC)
                 .limit(15, 10)
-                .pageResult(UserInfo.class);
+                .findPage(UserInfo.class);
         Assertions.assertEquals(11L, (long) page.getList().get(0).getUserInfoId());
         Assertions.assertEquals(20L, (long) page.getList().get(9).getUserInfoId());
     }
@@ -191,10 +191,10 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void jdbcDaoSingleResultForEntityNotNullField() {
+    public void jdbcDaoFindOneForEntityNotNullField() {
         UserInfo tmp = new UserInfo();
         tmp.setUserAge(10);
-        UserInfo user = jdbcDao.singleResult(tmp);
+        UserInfo user = jdbcDao.findOne(tmp);
         Assertions.assertNotNull(user);
         Assertions.assertEquals(10L, (long) user.getUserInfoId());
         Assertions.assertEquals("name-10", user.getLoginName());
@@ -204,10 +204,10 @@ public class SpringJdbcDaoTest extends BaseTest {
 
 
     @Test
-    public void jdbcDaoFirstResultForEntityNotNullField() {
+    public void jdbcDaoFindFirstForEntityNotNullField() {
         UserInfo tmp = new UserInfo();
         tmp.setUserAge(10);
-        UserInfo user = jdbcDao.firstResult(tmp);
+        UserInfo user = jdbcDao.findFirst(tmp);
         Assertions.assertNotNull(user);
         Assertions.assertEquals(10L, (long) user.getUserInfoId());
         Assertions.assertEquals("name-10", user.getLoginName());
@@ -224,7 +224,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         UserInfo tmp = new UserInfo();
         tmp.setLoginName("name-17");
-        UserInfo user1 = jdbcDao.singleResult(tmp);
+        UserInfo user1 = jdbcDao.findOne(tmp);
         Assertions.assertNull(user1);
     }
 
@@ -261,7 +261,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         ku.setGmtCreate(new Date());
         ku.setGmtModify(new Date());
 
-        Long id = (Long) jdbcDao.executeInsert(ku);
+        Long id = jdbcDao.executeInsert(ku);
 
         AnnotationUserInfo annotationUserInfo = jdbcDao.get(AnnotationUserInfo.class, id);
         Assertions.assertEquals("selfly", annotationUserInfo.getLoginName());
@@ -272,7 +272,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void selectSingleTableWhereAliasName() {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where(UserInfo::getUserInfoId, 1L)
-                .singleResult();
+                .findOne();
         Assertions.assertEquals(1L, userInfo.getUserInfoId());
     }
 
@@ -281,7 +281,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .orderBy(UserInfo::getUserInfoId, OrderBy.ASC)
                 .orderBy(UserInfo::getGmtCreate, OrderBy.DESC)
-                .list();
+                .findList();
         Assertions.assertEquals(50, list.size());
         Assertions.assertEquals(1L, list.get(0).getUserInfoId());
     }
@@ -301,25 +301,25 @@ public class SpringJdbcDaoTest extends BaseTest {
         }
         Select<UserInfo> select1 = jdbcDao.selectFrom(UserInfo.class)
                 .where("loginName", "nameStrField");
-        long count1 = select1.count();
+        long count1 = select1.findCount();
         Assertions.assertEquals(10, count1);
 
-        List<UserInfo> list1 = select1.list();
+        List<UserInfo> list1 = select1.findList();
         Assertions.assertEquals(10, list1.size());
 
-        Page<UserInfo> page1 = select1.paginate(1, 5).pageResult(UserInfo.class);
+        Page<UserInfo> page1 = select1.paginate(1, 5).findPage(UserInfo.class);
         Assertions.assertEquals(5, page1.getList().size());
 
         Select<UserInfo> select2 = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getUserAge, 19)
                 .where(UserInfo::getLoginName, "nameStrField");
-        long count2 = select2.count();
+        long count2 = select2.findCount();
         Assertions.assertEquals(10, count2);
 
-        List<UserInfo> list2 = select2.list();
+        List<UserInfo> list2 = select2.findList();
         Assertions.assertEquals(10, list2.size());
 
-        Page<UserInfo> page2 = select2.paginate(1, 5).pageResult();
+        Page<UserInfo> page2 = select2.paginate(1, 5).findPage();
         Assertions.assertEquals(5, page2.getList().size());
     }
 
@@ -341,7 +341,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                     .where("loginName", "name-19")
                     .or()
                     .where("userAge", 21)
-                    .singleResult(UserInfo.class);
+                    .findOne(UserInfo.class);
         } catch (IncorrectResultSizeDataAccessException e) {
             Assertions.assertEquals("Incorrect result size: expected 1, actual 2", e.getMessage());
         }
@@ -369,7 +369,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .closeParen()
                 .and()
                 .where(UserInfo::getUserInfoId, 2L)
-                .singleResult(UserInfo.class);
+                .findOne(UserInfo.class);
         Assertions.assertEquals(2L, userInfo.getUserInfoId());
     }
 
@@ -382,7 +382,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 //add之后又移除
                 .dropColumn("password")
                 .where("userAge", SqlOperator.LTE, 10)
-                .list();
+                .findList();
         Assertions.assertNotNull(list);
         Assertions.assertEquals(10, list.size());
         for (UserInfo user : list) {
@@ -401,7 +401,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .addAllColumns()
                 .dropColumn("password")
                 .where("userAge", SqlOperator.LTE, 10)
-                .list();
+                .findList();
         Assertions.assertNotNull(list);
         Assertions.assertEquals(10, list.size());
         for (UserInfo user : list) {
@@ -419,7 +419,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
                 .dropColumn("password")
                 .where("userAge", SqlOperator.LTE, 10)
-                .list();
+                .findList();
         Assertions.assertNotNull(list);
         Assertions.assertEquals(10, list.size());
         for (UserInfo user : list) {
@@ -438,7 +438,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .addAllColumns()
                 .dropColumn("userInfoId", "password")
                 .orderBy("userAge", OrderBy.ASC)
-                .list(UserInfo.class);
+                .findList(UserInfo.class);
         Assertions.assertNotNull(list);
         int preAge = 0;
         for (UserInfo user : list) {
@@ -457,7 +457,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         Long maxId = jdbcDao.selectFrom(UserInfo.class)
                 .addColumn("max(userInfoId) maxid")
-                .oneColResult(Long.class);
+                .findOneForScalar(Long.class);
         Assertions.assertEquals(50, (long) maxId);
     }
 
@@ -465,7 +465,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void select6() {
         List<Long> ids = jdbcDao.selectFrom(UserInfo.class)
                 .addColumn(UserInfo::getUserInfoId)
-                .oneColList(Long.class);
+                .findListForScalar(Long.class);
         Assertions.assertNotNull(ids);
     }
 
@@ -474,14 +474,14 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void select8() {
         Object result = jdbcDao.selectFrom(UserInfo.class)
                 .where("userInfoId", 15L)
-                .singleMapResult();
+                .findOneForMap();
         Assertions.assertNotNull(result);
     }
 
     @Test
     public void select10() {
         List<?> result = jdbcDao.selectFrom(UserInfo.class)
-                .listMaps();
+                .findListForMap();
         Assertions.assertNotNull(result);
         Assertions.assertInstanceOf(Map.class, result.get(0));
     }
@@ -492,7 +492,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         pageable.setPageSize(5);
         Page<?> result = jdbcDao.selectFrom(UserInfo.class)
                 .paginate(pageable)
-                .pageMapResult();
+                .findPageForMap();
         Assertions.assertEquals(5, result.getList().size());
         Assertions.assertInstanceOf(Map.class, result.getList().get(0));
     }
@@ -503,7 +503,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .where("t1.userInfoId", SqlOperator.IN, new Object[]{11L, 12L, 13L})
                 .where("t1.loginName", SqlOperator.IN, new Object[]{"name-11", "name-12", "name-13"})
                 .where("t1.userAge", SqlOperator.IN, new Object[]{11L, 12L, 13L})
-                .list(UserInfo.class);
+                .findList(UserInfo.class);
         Assertions.assertEquals(3, users.size());
     }
 
@@ -519,7 +519,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         user.setLoginName("liyd");
         select.whereForBean(user);
 
-        List<UserInfo> users = select.list(UserInfo.class);
+        List<UserInfo> users = select.findList(UserInfo.class);
         Assertions.assertNotNull(users);
     }
 
@@ -530,7 +530,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         select.where("userAge", 15);
         select.where("userInfoId", 10L);
 
-        List<UserInfo> users = select.list();
+        List<UserInfo> users = select.findList();
         Assertions.assertNotNull(users);
     }
 
@@ -538,7 +538,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void select19() {
         Map<String, Object> result = jdbcDao.selectFrom(UserInfo.class)
                 .orderBy("userInfoId", OrderBy.ASC)
-                .firstMapResult();
+                .findFirstForMap();
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.get("USER_INFO_ID"));
     }
@@ -548,7 +548,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         Long result = jdbcDao.selectFrom(UserInfo.class)
                 .addColumn("userInfoId")
                 .orderBy("userInfoId", OrderBy.ASC)
-                .oneColFirstResult(Long.class);
+                .findFirstForScalar(Long.class);
         Assertions.assertEquals(1L, (long) result);
     }
 
@@ -558,7 +558,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .addColumn("userInfoId")
                 .orderBy("userInfoId", OrderBy.ASC)
                 .paginate(1, 10)
-                .oneColPageResult(Long.class);
+                .findPageForScalar(Long.class);
         Assertions.assertEquals(10, page.getList().size());
         Assertions.assertEquals(1L, (long) page.getList().get(0));
     }
@@ -568,7 +568,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         Page<UserInfo> userInfoPage = jdbcDao.selectFrom(UserInfo.class)
                 .addColumn((UserInfo::getLoginName))
                 .paginate(1, 10)
-                .pageResult(UserInfo.class);
+                .findPage(UserInfo.class);
         Assertions.assertNotNull(userInfoPage.getList());
         Assertions.assertEquals(10, userInfoPage.getList().size());
         for (UserInfo userInfo : userInfoPage.getList()) {
@@ -581,12 +581,12 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void singleResultObject() {
+    public void findOneObject() {
 
         Object object = jdbcDao.selectFrom(UserInfo.class)
                 .addColumn("loginName", "password")
                 .where("userInfoId", 5L)
-                .singleMapResult();
+                .findOneForMap();
 
         Assertions.assertNotNull(object);
     }
@@ -595,7 +595,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void selectForAnnotation() {
         Page<AnnotationUserInfo> page = jdbcDao.selectFrom(AnnotationUserInfo.class)
                 .paginate(1, 10)
-                .pageResult(AnnotationUserInfo.class);
+                .findPage(AnnotationUserInfo.class);
         Assertions.assertFalse(page.getList().isEmpty());
         Assertions.assertNotNull(page.getList().get(0).getLoginName());
     }
@@ -614,11 +614,11 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .addColumn("count(*) Num")
                 .groupBy(UserInfo::getUserAge)
                 .orderBy("Num", OrderBy.DESC);
-        Page<Map<String, Object>> page = select.paginate(1, 5).pageMapResult();
+        Page<Map<String, Object>> page = select.paginate(1, 5).findPageForMap();
 
         Assertions.assertEquals(5, page.getList().size());
 
-        List<Map<String, Object>> objects = select.listMaps();
+        List<Map<String, Object>> objects = select.findListForMap();
         Assertions.assertEquals(50, objects.size());
     }
 
@@ -709,7 +709,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         ku.setPassword("123456");
         ku.setUserAge(18);
         ku.setGmtCreate(new Date());
-        Long id = (Long) jdbcDao.executeInsert(ku);
+        Long id = jdbcDao.executeInsert(ku);
 
         AnnotationUserInfo annotationUserInfo = jdbcDao.get(AnnotationUserInfo.class, id);
         Assertions.assertEquals(ku.getLoginName(), annotationUserInfo.getLoginName());
@@ -759,7 +759,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         user.setUserAge(17);
         user.setGmtCreate(new Date());
 
-        Long id = (Long) jdbcDao.executeInsert(user);
+        Long id = jdbcDao.executeInsert(user);
         jdbcDao.update(UserInfo.class)
                 .set("{{userAge}}", "userAge+1")
                 .where("userInfoId", id)
@@ -855,7 +855,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         long result = jdbcDao.nativeExecutor()
                 .command("select count(*) from UserInfo")
-                .count();
+                .findCount();
         Assertions.assertEquals(50, result);
     }
 
@@ -869,7 +869,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         long count = jdbcDao.selectFrom(UserInfo.class)
                 .where("userAge", SqlOperator.LT, 18)
-                .count();
+                .findCount();
         Assertions.assertEquals(0, count);
     }
 
@@ -882,7 +882,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         long count = jdbcDao.selectFrom(UserInfo.class)
                 .where("userAge", SqlOperator.LT, 18)
-                .count();
+                .findCount();
         Assertions.assertEquals(0, count);
     }
 
@@ -890,24 +890,24 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void nativeOneColResult() {
         Integer integer = jdbcDao.nativeExecutor()
                 .command("select sum(userAge) from UserInfo")
-                .oneColResult(Integer.class);
+                .findOneForScalar(Integer.class);
         Assertions.assertTrue(integer > 0);
     }
 
     @Test
-    public void nativeFirstResult() {
+    public void nativeFindFirst() {
         UserInfo userInfo = jdbcDao.nativeExecutor()
                 .command("select * from UserInfo order by userInfoId asc")
-                .firstResult(UserInfo.class);
+                .findFirst(UserInfo.class);
 
         Assertions.assertEquals(1L, (long) userInfo.getUserInfoId());
     }
 
     @Test
-    public void nativeOneColFirstResult() {
+    public void nativeOneColFindFirst() {
         Long id = jdbcDao.nativeExecutor()
                 .command("select userInfoId from UserInfo order by userInfoId asc")
-                .oneColFirstResult(Long.class);
+                .findFirstForScalar(Long.class);
 
         Assertions.assertEquals(1L, (long) id);
     }
@@ -971,7 +971,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void nativeList() {
         List<UserInfo> list = jdbcDao.nativeExecutor()
                 .command("select * from UserInfo")
-                .list(UserInfo.class);
+                .findList(UserInfo.class);
 
         Assertions.assertTrue(list != null && !list.isEmpty());
     }
@@ -980,7 +980,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void nativeOneColList() {
         List<Long> list = jdbcDao.nativeExecutor()
                 .command("select userInfoId from UserInfo")
-                .oneColList(Long.class);
+                .findListForScalar(Long.class);
 
         Assertions.assertTrue(list != null && !list.isEmpty());
     }
@@ -990,7 +990,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void nativeFirstList() {
         Object result = jdbcDao.nativeExecutor()
                 .command("select userInfoId from UserInfo")
-                .firstMapResult();
+                .findFirstForMap();
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, ((Map<?, ?>) result).size());
     }
@@ -1003,7 +1003,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         Page<Map<String, Object>> page = jdbcDao.nativeExecutor()
                 .command("select userInfoId from UserInfo order by userInfoId asc")
                 .paginate(pageable)
-                .pageMapResult();
+                .findPageForMap();
         Assertions.assertEquals(10, page.getList().size());
         Assertions.assertNotNull(page.getList().get(0));
         Map<String, Object> map = page.getList().get(0);
@@ -1019,7 +1019,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("select * from UserInfo order by userInfoId asc")
                 .paginate(2, 5)
                 .resultHandler(new CustomResultHandler())
-                .pageResult(Account.class);
+                .findPage(Account.class);
         Assertions.assertEquals(5, page.getList().size());
         Assertions.assertEquals("name-6", page.getList().get(0).getLoginName());
         Assertions.assertEquals("name-10", page.getList().get(4).getLoginName());
@@ -1030,7 +1030,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         Page<Map<String, Object>> page = jdbcDao.nativeExecutor()
                 .command("select userInfoId from UserInfo order by userInfoId asc")
                 .limit(15, 10)
-                .pageMapResult();
+                .findPageForMap();
         Assertions.assertEquals(10, page.getList().size());
         Assertions.assertNotNull(page.getList());
         Assertions.assertNotNull(page.getList().get(0));
@@ -1046,7 +1046,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("getUser")
                 .parameter("id", 9L)
                 .parameter("loginName", "name-9")
-                .singleResult(UserInfo.class);
+                .findOne(UserInfo.class);
 
         Assertions.assertNotNull(user);
     }
@@ -1061,7 +1061,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("getUserSql")
                 .parameters(params)
                 .forceNative()
-                .singleResult(UserInfo.class);
+                .findOne(UserInfo.class);
 
         Assertions.assertNotNull(user);
     }
@@ -1077,7 +1077,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("getUser2")
                 .parameter("user", userInfo)
                 .forceNative()
-                .singleMapResult();
+                .findOneForMap();
 
         Assertions.assertNotNull(user);
     }
@@ -1094,7 +1094,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("queryUserList")
                 .parameter("names", names)
                 .forceNative()
-                .listMaps();
+                .findListForMap();
 
         Assertions.assertEquals(3, list.size());
     }
@@ -1121,7 +1121,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("getUser3")
                 .parameter("userInfoId", 9L)
                 .parameter("loginName", "name-9")
-                .singleMapResult();
+                .findOneForMap();
 
         Assertions.assertNotNull(user);
     }
@@ -1133,7 +1133,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .command("getUser3")
                 .parameter("userInfoId", 9L)
                 .parameter("loginName", "name-9")
-                .singleResult(UserInfo.class);
+                .findOne(UserInfo.class);
 
         Assertions.assertEquals("name-9", userInfo.getLoginName());
     }
@@ -1143,7 +1143,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         Page<UserInfo> page = jdbcDao.myBatisExecutor()
                 .command("queryUserList2")
                 .paginate(1, 10)
-                .pageResult(UserInfo.class);
+                .findPage(UserInfo.class);
 
         Assertions.assertEquals(10, page.getList().size());
     }
@@ -1157,7 +1157,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
                 .where(getLoginName, userInfo.getLoginName())
                 .where(UserInfo::getPassword, userInfo.getPassword())
-                .list(UserInfo.class);
+                .findList(UserInfo.class);
 
         Assertions.assertFalse(list.isEmpty());
 
@@ -1260,7 +1260,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .where("userAge", SqlOperator.GT, 5)
                 .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
-                .singleResult(UserInfo.class);
+                .findOne(UserInfo.class);
         Assertions.assertNotNull(userInfo);
     }
 
@@ -1272,7 +1272,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .namedParameter()
                 .where("userAge", SqlOperator.GT, 5)
                 .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
-                .singleResult(UserInfo.class);
+                .findOne(UserInfo.class);
         Assertions.assertNotNull(userInfo);
     }
 
@@ -1331,7 +1331,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         long count1 = jdbcDao.selectFrom(UserInfo.class)
                 .where(UserInfo::getLoginName, "name-9999")
-                .count();
+                .findCount();
         Assertions.assertTrue(count1 > 0);
 
     }
@@ -1351,7 +1351,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
                 .innerJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
-                .list();
+                .findList();
         Assertions.assertEquals(10, list.size());
     }
 
@@ -1371,7 +1371,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .innerJoin(Account.class).as("t2")
                 .on(UserInfo::getUserInfoId, Account::getAccountId)
 //                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
-                .list();
+                .findList();
         Assertions.assertEquals(10, list.size());
     }
 
@@ -1390,7 +1390,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAliasColumn("t1", "loginName")
                 .innerJoin(Account.class).as("t2")
                 .on(UserInfo::getUserInfoId, Account::getAccountId)
-                .list();
+                .findList();
         Assertions.assertEquals(10, list.size());
     }
 
@@ -1400,7 +1400,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         // 测试使用表别名的where条件
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where("t1.userInfoId", 1L)
-                .singleResult();
+                .findOne();
 
         Assertions.assertNotNull(userInfo);
         Assertions.assertEquals(1L, userInfo.getUserInfoId());
@@ -1412,7 +1412,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         // 测试使用Lambda表达式的where条件
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where(UserInfo::getUserInfoId, 1L)
-                .singleResult();
+                .findOne();
 
         Assertions.assertNotNull(userInfo);
         Assertions.assertEquals(1L, userInfo.getUserInfoId());
@@ -1425,7 +1425,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where("t1.userInfoId", 1L)
                 .where("t1.loginName", "name-1")
-                .list();
+                .findList();
 
         Assertions.assertEquals(1, users.size());
         Assertions.assertEquals(1L, users.get(0).getUserInfoId());
@@ -1436,7 +1436,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         // 测试使用操作符的where条件
         List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where("t1.userAge", SqlOperator.GTE, 40)
-                .list();
+                .findList();
 
         Assertions.assertEquals(11, users.size());
         Assertions.assertEquals(40, users.get(0).getUserAge());
@@ -1451,7 +1451,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .groupBy(UserInfo::getUserType)
                 .having("num", SqlOperator.GTE, 5)
                 .and(UserInfo::getUserType, SqlOperator.EQ, userType)
-                .listMaps();
+                .findListForMap();
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals(10L, (Long) list.get(0).get("num"));
         Assertions.assertEquals(userType, list.get(0).get("user_type"));
@@ -1466,7 +1466,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                 .groupBy(UserInfo::getUserType)
                 .having(UserInfo::getUserType, SqlOperator.EQ, userType)
                 .and("num", SqlOperator.GTE, 5)
-                .listMaps();
+                .findListForMap();
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals(10L, (Long) list.get(0).get("num"));
         Assertions.assertEquals(userType, list.get(0).get("user_type"));
@@ -1477,7 +1477,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         //sql不执行通过拦截器返回数据
         List<UserInfo> list = jdbcDao.nativeExecutor()
                 .command(DumperTestConfig.TestBeforeInterceptor.SQL)
-                .list(UserInfo.class);
+                .findList(UserInfo.class);
 
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals("interceptorUserAfter", list.get(0).getLoginName());

@@ -72,16 +72,16 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     }
 
     @Override
-    public long count() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL);
+    public long findCount() {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_ONE_FOR_SCALAR);
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return (Long) getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     @Override
-    public <T> T singleResult(Class<T> cls) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP);
+    public <T> T findOne(Class<T> cls) {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_ONE_FOR_MAP);
         this.getExecutableCmdBuilder().resultType(Map.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         Object result = getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -90,8 +90,8 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> list(Class<T> cls) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+    public <T> List<T> findList(Class<T> cls) {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST_FOR_MAP);
         this.getExecutableCmdBuilder().resultType(List.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         List<Map<String, Object>> mapList = (List<Map<String, Object>>) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -99,15 +99,15 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
     }
 
     @Override
-    public <T> Page<T> pageResult(Class<T> cls) {
-        Page<Map<String, Object>> page = this.pageMapResult();
+    public <T> Page<T> findPage(Class<T> cls) {
+        Page<Map<String, Object>> page = this.findPageForMap();
         return this.handleResult(page, getResultHandler(cls));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Page<Map<String, Object>> pageMapResult() {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+    public Page<Map<String, Object>> findPageForMap() {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST_FOR_MAP);
         this.getExecutableCmdBuilder().resultType(Page.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return this.doPageResult(executableCmd, cmd -> (List<Map<String, Object>>) getJdbcContext().getPersistExecutor().execute(cmd));
@@ -115,8 +115,8 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Page<T> oneColPageResult(Class<T> clazz) {
-        this.getExecutableCmdBuilder().executionType(ExecutionType.QUERY_ONE_COL_LIST);
+    public <T> Page<T> findPageForScalar(Class<T> clazz) {
+        this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_LIST_FOR_SCALAR);
         this.getExecutableCmdBuilder().resultType(clazz);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         return this.doPageResult(executableCmd, cmd -> (List<T>) getJdbcContext().getPersistExecutor().execute(cmd));

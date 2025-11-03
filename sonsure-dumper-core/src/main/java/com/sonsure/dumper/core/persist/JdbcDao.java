@@ -58,25 +58,16 @@ public interface JdbcDao {
      * @param entityClass the entity class
      * @return list
      */
-    <T> List<T> find(Class<T> entityClass);
+    <T> List<T> findAll(Class<T> entityClass);
 
     /**
      * 根据实体条件查询列表,根据默认主键desc排序
      *
      * @param <T>    the type parameter
      * @param entity the entity
-     * @return list list
+     * @return list
      */
-    <T> List<T> find(T entity);
-
-    /**
-     * 查询分页列表
-     *
-     * @param <T>    the type parameter
-     * @param entity the entity
-     * @return page
-     */
-    <T extends Pageable> Page<T> pageResult(T entity);
+    <T> List<T> findList(T entity);
 
     /**
      * 根据实体条件查询记录数
@@ -95,13 +86,22 @@ public interface JdbcDao {
     long findCount(Class<?> cls);
 
     /**
+     * 查询分页列表
+     *
+     * @param <T>    the type parameter
+     * @param entity the entity
+     * @return page
+     */
+    <T extends Pageable> Page<T> findPage(T entity);
+
+    /**
      * 根据实体条件查询单个结果
      *
      * @param <T>    the type parameter
      * @param entity the entity
      * @return t
      */
-    <T> T singleResult(T entity);
+    <T> T findOne(T entity);
 
     /**
      * 根据实体条件查询首个结果
@@ -110,16 +110,17 @@ public interface JdbcDao {
      * @param entity the entity
      * @return t
      */
-    <T> T firstResult(T entity);
+    <T> T findFirst(T entity);
 
     /**
      * 插入
      *
      * @param <T>    the type parameter
+     * @param <R>    the type parameter
      * @param entity the entity
-     * @return object
+     * @return object r
      */
-    <T> Object executeInsert(T entity);
+    <T, R> R executeInsert(T entity);
 
     /**
      * 创建insert对象
@@ -209,13 +210,6 @@ public interface JdbcDao {
     Update update();
 
     /**
-     * Batch update batch update executor.
-     *
-     * @return the batch update executor
-     */
-    BatchUpdateExecutor batchUpdate();
-
-    /**
      * Batch update.
      *
      * @param <T>                 the type parameter
@@ -242,6 +236,13 @@ public interface JdbcDao {
      * @return the t
      */
     <T> T executeInConnection(ExecutionFunction<Connection, T> function);
+
+    /**
+     * Batch update batch update executor.
+     *
+     * @return the batch update executor
+     */
+    BatchUpdateExecutor batchUpdate();
 
     /**
      * 创建native executor对象

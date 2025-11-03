@@ -50,7 +50,7 @@ public class PostgresJdbcTemplateDaoImplTest {
         Page<UserInfo> page = jdbcDao.selectFrom(UserInfo.class)
                 .orderBy("userInfoId", OrderBy.ASC)
                 .paginate(1, 20)
-                .pageResult(UserInfo.class);
+                .findPage(UserInfo.class);
 
         Assertions.assertTrue(page.getPagination().getTotalItems() > 0);
         for (UserInfo userInfo : page.getList()) {

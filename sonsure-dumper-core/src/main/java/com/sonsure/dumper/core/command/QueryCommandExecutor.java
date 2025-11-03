@@ -66,9 +66,9 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @return t object
      */
     @SuppressWarnings("unchecked")
-    default Map<String, Object> singleMapResult() {
+    default Map<String, Object> findOneForMap() {
         ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
-        executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP);
+        executableCmdBuilder.executionType(ExecutionType.FIND_ONE_FOR_MAP);
         executableCmdBuilder.resultType(Map.class);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
         return (Map<String, Object>) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -82,9 +82,9 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @return t
      */
     @SuppressWarnings("unchecked")
-    default <T> T oneColResult(Class<T> clazz) {
+    default <T> T findOneForScalar(Class<T> clazz) {
         ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
-        executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL);
+        executableCmdBuilder.executionType(ExecutionType.FIND_ONE_FOR_SCALAR);
         executableCmdBuilder.resultType(clazz);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
         return (T) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -98,9 +98,9 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @return list
      */
     @SuppressWarnings("unchecked")
-    default <T> List<T> oneColList(Class<T> clazz) {
+    default <T> List<T> findListForScalar(Class<T> clazz) {
         ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
-        executableCmdBuilder.executionType(ExecutionType.QUERY_ONE_COL_LIST);
+        executableCmdBuilder.executionType(ExecutionType.FIND_LIST_FOR_SCALAR);
         executableCmdBuilder.resultType(clazz);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
         return (List<T>) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -112,9 +112,9 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @return list
      */
     @SuppressWarnings("unchecked")
-    default List<Map<String, Object>> listMaps() {
+    default List<Map<String, Object>> findListForMap() {
         ExecutableCmdBuilder executableCmdBuilder = this.getExecutableCmdBuilder();
-        executableCmdBuilder.executionType(ExecutionType.QUERY_FOR_MAP_LIST);
+        executableCmdBuilder.executionType(ExecutionType.FIND_LIST_FOR_MAP);
         executableCmdBuilder.resultType(List.class);
         ExecutableCmd executableCmd = executableCmdBuilder.build();
         return (List<Map<String, Object>>) executableCmdBuilder.getJdbcContext().getPersistExecutor().execute(executableCmd);
@@ -137,9 +137,9 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param cls the cls
      * @return t
      */
-    default <T> T firstResult(Class<T> cls) {
+    default <T> T findFirst(Class<T> cls) {
         this.paginate(1, 1).disableCount();
-        Page<T> page = this.pageResult(cls);
+        Page<T> page = this.findPage(cls);
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
 
@@ -148,9 +148,9 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      *
      * @return t object
      */
-    default Map<String, Object> firstMapResult() {
+    default Map<String, Object> findFirstForMap() {
         this.paginate(1, 1).disableCount();
-        Page<Map<String, Object>> page = this.pageMapResult();
+        Page<Map<String, Object>> page = this.findPageForMap();
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
 
@@ -161,10 +161,10 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param clazz the clazz
      * @return t
      */
-    default <T> T oneColFirstResult(Class<T> clazz) {
+    default <T> T findFirstForScalar(Class<T> clazz) {
         Page<T> page = this.paginate(1, 1)
                 .disableCount()
-                .oneColPageResult(clazz);
+                .findPageForScalar(clazz);
         return page.getList() != null && !page.getList().isEmpty() ? page.getList().iterator().next() : null;
     }
 
@@ -176,14 +176,14 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param cls the cls
      * @return page
      */
-    <T> Page<T> pageResult(Class<T> cls);
+    <T> Page<T> findPage(Class<T> cls);
 
     /**
      * 分页列表查询
      *
      * @return page
      */
-    Page<Map<String, Object>> pageMapResult();
+    Page<Map<String, Object>> findPageForMap();
 
     /**
      * singleColumnList分页查询
@@ -192,14 +192,14 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param clazz the clazz
      * @return page list
      */
-    <T> Page<T> oneColPageResult(Class<T> clazz);
+    <T> Page<T> findPageForScalar(Class<T> clazz);
 
     /**
      * count查询
      *
      * @return long
      */
-    long count();
+    long findCount();
 
     /**
      * 单个结果
@@ -208,7 +208,7 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param cls the cls
      * @return t
      */
-    <T> T singleResult(Class<T> cls);
+    <T> T findOne(Class<T> cls);
 
     /**
      * 列表查询
@@ -217,5 +217,5 @@ public interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends
      * @param cls the cls
      * @return list
      */
-    <T> List<T> list(Class<T> cls);
+    <T> List<T> findList(Class<T> cls);
 }

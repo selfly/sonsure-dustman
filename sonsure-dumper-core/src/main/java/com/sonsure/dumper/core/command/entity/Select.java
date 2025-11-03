@@ -180,27 +180,27 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      *
      * @return the m
      */
-    M singleResult();
+    M findOne();
 
     /**
      * First result m.
      *
      * @return the m
      */
-    M firstResult();
+    M findFirst();
 
     /**
      * List .
      *
      * @return the list
      */
-    List<M> list();
+    List<M> findList();
 
     /**
      * Page result page.
      *
      * @return the page
      */
-    Page<M> pageResult();
+    Page<M> findPage();
 
 }

@@ -54,22 +54,22 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                 case INSERT:
                     result = this.insert(executableCmd);
                     break;
-                case QUERY_FOR_LIST:
+                case FIND_LIST:
                     result = this.queryForList(executableCmd);
                     break;
-                case QUERY_SINGLE_RESULT:
+                case FIND_ONE:
                     result = this.querySingleResult(executableCmd);
                     break;
-                case QUERY_FOR_MAP:
+                case FIND_ONE_FOR_MAP:
                     result = this.queryForMap(executableCmd);
                     break;
-                case QUERY_FOR_MAP_LIST:
+                case FIND_LIST_FOR_MAP:
                     result = this.queryForMapList(executableCmd);
                     break;
-                case QUERY_ONE_COL:
+                case FIND_ONE_FOR_SCALAR:
                     result = this.queryOneCol(executableCmd);
                     break;
-                case QUERY_ONE_COL_LIST:
+                case FIND_LIST_FOR_SCALAR:
                     result = this.queryOneColList(executableCmd);
                     break;
                 case UPDATE:

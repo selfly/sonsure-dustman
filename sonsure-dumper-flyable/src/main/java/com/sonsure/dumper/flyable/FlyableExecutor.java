@@ -127,7 +127,7 @@ public class FlyableExecutor {
             List<FlyableHistory> list = jdbcDao.selectFrom(FlyableHistory.class)
                     .where(FlyableHistory::getMigrationGroup, resource.getGroup())
                     .orderBy(FlyableHistory::getFlyableHistoryId, OrderBy.DESC)
-                    .list(FlyableHistory.class);
+                    .findList(FlyableHistory.class);
             if (list != null && !list.isEmpty()) {
                 FlyableHistory flyableHistory = list.iterator().next();
                 if (flyableHistory.getSuccess() == null || !flyableHistory.getSuccess()) {
