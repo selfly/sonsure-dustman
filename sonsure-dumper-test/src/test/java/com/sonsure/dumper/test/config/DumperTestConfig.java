@@ -23,7 +23,7 @@ public class DumperTestConfig {
     public MappingHandler defaultMappingHandler() {
         MappingHandlerImpl mappingHandler = new MappingHandlerImpl();
         mappingHandler.addScanPackages("com.sonsure.dumper.test.model");
-        mappingHandler.registerTablePrefix("sd_", FlyableHistory.class.getPackage().getName(), "com.sonsure.dumper.test.model");
+        mappingHandler.registerTablePrefixMapping("sd_", FlyableHistory.class.getPackage().getName(), "com.sonsure.dumper.test.model");
         return mappingHandler;
     }
 

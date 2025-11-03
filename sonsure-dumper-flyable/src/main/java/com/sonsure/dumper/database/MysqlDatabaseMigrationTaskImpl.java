@@ -4,7 +4,7 @@ package com.sonsure.dumper.database;
 /**
  * @author selfly
  */
-public class MysqlDatabaseMigrationTaskExecutorImpl implements DatabaseMigrationTaskExecutor {
+public class MysqlDatabaseMigrationTaskImpl implements DatabaseMigrationTask {
 
     @Override
     public boolean support(String databaseProduct) {

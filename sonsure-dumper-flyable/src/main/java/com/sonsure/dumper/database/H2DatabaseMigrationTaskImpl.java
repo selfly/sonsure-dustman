@@ -5,7 +5,7 @@ package com.sonsure.dumper.database;
  * @author selfly
  * 使用mysql模式
  */
-public class H2DatabaseMigrationTaskExecutorImpl extends MysqlDatabaseMigrationTaskExecutorImpl {
+public class H2DatabaseMigrationTaskImpl extends MysqlDatabaseMigrationTaskImpl {
 
     @Override
     public boolean support(String databaseProduct) {

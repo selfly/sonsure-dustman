@@ -1,25 +1,25 @@
 package com.sonsure.dumper.flyable;
 
-import lombok.Getter;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import com.sonsure.dumper.core.persist.JdbcDao;
+import com.sonsure.dumper.resource.MigrationResource;
 
 /**
  * @author selfly
  */
-@Getter
-public class MigrationTask {
+public interface MigrationTask {
 
-    private final String resourcePattern;
-    private final MigrationTaskExecutor migrationTaskExecutor;
-    private final List<String> groupOrder;
+    /**
+     * Get resource pattern string.
+     *
+     * @return the string
+     */
+    String getResourcePattern();
 
-    public MigrationTask(String resourcePattern, MigrationTaskExecutor migrationTaskExecutor, String... groupOrder) {
-        this.resourcePattern = resourcePattern;
-        this.migrationTaskExecutor = migrationTaskExecutor;
-        this.groupOrder = groupOrder == null ? Collections.emptyList() : Arrays.asList(groupOrder);
-    }
-
+    /**
+     * Execute resource.
+     *
+     * @param jdbcDao  the jdbc dao
+     * @param resource the resource
+     */
+    void execute(JdbcDao jdbcDao, MigrationResource resource);
 }

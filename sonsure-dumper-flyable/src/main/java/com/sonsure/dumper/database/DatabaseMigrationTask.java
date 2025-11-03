@@ -1,7 +1,7 @@
 package com.sonsure.dumper.database;
 
 import com.sonsure.dumper.core.persist.JdbcDao;
-import com.sonsure.dumper.flyable.MigrationTaskExecutor;
+import com.sonsure.dumper.flyable.MigrationTask;
 import com.sonsure.dumper.resource.MigrationResource;
 
 import java.nio.charset.StandardCharsets;
@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * @author selfly
  */
-public interface DatabaseMigrationTaskExecutor extends MigrationTaskExecutor {
+public interface DatabaseMigrationTask extends MigrationTask {
 
     /**
      * Support boolean.
@@ -26,7 +26,7 @@ public interface DatabaseMigrationTaskExecutor extends MigrationTaskExecutor {
      * @param flyableHistory the flyable history
      * @return the boolean
      */
-    default boolean existFlyableHistoryTable(JdbcDao jdbcDao, String flyableHistory) {
+    default boolean isHistoryTableExists(JdbcDao jdbcDao, String flyableHistory) {
         return jdbcDao.executeInConnection(connection -> connection.getMetaData()
                 .getTables(null, null, flyableHistory, new String[]{"TABLE"}).next());
     }
@@ -38,7 +38,7 @@ public interface DatabaseMigrationTaskExecutor extends MigrationTaskExecutor {
      * @param resource the resource
      */
     @Override
-    default void executeResource(JdbcDao jdbcDao, MigrationResource resource) {
+    default void execute(JdbcDao jdbcDao, MigrationResource resource) {
         jdbcDao.executeScript(resource.getResourceContent(StandardCharsets.UTF_8));
     }
 
