@@ -98,8 +98,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Select<M> join(Class<?> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().join(cls.getSimpleName());
-        return this;
+        return this.join(cls.getSimpleName());
     }
 
     @Override
@@ -111,8 +110,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Select<M> innerJoin(Class<?> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().innerJoin(cls.getSimpleName());
-        return this;
+        return this.innerJoin(cls.getSimpleName());
     }
 
     @Override
@@ -124,8 +122,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Select<M> outerJoin(Class<?> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().outerJoin(cls.getSimpleName());
-        return this;
+        return this.outerJoin(cls.getSimpleName());
     }
 
     @Override
@@ -137,8 +134,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Select<M> leftJoin(Class<?> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().leftOuterJoin(cls.getSimpleName());
-        return this;
+        return this.leftJoin(cls.getSimpleName());
     }
 
     @Override
@@ -150,8 +146,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     @Override
     public Select<M> rightJoin(Class<?> cls) {
         this.registerClassToMappingHandler(cls);
-        this.getExecutableCmdBuilder().rightOuterJoin(cls.getSimpleName());
-        return this;
+        return this.rightJoin(cls.getSimpleName());
     }
 
     @Override
