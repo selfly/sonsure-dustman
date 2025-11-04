@@ -13,19 +13,22 @@ import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.*;
 
+/**
+ * @author selfly
+ */
 public class BeanFieldCache {
 
     /**
      * 缓存的BeanInfo信息，一个Bean根据stopClass的不同可能存有多个BeanInfo
      * 子map根据stopClass进行缓存
      */
-    public static final Map<Class<?>, Map<Class<?>, Object>> classCache = Collections
-            .synchronizedMap(new WeakHashMap<Class<?>, Map<Class<?>, Object>>());
+    private static final Map<Class<?>, Map<Class<?>, Object>> classCache = Collections
+            .synchronizedMap(new WeakHashMap<>());
 
     /**
      * 类的属性信息，key为属性名
      */
-    private final Map<String, Field> beanFieldCache;
+    private final Map<String, Field> fieldCache;
 
     /**
      * Instantiates a new bean field cache.
@@ -43,9 +46,9 @@ public class BeanFieldCache {
             fieldList.addAll(Arrays.asList(parentClass.getDeclaredFields()));
             parentClass = parentClass.getSuperclass();
         }
-        this.beanFieldCache = new LinkedHashMap<>();
+        this.fieldCache = new LinkedHashMap<>();
         for (Field field : fieldList) {
-            beanFieldCache.put(field.getName(), field);
+            fieldCache.put(field.getName(), field);
         }
     }
 
@@ -73,17 +76,13 @@ public class BeanFieldCache {
 
         Map<Class<?>, Object> map = classCache.computeIfAbsent(beanClass, k -> new HashMap<>());
         Class<?> stopCls = stopClass == null ? beanClass : stopClass;
-        Object value = map.get(stopCls);
+        Object value = map.computeIfAbsent(stopCls, k -> new BeanFieldCache(beanClass, stopClass));
         if (value instanceof Reference) {
             @SuppressWarnings("rawtypes")
             Reference ref = (Reference) value;
             beanFieldCache = (BeanFieldCache) ref.get();
         } else {
             beanFieldCache = (BeanFieldCache) value;
-        }
-        if (beanFieldCache == null) {
-            beanFieldCache = new BeanFieldCache(beanClass, stopClass);
-            map.put(stopCls, beanFieldCache);
         }
         return beanFieldCache;
     }
@@ -94,9 +93,9 @@ public class BeanFieldCache {
      * @return the  bean fields [ ]
      */
     public Field[] getBeanFields() {
-        Field[] fields = new Field[this.beanFieldCache.size()];
+        Field[] fields = new Field[this.fieldCache.size()];
         int i = 0;
-        for (Field field : this.beanFieldCache.values()) {
+        for (Field field : this.fieldCache.values()) {
             fields[i] = field;
             i++;
         }
@@ -110,6 +109,6 @@ public class BeanFieldCache {
      * @return the property descriptor
      */
     public Field getBeanField(String name) {
-        return this.beanFieldCache.get(name);
+        return this.fieldCache.get(name);
     }
 }

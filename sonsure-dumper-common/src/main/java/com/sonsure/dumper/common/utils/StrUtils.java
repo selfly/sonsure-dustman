@@ -102,7 +102,7 @@ public class StrUtils {
      */
     public static String substringForByte(String text, int length, boolean isConvertSpecialChars) {
 
-        if (isNotBlank(text) || length < 1) {
+        if (isBlank(text) || length < 1) {
             return text;
         }
         //转换特殊字符，页面显示时非常有用
@@ -111,7 +111,6 @@ public class StrUtils {
         }
         try {
             //防止中英文有长有短，转换成byte截取
-            assert text != null;
             byte[] bytes = text.getBytes("GBK");
 
             //截取

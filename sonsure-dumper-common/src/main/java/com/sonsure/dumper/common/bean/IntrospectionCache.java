@@ -22,9 +22,10 @@ import java.util.*;
 /**
  * JavaBean信息缓存
  * <p/>
- * User: liyd
  * Date: 13-5-8 下午6:36
  * version $Id: IntrospectionCache.java, v 0.1 Exp $
+ *
+ * @author selfly
  */
 public class IntrospectionCache {
 
@@ -33,7 +34,7 @@ public class IntrospectionCache {
      * 子map根据stopClass进行缓存
      */
     public static final Map<Class<?>, Map<Class<?>, Object>> classCache = Collections
-            .synchronizedMap(new WeakHashMap<Class<?>, Map<Class<?>, Object>>());
+            .synchronizedMap(new WeakHashMap<>());
 
     /**
      * 类的属性信息，key为属性名
@@ -103,17 +104,13 @@ public class IntrospectionCache {
         //例如第一次未指定stopClass默认到了Object.class，第二次到自身如果该类未继承任何类就是stopClass=Object.class，
         //命中了第一次的缓存从而会有object类中的属性而出错
         Class<?> stopCls = stopClass == null ? beanClass : stopClass;
-        Object value = map.get(stopCls);
+        Object value = map.computeIfAbsent(stopCls, k -> new IntrospectionCache(beanClass, stopClass));
         if (value instanceof Reference) {
             @SuppressWarnings("rawtypes")
             Reference ref = (Reference) value;
             introspectionCache = (IntrospectionCache) ref.get();
         } else {
             introspectionCache = (IntrospectionCache) value;
-        }
-        if (introspectionCache == null) {
-            introspectionCache = new IntrospectionCache(beanClass, stopClass);
-            map.put(stopCls, introspectionCache);
         }
         return introspectionCache;
     }

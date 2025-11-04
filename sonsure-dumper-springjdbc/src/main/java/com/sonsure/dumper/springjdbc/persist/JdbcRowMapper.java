@@ -146,7 +146,7 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
         final MappingHandler mappingHandler = this.jdbcContext.getMappingHandler();
         for (int index = 1; index <= columnCount; index++) {
             String column = JdbcUtils.lookupColumnName(rsmd, index);
-            String field = column.replaceAll(" ", "");
+            String field = column.replace(" ", "");
             field = lowerCaseName(mappingHandler.getField(this.mappedClass, field));
             PropertyDescriptor pd = this.mappedFields.get(field);
             if (pd != null) {

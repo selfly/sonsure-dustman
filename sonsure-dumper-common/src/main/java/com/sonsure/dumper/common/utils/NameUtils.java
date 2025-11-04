@@ -80,13 +80,6 @@ public class NameUtils {
         return firstChar + name.substring(1);
     }
 
-    public static void main(String[] args) {
-        System.out.println(NameUtils.getCamelName("login-name-info", '-'));
-        System.out.println(NameUtils.getCamelName("LOGIN-NAME-INFO", '-'));
-        System.out.println(NameUtils.getCamelName("-login-name-info-", '-'));
-        System.out.println(NameUtils.getCamelName("-LOGIN-NAME-INFO-", '-'));
-    }
-
     /**
      * 转换成骆驼命名法返回 默认分隔符下划线_
      *

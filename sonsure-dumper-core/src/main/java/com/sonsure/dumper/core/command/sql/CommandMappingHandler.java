@@ -240,9 +240,9 @@ public class CommandMappingHandler {
             this.extractExpression(leftExpression, mappings);
         } else if (expression instanceof Function) {
             Function function = (Function) expression;
-            ExpressionList parameters = function.getParameters();
-            if (parameters != null) {
-                this.extractExpression(parameters.getExpressions(), mappings);
+            ExpressionList paramsExpressionList = function.getParameters();
+            if (paramsExpressionList != null) {
+                this.extractExpression(paramsExpressionList.getExpressions(), mappings);
             }
         } else if (expression instanceof Parenthesis) {
             Parenthesis parenthesis = (Parenthesis) expression;

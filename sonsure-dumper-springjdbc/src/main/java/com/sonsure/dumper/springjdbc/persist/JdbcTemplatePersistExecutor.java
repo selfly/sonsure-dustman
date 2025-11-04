@@ -26,6 +26,7 @@ import org.springframework.lang.NonNull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -153,7 +154,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
         @Override
         @NonNull
         public PreparedStatement createPreparedStatement(@NonNull Connection con) throws SQLException {
-            PreparedStatement ps = generateKey.getColumn() == null ? con.prepareStatement(executableCmd.getCommand(), PreparedStatement.RETURN_GENERATED_KEYS) : con.prepareStatement(executableCmd.getCommand(), new String[]{generateKey.getColumn()});
+            PreparedStatement ps = generateKey.getColumn() == null ? con.prepareStatement(executableCmd.getCommand(), Statement.RETURN_GENERATED_KEYS) : con.prepareStatement(executableCmd.getCommand(), new String[]{generateKey.getColumn()});
             setValues(ps);
             return ps;
         }
