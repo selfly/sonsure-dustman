@@ -11,8 +11,6 @@ package com.sonsure.dumper.core.page;
 
 import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.exception.SonsureJdbcException;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +20,20 @@ import java.util.List;
  */
 public class NegotiatingPageHandler implements PageHandler {
 
-    protected List<PageHandler> defaultPageHandlers;
-
-    @Getter
-    @Setter
     protected List<PageHandler> pageHandlers;
 
     public NegotiatingPageHandler() {
-        defaultPageHandlers = new ArrayList<>();
-        defaultPageHandlers.add(new MysqlPageHandler());
-        defaultPageHandlers.add(new OraclePageHandler());
-        defaultPageHandlers.add(new PostgresqlPageHandler());
-        defaultPageHandlers.add(new SqlServerPageHandler());
-        defaultPageHandlers.add(new SqlitePageHandler());
-        defaultPageHandlers.add(new H2PageHandler());
+        pageHandlers = new ArrayList<>();
+        this.addPageHandler(new MysqlPageHandler());
+        this.addPageHandler(new OraclePageHandler());
+        this.addPageHandler(new PostgresqlPageHandler());
+        this.addPageHandler(new SqlServerPageHandler());
+        this.addPageHandler(new SqlitePageHandler());
+        this.addPageHandler(new H2PageHandler());
+    }
+
+    public void addPageHandler(PageHandler pageHandler) {
+        pageHandlers.add(pageHandler);
     }
 
     @Override
@@ -67,11 +65,6 @@ public class NegotiatingPageHandler implements PageHandler {
                 if (pageHandler.support(dialect)) {
                     return pageHandler;
                 }
-            }
-        }
-        for (PageHandler defaultPageHandler : defaultPageHandlers) {
-            if (defaultPageHandler.support(dialect)) {
-                return defaultPageHandler;
             }
         }
         throw new SonsureJdbcException("当前数据库dialect:" + dialect + "没有适配的PageHandler");

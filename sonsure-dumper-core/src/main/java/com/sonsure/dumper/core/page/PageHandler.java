@@ -12,7 +12,9 @@ package com.sonsure.dumper.core.page;
 import com.sonsure.dumper.common.model.Pagination;
 
 /**
- * Created by liyd on 16/6/8.
+ *
+ * @author liyd
+ * @since 16/6/8
  */
 public interface PageHandler {
 
