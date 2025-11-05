@@ -39,7 +39,7 @@ public interface Select<M> extends QueryCommandExecutor<Select<M>>, ConditionCom
      *
      * @return the select
      */
-    Select<M> addAllColumns();
+    Select<M> addBeanColumns();
 
     /**
      * Select 字段.

@@ -56,7 +56,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     @BeforeEach
     public void before() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         List<UserInfo> users = new ArrayList<>();
         for (int i = 1; i < 51; i++) {
             UserInfo user = new UserInfo();
@@ -72,7 +72,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         }
 
         String sql = "insert into UserInfo(userInfoId,loginName,password,userAge,status,userType,gmtCreate) values(?,?,?,?,?,?,?)";
-        Object count = jdbcDao.executeBatchUpdate(sql, users, users.size(), (ps, paramNames, argument) -> {
+        Object result = jdbcDao.executeBatchUpdate(sql, users, users.size(), (ps, paramNames, argument) -> {
             ps.setLong(1, argument.getUserInfoId());
             ps.setString(2, argument.getLoginName());
             ps.setString(3, argument.getPassword());
@@ -81,7 +81,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             ps.setString(6, argument.getUserType());
             ps.setObject(7, argument.getGmtCreate());
         });
-        Assertions.assertNotNull(count);
+        Assertions.assertNotNull(result);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void executeDelete() {
+    public void executeDeleteAll() {
         int count = jdbcDao.executeDelete(UserInfo.class, 3L);
         Assertions.assertEquals(1, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 3L);
@@ -141,7 +141,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void findAllForClass() {
         List<UserInfo> users = jdbcDao.findAll(UserInfo.class);
         Assertions.assertNotNull(users);
-        long count = jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertEquals(count, users.size());
     }
 
@@ -195,7 +195,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void jdbcDaoCountAllForClass() {
-        long count = jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertEquals(50, count);
     }
 
@@ -239,9 +239,9 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void jdbcDaoDeleteAllForClass() {
-        int count = jdbcDao.executeDelete(UserInfo.class);
+        int count = jdbcDao.executeDeleteAll(UserInfo.class);
         Assertions.assertTrue(count > 0);
-        long result = jdbcDao.findCount(UserInfo.class);
+        long result = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertEquals(0, result);
     }
 
@@ -298,7 +298,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     @Test
     public void selectWhereField() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         for (int i = 60; i < 70; i++) {
             UserInfo user = new UserInfo();
             user.setUserInfoId((long) i);
@@ -335,7 +335,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     @Test
     public void selectWhereOr() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         for (int i = 1; i < 3; i++) {
             UserInfo user = new UserInfo();
             user.setUserInfoId((long) i);
@@ -349,7 +349,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             jdbcDao.selectFrom(UserInfo.class)
                     .where("loginName", "name-19")
                     .or()
-                    .where("userAge", 21)
+                    .condition("userAge", 21)
                     .findOne(UserInfo.class);
         } catch (IncorrectResultSizeDataAccessException e) {
             Assertions.assertEquals("Incorrect result size: expected 1, actual 2", e.getMessage());
@@ -359,7 +359,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     @Test
     public void selectWhereAndSqlParen() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         for (int i = 1; i < 3; i++) {
             UserInfo user = new UserInfo();
             user.setUserInfoId((long) i);
@@ -372,12 +372,12 @@ public class SpringJdbcDaoTest extends BaseTest {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .where()
                 .openParen()
-                .where(UserInfo::getLoginName, SqlOperator.EQ, "whereAnd")
+                .condition(UserInfo::getLoginName, SqlOperator.EQ, "whereAnd")
                 .or()
-                .where(UserInfo::getPassword, SqlOperator.EQ, "123456-5")
+                .condition(UserInfo::getPassword, SqlOperator.EQ, "123456-5")
                 .closeParen()
                 .and()
-                .where(UserInfo::getUserInfoId, 2L)
+                .condition(UserInfo::getUserInfoId, 2L)
                 .findOne(UserInfo.class);
         Assertions.assertEquals(2L, userInfo.getUserInfoId());
     }
@@ -407,7 +407,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void selectDropColumn() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
-                .addAllColumns()
+                .addBeanColumns()
                 .dropColumn("password")
                 .where("userAge", SqlOperator.LTE, 10)
                 .findList();
@@ -444,7 +444,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void select4() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
-                .addAllColumns()
+                .addBeanColumns()
                 .dropColumn("userInfoId", "password")
                 .orderBy("userAge", OrderBy.ASC)
                 .findList(UserInfo.class);
@@ -510,8 +510,8 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void select13() {
         List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .where("t1.userInfoId", SqlOperator.IN, new Object[]{11L, 12L, 13L})
-                .where("t1.loginName", SqlOperator.IN, new Object[]{"name-11", "name-12", "name-13"})
-                .where("t1.userAge", SqlOperator.IN, new Object[]{11L, 12L, 13L})
+                .and("t1.loginName", SqlOperator.IN, new Object[]{"name-11", "name-12", "name-13"})
+                .and("t1.userAge", SqlOperator.IN, new Object[]{11L, 12L, 13L})
                 .findList(UserInfo.class);
         Assertions.assertEquals(3, users.size());
     }
@@ -727,7 +727,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void updateAnnotation() {
-        jdbcDao.executeDelete(AnnotationUserInfo.class);
+        jdbcDao.executeDeleteAll(AnnotationUserInfo.class);
         AnnotationUserInfo ai = new AnnotationUserInfo();
         ai.setRowId(36L);
         ai.setLoginName("666");
@@ -782,7 +782,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void nativeExecutor() {
         int count = jdbcDao.nativeExecutor()
                 .command("update UserInfo set loginName = ? where userInfoId = ?")
-                .parameters(new Object[]{"newName", 39L})
+                .parameters("newName", 39L)
                 .update();
         Assertions.assertEquals(1, count);
         UserInfo user = jdbcDao.get(UserInfo.class, 39L);
@@ -1175,7 +1175,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     @Test
     public void batchUpdate() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         List<UserInfo> userInfoList = new ArrayList<>();
         for (int i = 1; i < 10000; i++) {
             UserInfo user = new UserInfo();
@@ -1202,14 +1202,14 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         final long end = System.currentTimeMillis();
         System.out.println("jdbcDao插入耗时:" + (end - begin));
-        Assertions.assertEquals(userInfoList.size(), jdbcDao.findCount(UserInfo.class));
+        Assertions.assertEquals(userInfoList.size(), jdbcDao.findAllCount(UserInfo.class));
 
     }
 
     @Test
     public void batchUpdate1() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         List<UserInfo> userInfoList = new ArrayList<>();
         for (int i = 1; i < 10000; i++) {
             UserInfo user = new UserInfo();
@@ -1234,7 +1234,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
         final long end1 = System.currentTimeMillis();
         System.out.println("jdbcDao插入耗时:" + (end1 - begin1));
-        Assertions.assertEquals(userInfoList.size(), jdbcDao.findCount(UserInfo.class));
+        Assertions.assertEquals(userInfoList.size(), jdbcDao.findAllCount(UserInfo.class));
 
     }
 
@@ -1268,6 +1268,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void whereAppendSubSqlParam() {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .where("userAge", SqlOperator.GT, 5)
+                .and()
                 .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
                 .findOne(UserInfo.class);
         Assertions.assertNotNull(userInfo);
@@ -1280,6 +1281,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
                 .namedParameter()
                 .where("userAge", SqlOperator.GT, 5)
+                .and()
                 .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
                 .findOne(UserInfo.class);
         Assertions.assertNotNull(userInfo);
@@ -1310,7 +1312,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     @Test
     public void batchUpdate2() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         String sql = "INSERT INTO sd_USER_INFO (PASSWORD, LOGIN_NAME, GMT_CREATE, USER_AGE, USER_INFO_ID) VALUES (:PASSWORD, :LOGIN_NAME, :GMT_CREATE, :USER_AGE, :USER_INFO_ID)";
         List<Map<String, Object>> userInfoList = new ArrayList<>();
         for (int i = 1; i <= 10000; i++) {
@@ -1335,7 +1337,7 @@ public class SpringJdbcDaoTest extends BaseTest {
                     }
                 });
 
-        long count = jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertTrue(count >= 10000);
 
         long count1 = jdbcDao.selectFrom(UserInfo.class)
@@ -1347,7 +1349,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void innerJoinClassFieldStr() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 11; i++) {
             Account account = new Account();
             account.setAccountId((long) i);
@@ -1357,7 +1359,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             account.setUserAge(i);
             jdbcDao.executeInsert(account);
         }
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
                 .innerJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .findList();
@@ -1366,7 +1368,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void innerJoinClassFieldLambda() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 11; i++) {
             Account account = new Account();
             account.setAccountId((long) i);
@@ -1376,17 +1378,25 @@ public class SpringJdbcDaoTest extends BaseTest {
             account.setUserAge(i);
             jdbcDao.executeInsert(account);
         }
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+        List<Map<String, Object>> list = jdbcDao.selectFrom(UserInfo.class).as("t1")
                 .innerJoin(Account.class).as("t2")
                 .on(UserInfo::getUserInfoId, Account::getAccountId)
-//                .on(SqlPart.of(UserInfo::getUserInfoId).eq(Account::getAccountId))
-                .findList();
+                //lambda自动识别属性属于哪个表
+                .addColumn(UserInfo::getLoginName)
+                //明确指定哪个表的属性
+                .addAliasColumn("t2", "accountName")
+                .findListForMap();
         Assertions.assertEquals(10, list.size());
+        for (Map<String, Object> map : list) {
+            Assertions.assertEquals(2, map.size());
+            Assertions.assertNotNull(map.get("login_name"));
+            Assertions.assertNotNull(map.get("account_name"));
+        }
     }
 
     @Test
     public void innerJoinClassAddColumn() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 11; i++) {
             Account account = new Account();
             account.setAccountId((long) i);
@@ -1396,6 +1406,20 @@ public class SpringJdbcDaoTest extends BaseTest {
             account.setUserAge(i);
             jdbcDao.executeInsert(account);
         }
+
+        List<UserInfo> users = jdbcDao.selectFrom(UserInfo.class).as("t1")
+                //lambda自动识别属于哪个表
+                .addColumn(UserInfo::getUserInfoId)
+                .innerJoin(Account.class).as("t2")
+                .on(UserInfo::getUserInfoId, Account::getAccountId)
+                .findList();
+        Assertions.assertEquals(10, users.size());
+        for (UserInfo user : users) {
+            Assertions.assertNotNull(user.getUserInfoId());
+            Assertions.assertNull(user.getLoginName());
+            Assertions.assertNull(user.getPassword());
+        }
+
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAliasColumn("t1", "loginName")
                 .innerJoin(Account.class).as("t2")
                 .on(UserInfo::getUserInfoId, Account::getAccountId)
@@ -1496,7 +1520,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testLeftJoin() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 6; i++) {
             Account account = new Account();
             account.setAccountId((long) i);
@@ -1507,7 +1531,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             jdbcDao.executeInsert(account);
         }
         // left join测试
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
                 .leftJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .where("t2.accountId", SqlOperator.IS, null)
@@ -1518,7 +1542,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testRightJoin() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 11; i++) {
             Account account = new Account();
             account.setAccountId((long) (i + 50)); // 使用不存在的ID，测试右连接
@@ -1528,7 +1552,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             account.setUserAge(i);
             jdbcDao.executeInsert(account);
         }
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
                 .rightJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .orderBy("t2.accountId", OrderBy.ASC)
@@ -1538,7 +1562,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testJoinWithStringTableName() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         Account account = new Account();
         account.setAccountId(1L);
         account.setLoginName("account1");
@@ -1547,7 +1571,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         account.setUserAge(1);
         jdbcDao.executeInsert(account);
 
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
                 .innerJoin("Account").as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .findList();
@@ -1738,7 +1762,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testSelectAddAliasColumn() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         Account account = new Account();
         account.setAccountId(1L);
         account.setLoginName("aliasTest");
@@ -1838,7 +1862,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testSelectWithJoinAndComplexConditions() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 11; i++) {
             Account account = new Account();
             account.setAccountId((long) i);
@@ -1849,7 +1873,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             jdbcDao.executeInsert(account);
         }
 
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addAllColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
                 .innerJoin(Account.class).as("t2")
                 .on(UserInfo::getUserInfoId, Account::getAccountId)
                 .where("t1.userAge", SqlOperator.GTE, 5)
@@ -2053,7 +2077,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testBatchUpdateWithDifferentBatchSize() {
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
         List<UserInfo> userInfoList = new ArrayList<>();
         for (int i = 1; i < 100; i++) {
             UserInfo user = new UserInfo();
@@ -2074,7 +2098,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             ps.setObject(5, userInfo.getGmtCreate());
         });
 
-        long count = jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertEquals(99, count);
     }
 
@@ -2243,7 +2267,7 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testOuterJoin() {
-        jdbcDao.executeDelete(Account.class);
+        jdbcDao.executeDeleteAll(Account.class);
         for (int i = 1; i < 6; i++) {
             Account account = new Account();
             account.setAccountId((long) i);

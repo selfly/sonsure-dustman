@@ -45,7 +45,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     }
 
     @Override
-    public Select<M> addAllColumns() {
+    public Select<M> addBeanColumns() {
         Verifier.init().notNull(this.cls, "class对象不能为空").validate();
         String tableAlias = this.getExecutableCmdBuilder().resolveTableAlias(this.cls.getSimpleName());
         CacheEntityClassWrapper cacheEntityClassWrapper = new CacheEntityClassWrapper(this.cls);
@@ -78,7 +78,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
     public Select<M> dropColumn(String... fields) {
         // 如果还没有添加列，则添加所有列
         if (this.getExecutableCmdBuilder().isEmptySelectColumns()) {
-            this.addAllColumns();
+            this.addBeanColumns();
         }
         this.getExecutableCmdBuilder().dropSelectColumn(fields);
         return this;
