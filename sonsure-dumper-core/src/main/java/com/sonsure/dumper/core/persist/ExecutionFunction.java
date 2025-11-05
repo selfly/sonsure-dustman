@@ -1,7 +1,5 @@
 package com.sonsure.dumper.core.persist;
 
-import java.sql.SQLException;
-
 /**
  * @author selfly
  */
@@ -13,8 +11,7 @@ public interface ExecutionFunction<T, R> {
      *
      * @param t the t
      * @return the t
-     * @throws SQLException the sql exception
      */
-    R apply(T t) throws SQLException;
+    R apply(T t);
 
 }

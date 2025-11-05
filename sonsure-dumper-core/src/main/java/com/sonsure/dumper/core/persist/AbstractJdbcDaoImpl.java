@@ -14,6 +14,8 @@ import com.sonsure.dumper.common.model.Pageable;
 import com.sonsure.dumper.core.command.CommandExecutor;
 import com.sonsure.dumper.core.command.batch.BatchUpdateExecutor;
 import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
+import com.sonsure.dumper.core.command.build.ExecutionType;
 import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.entity.Delete;
 import com.sonsure.dumper.core.command.entity.Insert;
@@ -185,10 +187,26 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
         this.nativeExecutor().command(script).forceNative().executeScript();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T executeInConnection(ExecutionFunction<Connection, T> function) {
-        return this.getJdbcContext().getPersistExecutor()
-                .executeInConnection(function);
+    public <T> T executeInConnection(ExecutionFunction<Connection, T> execution) {
+        ExecutableCmd executableCmd = new ExecutableCmd();
+        executableCmd.setExecutionType(ExecutionType.EXECUTE_IN_CONNECTION);
+        executableCmd.setJdbcContext(this.getJdbcContext());
+        executableCmd.setExecutionFunction(connection -> {
+            Connection conn = (Connection) connection;
+            return execution.apply(conn);
+        });
+        return (T) this.getJdbcContext().getPersistExecutor().execute(executableCmd);
+    }
+
+    @Override
+    public Object executeInRaw(ExecutionFunction<Object, Object> function) {
+        ExecutableCmd executableCmd = new ExecutableCmd();
+        executableCmd.setExecutionType(ExecutionType.EXECUTE_IN_RAW);
+        executableCmd.setJdbcContext(this.getJdbcContext());
+        executableCmd.setExecutionFunction(function);
+        return this.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     @Override

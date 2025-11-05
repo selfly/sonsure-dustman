@@ -10,6 +10,9 @@ package com.sonsure.dumper.core.persist;
 
 import com.sonsure.dumper.core.config.JdbcContext;
 
+import java.sql.Connection;
+import java.sql.Statement;
+
 /**
  * The type Flexible dao template.
  *

@@ -2,6 +2,7 @@ package com.sonsure.dumper.core.command.build;
 
 import com.sonsure.dumper.common.model.Pagination;
 import com.sonsure.dumper.core.config.JdbcContext;
+import com.sonsure.dumper.core.persist.ExecutionFunction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -71,6 +72,11 @@ public class ExecutableCmd {
      * The Disable count query.
      */
     private boolean disableCountQuery;
+
+    /**
+     * The Execution function.
+     */
+    private ExecutionFunction<Object, Object> executionFunction;
 
     public ExecutableCmd() {
         forceNative = false;

@@ -71,6 +71,21 @@ public enum ExecutionType {
     EXECUTE,
 
     /**
+     * Execute in connection execution type.
+     */
+    EXECUTE_IN_CONNECTION,
+
+    /**
+     * Execute in raw execution type.
+     */
+    EXECUTE_IN_RAW,
+
+    /**
+     * Get database product execution type.
+     */
+    GET_DATABASE_PRODUCT,
+
+    /**
      * Execute script command type.
      */
     EXECUTE_SCRIPT;

@@ -14,7 +14,6 @@ import com.sonsure.dumper.core.command.batch.ParameterizedSetter;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.command.build.GenerateKey;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
-import com.sonsure.dumper.core.persist.ExecutionFunction;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.*;
@@ -41,11 +40,6 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
 
     public JdbcTemplatePersistExecutor(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
-    }
-
-    @Override
-    public <R> R executeInConnection(ExecutionFunction<Connection, R> function) {
-        return jdbcOperations.execute(function::apply);
     }
 
     @Override
@@ -130,6 +124,16 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     public Object doExecute(ExecutableCmd executableCmd) {
         jdbcOperations.execute(executableCmd.getCommand());
         return true;
+    }
+
+    @Override
+    protected Object doExecuteInConnection(ExecutableCmd executableCmd) {
+        return jdbcOperations.execute((ConnectionCallback<Object>) con -> executableCmd.getExecutionFunction().apply(con));
+    }
+
+    @Override
+    protected Object doExecutionInRaw(ExecutableCmd executableCmd) {
+        return executableCmd.getExecutionFunction().apply(this.jdbcOperations);
     }
 
     @Override

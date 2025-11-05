@@ -16,6 +16,7 @@ import com.sonsure.dumper.core.command.build.GetterFunction;
 import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.command.build.SqlOperator;
 import com.sonsure.dumper.core.command.entity.Select;
+import com.sonsure.dumper.core.config.JdbcContext;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.test.basic.BaseTest;
 import com.sonsure.dumper.test.config.DumperTestConfig;
@@ -27,12 +28,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.IncorrectResultSetColumnCountException;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -1696,15 +1703,34 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void testExecuteInConnection() {
         // 测试在连接中执行函数
         String dbProduct = jdbcDao.executeInConnection(connection -> {
-            return connection.getMetaData().getDatabaseProductName();
+            try {
+                return connection.getMetaData().getDatabaseProductName();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         });
         Assertions.assertNotNull(dbProduct);
     }
 
     @Test
+    public void testExecuteInRaw() {
+        // 测试在原生执行器中执行函数
+        String result = (String) jdbcDao.executeInRaw(rawExecutor -> {
+            JdbcOperations jdbcOperations = (JdbcOperations) rawExecutor;
+            return jdbcOperations.execute(new ConnectionCallback<String>() {
+                @Override
+                public String doInConnection(@NonNull Connection con) throws SQLException, DataAccessException {
+                    return con.getMetaData().getDatabaseProductName();
+                }
+            });
+        });
+        Assertions.assertNotNull(result);
+    }
+
+    @Test
     public void testGetJdbcContext() {
         // 测试获取JdbcContext
-        com.sonsure.dumper.core.config.JdbcContext context = jdbcDao.getJdbcContext();
+        JdbcContext context = jdbcDao.getJdbcContext();
         Assertions.assertNotNull(context);
         Assertions.assertNotNull(context.getPersistExecutor());
         Assertions.assertNotNull(context.getMappingHandler());

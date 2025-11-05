@@ -12,15 +12,11 @@ package com.sonsure.dumper.test.jdbc.extension.executor;
 import com.sonsure.dumper.core.command.batch.BatchExecutableCmd;
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 import com.sonsure.dumper.core.persist.AbstractPersistExecutor;
-import com.sonsure.dumper.core.persist.ExecutionFunction;
 import lombok.Setter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.query.NativeQuery;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,18 +28,6 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
 
     private SessionFactory sessionFactory;
 
-    @Override
-    public <R> R executeInConnection(ExecutionFunction<Connection, R> function) {
-        Session session = sessionFactory.openSession();
-        R r = session.doReturningWork(new ReturningWork<R>() {
-            @Override
-            public R execute(Connection connection) throws SQLException {
-                return function.apply(connection);
-            }
-        });
-        session.close();
-        return r;
-    }
 
     @Override
     public Object insert(final ExecutableCmd executableCmd) {
@@ -61,6 +45,14 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
         List<?> resultList = nativeQuery.getResultList();
         session.close();
         return resultList;
+    }
+
+    @Override
+    protected Object doExecuteInConnection(ExecutableCmd executableCmd) {
+        Session session = sessionFactory.openSession();
+        String r = (String) session.doReturningWork(connection -> executableCmd.getExecutionFunction().apply(connection));
+        session.close();
+        return r;
     }
 
     @Override
@@ -100,6 +92,11 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
 
     @Override
     protected <T> Object batchUpdate(BatchExecutableCmd<T> commandContext) {
+        return null;
+    }
+
+    @Override
+    protected Object doExecutionInRaw(ExecutableCmd executableCmd) {
         return null;
     }
 

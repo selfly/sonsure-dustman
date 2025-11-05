@@ -1,6 +1,8 @@
 package com.sonsure.dumper.flyable;
 
 import com.sonsure.dumper.common.utils.VersionUtils;
+import com.sonsure.dumper.core.command.build.ExecutableCmd;
+import com.sonsure.dumper.core.command.build.ExecutionType;
 import com.sonsure.dumper.core.command.build.OrderBy;
 import com.sonsure.dumper.core.persist.JdbcDao;
 import com.sonsure.dumper.database.DatabaseMigrationTask;
@@ -94,7 +96,10 @@ public class FlyableExecutor {
     }
 
     protected String getDatabaseProduct() {
-        return jdbcDao.getJdbcContext().getPersistExecutor().getDatabaseProduct();
+        ExecutableCmd executableCmd = new ExecutableCmd();
+        executableCmd.setExecutionType(ExecutionType.GET_DATABASE_PRODUCT);
+        executableCmd.setJdbcContext(jdbcDao.getJdbcContext());
+        return (String) jdbcDao.getJdbcContext().getPersistExecutor().execute(executableCmd);
     }
 
     protected void updateMigrate(List<MigrationResource> resources, boolean historyTableExists, MigrationTask migrationTask) {

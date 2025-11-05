@@ -231,11 +231,19 @@ public interface JdbcDao {
     /**
      * Execute in connection t.
      *
-     * @param <T>      the type parameter
-     * @param function the function
+     * @param <T>       the type parameter
+     * @param execution the execution
      * @return the t
      */
-    <T> T executeInConnection(ExecutionFunction<Connection, T> function);
+    <T> T executeInConnection(ExecutionFunction<Connection, T> execution);
+    
+    /**
+     * Execute in raw t.
+     *
+     * @param execution the execution
+     * @return the t
+     */
+    Object executeInRaw(ExecutionFunction<Object, Object> execution);
 
     /**
      * Batch update batch update executor.

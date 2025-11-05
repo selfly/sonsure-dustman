@@ -202,8 +202,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         PersistExecutor persistExecutor = this.getJdbcContext().getPersistExecutor();
-        String databaseProduct = persistExecutor.getDatabaseProduct();
-        String countCommand = this.getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), databaseProduct);
+        String countCommand = this.getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), this.getDatabaseProduct());
         ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
         countExecutableCmd.setCommand(countCommand);
         countExecutableCmd.setResultType(Long.class);

@@ -19,6 +19,9 @@ import com.sonsure.dumper.core.interceptor.PersistInterceptor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,14 +36,6 @@ import java.util.Map;
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
     private String databaseProduct;
-
-    @Override
-    public String getDatabaseProduct() {
-        if (this.databaseProduct == null) {
-            this.databaseProduct = PersistExecutor.super.getDatabaseProduct();
-        }
-        return this.databaseProduct;
-    }
 
     @Override
     public Object execute(ExecutableCmd executableCmd) {
@@ -83,6 +78,29 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                     break;
                 case EXECUTE:
                     result = this.doExecute(executableCmd);
+                    break;
+                case EXECUTE_IN_CONNECTION:
+                    result = this.doExecuteInConnection(executableCmd);
+                    break;
+                case EXECUTE_IN_RAW:
+                    result = this.doExecutionInRaw(executableCmd);
+                    break;
+                case GET_DATABASE_PRODUCT:
+                    if (this.databaseProduct == null) {
+                        if (executableCmd.getExecutionFunction() == null) {
+                            executableCmd.setExecutionFunction(connection -> {
+                                try {
+                                    Connection conn = (Connection) connection;
+                                    final DatabaseMetaData metaData = conn.getMetaData();
+                                    return metaData.getDatabaseProductName().toLowerCase() + "/" + metaData.getDatabaseProductVersion();
+                                } catch (SQLException e) {
+                                    throw new SonsureJdbcException("GetDatabaseProduct失败", e);
+                                }
+                            });
+                        }
+                        this.databaseProduct = (String) this.doExecuteInConnection(executableCmd);
+                    }
+                    result = this.databaseProduct;
                     break;
                 case EXECUTE_SCRIPT:
                     result = this.doExecuteScript(executableCmd);
@@ -185,6 +203,22 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @return object object
      */
     protected abstract Object doExecute(ExecutableCmd executableCmd);
+
+    /**
+     * Do execute in connection.
+     *
+     * @param executableCmd the executable cmd
+     * @return the object
+     */
+    protected abstract Object doExecuteInConnection(ExecutableCmd executableCmd);
+
+    /**
+     * Do execution in raw object.
+     *
+     * @param executableCmd the executable cmd
+     * @return the object
+     */
+    protected abstract Object doExecutionInRaw(ExecutableCmd executableCmd);
 
     /**
      * 执行代码

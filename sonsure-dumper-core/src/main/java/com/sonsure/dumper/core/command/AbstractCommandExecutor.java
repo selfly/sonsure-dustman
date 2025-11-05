@@ -61,7 +61,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         if (pagination == null) {
             throw new SonsureJdbcException("查询分页列表请设置分页信息");
         }
-        String dialect = getJdbcContext().getPersistExecutor().getDatabaseProduct();
+        String dialect = this.getDatabaseProduct();
         long count = Long.MAX_VALUE;
         if (!executableCmd.isDisableCountQuery()) {
             String countCommand = getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);
@@ -79,6 +79,13 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
         List<T> list = pageQueryHandler.queryList(pageExecutableCmd);
 
         return new Page<>(list, pagination);
+    }
+
+    protected String getDatabaseProduct() {
+        ExecutableCmd gdpCmd = new ExecutableCmd();
+        gdpCmd.setExecutionType(ExecutionType.GET_DATABASE_PRODUCT);
+        gdpCmd.setJdbcContext(this.getJdbcContext());
+        return (String) getJdbcContext().getPersistExecutor().execute(gdpCmd);
     }
 
     protected <T> T handleResult(Object result, ResultHandler<T> resultHandler) {

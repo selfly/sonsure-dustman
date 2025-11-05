@@ -12,9 +12,6 @@ package com.sonsure.dumper.core.persist;
 
 import com.sonsure.dumper.core.command.build.ExecutableCmd;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-
 /**
  * 持久化执行
  * <p>
@@ -23,27 +20,6 @@ import java.sql.DatabaseMetaData;
  * @since 17/4/11
  */
 public interface PersistExecutor {
-
-    /**
-     * Gets database product.
-     *
-     * @return the database product
-     */
-    default String getDatabaseProduct() {
-        return this.executeInConnection(connection -> {
-            final DatabaseMetaData metaData = connection.getMetaData();
-            return metaData.getDatabaseProductName().toLowerCase() + "/" + metaData.getDatabaseProductVersion();
-        });
-    }
-
-    /**
-     * Execute t.
-     *
-     * @param <R>      the type parameter
-     * @param function the function
-     * @return the t
-     */
-    <R> R executeInConnection(ExecutionFunction<Connection, R> function);
 
     /**
      * 执行command
