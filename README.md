@@ -60,11 +60,9 @@
     .where()
     .openParen()
         .condition(UserInfo::getLoginName, SqlOperator.EQ, "whereAnd")
-        .or()
-        .condition(UserInfo::getEmail, SqlOperator.EQ, "123456@dustman.com")
+        .or(UserInfo::getEmail, SqlOperator.EQ, "123456@dustman.com")
     .closeParen()
-    .and()
-    .condition(UserInfo::getStatus, "normal")
+    .and(UserInfo::getStatus, "normal")
     .findOne(UserInfo.class);
 
     //named方式，且自定义sql片断
