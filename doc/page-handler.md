@@ -61,19 +61,19 @@
     
 非常的简单，然后将它配置到`JdbcEngine`中即可使用：
 
-    <bean id="postgresqlPageHandler" class="com.sonsure.dumper.core.page.PostgresqlPageHandler"/>
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="postgresqlPageHandler" class="com.sonsure.dustman.jdbc.page.PostgresqlPageHandler"/>
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <!-- ... -->
         <property name="pageHandler" ref="postgresqlPageHandler"/>
     </bean>
     
 也可以像下面这样配置到`NegotiatingPageHandler`中，统一使用`NegotiatingPageHandler`：
 
-    <bean id="postgresqlPageHandler" class="com.sonsure.dumper.core.page.PostgresqlPageHandler"/>
-    <bean id="mysqlPageHandler" class="com.sonsure.dumper.core.page.MysqlPageHandler"/>
-    <bean id="oraclePageHandler" class="com.sonsure.dumper.core.page.OraclePageHandler"/>
+    <bean id="postgresqlPageHandler" class="com.sonsure.dustman.jdbc.page.PostgresqlPageHandler"/>
+    <bean id="mysqlPageHandler" class="com.sonsure.dustman.jdbc.page.MysqlPageHandler"/>
+    <bean id="oraclePageHandler" class="com.sonsure.dustman.jdbc.page.OraclePageHandler"/>
 
-    <bean id="negotiatingPageHandler" class="com.sonsure.dumper.core.page.NegotiatingPageHandler">
+    <bean id="negotiatingPageHandler" class="com.sonsure.dustman.jdbc.page.NegotiatingPageHandler">
         <property name="pageHandlers">
             <list>
                 <ref bean="postgresqlPageHandler"/>
@@ -83,7 +83,7 @@
         </property>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <!-- ... -->
         <property name="pageHandler" ref="negotiatingPageHandler"/>
     </bean>

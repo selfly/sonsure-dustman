@@ -4,24 +4,24 @@
 
 以下示例配置分别声明了一个`mysql`和一个`oracle`的`JdbcEngine`操作对象：
 
-    <bean id="mappingHandler" class="com.sonsure.dumper.core.mapping.DefaultMappingHandler">
-        <constructor-arg name="modelPackages" value="com.sonsure.dumper.test.model.**"/>
+    <bean id="mappingHandler" class="com.sonsure.dustman.jdbc.mapping.DefaultMappingHandler">
+        <constructor-arg name="modelPackages" value="com.sonsure.dustman.test.model.**"/>
     </bean>
 
-    <bean id="mysqlJdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="mysqlJdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="mysqlDataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
-    <bean id="oracleKeyGenerator" class="com.sonsure.dumper.core.persist.OracleKeyGenerator"/>
+    <bean id="oracleKeyGenerator" class="com.sonsure.dustman.jdbc.persist.OracleKeyGenerator"/>
 
-    <bean id="oracleJdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="oracleJdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="oracleDataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="keyGenerator" ref="oracleKeyGenerator"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="defaultJdbcEngine" ref="mysqlJdbcTemplateEngine"/>
         <property name="jdbcEngineMap">
             <map>

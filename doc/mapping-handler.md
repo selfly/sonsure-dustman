@@ -92,7 +92,7 @@
 
 然后在声明JdbcEngine时设置：
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <!-- ...... -->
         <property name="mappingHandler" ref="customMappingHandler"/>
     </bean>

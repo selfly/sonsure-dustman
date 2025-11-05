@@ -124,30 +124,30 @@
         </property>
         <property name="annotatedClasses">
             <list>
-                <value>com.sonsure.dumper.test.model.HbUserInfo</value>
+                <value>com.sonsure.dustman.test.model.HbUserInfo</value>
             </list>
         </property>
     </bean>
 
-    <bean id="mappingHandler" class="com.sonsure.dumper.core.mapping.DefaultMappingHandler">
-        <constructor-arg name="modelPackages" value="com.sonsure.dumper.test.model.**"/>
+    <bean id="mappingHandler" class="com.sonsure.dustman.jdbc.mapping.DefaultMappingHandler">
+        <constructor-arg name="modelPackages" value="com.sonsure.dustman.test.model.**"/>
     </bean>
 
-    <bean id="hibernatePersistExecutor" class="com.sonsure.dumper.test.jdbc.extension.executor.HibernatePersistExecutor">
+    <bean id="hibernatePersistExecutor" class="com.sonsure.dustman.test.jdbc.extension.executor.HibernatePersistExecutor">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <bean id="jdbcExecutorConfig" class="com.sonsure.dumper.core.config.JdbcExecutorConfigImpl">
+    <bean id="jdbcExecutorConfig" class="com.sonsure.dustman.jdbc.config.JdbcExecutorConfigImpl">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="persistExecutor" ref="hibernatePersistExecutor"/>
     </bean>
 
-    <bean id="jdbcContext" class="com.sonsure.dumper.core.config.JdbcContextImpl">
+    <bean id="jdbcContext" class="com.sonsure.dustman.jdbc.config.JdbcContextImpl">
         <property name="jdbcExecutorConfig" ref="jdbcExecutorConfig"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.core.persist.JdbcDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.jdbc.persist.JdbcDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcContext"/>
     </bean>
     

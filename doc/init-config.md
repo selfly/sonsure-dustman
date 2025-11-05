@@ -4,7 +4,7 @@
 
 如果使用默认配置，只需要声明以下bean，传入`dataSource`即可：
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
@@ -12,12 +12,12 @@
 
 自定义一些配置时，通过配置`jdbcContext`参数来完成，以下是使用 Spring Jdbc 相应的实现类`JdbcTemplateEngineFactoryBean`示例：
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="caseStyle" value="lower"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="jdbcContext" ref="jdbcTemplateEngine"/>
     </bean>
     

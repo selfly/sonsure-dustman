@@ -1,0 +1,90 @@
+/*
+ * Copyright (c) 2020. www.sonsure.com Inc. All rights reserved.
+ * You may obtain more information at
+ *
+ *   http://www.sonsure.com
+ *
+ * Designed By Selfly Lee (selfly@live.com)
+ */
+
+package com.sonsure.dustman.jdbc.config;
+
+import com.sonsure.dustman.jdbc.command.build.CaseStyle;
+import com.sonsure.dustman.jdbc.command.sql.CommandConversionHandler;
+import com.sonsure.dustman.jdbc.command.sql.JSqlParserCommandConversionHandler;
+import com.sonsure.dustman.jdbc.interceptor.PersistInterceptor;
+import com.sonsure.dustman.jdbc.mapping.MappingHandler;
+import com.sonsure.dustman.jdbc.mapping.MappingHandlerImpl;
+import com.sonsure.dustman.jdbc.page.NegotiatingPageHandler;
+import com.sonsure.dustman.jdbc.page.PageHandler;
+import com.sonsure.dustman.jdbc.persist.KeyGenerator;
+import com.sonsure.dustman.jdbc.persist.PersistExecutor;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import java.util.List;
+
+/**
+ * The type Jdbc engine.
+ *
+ * @author liyd
+ * @since 17 /4/12
+ */
+@Getter
+@Setter
+public class JdbcContextImpl implements JdbcContext {
+
+    /**
+     * 执行器构建factory
+     */
+    protected CommandExecutorFactory commandExecutorFactory;
+
+    /**
+     * 默认映射处理
+     */
+    protected MappingHandler mappingHandler;
+
+    /**
+     * 分页处理器
+     */
+    protected PageHandler pageHandler;
+
+    /**
+     * 解析器
+     */
+    protected CommandConversionHandler commandConversionHandler;
+
+    /**
+     * 默认主键生成器
+     */
+    protected KeyGenerator keyGenerator;
+
+    /**
+     * 默认持久化处理
+     */
+    protected PersistExecutor persistExecutor;
+
+    /**
+     * 拦截器
+     */
+    protected List<PersistInterceptor> persistInterceptors;
+
+    /**
+     * mybatis SqlSessionFactory
+     */
+    protected SqlSessionFactory mybatisSqlSessionFactory;
+
+    /**
+     * command大小写
+     */
+    protected CaseStyle caseStyle = CaseStyle.NONE;
+
+    public JdbcContextImpl() {
+        this.commandExecutorFactory = new CommandExecutorFactoryImpl();
+        this.mappingHandler = new MappingHandlerImpl();
+        this.pageHandler = new NegotiatingPageHandler();
+        this.commandConversionHandler = new JSqlParserCommandConversionHandler();
+    }
+
+}

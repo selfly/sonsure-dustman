@@ -27,21 +27,21 @@ CommandConversionHandler的定义就一个方法：
 
 以下配置和在省略`commandConversionHandler`时效果相同：
 
-    <bean id="mappingHandler" class="com.sonsure.dumper.core.mapping.DefaultMappingHandler">
-        <constructor-arg name="modelPackages" value="com.sonsure.dumper.test.model.**"/>
+    <bean id="mappingHandler" class="com.sonsure.dustman.jdbc.mapping.DefaultMappingHandler">
+        <constructor-arg name="modelPackages" value="com.sonsure.dustman.test.model.**"/>
     </bean>
 
-    <bean id="jSqlParserCommandConversionHandler" class="com.sonsure.dumper.core.command.sql.JSqlParserCommandConversionHandler">
+    <bean id="jSqlParserCommandConversionHandler" class="com.sonsure.dustman.jdbc.command.sql.JSqlParserCommandConversionHandler">
         <property name="mappingHandler" ref="mappingHandler"/>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="mappingHandler" ref="mappingHandler"/>
         <property name="commandConversionHandler" ref="jSqlParserCommandConversionHandler"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
     </bean>
 

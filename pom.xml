@@ -14,11 +14,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sonsure</groupId>
-    <artifactId>sonsure-dumper</artifactId>
+    <artifactId>sonsure-dustman</artifactId>
     <packaging>pom</packaging>
-    <version>4.4.0</version>
+    <version>1.0.0</version>
 
-    <name>sonsure-dumper</name>
+    <name>sonsure-dustman</name>
     <description>Java Jdbc Framework.</description>
     <url>https://www.sonsure.com/</url>
     <licenses>
@@ -34,17 +34,17 @@
         </developer>
     </developers>
     <scm>
-        <connection>https://github.com/selfly/sonsure-dumper</connection>
-        <developerConnection>https://github.com/selfly/sonsure-dumper</developerConnection>
-        <url>https://github.com/selfly/sonsure-dumper</url>
+        <connection>https://github.com/selfly/sonsure-dustman</connection>
+        <developerConnection>https://github.com/selfly/sonsure-dustman</developerConnection>
+        <url>https://github.com/selfly/sonsure-dustman</url>
     </scm>
 
     <modules>
-        <module>sonsure-dumper-core</module>
-        <module>sonsure-dumper-springjdbc</module>
-        <module>sonsure-dumper-test</module>
-        <module>sonsure-dumper-common</module>
-        <module>sonsure-dumper-flyable</module>
+        <module>sonsure-dustman-common</module>
+        <module>sonsure-dustman-jdbc</module>
+        <module>sonsure-dustman-springjdbc</module>
+        <module>sonsure-dustman-flyable</module>
+        <module>sonsure-dustman-test</module>
     </modules>
 
     <properties>
@@ -62,7 +62,7 @@
         <hibernate-core.version>5.6.15.Final</hibernate-core.version>
 
         <!-- Sonar -->
-        <aggregate.report.dir>sonsure-dumper-test/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+        <aggregate.report.dir>sonsure-dustman-test/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
         <dom4j.version>2.1.4</dom4j.version>
 
         <!-- spring boot dependencies fix-->
@@ -116,15 +116,6 @@
     </dependencyManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>5.1.8</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -197,20 +188,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- Source -->
-                    <!--                    <plugin>-->
-                    <!--                        <groupId>org.apache.maven.plugins</groupId>-->
-                    <!--                        <artifactId>maven-source-plugin</artifactId>-->
-                    <!--                        <version>2.2.1</version>-->
-                    <!--                        <executions>-->
-                    <!--                            <execution>-->
-                    <!--                                <phase>package</phase>-->
-                    <!--                                <goals>-->
-                    <!--                                    <goal>jar-no-fork</goal>-->
-                    <!--                                </goals>-->
-                    <!--                            </execution>-->
-                    <!--                        </executions>-->
-                    <!--                    </plugin>-->
                     <!-- Javadoc -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

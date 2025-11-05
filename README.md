@@ -1,4 +1,4 @@
-# Sonsure-Dumper
+# Sonsure-dustman
 
 简单、快速、易用的jdbc持久化操作层。
 
@@ -78,13 +78,13 @@
 
     <dependency>
         <groupId>com.sonsure</groupId>
-        <artifactId>sonsure-dumper-springjdbc</artifactId>
+        <artifactId>sonsure-dustman-springjdbc</artifactId>
         <version>${version}</version>
     </dependency>
     
 声明Bean，更多参数详见相关配置文档：
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="dataSource" ref="dataSource"/>
     </bean>
     
@@ -126,8 +126,8 @@
 
 ## 参与贡献
 
-github：[https://github.com/selfly/sonsure-dumper](https://github.com/selfly/sonsure-dumper)  
-gitee: [https://gitee.com/selfly/sonsure-dumper](https://gitee.com/selfly/sonsure-dumper)
+github：[https://github.com/selfly/sonsure-dustman](https://github.com/selfly/sonsure-dustman)  
+gitee: [https://gitee.com/selfly/sonsure-dustman](https://gitee.com/selfly/sonsure-dustman)
 
 1. Fork 本项目
 2. 新建 Feat_xxx 分支

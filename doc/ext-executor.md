@@ -112,20 +112,20 @@ CountCommandContextBuilder 代码：
 
 有了上面的实现代码，需要在声明JdbcDao的时候将我们自定义实现的 CommandExecutor 配置进去，主要配置如下，显示声明了一个 CommandExecutorFactoryImpl 并将我们实现的 CountCommandExecutorBuilderImpl 进入了初始化：
 
-    <bean id="commandExecutorFactory" class="com.sonsure.dumper.core.config.CommandExecutorFactoryImpl">
+    <bean id="commandExecutorFactory" class="com.sonsure.dustman.jdbc.config.CommandExecutorFactoryImpl">
         <property name="commandExecutorBuilders">
             <list>
-                <bean class="com.sonsure.dumper.test.executor.CountCommandExecutorBuilderImpl"/>
+                <bean class="com.sonsure.dustman.test.executor.CountCommandExecutorBuilderImpl"/>
             </list>
         </property>
     </bean>
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dumper.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="commandExecutorFactory" ref="commandExecutorFactory"/>
     </bean>
 
-    <bean id="jdbcDao" class="com.sonsure.dumper.springjdbc.persist.SpringJdbcTemplateDaoImpl">
+    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
         <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
     </bean>
     
