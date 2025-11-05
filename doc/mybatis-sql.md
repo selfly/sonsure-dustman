@@ -34,9 +34,9 @@ Mybatis是一个优秀的框架，但也有它的不足之处。
     
 然后将`sqlSessionFactory`注入到我们的`jdbcContext`就可以了：
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
+    <bean id="jdbcContext" class="com.sonsure.dustman.jdbc.config.JdbcContextImpl">
         <property name="mybatisSqlSessionFactory" ref="sqlSessionFactory"/>
-        <property name="dataSource" ref="dataSource"/>
+        ...
     </bean>
  
 从以上可以看出，我们只是需要拿到Mybatis的`sqlSessionFactory`注入到`jdbcContext`就可以了，至于Mybatis其它的东西并不关心。
@@ -71,9 +71,9 @@ Mybatis是一个优秀的框架，但也有它的不足之处。
             .command("getUser")
             .parameter("id", 9L)
             .parameter("loginName", "name-9")
-            .singleResult(UserInfo.class);
+            .findOne(UserInfo.class);
             
-    //这里指定了nativeCommand，sql将不经过转换
+    //这里指定了forceNative，sql将不经过转换
     Map<String, Object> params = new HashMap<>();
     params.put("id", 9L);
     params.put("loginName", "name-9");
@@ -81,12 +81,12 @@ Mybatis是一个优秀的框架，但也有它的不足之处。
     UserInfo user = jdbcDao.myBatisExecutor()
             .command("getUserSql")
             .parameters(params)
-            .nativeCommand()
-            .singleResult(UserInfo.class);
+            .forceNative()
+            .findOne(UserInfo.class);
             
 此种方式调用，Mybatis中可以不必再写分页等相关代码，如果需要，直接指定分页参数将自动完成分页：
 
     Page<UserInfo> page = jdbcDao.myBatisExecutor()
             .command("queryUserList")
             .paginate(1, 10) //第一页，取10条
-            .pageResult(UserInfo.class);
+            .findPage(UserInfo.class);

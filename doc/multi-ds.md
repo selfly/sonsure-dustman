@@ -1,6 +1,6 @@
 # 多数据源的使用
 
-在本组件中，对于多个数据源的操作实际上是通过声明相应的`JdbcEngine`来完成的，即一个`DataSource`对应一个`JdbcEngine`。
+在本组件中，对于多个数据源的操作实际上是通过声明相应的`jdbcContext`来完成的，即一个`DataSource`对应一个`jdbcContext`。
 
 以下示例配置分别声明了一个`mysql`和一个`oracle`的`JdbcEngine`操作对象：
 

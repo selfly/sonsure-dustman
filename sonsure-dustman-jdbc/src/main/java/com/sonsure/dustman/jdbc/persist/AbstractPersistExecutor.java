@@ -16,8 +16,6 @@ import com.sonsure.dustman.jdbc.exception.SonsureJdbcException;
 import com.sonsure.dustman.jdbc.interceptor.InterceptorChain;
 import com.sonsure.dustman.jdbc.interceptor.PersistContext;
 import com.sonsure.dustman.jdbc.interceptor.PersistInterceptor;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -31,8 +29,6 @@ import java.util.Map;
  * @author liyd
  * @since 17 /4/12
  */
-@Getter
-@Setter
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
     private String databaseProduct;
@@ -50,22 +46,22 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                     result = this.insert(executableCmd);
                     break;
                 case FIND_LIST:
-                    result = this.queryForList(executableCmd);
+                    result = this.findList(executableCmd);
                     break;
                 case FIND_ONE:
-                    result = this.querySingleResult(executableCmd);
+                    result = this.findOne(executableCmd);
                     break;
                 case FIND_ONE_FOR_MAP:
-                    result = this.queryForMap(executableCmd);
+                    result = this.findOneForMap(executableCmd);
                     break;
                 case FIND_LIST_FOR_MAP:
-                    result = this.queryForMapList(executableCmd);
+                    result = this.findListForMap(executableCmd);
                     break;
                 case FIND_ONE_FOR_SCALAR:
-                    result = this.queryOneCol(executableCmd);
+                    result = this.findOneForScalar(executableCmd);
                     break;
                 case FIND_LIST_FOR_SCALAR:
-                    result = this.queryOneColList(executableCmd);
+                    result = this.findListForScalar(executableCmd);
                     break;
                 case UPDATE:
                     result = this.update(executableCmd);
@@ -129,7 +125,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param executableCmd the executable cmd
      * @return list
      */
-    protected abstract List<?> queryForList(ExecutableCmd executableCmd);
+    protected abstract List<?> findList(ExecutableCmd executableCmd);
 
     /**
      * 查询单个结果对象，返回结果为某个实体对象
@@ -137,7 +133,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param executableCmd the executable cmd
      * @return object object
      */
-    protected abstract Object querySingleResult(ExecutableCmd executableCmd);
+    protected abstract Object findOne(ExecutableCmd executableCmd);
 
     /**
      * 查询单条记录的map结果集，key=列名，value=列值
@@ -145,7 +141,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param executableCmd the executable cmd
      * @return map map
      */
-    protected abstract Map<String, Object> queryForMap(ExecutableCmd executableCmd);
+    protected abstract Map<String, Object> findOneForMap(ExecutableCmd executableCmd);
 
     /**
      * 查询列表记录的map结果集，key=列名，value=列值
@@ -153,7 +149,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param executableCmd the executable cmd
      * @return list
      */
-    protected abstract List<Map<String, Object>> queryForMapList(ExecutableCmd executableCmd);
+    protected abstract List<Map<String, Object>> findListForMap(ExecutableCmd executableCmd);
 
     /**
      * 查询某一列的值
@@ -161,7 +157,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param executableCmd the executable cmd
      * @return object object
      */
-    protected abstract Object queryOneCol(ExecutableCmd executableCmd);
+    protected abstract Object findOneForScalar(ExecutableCmd executableCmd);
 
     /**
      * 查询某一列的值列表
@@ -169,7 +165,7 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
      * @param executableCmd the executable cmd
      * @return list
      */
-    protected abstract List<?> queryOneColList(ExecutableCmd executableCmd);
+    protected abstract List<?> findListForScalar(ExecutableCmd executableCmd);
 
     /**
      * 更新操作

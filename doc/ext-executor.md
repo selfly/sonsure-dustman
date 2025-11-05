@@ -2,15 +2,15 @@
 
 通过`JdbcDao`操作Insert、Select、Update、Delete、nativeExecutor、mybatisExecutor本质上都是创建了一个`CommandExecutor`的实现。
 
-对于上述几个内置的CommandExecutor对象都是由`CommandExecutorBuilderImpl`来进行构建的。
+对于上述几个内置的CommandExecutor对象都是由`CommandExecutorFactoryImpl`中的`InternalCommandExecutorCreatorImpl`来进行构建的。
 
-可以实现自己的`CommandExecutor`来整合不同的执行方式。
+可以实现自己的`CommandExecutorCreator`来扩展新的CommandExecutor。
 
 ## 实现逻辑
 
-`CommandExecutor`的生产是在`CommandExecutorFactory`内进行的，`CommandExecutorFactory`负责找到对应的`CommandExecutorBuilder`然后构建出具体的CommandExecutor对象。
+`CommandExecutor`的生产是在`CommandExecutorFactory`内进行的，`CommandExecutorFactory`负责找到对应的`CommandExecutorCreator`然后构建出具体的CommandExecutor对象。
 
-而`CommandExecutor`执行时需要的command上下文信息由其内部的`CommandContextBuilder`来完成，在构建`CommandExecutor`时需要为其指定使用的`CommandContextBuilder`。
+只需要把自定义的 CommandExecutorCreator 添加到 CommandExecutorFactoryImpl 中即可。
 
 ## 示例
 
@@ -26,9 +26,6 @@
 总的来说实现一个`CountCommandExecutor`需要以下几个类：
 
 - CountCommandExecutor 接口以及实现类 CountCommandExecutorImpl
-- CountCommandExecutorBuilderImpl 负责构建 CountCommandExecutor
-- CountCommandContextBuilder 负责构建command的上下文信息
-- CountExecutorContext 用来保存在构建CountCommandExecutor过程中的一些数据信息，类似于实体对象
 
 CountCommandExecutor 类代码：
 
@@ -43,17 +40,6 @@ CountCommandExecutor 类代码：
 
     public class CountCommandExecutorImpl implements CountCommandExecutor {
     
-        private JdbcEngineConfig jdbcExecutorConfig;
-    
-        private CommandContextBuilder commandContextBuilder;
-    
-        private CountExecutorContext countExecutorContext;
-    
-        public CountCommandExecutorImpl(JdbcEngineConfig jdbcExecutorConfig) {
-            this.jdbcExecutorConfig = jdbcExecutorConfig;
-            countExecutorContext = new CountExecutorContext();
-        }
-    
         @Override
         public CountCommandExecutor clazz(Class<?> clazz) {
             this.countExecutorContext.setClazz(clazz);
@@ -62,8 +48,7 @@ CountCommandExecutor 类代码：
     
         @Override
         public long getCount() {
-            CommandContext commandDetails = this.commandContextBuilder.build(this.countExecutorContext, this.jdbcExecutorConfig);
-            PersistExecutor persistExecutor = this.jdbcExecutorConfig.getPersistExecutor();
+            PersistExecutor persistExecutor = this.getJdbcContext().getPersistExecutor();
             commandDetails.setResultType(Long.class);
             Object result = persistExecutor.execute(commandDetails, CommandType.QUERY_ONE_COL);
             return (Long) result;

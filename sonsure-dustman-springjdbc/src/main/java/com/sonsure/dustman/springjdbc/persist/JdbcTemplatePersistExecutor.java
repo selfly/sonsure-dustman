@@ -71,36 +71,36 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
     }
 
     @Override
-    public List<?> queryForList(ExecutableCmd executableCmd) {
+    public List<?> findList(ExecutableCmd executableCmd) {
         return jdbcOperations.query(executableCmd.getCommand(), JdbcRowMapper.newInstance(executableCmd.getJdbcContext(), executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
     }
 
     @Override
-    public Object querySingleResult(ExecutableCmd executableCmd) {
+    public Object findOne(ExecutableCmd executableCmd) {
         //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
         List<?> list = jdbcOperations.query(executableCmd.getCommand(), JdbcRowMapper.newInstance(executableCmd.getJdbcContext(), executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
         return DataAccessUtils.singleResult(list);
     }
 
     @Override
-    public Map<String, Object> queryForMap(ExecutableCmd executableCmd) {
+    public Map<String, Object> findOneForMap(ExecutableCmd executableCmd) {
         //直接queryForMap没有记录时会抛出异常，采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
         List<Map<String, Object>> maps = jdbcOperations.queryForList(executableCmd.getCommand(), executableCmd.getParsedParameterValues().toArray());
         return DataAccessUtils.singleResult(maps);
     }
 
     @Override
-    public List<Map<String, Object>> queryForMapList(ExecutableCmd executableCmd) {
+    public List<Map<String, Object>> findListForMap(ExecutableCmd executableCmd) {
         return jdbcOperations.queryForList(executableCmd.getCommand(), executableCmd.getParsedParameterValues().toArray());
     }
 
     @Override
-    public Object queryOneCol(ExecutableCmd executableCmd) {
+    public Object findOneForScalar(ExecutableCmd executableCmd) {
         return jdbcOperations.queryForObject(executableCmd.getCommand(), executableCmd.getResultType(), executableCmd.getParsedParameterValues().toArray());
     }
 
     @Override
-    public List<?> queryOneColList(ExecutableCmd executableCmd) {
+    public List<?> findListForScalar(ExecutableCmd executableCmd) {
         return jdbcOperations.queryForList(executableCmd.getCommand(), executableCmd.getResultType(), executableCmd.getParsedParameterValues().toArray());
     }
 

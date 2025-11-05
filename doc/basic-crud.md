@@ -8,10 +8,10 @@
     user.setPassword("2017");
     user.setUserAge(18);
     user.setGmtCreate(new Date());
-    Long id = (Long) jdbcDao.executeInsert(user);
+    Long id = jdbcDao.executeInsert(user);
 
     //方式二，单个设置属性值
-    Long id = (Long)jdbcDao.insertInto(UserInfo.class)
+    Long id = jdbcDao.insertInto(UserInfo.class)
             .set("loginName", "selfly")
             .set("password", "2019")
             .set("userAge", 18)
@@ -46,26 +46,26 @@
     int count = jdbcDao.executeDelete(user);
     
     //删除对应表所表数据，即没有where条件
-    int count = jdbcDao.executeDelete(UserInfo.class);
+    int count = jdbcDao.executeDeleteAll(UserInfo.class);
 
 ## 查询
 
     //查询所有列表
-    List<UserInfo> users = jdbcDao.find(UserInfo.class);
+    List<UserInfo> users = jdbcDao.findAll(UserInfo.class);
 
     //实体类方式，不为空的属性为where条件
     UserInfo user = new UserInfo();
     user.setUserAge(10);
-    List<UserInfo> users = jdbcDao.find(user);
+    List<UserInfo> users = jdbcDao.findList(user);
 
     //查询分页列表 UserInfo 继承了Pageable类
     UserInfo user = new UserInfo();
     user.setPageSize(10); //每页10条
     user.setUserAge(10);
-    Page<UserInfo> page = jdbcDao.pageResult(user);
+    Page<UserInfo> page = jdbcDao.findPage(user);
     
     //执行count(*) 所有记录数
-    long count = jdbcDao.findCount(UserInfo.class);
+    long count = jdbcDao.findAllCount(UserInfo.class);
     
     //执行count(*),不为空的属性为where条件
     UserInfo user = new UserInfo();
@@ -75,9 +75,9 @@
     //查询单个结果，多于一条时抛出异常，无记录时返回null
     UserInfo tmp = new UserInfo();
     tmp.setUserAge(10);
-    UserInfo user = jdbcDao.singleResult(tmp);
+    UserInfo user = jdbcDao.findOne(tmp);
 
     //获取第一条记录，多于一条时取第一条，无记录时返回null，有做分页处理不用担心满足条件的数据返回过多
     UserInfo tmp = new UserInfo();
     tmp.setUserAge(10);
-    UserInfo user = jdbcDao.firstResult(tmp);
+    UserInfo user = jdbcDao.findFirst(tmp);

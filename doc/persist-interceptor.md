@@ -8,47 +8,35 @@
 
 包含2个方法，分别在sql执行前后调用。
 
-`CommandContext`包含了当前执行的sql、参数等所有信息，对其内容进行修改将影响sql的执行行为。
+拦截器参数`PersistContext`中`ExecutableCmd`包含了当前执行的sql、参数等所有信息，对其内容进行修改将影响sql的执行行为。
 
-拦截器可以有多个，当有一个的`executeBefore`方法返回false时，实际的数据库操作将不再执行，`executeAfter`方法仍会执行，`commandResult`为null。
+拦截器可以有多个，执行方式为链式调用。
 
-    /**
-    * @author selfly
-    */
+当设置`skipExecution`为true时，实际的数据库操作将不再执行，`executeAfter`方法仍会执行，返回结果为PersistContext参数中设置的result。
+
     public interface PersistInterceptor {
-
+    
         /**
-        * 执行前调用
-        *
-        * @param dialect        the dialect
-        * @param commandDetails the command context
-        * @param executionType    the command type
-        * @return the boolean
-        */
-        default boolean executeBefore(String dialect, CommandContext commandDetails, CommandType executionType) {
-            return true;
+         * 执行前调用
+         *
+         * @param persistContext the interceptor context
+         * @param chain          the chain
+         */
+        default void executeBefore(PersistContext persistContext, InterceptorChain chain) {
+            chain.execute(persistContext);
         }
-
+    
         /**
-        * 执行后调用,返回结果将替换实际查询结果
-        *
-        * @param dialect        the dialect
-        * @param commandDetails the command context
-        * @param executionType    the command type
-        * @param commandResult  the command result
-        * @return the object
-        */
-        default Object executeAfter(String dialect, CommandContext commandDetails, CommandType executionType, Object commandResult) {
-            return commandResult;
+         * 执行后调用,返回结果将替换实际查询结果
+         *
+         * @param persistContext the persist context
+         * @param chain          the chain
+         */
+        default void executeAfter(PersistContext persistContext, InterceptorChain chain) {
+            chain.execute(persistContext);
         }
     }
 
-可以在声明`JdbcEngine`时，添加需要的拦截器：
+可以在声明`jdbcContext`时，添加需要的拦截器：
 
-    JdbcTemplateEngineConfigImpl jdbcTemplateEngineConfig = new JdbcTemplateEngineConfigImpl();
-    jdbcTemplateEngineConfig.setDataSource(getDataSource());
-    final List<PersistInterceptor> persistInterceptors = new ArrayList<>();
-    // 添加需要的拦截器
-    persistInterceptors.add(new XXXInterceptor())
-    jdbcTemplateEngineConfig.setPersistInterceptors(persistInterceptors);
-    defaultJdbcEngine = new JdbcEngineImpl(jdbcTemplateEngineConfig);
+    jdbcContext.setPersistInterceptors(Arrays.asList(new TestBeforeInterceptor(), new TestAfterInterceptor()));

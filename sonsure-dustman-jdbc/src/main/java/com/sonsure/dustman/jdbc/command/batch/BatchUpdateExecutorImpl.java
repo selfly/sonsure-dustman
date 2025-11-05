@@ -29,8 +29,9 @@ public class BatchUpdateExecutorImpl extends AbstractCommandExecutor<BatchUpdate
         super(jdbcContext);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> Object execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
+    public <T, R> R execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
         this.getExecutableCmdBuilder().command(command);
         this.getExecutableCmdBuilder().executionType(ExecutionType.BATCH_UPDATE);
         this.getExecutableCmdBuilder().resultType(Object.class);
@@ -39,7 +40,7 @@ public class BatchUpdateExecutorImpl extends AbstractCommandExecutor<BatchUpdate
         batchExecutableCmd.setBatchSize(batchSize);
         batchExecutableCmd.setBatchData(batchData);
         batchExecutableCmd.setParameterizedSetter(parameterizedSetter);
-        return getJdbcContext().getPersistExecutor().execute(batchExecutableCmd);
+        return (R) getJdbcContext().getPersistExecutor().execute(batchExecutableCmd);
     }
 
 }

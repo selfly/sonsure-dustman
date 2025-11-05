@@ -13,3 +13,27 @@
 遵循以上约定后，一个实体类中不需要任何的额外配置或注解，显得十分的干净整洁。
 
 当然，这些约定都可以通过配置或扩展改变它，但不建议这么做，这本身就是一个良好的规范。
+
+对于一些通用的属性可能会有属性提取，类继承的情况，可以在父类添加`BaseProperties`注解，这样继承的子类在处理时也会处理父类中定义的属性。
+
+**示例**
+    
+父类：
+
+    @BaseProperties
+    public class BaseUser {
+    
+        private Date gmtCreate;
+        private Date gmtModify;
+    }
+
+子类：
+
+    public class UserInfo extends BaseUser {
+    
+        private Long userInfoId;
+    
+        //...
+    }
+
+当操作`UserInfo`时，会包含`gmtCreate`和`gmtModify`两个属性。

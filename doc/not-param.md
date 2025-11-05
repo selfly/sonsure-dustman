@@ -14,6 +14,6 @@
 
     List<UserInfo> userInfos = jdbcDao.selectFrom(UserInfo.class)
             .where("{{userAge}}", "userInfoId")
-            .list(UserInfo.class);
+            .findList(UserInfo.class);
 
 最终的sql：SELECT ... FROM USER_INFO WHERE USER_AGE = USER_INFO_ID         

@@ -21,7 +21,7 @@
 
     String sql = "INSERT INTO USER_INFO (PASSWORD, LOGIN_NAME, GMT_CREATE, USER_AGE, USER_INFO_ID) VALUES (?, ?, ?, ?, ?)";
     jdbcDao.batchUpdate()
-            .nativeCommand() //直接使用sql
+            .forceNative() //直接使用sql
             .execute(sql, userInfoList, 1000, (ps, names, userInfo) -> {
                 ps.setString(1, userInfo.getPassword());
                 ps.setString(2, userInfo.getLoginName());
@@ -61,7 +61,7 @@
         userInfoList.add(map);
     }
     jdbcDao.batchUpdate()
-            .nativeCommand()
+            .forceNative()
             .namedParameter()
             .execute(sql, userInfoList, userInfoList.size(), (ps, names, map) -> {
                 for (int j = 0; j < names.size(); j++) {

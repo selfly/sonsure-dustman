@@ -19,7 +19,7 @@ sql使用named书写方式并传参，类似于`NamedParameterJdbcTemplate`执�
 
     int count = jdbcDao.nativeExecutor()
             .namedParameter()
-            .nativeCommand()
+            .forceNative()
             .command(sql)
             .parameters(params)
             .update();

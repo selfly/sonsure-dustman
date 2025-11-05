@@ -72,18 +72,18 @@ public interface JdbcDao {
     /**
      * 根据实体条件查询记录数
      *
-     * @param entity the entity
+     * @param cls the cls
      * @return long
      */
-    long findCount(Object entity);
+    long findAllCount(Class<?> cls);
 
     /**
      * 根据实体条件查询记录数
      *
-     * @param cls the cls
+     * @param entity the entity
      * @return long
      */
-    long findCount(Class<?> cls);
+    long findCount(Object entity);
 
     /**
      * 查询分页列表
@@ -153,7 +153,7 @@ public interface JdbcDao {
      * @param cls the cls
      * @return int int
      */
-    int executeDelete(Class<?> cls);
+    int executeDeleteAll(Class<?> cls);
 
     /**
      * 更新
@@ -213,13 +213,14 @@ public interface JdbcDao {
      * Batch update.
      *
      * @param <T>                 the type parameter
+     * @param <R>                 the type parameter
      * @param command             the command
      * @param batchData           the batch data
      * @param batchSize           the batch size
      * @param parameterizedSetter the parameterized setter
      * @return the object
      */
-    <T> Object executeBatchUpdate(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter);
+    <T,R> R executeBatchUpdate(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter);
 
     /**
      * 执行脚本

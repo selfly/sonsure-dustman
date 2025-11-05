@@ -8,7 +8,7 @@
     byte[] bytes = FileIOUtils.toByteArray(resourceAsStream);
     jdbcDao.nativeExecutor()
             .command(script)
-            .nativeCommand()
+            .forceNative()
             .executeScript();
 
 具体调用可参考测试用例中的代码。

@@ -35,7 +35,7 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
     }
 
     @Override
-    public List<?> queryForList(ExecutableCmd executableCmd) {
+    public List<?> findList(ExecutableCmd executableCmd) {
         Session session = sessionFactory.openSession();
         NativeQuery<?> nativeQuery = session.createNativeQuery(executableCmd.getCommand(), executableCmd.getResultType());
         List<Object> parameters = executableCmd.getParsedParameterValues();
@@ -56,27 +56,27 @@ public class HibernatePersistExecutor extends AbstractPersistExecutor {
     }
 
     @Override
-    public Object querySingleResult(ExecutableCmd executableCmd) {
+    public Object findOne(ExecutableCmd executableCmd) {
         return null;
     }
 
     @Override
-    public Map<String, Object> queryForMap(ExecutableCmd executableCmd) {
+    public Map<String, Object> findOneForMap(ExecutableCmd executableCmd) {
         return null;
     }
 
     @Override
-    public List<Map<String, Object>> queryForMapList(ExecutableCmd executableCmd) {
+    public List<Map<String, Object>> findListForMap(ExecutableCmd executableCmd) {
         return null;
     }
 
     @Override
-    public Object queryOneCol(ExecutableCmd executableCmd) {
+    public Object findOneForScalar(ExecutableCmd executableCmd) {
         return null;
     }
 
     @Override
-    public List<?> queryOneColList(ExecutableCmd executableCmd) {
+    public List<?> findListForScalar(ExecutableCmd executableCmd) {
         return null;
     }
 

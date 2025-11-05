@@ -10,7 +10,7 @@
     .addColumn("userInfoId", "password")
     .addColumn(UserInfo::getLoginName)
     .where("userAge", "<=", 10)
-    .list();
+    .findList();
 
 ## 排除返回列
 
@@ -19,11 +19,9 @@
     List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
     .dropColumn("password")
     .where("userAge", "<=", 10)
-    .list();
+    .findList();
 
 两个方法均可多次调用。
-
-注：当同时指定`addColumn`和`dropColumn`时，以addColumn为准。
 
 ## 其它用法
 
@@ -31,24 +29,19 @@
 
     Long maxId = jdbcDao.selectFrom(UserInfo.class)
     .addColumn("max(userInfoId) maxid")
-    .oneColResult(Long.class);
+    .findOneForScalar(Long.class);
 
 ## 表别名使用
 
 表别名单表也可使用不过意义不大。
-以下查询，from两张表并使用了表别名及列别名。
-
-    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class,"t1")
-            .from(Account.class, "t2")
-            .addColumn("t1.loginName as name1", "t2.loginName as name2")
-            .where()
-            .append("t1.userInfoId = t2.accountId")
-            .listMaps();
-
-以下where条件使用不传参方式，与上面等价：
 
     List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).as("t1")
-            .from(Account.class, "t2")
-            .addColumn("t1.loginName as name1", "t2.loginName as name2")
-            .where("{{t1.userInfoId}}", "t2.accountId")
-            .listMaps();
+            .addColumn("t1.loginName as name1")
+            .findListForMap();
+
+以下where条件使用不传参方式：
+
+    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).as("t1")
+            .addColumn("t1.loginName as name1")
+            .where("{{t1.userInfoId}}", 1000L)
+            .findListForMap();

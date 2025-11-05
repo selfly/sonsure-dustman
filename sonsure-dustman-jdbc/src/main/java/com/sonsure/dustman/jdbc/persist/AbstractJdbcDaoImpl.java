@@ -90,7 +90,7 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     }
 
     @Override
-    public long findCount(Class<?> cls) {
+    public long findAllCount(Class<?> cls) {
         return this.selectFrom(cls).findCount();
     }
 
@@ -129,7 +129,7 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     }
 
     @Override
-    public int executeDelete(Class<?> cls) {
+    public int executeDeleteAll(Class<?> cls) {
         return this.delete().from(cls).execute();
     }
 
@@ -178,7 +178,7 @@ public abstract class AbstractJdbcDaoImpl implements JdbcDao {
     }
 
     @Override
-    public <T> Object executeBatchUpdate(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
+    public <T, R> R executeBatchUpdate(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter) {
         return this.batchUpdate().execute(command, batchData, batchSize, parameterizedSetter);
     }
 

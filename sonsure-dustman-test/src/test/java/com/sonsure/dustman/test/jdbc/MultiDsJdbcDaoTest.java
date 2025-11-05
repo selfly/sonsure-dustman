@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Date;
 
@@ -32,7 +31,7 @@ public class MultiDsJdbcDaoTest {
     @Test
     public void defaultDsJdbcDaoTest() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -43,14 +42,14 @@ public class MultiDsJdbcDaoTest {
             user.setGmtCreate(new Date());
             jdbcDao.executeInsert(user);
         }
-        long count = jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertEquals(count, 5);
     }
 
     @Test
     public void mysqlDsJdbcDaoTest() {
 
-        jdbcDao.use("mysql").executeDelete(UserInfo.class);
+        jdbcDao.use("mysql").executeDeleteAll(UserInfo.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -61,14 +60,14 @@ public class MultiDsJdbcDaoTest {
             user.setGmtCreate(new Date());
             jdbcDao.use("mysql").executeInsert(user);
         }
-        long count = jdbcDao.use("mysql").findCount(UserInfo.class);
+        long count = jdbcDao.use("mysql").findAllCount(UserInfo.class);
         Assertions.assertEquals(count, 5);
     }
 
     @Test
     public void oracleDsJdbcDaoTest() {
 
-        jdbcDao.use("oracle").executeDelete(OracleUser.class);
+        jdbcDao.use("oracle").executeDeleteAll(OracleUser.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -77,14 +76,14 @@ public class MultiDsJdbcDaoTest {
 
             jdbcDao.use("oracle").executeInsert(oracleUser);
         }
-        long count = jdbcDao.use("oracle").findCount(OracleUser.class);
+        long count = jdbcDao.use("oracle").findAllCount(OracleUser.class);
         Assertions.assertEquals(count, 5);
     }
 
     @Test
     public void jdbcDefaultDsJdbcDaoTest() {
 
-        jdbcDao.executeDelete(UserInfo.class);
+        jdbcDao.executeDeleteAll(UserInfo.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -95,14 +94,14 @@ public class MultiDsJdbcDaoTest {
             user.setGmtCreate(new Date());
             jdbcDao.executeInsert(user);
         }
-        long count = jdbcDao.findCount(UserInfo.class);
+        long count = jdbcDao.findAllCount(UserInfo.class);
         Assertions.assertEquals(5, count);
     }
 
     @Test
     public void jdbcMysqlDsJdbcDaoTest() {
 
-        jdbcDao.use("mysql").executeDelete(UserInfo.class);
+        jdbcDao.use("mysql").executeDeleteAll(UserInfo.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -113,14 +112,14 @@ public class MultiDsJdbcDaoTest {
             user.setGmtCreate(new Date());
             jdbcDao.use("mysql").executeInsert(user);
         }
-        long count = jdbcDao.use("mysql").findCount(UserInfo.class);
+        long count = jdbcDao.use("mysql").findAllCount(UserInfo.class);
         Assertions.assertEquals(5, count);
     }
 
     @Test
     public void jdbcOracleDsJdbcDaoTest() {
 
-        jdbcDao.use("oracle").executeDelete(OracleUser.class);
+        jdbcDao.use("oracle").executeDeleteAll(OracleUser.class);
 
         //默认
         for (int i = 0; i < 5; i++) {
@@ -129,7 +128,7 @@ public class MultiDsJdbcDaoTest {
 
             jdbcDao.use("oracle").executeInsert(oracleUser);
         }
-        long count = jdbcDao.use("oracle").findCount(OracleUser.class);
+        long count = jdbcDao.use("oracle").findAllCount(OracleUser.class);
         Assertions.assertEquals(5, count);
     }
 
@@ -137,7 +136,7 @@ public class MultiDsJdbcDaoTest {
     public void use() {
 
         try {
-            jdbcDao.use("oracle").use("oracle").executeDelete(OracleUser.class);
+            jdbcDao.use("oracle").use("oracle").executeDeleteAll(OracleUser.class);
         } catch (UnsupportedOperationException e) {
             Assertions.assertEquals("不支持的方法", e.getMessage());
         }

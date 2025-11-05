@@ -7,9 +7,9 @@
 ## 示例一，传统方式
 
     UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
-            .where("userAge", ">", 5)
-            .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
-            .singleResult(UserInfo.class);
+            .where("userAge", SqlOperator.GT, 5)
+            .appendSegment("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
+            .findOne();
     Assert.assertNotNull(userInfo);
 
 ## 示例二，也支持named方式
@@ -18,8 +18,8 @@
     params.put("userInfoId", 40L);
     UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
             .namedParameter()
-            .where("userAge", ">", 5)
+            .where("userAge", SqlOperator.GT, 5)
             .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
-            .singleResult(UserInfo.class);
+            .findOne();
     Assert.assertNotNull(userInfo);
 

@@ -59,33 +59,21 @@
         }
     }
     
-非常的简单，然后将它配置到`JdbcEngine`中即可使用：
+非常的简单，然后将它配置到`jdbcContext`中即可使用：
 
-    <bean id="postgresqlPageHandler" class="com.sonsure.dustman.jdbc.page.PostgresqlPageHandler"/>
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
-        <!-- ... -->
-        <property name="pageHandler" ref="postgresqlPageHandler"/>
-    </bean>
+    JdbcContextImpl jdbcContext = new JdbcContextImpl();
+    jdbcContext.setPageHandler(new PostgresqlPageHandler());
     
 也可以像下面这样配置到`NegotiatingPageHandler`中，统一使用`NegotiatingPageHandler`：
 
-    <bean id="postgresqlPageHandler" class="com.sonsure.dustman.jdbc.page.PostgresqlPageHandler"/>
-    <bean id="mysqlPageHandler" class="com.sonsure.dustman.jdbc.page.MysqlPageHandler"/>
-    <bean id="oraclePageHandler" class="com.sonsure.dustman.jdbc.page.OraclePageHandler"/>
-
-    <bean id="negotiatingPageHandler" class="com.sonsure.dustman.jdbc.page.NegotiatingPageHandler">
-        <property name="pageHandlers">
-            <list>
-                <ref bean="postgresqlPageHandler"/>
-                <ref bean="mysqlPageHandler"/>
-                <ref bean="oraclePageHandler"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
-        <!-- ... -->
-        <property name="pageHandler" ref="negotiatingPageHandler"/>
-    </bean>
+    NegotiatingPageHandler negotiatingPageHandler = new NegotiatingPageHandler();
+    negotiatingPageHandler.addPageHandler(new MysqlPageHandler());
+    negotiatingPageHandler.addPageHandler(new OraclePageHandler());
+    negotiatingPageHandler.addPageHandler(new PostgresqlPageHandler());
+    negotiatingPageHandler.addPageHandler(new SqlServerPageHandler());
+    negotiatingPageHandler.addPageHandler(new SqlitePageHandler());
+    negotiatingPageHandler.addPageHandler(new H2PageHandler());
     
-*注意：MysqlPageHandler、OraclePageHandler、PostgresqlPageHandler默认已经实现并内置在NegotiatingPageHandler中，可以直接拿来用或使用NegotiatingPageHandler。*
+    jdbcContext.setPageHandler(negotiatingPageHandler);
+    
+*注意：以上的分页处理实现，默认已经内置在NegotiatingPageHandler中，可以直接拿来用或使用单独的分页实现。*

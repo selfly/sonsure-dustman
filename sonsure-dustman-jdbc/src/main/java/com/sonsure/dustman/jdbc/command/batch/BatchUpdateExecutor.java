@@ -24,13 +24,14 @@ public interface BatchUpdateExecutor extends CommandExecutor<BatchUpdateExecutor
      * Execute object.
      *
      * @param <T>                 the type parameter
+     * @param <R>                 the type parameter
      * @param command             the command
      * @param batchData           the batch data
      * @param batchSize           the batch size
      * @param parameterizedSetter the parameterized setter
      * @return the object
      */
-    <T> Object execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter);
+    <T,R> R execute(String command, Collection<T> batchData, int batchSize, ParameterizedSetter<T> parameterizedSetter);
 
 
 }

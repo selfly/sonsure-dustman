@@ -11,11 +11,12 @@ CommandConversionHandler的定义就一个方法：
         /**
          * command转换
          *
-         * @param command the command
-         * @param params  
+         * @param command     the command
+         * @param parameters  the parameters
+         * @param jdbcContext the jdbc context
          * @return string string
          */
-        String convert(String command, Map<String, Object> params);
+        String convert(String command, List<CmdParameter> parameters, JdbcContext jdbcContext);
     
     }
     
@@ -23,26 +24,6 @@ CommandConversionHandler的定义就一个方法：
 
 默认使用`JSqlParser`来实现转换，实现类`JSqlParserCommandConversionHandler`。
 
-如果`JSqlParserCommandConversionHandler`不能满足需求，可以实现自己的`CommandConversionHandler`，把它配置到`JdbcEngine`即可。
+如果`JSqlParserCommandConversionHandler`不能满足需求，可以实现自己的`CommandConversionHandler`，把它配置到`jdbcContext`即可。
 
-以下配置和在省略`commandConversionHandler`时效果相同：
-
-    <bean id="mappingHandler" class="com.sonsure.dustman.jdbc.mapping.DefaultMappingHandler">
-        <constructor-arg name="modelPackages" value="com.sonsure.dustman.test.model.**"/>
-    </bean>
-
-    <bean id="jSqlParserCommandConversionHandler" class="com.sonsure.dustman.jdbc.command.sql.JSqlParserCommandConversionHandler">
-        <property name="mappingHandler" ref="mappingHandler"/>
-    </bean>
-
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="mappingHandler" ref="mappingHandler"/>
-        <property name="commandConversionHandler" ref="jSqlParserCommandConversionHandler"/>
-    </bean>
-
-    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
-        <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
-    </bean>
-
-*注意：当执行自定义sql调用了`nativeCommand()`方法时，将不经过`commandConversionHandler`的转换。*
+*注意：当执行自定义sql调用了`forceNative()`方法时，将不经过`commandConversionHandler`的转换。*
