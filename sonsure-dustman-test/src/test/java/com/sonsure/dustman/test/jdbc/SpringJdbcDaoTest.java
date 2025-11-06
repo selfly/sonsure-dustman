@@ -407,7 +407,6 @@ public class SpringJdbcDaoTest extends BaseTest {
     public void selectDropColumn() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
-                .addBeanColumns()
                 .dropColumn("password")
                 .where("userAge", SqlOperator.LTE, 10)
                 .findList();
@@ -423,7 +422,7 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void selectNotAddAllDropColumn() {
+    public void selectNotAddDropColumnStr() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
                 .dropColumn("password")
@@ -441,11 +440,11 @@ public class SpringJdbcDaoTest extends BaseTest {
     }
 
     @Test
-    public void select4() {
+    public void selectDropColumnLambda() {
 
         List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class)
-                .addBeanColumns()
-                .dropColumn("userInfoId", "password")
+                .dropColumn(UserInfo::getUserInfoId)
+                .dropColumn(UserInfo::getPassword)
                 .orderBy("userAge", OrderBy.ASC)
                 .findList(UserInfo.class);
         Assertions.assertNotNull(list);
@@ -1359,7 +1358,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             account.setUserAge(i);
             jdbcDao.executeInsert(account);
         }
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addColumns(UserInfo.class)
                 .innerJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .findList();
@@ -1531,7 +1530,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             jdbcDao.executeInsert(account);
         }
         // left join测试
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addColumns(UserInfo.class)
                 .leftJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .where("t2.accountId", SqlOperator.IS, null)
@@ -1552,7 +1551,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             account.setUserAge(i);
             jdbcDao.executeInsert(account);
         }
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addColumns(UserInfo.class)
                 .rightJoin(Account.class).as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .orderBy("t2.accountId", OrderBy.ASC)
@@ -1571,7 +1570,7 @@ public class SpringJdbcDaoTest extends BaseTest {
         account.setUserAge(1);
         jdbcDao.executeInsert(account);
 
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addColumns(UserInfo.class)
                 .innerJoin("Account").as("t2")
                 .on("t1.userInfoId = t2.accountId")
                 .findList();
@@ -1873,7 +1872,7 @@ public class SpringJdbcDaoTest extends BaseTest {
             jdbcDao.executeInsert(account);
         }
 
-        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addBeanColumns()
+        List<UserInfo> list = jdbcDao.selectFrom(UserInfo.class).as("t1").addColumns(UserInfo.class)
                 .innerJoin(Account.class).as("t2")
                 .on(UserInfo::getUserInfoId, Account::getAccountId)
                 .where("t1.userAge", SqlOperator.GTE, 5)
