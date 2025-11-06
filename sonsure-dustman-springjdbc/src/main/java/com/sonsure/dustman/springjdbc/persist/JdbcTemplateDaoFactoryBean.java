@@ -8,7 +8,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * @author selfly
  */
-public class SpringJdbcTemplateDaoFactoryBean extends JdbcContextImpl implements FactoryBean<JdbcDao> {
+public class JdbcTemplateDaoFactoryBean extends JdbcContextImpl implements FactoryBean<JdbcDao> {
 
     @Override
     public JdbcDao getObject() throws Exception {

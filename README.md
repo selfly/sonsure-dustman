@@ -143,8 +143,8 @@
     }
 
     @Bean
-    public SpringJdbcTemplateDaoFactoryBean jdbcDao(JdbcOperations jdbcOperations) {
-        SpringJdbcTemplateDaoFactoryBean factoryBean = new SpringJdbcTemplateDaoFactoryBean();
+    public JdbcTemplateDaoFactoryBean jdbcDao(JdbcOperations jdbcOperations) {
+        JdbcTemplateDaoFactoryBean factoryBean = new JdbcTemplateDaoFactoryBean();
         factoryBean.setPersistExecutor(new JdbcTemplatePersistExecutor(jdbcOperations));
         return factoryBean;
     }

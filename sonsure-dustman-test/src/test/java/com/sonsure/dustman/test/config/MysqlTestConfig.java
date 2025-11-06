@@ -3,7 +3,7 @@ package com.sonsure.dustman.test.config;
 import com.sonsure.dustman.jdbc.mapping.MappingHandler;
 import com.sonsure.dustman.jdbc.persist.JdbcDao;
 import com.sonsure.dustman.springjdbc.persist.JdbcTemplatePersistExecutor;
-import com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoFactoryBean;
+import com.sonsure.dustman.springjdbc.persist.JdbcTemplateDaoFactoryBean;
 import com.sonsure.dustman.test.flyable.FlyableInitializer;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,9 +42,9 @@ public class MysqlTestConfig {
 //    }
 
     @Bean
-    public SpringJdbcTemplateDaoFactoryBean mysqlJdbcDao(JdbcOperations jdbcOperations, MappingHandler mappingHandler, SqlSessionFactory sqlSessionFactory) {
+    public JdbcTemplateDaoFactoryBean mysqlJdbcDao(JdbcOperations jdbcOperations, MappingHandler mappingHandler, SqlSessionFactory sqlSessionFactory) {
 
-        SpringJdbcTemplateDaoFactoryBean factoryBean = new SpringJdbcTemplateDaoFactoryBean();
+        JdbcTemplateDaoFactoryBean factoryBean = new JdbcTemplateDaoFactoryBean();
         factoryBean.setMappingHandler(mappingHandler);
         factoryBean.setMybatisSqlSessionFactory(sqlSessionFactory);
         factoryBean.setPersistInterceptors(Arrays.asList(new DustmanTestConfig.TestBeforeInterceptor(), new DustmanTestConfig.TestAfterInterceptor()));
