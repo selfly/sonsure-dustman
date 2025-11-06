@@ -136,9 +136,18 @@
     
 声明Bean，更多参数详见相关配置文档：
 
-    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+    // jdbcTemplate对象
+    @Bean
+    public JdbcOperations jdbcOperations(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+
+    @Bean
+    public SpringJdbcTemplateDaoFactoryBean jdbcDao(JdbcOperations jdbcOperations) {
+        SpringJdbcTemplateDaoFactoryBean factoryBean = new SpringJdbcTemplateDaoFactoryBean();
+        factoryBean.setPersistExecutor(new JdbcTemplatePersistExecutor(jdbcOperations));
+        return factoryBean;
+    }
     
 传统注入方式使用JdbcDao：
 
