@@ -8,7 +8,8 @@
 
     UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
             .where("userAge", SqlOperator.GT, 5)
-            .appendSegment("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
+            .and()
+            .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < ?)", 40)
             .findOne();
     Assert.assertNotNull(userInfo);
 
@@ -19,7 +20,8 @@
     UserInfo userInfo = jdbcDao.selectFrom(UserInfo.class)
             .namedParameter()
             .where("userAge", SqlOperator.GT, 5)
-            .append("and userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
+            .and()
+            .append("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
             .findOne();
     Assert.assertNotNull(userInfo);
 
