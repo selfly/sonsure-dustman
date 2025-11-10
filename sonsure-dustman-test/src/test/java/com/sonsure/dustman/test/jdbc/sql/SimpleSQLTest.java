@@ -122,6 +122,19 @@ public class SimpleSQLTest {
         String minify = StrUtils.minify(sql.toString());
         Assertions.assertEquals(expect, minify);
     }
+    @Test
+    public void innerJoinAndCondition() {
+        String expect = "SELECT t1.loginName, t2.accountName FROM user_info t1 INNER JOIN account t2 ON t1.userInfoId = t2.accountId AND t1.loginName = '123' INNER JOIN order t3 on t1.userInfoId = t3.userInfoId WHERE t3.status = '123'";
+        SimpleSQL sql = new SimpleSQL();
+        sql.select("t1.loginName, t2.accountName")
+                .from("user_info t1")
+                .innerJoin("account t2 ON t1.userInfoId = t2.accountId")
+                .and("t1.loginName = '123'")
+                .innerJoin("order t3 on t1.userInfoId = t3.userInfoId")
+                .where("t3.status = '123'");
+        String minify = StrUtils.minify(sql.toString());
+        Assertions.assertEquals(expect, minify);
+    }
 
     @Test
     public void leftJoin() {

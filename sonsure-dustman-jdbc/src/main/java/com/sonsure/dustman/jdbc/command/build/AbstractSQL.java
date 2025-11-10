@@ -138,6 +138,7 @@ public abstract class AbstractSQL<T> {
      */
     public T join(String... joins) {
         Collections.addAll(sql().join, joins);
+        this.sql().lastList = sql().join;
         return getSelf();
     }
 
@@ -150,6 +151,7 @@ public abstract class AbstractSQL<T> {
      */
     public T innerJoin(String... joins) {
         Collections.addAll(sql().innerJoin, joins);
+        this.sql().lastList = sql().innerJoin;
         return getSelf();
     }
 
@@ -162,6 +164,7 @@ public abstract class AbstractSQL<T> {
      */
     public T leftOuterJoin(String... joins) {
         Collections.addAll(sql().leftOuterJoin, joins);
+        this.sql().lastList = sql().leftOuterJoin;
         return getSelf();
     }
 
@@ -174,6 +177,7 @@ public abstract class AbstractSQL<T> {
      */
     public T rightOuterJoin(String... joins) {
         Collections.addAll(sql().rightOuterJoin, joins);
+        this.sql().lastList = sql().rightOuterJoin;
         return getSelf();
     }
 
@@ -186,6 +190,7 @@ public abstract class AbstractSQL<T> {
      */
     public T outerJoin(String... joins) {
         Collections.addAll(sql().outerJoin, joins);
+        this.sql().lastList = sql().outerJoin;
         return getSelf();
     }
 
