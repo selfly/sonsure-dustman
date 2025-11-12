@@ -9,26 +9,20 @@
 
 package com.sonsure.dustman.common.utils;
 
-import com.sonsure.dustman.common.exception.SonsureException;
-
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * 字符文本操作
- * 太多的StringUtils了，命名为TextUtils
- * <p/>
  *
  * @author liyd
  * @since 2015-8-14
  */
 public class StrUtils {
-
-    public static final String EMPTY = "";
-    public static final int INDEX_NOT_FOUND = -1;
 
     public static String minify(String text) {
         StringBuilder sb = new StringBuilder();
@@ -88,49 +82,42 @@ public class StrUtils {
      * @return string
      */
     public static String substringForByte(String text, int length) {
-
-        return substringForByte(text, length, false);
+        return substringForByte(text, length, StandardCharsets.UTF_8);
     }
 
     /**
      * 截取字符串，按byte长度，可以避免直接按length截取中英文混合显示长短差很多的情况
      *
-     * @param text                  the text
-     * @param length                the length
-     * @param isConvertSpecialChars the is convert special chars
+     * @param text   the text
+     * @param length the length
      * @return string
      */
-    public static String substringForByte(String text, int length, boolean isConvertSpecialChars) {
+    public static String substringForByte(String text, int length, Charset charset) {
 
         if (isBlank(text) || length < 1) {
             return text;
         }
-        //转换特殊字符，页面显示时非常有用
-        if (isConvertSpecialChars) {
-            text = convertHtmlSpecialChars(text);
+        //防止中英文有长有短，转换成byte截取
+        byte[] bytes = text.getBytes(charset);
+        if (bytes.length <= length) {
+            return text;
         }
-        try {
-            //防止中英文有长有短，转换成byte截取
-            byte[] bytes = text.getBytes("GBK");
 
-            //截取
-            byte[] contentNameBytes = Arrays.copyOfRange(bytes, 0, length);
+        //截取
+        byte[] contentNameBytes = Arrays.copyOfRange(bytes, 0, length);
 
-            //处理截取了半个汉字的情况
-            int count = 0;
-            for (byte b : contentNameBytes) {
-                if (b < 0) {
-                    count++;
-                }
+        //处理截取了半个汉字的情况
+        int count = 0;
+        for (byte b : contentNameBytes) {
+            if (b < 0) {
+                count++;
             }
-            if (count % 2 != 0) {
-                contentNameBytes = Arrays.copyOfRange(contentNameBytes, 0, contentNameBytes.length - 1);
-            }
-
-            return new String(contentNameBytes, "GBK");
-        } catch (UnsupportedEncodingException e) {
-            throw new SonsureException("根据byte截取字符串失败", e);
         }
+        if (count % 2 != 0) {
+            contentNameBytes = Arrays.copyOfRange(contentNameBytes, 0, contentNameBytes.length - 1);
+        }
+
+        return new String(contentNameBytes, charset);
     }
 
     public static String reflectionToString(Object obj) {
@@ -189,19 +176,5 @@ public class StrUtils {
 
     public static boolean endsWith(String str, String suffix) {
         return str != null && str.endsWith(suffix);
-    }
-
-    public static String substringBefore(String str, String separator) {
-        if (isBlank(str) || separator == null) {
-            return str;
-        }
-        if (separator.isEmpty()) {
-            return EMPTY;
-        }
-        int pos = str.indexOf(separator);
-        if (pos == INDEX_NOT_FOUND) {
-            return str;
-        }
-        return str.substring(0, pos);
     }
 }
