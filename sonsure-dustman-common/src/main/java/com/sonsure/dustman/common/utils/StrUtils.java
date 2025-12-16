@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 字符文本操作
@@ -44,7 +45,7 @@ public class StrUtils {
      * @param str the str
      * @return string
      */
-    public static String convertHtmlSpecialChars(String str) {
+    public static String escapeHtmlTags(String str) {
         if (isBlank(str)) {
             return "";
         }
@@ -59,7 +60,7 @@ public class StrUtils {
      * @param str the str
      * @return string
      */
-    public static String reverseHtmlSpecialChars(String str) {
+    public static String unescapeHtmlTags(String str) {
         if (isBlank(str)) {
             return "";
         }
@@ -142,6 +143,20 @@ public class StrUtils {
         return sb.toString();
     }
 
+    public static boolean equals(String a, String b) {
+        return Objects.equals(a, b);
+    }
+
+    public static boolean equalsIgnoreCase(String a, String b) {
+        if (Objects.equals(a, b)) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equalsIgnoreCase(b);
+    }
+
     public static boolean isBlank(String str) {
         return str == null || str.trim().isEmpty();
     }
@@ -176,5 +191,13 @@ public class StrUtils {
 
     public static boolean endsWith(String str, String suffix) {
         return str != null && str.endsWith(suffix);
+    }
+
+    public static boolean startsWithIgnoreCase(String str, String prefix) {
+        return str != null && str.toLowerCase().startsWith(prefix.toLowerCase());
+    }
+
+    public static boolean endsWithIgnoreCase(String str, String suffix) {
+        return str != null && str.toLowerCase().endsWith(suffix.toLowerCase());
     }
 }
