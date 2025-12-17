@@ -10,6 +10,7 @@
 package com.sonsure.dustman.common.validation;
 
 
+import com.sonsure.dustman.common.enums.BaseEnum;
 import com.sonsure.dustman.common.exception.ValidationException;
 
 import java.util.ArrayList;
@@ -43,47 +44,102 @@ public final class Verifier {
         return new Verifier();
     }
 
+    public Verifier notNull(Object value, String code, String message) {
+        ValidatorElement validatorElement = new ValidatorElement(value, code, message, new NotNullValidator());
+        validatorElements.add(validatorElement);
+        return this;
+    }
+
     public Verifier notNull(Object value, String message) {
-        ValidatorElement validatorElement = new ValidatorElement(value, message, new NotNullValidator());
+        return this.notNull(value, null, message);
+    }
+
+    public Verifier notNull(Object value, BaseEnum baseEnum) {
+        return this.notNull(value, baseEnum.getCode(), baseEnum.getName());
+    }
+
+    public Verifier notBlank(String value, String code, String message) {
+        ValidatorElement validatorElement = new ValidatorElement(value, code, message, new StringValidator());
         validatorElements.add(validatorElement);
         return this;
     }
 
     public Verifier notBlank(String value, String message) {
-        ValidatorElement validatorElement = new ValidatorElement(value, message, new StringValidator());
+        return this.notBlank(value, null, message);
+    }
+
+    public Verifier notBlank(String value, BaseEnum baseEnum) {
+        return this.notBlank(value, baseEnum.getCode(), baseEnum.getName());
+    }
+
+    public Verifier notEmpty(Object value, String code, String message) {
+        ValidatorElement validatorElement = new ValidatorElement(value, code, message, new NotEmptyValidator());
         validatorElements.add(validatorElement);
         return this;
     }
 
     public Verifier notEmpty(Object value, String message) {
-        ValidatorElement validatorElement = new ValidatorElement(value, message, new NotEmptyValidator());
+        return this.notEmpty(value, null, message);
+    }
+
+    public Verifier notEmpty(Object value, BaseEnum baseEnum) {
+        return this.notEmpty(value, baseEnum.getCode(), baseEnum.getName());
+    }
+
+    public Verifier eachNotNull(Collection<?> collection, String code, String message) {
+        ValidatorElement validatorElement = new ValidatorElement(collection, code, message, new CollectionEachNotNullValidator());
         validatorElements.add(validatorElement);
         return this;
     }
 
-    public Verifier eachElNotNull(Collection<?> collection, String message) {
-        ValidatorElement validatorElement = new ValidatorElement(collection, message, new CollectionEachNotNullValidator());
+    public Verifier eachNotNull(Collection<?> collection, String message) {
+        return this.eachNotNull(collection, null, message);
+    }
+
+    public Verifier eachNotNull(Collection<?> collection, BaseEnum baseEnum) {
+        return this.eachNotNull(collection, baseEnum.getCode(), baseEnum.getName());
+    }
+
+    public Verifier expectTrue(boolean value, String code, String message, Object... args) {
+        ValidatorElement validatorElement = new ValidatorElement(value, code, message, args, new BooleanValidator(true));
         validatorElements.add(validatorElement);
         return this;
     }
 
     public Verifier expectTrue(boolean value, String message, Object... args) {
-        ValidatorElement validatorElement = new ValidatorElement(value, message, args, new BooleanValidator(true));
+        return this.expectTrue(value, null, message, args);
+    }
+
+    public Verifier expectTrue(boolean value, BaseEnum baseEnum, Object... args) {
+        return this.expectTrue(value, baseEnum.getCode(), baseEnum.getName(), args);
+    }
+
+    public Verifier expectFalse(boolean value, String code, String message, Object... args) {
+        ValidatorElement validatorElement = new ValidatorElement(value, code, message, args, new BooleanValidator(false));
         validatorElements.add(validatorElement);
         return this;
     }
 
     public Verifier expectFalse(boolean value, String message, Object... args) {
-        ValidatorElement validatorElement = new ValidatorElement(value, message, args, new BooleanValidator(false));
+        return this.expectFalse(value, null, message, args);
+    }
+
+    public Verifier expectFalse(boolean value, BaseEnum baseEnum, Object... args) {
+        return this.expectFalse(value, baseEnum.getCode(), baseEnum.getName(), args);
+    }
+
+    public Verifier regexMatch(String value, String regex, String code, String message) {
+        ValidatorElement validatorElement = new ValidatorElement(new String[]{value, regex}, code, message, new RegexValidator());
         validatorElements.add(validatorElement);
         return this;
     }
 
     public Verifier regexMatch(String value, String regex, String message) {
-        ValidatorElement validatorElement = new ValidatorElement(new String[]{value, regex}, message,
-                new RegexValidator());
-        validatorElements.add(validatorElement);
-        return this;
+        return this.regexMatch(value, regex, null, message);
+    }
+
+    public Verifier regexMatch(String value, String regex, BaseEnum baseEnum) {
+        return this.regexMatch(value, regex, baseEnum.getCode(), baseEnum.getName());
     }
 
     public Verifier with(boolean b) {
@@ -105,7 +161,7 @@ public final class Verifier {
     }
 
     public Verifier errorMessage(String message) {
-        getLastValidationElement().setErrorMsg(message);
+        getLastValidationElement().setParsedErrorMessage(message);
         return this;
     }
 

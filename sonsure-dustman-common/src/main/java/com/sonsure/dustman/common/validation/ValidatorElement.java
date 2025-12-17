@@ -35,9 +35,14 @@ public class ValidatorElement {
     private Object value;
 
     /**
+     * 指定的错误码
+     */
+    private String errorCode;
+
+    /**
      * 指定的校验信息
      */
-    private String message;
+    private String errorMessage;
 
     /**
      * 消息需要格式化时的参数
@@ -45,35 +50,32 @@ public class ValidatorElement {
     private Object[] messageArgs;
 
     /**
-     * 指定的错误码
+     * 解析后的错误信息
      */
-    private String errorCode;
+    private String parsedErrorMessage;
 
-    /**
-     * 指定的错误信息
-     */
-    private String errorMsg;
-
-    /**
-     * create
-     *
-     * @param value     the value
-     * @param message   the message
-     * @param validator 验证器
-     */
-    public ValidatorElement(Object value, String message, Validator validator) {
-        this(value, message, null, validator);
+    public ValidatorElement(Object value, String errorMessage, Validator validator) {
+        this(value, null, errorMessage, validator);
     }
 
-    public ValidatorElement(Object value, String message, Object[] msgArgs, Validator validator) {
+    public ValidatorElement(Object value, String errorCode, String errorMessage, Validator validator) {
+        this(value, errorCode, errorMessage, null, validator);
+    }
+
+    public ValidatorElement(Object value, String errorMessage, Object[] msgArgs, Validator validator) {
+        this(value, null, errorMessage, msgArgs, validator);
+    }
+
+    public ValidatorElement(Object value, String errorCode, String errorMessage, Object[] msgArgs, Validator validator) {
         this.value = value;
-        this.message = message;
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
         this.messageArgs = msgArgs;
         this.validator = validator;
     }
 
     public ValidatorResult validate() {
-        ValidatorResult result = this.getValidator().validate(this.getValue(), this.getMessage(), this.getMessageArgs());
+        ValidatorResult result = this.getValidator().validate(this.getValue(), this.getErrorMessage(), this.getMessageArgs());
         ValidatorResult theResult = new ValidatorResult(result.isSuccess());
         if (!result.isSuccess()) {
             //为空，自动生成一个唯一code
@@ -84,11 +86,11 @@ public class ValidatorElement {
                         .append(UUIDUtils.getUUID16(result.getMessage().getBytes()))
                         .toString();
             }
-            if (StrUtils.isBlank(errorMsg)) {
-                this.errorMsg = result.getMessage();
+            if (StrUtils.isBlank(parsedErrorMessage)) {
+                this.parsedErrorMessage = result.getMessage();
             }
             theResult.setCode(this.errorCode);
-            theResult.setMessage(this.errorMsg);
+            theResult.setMessage(this.parsedErrorMessage);
         }
         return theResult;
     }

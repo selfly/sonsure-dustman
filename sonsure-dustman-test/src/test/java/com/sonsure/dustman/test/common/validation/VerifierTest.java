@@ -103,17 +103,17 @@ public class VerifierTest {
         String message = "不能有null元素";
 
         Exception ex1 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().eachElNotNull(null, message).validate();
+            Verifier.init().eachNotNull(null, message).validate();
         });
         Assertions.assertEquals(message, ex1.getMessage());
 
         ArrayList<Object> list = new ArrayList<>();
         list.add(111);
-        Verifier.init().eachElNotNull(list, message).validate();
+        Verifier.init().eachNotNull(list, message).validate();
 
         list.add(null);
         Exception ex2 = Assertions.assertThrows(ValidationException.class, () -> {
-            Verifier.init().eachElNotNull(list, message).validate();
+            Verifier.init().eachNotNull(list, message).validate();
         });
         Assertions.assertEquals(message, ex2.getMessage());
     }
