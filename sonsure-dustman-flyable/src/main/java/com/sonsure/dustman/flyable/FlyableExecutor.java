@@ -27,21 +27,21 @@ import java.util.stream.Collectors;
 @Getter
 public class FlyableExecutor {
 
-    private static final String FLYABLE_HISTORY = "flyable_history";
     public static final String FLYABLE_EXECUTION_GROUP = "flyable";
-    public static final String FLYABLE_PREFIX_VAR = "flyablePrefix";
+    public static final String FLYABLE_TABLE_NAME = "flyableTableName";
 
     private static final String UNKNOWN_EXECUTION_GROUP = "unknown";
 
     private final JdbcDao jdbcDao;
-    private String flyablePrefix = "";
     private boolean enableChecksum = true;
+    private final String flyableTableName;
     private final MigrationResourceResolver migrationResourceResolver = new ClassPathMigrationResourcePatternResolver();
     private final Map<String, List<MigrationTask>> migrationTasks = new HashMap<>(8);
     private final Map<Integer, String> executionGroupOrder = new TreeMap<>();
 
     public FlyableExecutor(JdbcDao jdbcDao) {
         this.jdbcDao = jdbcDao;
+        this.flyableTableName = jdbcDao.getJdbcContext().getMappingHandler().getTable(FlyableHistory.class, Collections.emptyList());
         this.addExecutionGroupOrder(0, FLYABLE_EXECUTION_GROUP);
         this.addExecutionGroupOrder(10000, UNKNOWN_EXECUTION_GROUP);
     }
@@ -81,7 +81,7 @@ public class FlyableExecutor {
                 if (!historyTableExists && task instanceof DatabaseMigrationTask) {
                     DatabaseMigrationTask databaseMigrationTask = (DatabaseMigrationTask) task;
                     if (databaseMigrationTask.support(this.getDatabaseProduct())) {
-                        historyTableExists = databaseMigrationTask.isHistoryTableExists(jdbcDao, this.getFlyablePrefix() + FLYABLE_HISTORY);
+                        historyTableExists = databaseMigrationTask.isHistoryTableExists(jdbcDao, this.flyableTableName);
                     }
                 }
                 List<MigrationResource> migrationResources = this.migrationResourceResolver.resolveMigrationResources(task.getResourcePattern());
@@ -131,7 +131,7 @@ public class FlyableExecutor {
         if (historyTableExists) {
             List<FlyableHistory> list = jdbcDao.selectFrom(FlyableHistory.class)
                     .where(FlyableHistory::getMigrationGroup, resource.getGroup())
-                    .orderBy(FlyableHistory::getFlyableHistoryId, OrderBy.DESC)
+                    .orderBy(FlyableHistory::getFlyableId, OrderBy.DESC)
                     .findList(FlyableHistory.class);
             if (list != null && !list.isEmpty()) {
                 FlyableHistory flyableHistory = list.iterator().next();
@@ -164,7 +164,7 @@ public class FlyableExecutor {
         long begin = System.currentTimeMillis();
         try {
             if (FLYABLE_EXECUTION_GROUP.equals(resource.getGroup())) {
-                resource.addVariable(FLYABLE_PREFIX_VAR, this.getFlyablePrefix());
+                resource.addVariable(FLYABLE_TABLE_NAME, this.flyableTableName);
             }
             migrationTask.execute(jdbcDao, resource);
             long end = System.currentTimeMillis();

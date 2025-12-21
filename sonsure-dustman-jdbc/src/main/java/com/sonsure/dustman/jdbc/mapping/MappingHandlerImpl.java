@@ -97,7 +97,7 @@ public class MappingHandlerImpl implements MappingHandler {
             tableName = CommandBuildHelper.getTableAnnotationName(annotation);
         } else {
             String tablePreFix = this.getTablePrefix(entityClass.getName());
-            tableName = tablePreFix + NameUtils.getUnderlineName(entityClass.getSimpleName());
+            tableName = tablePreFix + NameUtils.getLowerUnderlineName(entityClass.getSimpleName());
         }
         return tableName;
     }
@@ -122,7 +122,7 @@ public class MappingHandlerImpl implements MappingHandler {
         if (columnAnnotation != null) {
             return fieldWrapper.getFieldAnnotationColumn();
         }
-        return NameUtils.getUnderlineName(fieldName);
+        return NameUtils.getLowerUnderlineName(fieldName);
     }
 
     @Override

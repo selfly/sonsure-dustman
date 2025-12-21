@@ -16,7 +16,6 @@ public class FlyableInitializer implements InitializingBean, Ordered {
     @Override
     public void afterPropertiesSet() throws Exception {
         FlyableExecutor flyableExecutor = new FlyableExecutor(jdbcDao);
-        flyableExecutor.setFlyablePrefix("sd_");
         flyableExecutor.migrate();
     }
 

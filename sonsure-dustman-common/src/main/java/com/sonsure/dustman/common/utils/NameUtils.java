@@ -134,7 +134,12 @@ public class NameUtils {
      * @param name the name
      * @return underline name
      */
-    public static String getUnderlineName(String name) {
+    public static String getLowerUnderlineName(String name) {
+
+        return getLowerDelimiterName(name, "_");
+    }
+
+    public static String getUpperUnderlineName(String name) {
 
         return getUpperDelimiterName(name, "_");
     }

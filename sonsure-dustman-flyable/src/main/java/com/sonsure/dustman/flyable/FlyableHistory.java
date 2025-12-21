@@ -1,5 +1,6 @@
 package com.sonsure.dustman.flyable;
 
+import com.sonsure.dustman.jdbc.annotation.Id;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 public class FlyableHistory {
 
-    private Long flyableHistoryId;
+    @Id
+    private Long flyableId;
     private String migrationGroup;
     private String version;
     private String description;
