@@ -10,12 +10,10 @@
 package com.sonsure.dustman.common.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 字符文本操作
@@ -132,9 +130,15 @@ public class StrUtils {
 
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             field.setAccessible(true);
             try {
-                sb.append("  ").append(field.getName()).append("=").append(field.get(obj)).append(System.lineSeparator());
+                Object fieldVal = Optional.ofNullable(field.get(obj))
+                        .map(Object::toString)
+                        .orElse("null");
+                sb.append("  ").append(field.getName()).append("=").append(fieldVal).append(System.lineSeparator());
             } catch (IllegalAccessException e) {
                 sb.append("  ").append(field.getName()).append("=N/A (Access Denied)").append(System.lineSeparator());
             }
