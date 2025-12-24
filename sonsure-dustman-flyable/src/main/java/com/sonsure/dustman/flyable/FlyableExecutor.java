@@ -36,7 +36,9 @@ public class FlyableExecutor {
     private boolean enableChecksum = true;
     private final String flyableTableName;
     private final MigrationResourceResolver migrationResourceResolver = new ClassPathMigrationResourcePatternResolver();
-    private final Map<String, List<MigrationTask>> migrationTasks = new HashMap<>(8);
+    //任务组 TreeMap不区分大小写
+    private final Map<String, List<MigrationTask>> migrationTasks = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    //执行顺序 TreeMap自动排序
     private final Map<Integer, String> executionGroupOrder = new TreeMap<>();
 
     public FlyableExecutor(JdbcDao jdbcDao) {
