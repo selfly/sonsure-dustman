@@ -54,7 +54,7 @@ public class MappingHandlerImpl implements MappingHandler {
     /**
      * 表前缀定义, 如 com.sonsure 开头的class表名统一加ss_  com.sonsure.User -> ss_user
      */
-    protected Map<String, String> tablePrefixMapping = new ConcurrentHashMap<>(16);
+    protected Map<String, String> tablePrefixMapping = new LinkedHashMap<>(16);
 
     /**
      * 类名称映射
