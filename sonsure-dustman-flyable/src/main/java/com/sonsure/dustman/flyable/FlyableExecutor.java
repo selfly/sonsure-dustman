@@ -59,6 +59,19 @@ public class FlyableExecutor {
         this.addMigrationTask(migrationTask, UNKNOWN_EXECUTION_GROUP);
     }
 
+    public void sortAllGroupTask(Comparator<? super MigrationTask> comparator) {
+        for (Map.Entry<String, List<MigrationTask>> entry : this.getMigrationTasks().entrySet()) {
+            entry.getValue().sort(comparator);
+        }
+    }
+
+    public void sortGroupTask(String group, Comparator<? super MigrationTask> comparator) {
+        List<MigrationTask> migrationTasks = this.getMigrationTasks().get(group);
+        if (migrationTasks != null) {
+            migrationTasks.sort(comparator);
+        }
+    }
+
     public void addMigrationTask(MigrationTask migrationTask, String executionGroup) {
         List<MigrationTask> tasks = this.migrationTasks.computeIfAbsent(executionGroup, k -> new ArrayList<>(8));
         tasks.add(migrationTask);
