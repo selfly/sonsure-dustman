@@ -66,8 +66,24 @@ public interface BaseDynamicEnum extends BaseEnum {
         return getEnumItem().getName();
     }
 
+    /**
+     * Gets orig name.
+     *
+     * @return the orig name
+     */
     default String getOrigName() {
         return getEnumItem().getOrigName();
     }
+
+    /**
+     * To dynamic enum t.
+     *
+     * @param <T> the type parameter
+     * @return the t
+     */
+    default <T extends DynamicEnum<?>> T toDynamicEnum() {
+        return DynamicEnumItem.of(this);
+    }
+
 
 }
