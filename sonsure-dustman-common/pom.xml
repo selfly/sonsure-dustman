@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>sonsure-dustman-common</artifactId>
+    <name>sonsure-dustman-common</name>
 
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}

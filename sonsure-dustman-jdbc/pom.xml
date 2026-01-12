@@ -19,6 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sonsure-dustman-jdbc</artifactId>
+    <name>sonsure-dustman-jdbc</name>
 
     <properties>
         <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}
