@@ -14,6 +14,7 @@ import com.sonsure.dustman.jdbc.command.batch.ParameterizedSetter;
 import com.sonsure.dustman.jdbc.command.build.ExecutableCmd;
 import com.sonsure.dustman.jdbc.command.build.GenerateKey;
 import com.sonsure.dustman.jdbc.persist.AbstractPersistExecutor;
+import com.sonsure.dustman.jdbc.persist.DataSourceSupport;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.*;
@@ -22,6 +23,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.NonNull;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,12 +36,17 @@ import java.util.Optional;
  * @author liyd
  * @since 17/4/12
  */
-public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor {
+public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor implements DataSourceSupport {
 
     private final JdbcOperations jdbcOperations;
 
     public JdbcTemplatePersistExecutor(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        return ((JdbcTemplate) jdbcOperations).getDataSource();
     }
 
     @Override

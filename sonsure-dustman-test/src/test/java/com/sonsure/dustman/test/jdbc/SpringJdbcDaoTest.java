@@ -17,7 +17,9 @@ import com.sonsure.dustman.jdbc.command.build.OrderBy;
 import com.sonsure.dustman.jdbc.command.build.SqlOperator;
 import com.sonsure.dustman.jdbc.command.entity.Select;
 import com.sonsure.dustman.jdbc.config.JdbcContext;
+import com.sonsure.dustman.jdbc.persist.DataSourceSupport;
 import com.sonsure.dustman.jdbc.persist.JdbcDao;
+import com.sonsure.dustman.jdbc.persist.PersistExecutor;
 import com.sonsure.dustman.test.basic.BaseTest;
 import com.sonsure.dustman.test.config.DustmanTestConfig;
 import com.sonsure.dustman.test.jdbc.extension.executor.CustomResultHandler;
@@ -37,6 +39,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
+import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -82,6 +85,13 @@ public class SpringJdbcDaoTest extends BaseTest {
             ps.setObject(7, argument.getGmtCreate());
         });
         Assertions.assertNotNull(result);
+    }
+
+    @Test
+    public void getDataSource() {
+        DataSourceSupport persistExecutor = (DataSourceSupport) jdbcDao.getJdbcContext().getPersistExecutor();
+        DataSource dataSource = persistExecutor.getDataSource();
+        Assertions.assertNotNull(dataSource);
     }
 
     @Test
