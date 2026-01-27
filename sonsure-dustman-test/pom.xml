@@ -14,10 +14,11 @@
     <parent>
         <artifactId>sonsure-dustman</artifactId>
         <groupId>com.sonsure</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <name>sonsure-dustman-test</name>
     <artifactId>sonsure-dustman-test</artifactId>
     <properties>
         <maven.install.skip>true</maven.install.skip>
@@ -104,5 +105,30 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <!-- 绑定到deploy阶段，确保生效 -->
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
