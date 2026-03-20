@@ -173,6 +173,22 @@ public class SpringJdbcDaoTest extends BaseTest {
         Assertions.assertEquals(10, page.getList().size());
     }
 
+    @Test
+    public void findPageDisableCount() {
+        UserInfo user = new UserInfo();
+        user.setPageSize(10);
+        user.setPageNum(6);
+        Page<UserInfo> page = jdbcDao
+                .selectFrom(UserInfo.class)
+                .paginate(user)
+                .disableCount()
+                .findPage();
+        Assertions.assertNotNull(page);
+        Assertions.assertEquals(user.getPageNum(), page.getPagination().getPageNum());
+        Assertions.assertEquals(user.getPageSize(), page.getPagination().getPageSize());
+        Assertions.assertEquals(0, page.getList().size());
+    }
+
 
     @Test
     public void jdbcDaoFindPageEntityNotNullFieldCondition() {

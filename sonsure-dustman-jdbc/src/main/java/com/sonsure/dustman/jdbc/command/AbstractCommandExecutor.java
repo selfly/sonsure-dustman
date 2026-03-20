@@ -62,7 +62,7 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
             throw new SonsureJdbcException("查询分页列表请设置分页信息");
         }
         String dialect = this.getDatabaseProduct();
-        long count = Long.MAX_VALUE;
+        int count = Integer.MAX_VALUE;
         if (!executableCmd.isDisableCountQuery()) {
             String countCommand = getJdbcContext().getPageHandler().getCountCommand(executableCmd.getCommand(), dialect);
             ExecutableCmd countExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
@@ -70,9 +70,9 @@ public abstract class AbstractCommandExecutor<E extends CommandExecutor<E>> impl
             countExecutableCmd.setExecutionType(ExecutionType.FIND_ONE_FOR_SCALAR);
             countExecutableCmd.setResultType(Long.class);
             Object result = getJdbcContext().getPersistExecutor().execute(countExecutableCmd);
-            count = (Long) result;
+            count = ((Number) result).intValue();
         }
-        pagination.setTotalItems((int) count);
+        pagination.setTotalItems(count);
         String pageCommand = getJdbcContext().getPageHandler().getPageCommand(executableCmd.getCommand(), pagination, dialect);
         ExecutableCmd pageExecutableCmd = BeanKit.copyProperties(new ExecutableCmd(), executableCmd);
         pageExecutableCmd.setCommand(pageCommand);
