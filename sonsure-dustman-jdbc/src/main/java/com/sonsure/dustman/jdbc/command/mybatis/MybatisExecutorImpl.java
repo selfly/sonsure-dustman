@@ -44,7 +44,7 @@ public class MybatisExecutorImpl extends AbstractSimpleCommandExecutor<MybatisEx
         @Override
         public void customize(ExecutableCmdBuilder executableCmdBuilder) {
 
-            SqlSessionFactory sqlSessionFactory = executableCmdBuilder.getJdbcContext().getMybatisSqlSessionFactory();
+            SqlSessionFactory sqlSessionFactory = (SqlSessionFactory) executableCmdBuilder.getJdbcContext().getMybatisSqlSessionFactory();
             if (sqlSessionFactory == null) {
                 throw new SonsureJdbcException("使用Mybatis请先设置MybatisSqlSessionFactory");
             }

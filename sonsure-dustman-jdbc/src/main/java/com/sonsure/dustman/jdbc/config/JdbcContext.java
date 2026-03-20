@@ -16,7 +16,6 @@ import com.sonsure.dustman.jdbc.mapping.MappingHandler;
 import com.sonsure.dustman.jdbc.page.PageHandler;
 import com.sonsure.dustman.jdbc.persist.KeyGenerator;
 import com.sonsure.dustman.jdbc.persist.PersistExecutor;
-import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;
 
@@ -82,10 +81,11 @@ public interface JdbcContext {
 
     /**
      * 获取mybatis SqlSessionFactory
+     * object避免启动时的ClassNotFound强依赖
      *
      * @return mybatis sql session factory
      */
-    SqlSessionFactory getMybatisSqlSessionFactory();
+    Object getMybatisSqlSessionFactory();
 
     /**
      * command大小写

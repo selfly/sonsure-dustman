@@ -21,7 +21,6 @@ import com.sonsure.dustman.jdbc.persist.KeyGenerator;
 import com.sonsure.dustman.jdbc.persist.PersistExecutor;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;
 
@@ -71,9 +70,9 @@ public class JdbcContextImpl implements JdbcContext {
     protected List<PersistInterceptor> persistInterceptors;
 
     /**
-     * mybatis SqlSessionFactory
+     * mybatis SqlSessionFactory object避免启动时的ClassNotFound强依赖
      */
-    protected SqlSessionFactory mybatisSqlSessionFactory;
+    protected Object mybatisSqlSessionFactory;
 
     /**
      * command大小写
