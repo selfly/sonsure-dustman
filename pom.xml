@@ -16,7 +16,7 @@
     <groupId>com.sonsure</groupId>
     <artifactId>sonsure-dustman</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <name>sonsure-dustman</name>
     <description>Java Jdbc Framework.</description>
