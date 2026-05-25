@@ -371,15 +371,14 @@ public class SpringJdbcDaoTest extends BaseTest {
             user.setGmtCreate(new Date());
             jdbcDao.executeInsert(user);
         }
-        try {
-            jdbcDao.selectFrom(UserInfo.class)
-                    .where("loginName", "name-19")
-                    .or()
-                    .condition("userAge", 21)
-                    .findOne(UserInfo.class);
-        } catch (IncorrectResultSizeDataAccessException e) {
-            Assertions.assertEquals("Incorrect result size: expected 1, actual 2", e.getMessage());
-        }
+        IncorrectResultSizeDataAccessException e = Assertions.assertThrows(IncorrectResultSizeDataAccessException.class, () ->
+                jdbcDao.selectFrom(UserInfo.class)
+                        .where("loginName", "name-19")
+                        .or()
+                        .condition("userAge", 21)
+                        .findOne(UserInfo.class)
+        );
+        Assertions.assertEquals("Incorrect result size: expected 1, actual 2", e.getMessage());
     }
 
     @Test
@@ -722,17 +721,16 @@ public class SpringJdbcDaoTest extends BaseTest {
     @Test
     public void updatePkNull() {
 
-        try {
-            UserInfo user = new UserInfo();
-            user.setLoginName("newName22");
-            user.setPassword("abc");
-            jdbcDao.update(UserInfo.class)
-                    .setForBean(user)
-                    .whereForBeanPrimaryKey(user)
-                    .execute();
-        } catch (Exception e) {
-            Assertions.assertEquals("主键属性值不能为空:userInfoId", e.getMessage());
-        }
+        UserInfo user = new UserInfo();
+        user.setLoginName("newName22");
+        user.setPassword("abc");
+        Exception e = Assertions.assertThrows(Exception.class, () ->
+                jdbcDao.update(UserInfo.class)
+                        .setForBean(user)
+                        .whereForBeanPrimaryKey(user)
+                        .execute()
+        );
+        Assertions.assertEquals("主键属性值不能为空:userInfoId", e.getMessage());
     }
 
     @Test

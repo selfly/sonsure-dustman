@@ -357,8 +357,11 @@ public class ClassUtils {
             Class<?>[] parameterTypes = method.getParameterTypes();
             for (int i = 0; i < value.length; i++) {
                 if (value[i] == null) {
+                    if (parameterTypes[i].isPrimitive()) {
+                        throw new IllegalArgumentException("无法为基本类型参数 '" + parameterTypes[i].getName() + "' 设置 null 值, 方法: " + method.getName());
+                    }
                     parameters[i] = null;
-                } else if (parameterTypes[i] == value[i].getClass()) {
+                } else if (parameterTypes[i].isAssignableFrom(value[i].getClass())) {
                     parameters[i] = value[i];
                 } else if (parameterTypes[i] == Boolean.class || parameterTypes[i] == boolean.class) {
                     parameters[i] = Boolean.parseBoolean(String.valueOf(value[i]));
@@ -366,6 +369,17 @@ public class ClassUtils {
                     parameters[i] = Integer.valueOf(String.valueOf(value[i]));
                 } else if (parameterTypes[i] == Long.class || parameterTypes[i] == long.class) {
                     parameters[i] = Long.valueOf(String.valueOf(value[i]));
+                } else if (parameterTypes[i] == Short.class || parameterTypes[i] == short.class) {
+                    parameters[i] = Short.valueOf(String.valueOf(value[i]));
+                } else if (parameterTypes[i] == Byte.class || parameterTypes[i] == byte.class) {
+                    parameters[i] = Byte.valueOf(String.valueOf(value[i]));
+                } else if (parameterTypes[i] == Float.class || parameterTypes[i] == float.class) {
+                    parameters[i] = Float.valueOf(String.valueOf(value[i]));
+                } else if (parameterTypes[i] == Double.class || parameterTypes[i] == double.class) {
+                    parameters[i] = Double.valueOf(String.valueOf(value[i]));
+                } else if (parameterTypes[i] == Character.class || parameterTypes[i] == char.class) {
+                    String str = String.valueOf(value[i]);
+                    parameters[i] = !str.isEmpty() ? str.charAt(0) : null;
                 } else {
                     parameters[i] = value[i];
                 }
@@ -398,7 +412,7 @@ public class ClassUtils {
      * @param method the method
      */
     public static void methodAccessible(Method method) {
-        if (!Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
+        if (!Modifier.isPublic(method.getModifiers())) {
             method.setAccessible(true);
         }
     }

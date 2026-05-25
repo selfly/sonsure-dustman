@@ -9,6 +9,7 @@
 
 package com.sonsure.dustman.common.validation;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class NotEmptyValidator implements Validator {
             Map<?, ?> map = (Map<?, ?>) value;
             validatorResult.setSuccess(!map.isEmpty());
         } else if (value.getClass().isArray()) {
-            validatorResult.setSuccess(((Object[]) value).length > 0);
+            validatorResult.setSuccess(Array.getLength(value) > 0);
         } else {
             throw new UnsupportedOperationException("不支持的参数类型");
         }

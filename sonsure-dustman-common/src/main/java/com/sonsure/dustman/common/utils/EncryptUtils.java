@@ -439,8 +439,8 @@ public class EncryptUtils {
                     result.append(BCRYPT_ENCODE_CHARS.charAt((v >>> 6) & 0x3F));
                     result.append(BCRYPT_ENCODE_CHARS.charAt(v & 0x3F));
                 }
-                // 处理字节21, 22: 2字节 -> 3个6位字符，得到3字符
-                int v2 = ((bytes[21] & 0xFF) << 16) | ((bytes[22] & 0xFF) << 8);
+                // 处理字节21, 22, 23: 3字节 -> 取高位18位 -> 3字符
+                int v2 = ((bytes[21] & 0xFF) << 16) | ((bytes[22] & 0xFF) << 8) | (bytes[23] & 0xFF);
                 result.append(BCRYPT_ENCODE_CHARS.charAt((v2 >>> 18) & 0x3F));
                 result.append(BCRYPT_ENCODE_CHARS.charAt((v2 >>> 12) & 0x3F));
                 result.append(BCRYPT_ENCODE_CHARS.charAt((v2 >>> 6) & 0x3F));

@@ -9,8 +9,8 @@
 
 package com.sonsure.dustman.jdbc.page;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author liyd
@@ -20,7 +20,12 @@ public abstract class AbstractPageHandler implements PageHandler {
     /**
      * The Sql cache.
      */
-    private final Map<String, String> sqlCache = new ConcurrentHashMap<>();
+    private final Map<String, String> sqlCache = new LinkedHashMap<String, String>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+            return size() > 1024;
+        }
+    };
 
     protected CountSqlParser countSqlParser = new CountSqlParser();
 

@@ -77,7 +77,7 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
         Object result = getJdbcContext().getPersistExecutor().execute(executableCmd);
-        return result != null ? (Long) result : 0L;
+        return result != null ? ((Number) result).longValue() : 0L;
     }
 
     @Override

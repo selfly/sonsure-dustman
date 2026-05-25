@@ -13,6 +13,7 @@ import com.sonsure.dustman.common.utils.ClassUtils;
 import com.sonsure.dustman.jdbc.command.AbstractCommandExecutor;
 import com.sonsure.dustman.jdbc.command.build.*;
 import com.sonsure.dustman.jdbc.config.JdbcContext;
+import com.sonsure.dustman.jdbc.exception.SonsureJdbcException;
 
 import java.util.Map;
 
@@ -95,6 +96,9 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
         EntityClassFieldWrapper pkField = uniqueModelClass.getPrimaryKeyField();
         String fieldName = pkField.getFieldName();
         Object value = ClassUtils.getFieldValue(bean, fieldName);
+        if (value == null) {
+            throw new SonsureJdbcException("主键属性值不能为空:" + fieldName);
+        }
         return this.where(fieldName, value);
     }
 

@@ -2,14 +2,14 @@ package com.sonsure.dustman.jdbc.command.build;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author selfly
  */
 public class CacheEntityClassWrapper {
 
-    private static final Map<Class<?>, EntityClassWrapper> CACHE = new WeakHashMap<>();
+    private static final Map<Class<?>, EntityClassWrapper> CACHE = new ConcurrentHashMap<>(32);
 
     private final EntityClassWrapper entityClassWrapper;
 
