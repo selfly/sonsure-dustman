@@ -206,7 +206,7 @@ public class SelectImpl<M> extends AbstractConditionCommandExecutor<Select<M>> i
         countExecutableCmd.setCommand(countCommand);
         countExecutableCmd.setResultType(Long.class);
         Object result = persistExecutor.execute(countExecutableCmd);
-        return (Long) result;
+        return result != null ? ((Number) result).longValue() : 0L;
     }
 
 

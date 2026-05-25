@@ -46,7 +46,10 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor impleme
 
     @Override
     public DataSource getDataSource() {
-        return ((JdbcTemplate) jdbcOperations).getDataSource();
+        if (jdbcOperations instanceof JdbcTemplate) {
+            return ((JdbcTemplate) jdbcOperations).getDataSource();
+        }
+        return null;
     }
 
     @Override
@@ -103,7 +106,9 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor impleme
 
     @Override
     public Object findOneForScalar(ExecutableCmd executableCmd) {
-        return jdbcOperations.queryForObject(executableCmd.getCommand(), executableCmd.getResultType(), executableCmd.getParsedParameterValues().toArray());
+        //采用list方式查询，当记录不存在时返回null而不会抛出异常,多于一条时会抛异常
+        List<?> list = jdbcOperations.query(executableCmd.getCommand(), new SingleColumnRowMapper<>(executableCmd.getResultType()), executableCmd.getParsedParameterValues().toArray());
+        return DataAccessUtils.singleResult(list);
     }
 
     @Override

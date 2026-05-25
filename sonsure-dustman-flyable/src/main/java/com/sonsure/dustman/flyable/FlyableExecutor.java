@@ -131,13 +131,16 @@ public class FlyableExecutor {
                 this.executeResource(resource, historyTableExists, migrationTask);
             }
         }
-        //未指定顺序的初始化
-        for (Map.Entry<String, List<MigrationResource>> entry : resourceMap.entrySet()) {
-            List<MigrationResource> taskResources = entry.getValue();
-            for (MigrationResource taskResource : taskResources) {
-                this.executeResource(taskResource, historyTableExists, migrationTask);
-            }
-        }
+        //未指定顺序的初始化，按 group 名称排序保证确定性
+        resourceMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    List<MigrationResource> taskResources = entry.getValue();
+                    taskResources.sort((o1, o2) -> VersionUtils.compareVersion(o1.getVersion(), o2.getVersion()));
+                    for (MigrationResource taskResource : taskResources) {
+                        this.executeResource(taskResource, historyTableExists, migrationTask);
+                    }
+                });
     }
 
     protected void executeResource(MigrationResource resource, boolean historyTableExists, MigrationTask migrationTask) {
@@ -187,7 +190,12 @@ public class FlyableExecutor {
         } catch (Exception e) {
             log.error("执行 Migration Task 失败:", e);
             flyableHistory.setSuccess(false);
-            jdbcDao.executeInsert(flyableHistory);
+            try {
+                jdbcDao.executeInsert(flyableHistory);
+            } catch (Exception insertEx) {
+                log.error("记录 FlyableHistory 失败:", insertEx);
+                e.addSuppressed(insertEx);
+            }
             throw new FlyableException(e);
         }
         flyableHistory.setSuccess(true);

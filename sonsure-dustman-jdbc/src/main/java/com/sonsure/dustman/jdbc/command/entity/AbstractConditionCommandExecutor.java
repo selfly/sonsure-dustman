@@ -59,12 +59,12 @@ public abstract class AbstractConditionCommandExecutor<E extends ConditionComman
 
     @Override
     public E condition(String field, Object value) {
-        return this.condition(field, SqlOperator.EQ, value);
+        return this.condition(field, value == null ? SqlOperator.IS : SqlOperator.EQ, value);
     }
 
     @Override
     public <T> E condition(GetterFunction<T> getter, Object value) {
-        return this.condition(lambda2Field(getter), SqlOperator.EQ, value);
+        return this.condition(lambda2Field(getter), value == null ? SqlOperator.IS : SqlOperator.EQ, value);
     }
 
     @Override

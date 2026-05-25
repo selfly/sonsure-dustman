@@ -11,7 +11,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class JdbcTemplateDaoFactoryBean extends JdbcContextImpl implements FactoryBean<JdbcDao> {
 
     @Override
-    public JdbcDao getObject() throws Exception {
+    public JdbcDao getObject() {
         JdbcDaoImpl jdbcDao = new JdbcDaoImpl();
         jdbcDao.setJdbcContext(this);
         return jdbcDao;

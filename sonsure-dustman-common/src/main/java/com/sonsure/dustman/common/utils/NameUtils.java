@@ -51,11 +51,14 @@ public class NameUtils {
             return null;
         }
         //去掉前面的非字母
-        char c = name.charAt(0);
-        while (!((c >= 65 && c <= 90) || (c >= 97 && c <= 122))) {
-            name = name.substring(1);
-            c = name.charAt(0);
+        int idx = 0;
+        while (idx < name.length() && !Character.isLetter(name.charAt(idx))) {
+            idx++;
         }
+        if (idx >= name.length()) {
+            return name;
+        }
+        name = name.substring(idx);
         String firstChar = name.substring(0, 1).toUpperCase();
         return firstChar + name.substring(1);
     }
@@ -71,11 +74,14 @@ public class NameUtils {
             return null;
         }
         //去掉前面的非字母
-        char c = name.charAt(0);
-        while (!((c >= 65 && c <= 90) || (c >= 97 && c <= 122))) {
-            name = name.substring(1);
-            c = name.charAt(0);
+        int idx = 0;
+        while (idx < name.length() && !Character.isLetter(name.charAt(idx))) {
+            idx++;
         }
+        if (idx >= name.length()) {
+            return name;
+        }
+        name = name.substring(idx);
         String firstChar = name.substring(0, 1).toLowerCase();
         return firstChar + name.substring(1);
     }
@@ -103,13 +109,19 @@ public class NameUtils {
         }
         name = name.toLowerCase();
         //去掉前面的 delimiter
-        while (name.charAt(0) == delimiter) {
-            name = name.substring(1);
+        int start = 0;
+        while (start < name.length() && name.charAt(start) == delimiter) {
+            start++;
         }
         //去掉后面的 delimiter
-        while (name.charAt(name.length() - 1) == delimiter) {
-            name = name.substring(0, name.length() - 1);
+        int end = name.length() - 1;
+        while (end >= start && name.charAt(end) == delimiter) {
+            end--;
         }
+        if (start > end) {
+            return "";
+        }
+        name = name.substring(start, end + 1);
 
         StringBuilder sb = new StringBuilder();
 
@@ -119,7 +131,9 @@ public class NameUtils {
 
             if (c == delimiter) {
                 i++;
-                sb.append(Character.toUpperCase(name.charAt(i)));
+                if (i < name.length()) {
+                    sb.append(Character.toUpperCase(name.charAt(i)));
+                }
                 continue;
             }
             sb.append(c);
@@ -202,8 +216,10 @@ public class NameUtils {
      * @return string
      */
     public static String createUniqueFileName(String fileName) {
-
         int index = fileName.lastIndexOf(".");
+        if (index == -1) {
+            return UUIDUtils.getUUID16() + fileName;
+        }
         String suffix = fileName.substring(index);
         return UUIDUtils.getUUID16() + suffix;
     }
@@ -217,6 +233,9 @@ public class NameUtils {
      */
     public static String createEndSuffixFileName(String fileName, String endSuffix) {
         int index = fileName.lastIndexOf(".");
+        if (index == -1) {
+            return fileName + endSuffix;
+        }
         String preFileName = fileName.substring(0, index);
         String suffix = fileName.substring(index);
         return preFileName + endSuffix + suffix;

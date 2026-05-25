@@ -76,7 +76,8 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.FIND_ONE_FOR_SCALAR);
         this.getExecutableCmdBuilder().resultType(Long.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Long) getJdbcContext().getPersistExecutor().execute(executableCmd);
+        Object result = getJdbcContext().getPersistExecutor().execute(executableCmd);
+        return result != null ? (Long) result : 0L;
     }
 
     @Override
@@ -143,7 +144,8 @@ public abstract class AbstractSimpleCommandExecutor<C extends SimpleCommandExecu
         this.getExecutableCmdBuilder().executionType(ExecutionType.UPDATE);
         this.getExecutableCmdBuilder().resultType(Integer.class);
         ExecutableCmd executableCmd = this.getExecutableCmdBuilder().build();
-        return (Integer) getJdbcContext().getPersistExecutor().execute(executableCmd);
+        Object result = getJdbcContext().getPersistExecutor().execute(executableCmd);
+        return result != null ? (Integer) result : 0;
     }
 
     @Override

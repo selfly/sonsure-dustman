@@ -11,6 +11,7 @@ import com.sonsure.dustman.jdbc.config.JdbcContext;
 import com.sonsure.dustman.jdbc.exception.SonsureJdbcException;
 import lombok.Getter;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,7 +94,7 @@ public class ExecutableCmdBuilder {
     public ExecutableCmdBuilder intoValues(Object... values) {
         simpleSQL.intoValues(PARAM_PLACEHOLDER);
         this.processStatementParam(values);
-        return null;
+        return this;
     }
 
     public ExecutableCmdBuilder select(String... columns) {
@@ -349,7 +350,7 @@ public class ExecutableCmdBuilder {
 
     public Map<String, Object> getParameterMap() {
         return this.cmdParameters.stream()
-                .collect(Collectors.toMap(CmdParameter::getName, CmdParameter::getValue));
+                .collect(Collectors.toMap(CmdParameter::getName, CmdParameter::getValue, (v1, v2) -> v1));
     }
 
     @SuppressWarnings("unchecked")
@@ -361,10 +362,9 @@ public class ExecutableCmdBuilder {
             this.addParameters((Map<String, ?>) params);
         } else {
             if (params.getClass().isArray()) {
-                Object[] valArray = (Object[]) params;
-                for (Object val : valArray) {
-                    //这里的参数名用不到，随机生成
-                    this.addParameter(UUIDUtils.getUUID8(), val);
+                int length = Array.getLength(params);
+                for (int i = 0; i < length; i++) {
+                    this.addParameter(UUIDUtils.getUUID8(), Array.get(params, i));
                 }
             } else {
                 this.addParameter(UUIDUtils.getUUID8(), params);
@@ -392,13 +392,12 @@ public class ExecutableCmdBuilder {
                 conditionParameters.add(new CmdParameter(column, value));
             } else {
                 if (value.getClass().isArray()) {
-                    Object[] valArray = (Object[]) value;
+                    int length = Array.getLength(value);
+                    List<CmdParameter> params = new ArrayList<>(length);
                     StringBuilder paramPlaceholder = new StringBuilder("(");
-                    List<CmdParameter> params = new ArrayList<>(valArray.length);
-                    int count = 1;
-                    for (Object val : valArray) {
+                    for (int i = 0; i < length; i++) {
                         paramPlaceholder.append(PARAM_PLACEHOLDER).append(",");
-                        params.add(new CmdParameter(column + (count++), val));
+                        params.add(new CmdParameter(column + (i + 1), Array.get(value, i)));
                     }
                     paramPlaceholder.deleteCharAt(paramPlaceholder.length() - 1);
                     paramPlaceholder.append(")");
@@ -454,7 +453,9 @@ public class ExecutableCmdBuilder {
             final ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(executableCmd.getCommand());
             Map<String, Object> paramMap = executableCmd.getParameters()
                     .stream()
-                    .collect(Collectors.toMap(CmdParameter::getName, CmdParameter::getValue));
+                    .collect(Collectors.toMap(CmdParameter::getName, CmdParameter::getValue, (v1, v2) -> {
+                        throw new SonsureJdbcException("命名参数模式下存在同名参数，请检查参数定义");
+                    }));
             final String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramMap);
             final Object[] objects = NamedParameterUtils.buildValueArray(parsedSql, paramMap);
             executableCmd.setCommand(sqlToUse);

@@ -13,7 +13,6 @@ package com.sonsure.dustman.jdbc.persist;
 import com.sonsure.dustman.jdbc.command.batch.BatchExecutableCmd;
 import com.sonsure.dustman.jdbc.command.build.ExecutableCmd;
 import com.sonsure.dustman.jdbc.exception.SonsureJdbcException;
-import com.sonsure.dustman.jdbc.interceptor.InterceptorChain;
 import com.sonsure.dustman.jdbc.interceptor.PersistContext;
 import com.sonsure.dustman.jdbc.interceptor.PersistInterceptor;
 
@@ -31,14 +30,17 @@ import java.util.Map;
  */
 public abstract class AbstractPersistExecutor implements PersistExecutor {
 
-    private String databaseProduct;
+    private volatile String databaseProduct;
 
     @Override
     public Object execute(ExecutableCmd executableCmd) {
         List<PersistInterceptor> persistInterceptors = executableCmd.getJdbcContext().getPersistInterceptors();
         PersistContext persistContext = new PersistContext(executableCmd);
-        InterceptorChain interceptorChain = new InterceptorChain(persistInterceptors);
-        interceptorChain.execute(persistContext);
+        if (persistInterceptors != null) {
+            for (PersistInterceptor interceptor : persistInterceptors) {
+                interceptor.executeBefore(persistContext);
+            }
+        }
         if (!persistContext.isSkipExecution()) {
             Object result;
             switch (executableCmd.getExecutionType()) {
@@ -67,6 +69,9 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
                     result = this.update(executableCmd);
                     break;
                 case BATCH_UPDATE:
+                    if (!(executableCmd instanceof BatchExecutableCmd)) {
+                        throw new SonsureJdbcException("BATCH_UPDATE 需要 BatchExecutableCmd 类型");
+                    }
                     result = this.batchUpdate(((BatchExecutableCmd<?>) executableCmd));
                     break;
                 case DELETE:
@@ -106,8 +111,11 @@ public abstract class AbstractPersistExecutor implements PersistExecutor {
             }
             persistContext.setResult(result);
         }
-        interceptorChain.reset(InterceptorChain.EXECUTION_AFTER);
-        interceptorChain.execute(persistContext);
+        if (persistInterceptors != null) {
+            for (PersistInterceptor interceptor : persistInterceptors) {
+                interceptor.executeAfter(persistContext);
+            }
+        }
         return persistContext.getResult();
     }
 

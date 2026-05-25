@@ -164,6 +164,9 @@ public class ClassUtils {
     public static void setFieldValue(Object bean, String fieldName, Object value) {
         try {
             final Field beanField = getBeanField(bean.getClass(), fieldName);
+            if (beanField == null) {
+                return;
+            }
             beanField.setAccessible(true);
             beanField.set(bean, value);
         } catch (IllegalAccessException e) {
@@ -184,6 +187,9 @@ public class ClassUtils {
         }
         try {
             final Field beanField = getBeanField(obj.getClass(), fieldName);
+            if (beanField == null) {
+                return null;
+            }
             beanField.setAccessible(true);
             return beanField.get(obj);
         } catch (IllegalAccessException e) {
@@ -203,6 +209,9 @@ public class ClassUtils {
             return null;
         }
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(obj.getClass(), fieldName);
+        if (propertyDescriptor == null) {
+            return null;
+        }
         Method readMethod = propertyDescriptor.getReadMethod();
         return invokeMethod(readMethod, obj);
     }
@@ -216,6 +225,9 @@ public class ClassUtils {
      */
     public static void setPropertyValue(Object obj, String fieldName, Object value) {
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(obj.getClass(), fieldName);
+        if (propertyDescriptor == null) {
+            return;
+        }
         Method writeMethod = propertyDescriptor.getWriteMethod();
         invokeMethod(writeMethod, obj, value);
     }
@@ -228,7 +240,7 @@ public class ClassUtils {
      */
     public static Class<?> getStopBaseClass(Class<?> cls) {
         Class<?> stopClass = cls.getSuperclass();
-        while (stopClass.getAnnotation(BaseProperties.class) != null) {
+        while (stopClass != null && stopClass.getAnnotation(BaseProperties.class) != null) {
             stopClass = stopClass.getSuperclass();
         }
         return stopClass;
@@ -344,7 +356,9 @@ public class ClassUtils {
             Object[] parameters = new Object[value.length];
             Class<?>[] parameterTypes = method.getParameterTypes();
             for (int i = 0; i < value.length; i++) {
-                if (parameterTypes[i] == value[i].getClass()) {
+                if (value[i] == null) {
+                    parameters[i] = null;
+                } else if (parameterTypes[i] == value[i].getClass()) {
                     parameters[i] = value[i];
                 } else if (parameterTypes[i] == Boolean.class || parameterTypes[i] == boolean.class) {
                     parameters[i] = Boolean.parseBoolean(String.valueOf(value[i]));

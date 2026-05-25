@@ -49,12 +49,12 @@ public class MappingHandlerImpl implements MappingHandler {
     /**
      * 扫描的包
      */
-    protected Set<String> scanPackages = new HashSet<>(16);
+    protected Set<String> scanPackages = Collections.synchronizedSet(new HashSet<>(16));
 
     /**
      * 表前缀定义, 如 com.sonsure 开头的class表名统一加ss_  com.sonsure.User -> ss_user
      */
-    protected Map<String, String> tablePrefixMapping = new LinkedHashMap<>(16);
+    protected Map<String, String> tablePrefixMapping = Collections.synchronizedMap(new LinkedHashMap<>(16));
 
     /**
      * 类名称映射
@@ -177,7 +177,7 @@ public class MappingHandlerImpl implements MappingHandler {
     /**
      * 初始化类，容忍多次初始化不需要严格的线程安全，
      */
-    protected void initScanClassMapping() {
+    protected synchronized void initScanClassMapping() {
 
         if (this.scanPackages == null) {
             return;

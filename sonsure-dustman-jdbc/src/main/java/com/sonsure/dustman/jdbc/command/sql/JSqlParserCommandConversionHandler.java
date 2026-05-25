@@ -19,7 +19,6 @@ import net.sf.jsqlparser.util.deparser.SelectDeParser;
 
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JSqlParserCommandConversionHandler implements CommandConversionHandler {
 
-    protected final Map<String, String> cache = new WeakHashMap<>(new ConcurrentHashMap<>());
+    protected final Map<String, String> cache = new ConcurrentHashMap<>();
 
     @Override
     public String convert(String command, List<CmdParameter> parameters, JdbcContext jdbcContext) {
@@ -44,6 +43,7 @@ public class JSqlParserCommandConversionHandler implements CommandConversionHand
                 expressionDeParser.setBuffer(buffer);
                 statement.accept(new CommandStatementDeParser(expressionDeParser, selectDeParser, buffer, commandMappingHandler));
                 convertedCommand = buffer.toString();
+                cache.put(command, convertedCommand);
             } catch (Exception e) {
                 throw new SonsureJdbcException("Parsing sql failed:" + command, e);
             }

@@ -26,11 +26,6 @@ public abstract class AbstractPageHandler implements PageHandler {
 
     @Override
     public String getCountCommand(String sql, String dialect) {
-        if (sqlCache.get(sql) != null) {
-            return sqlCache.get(sql);
-        }
-        final String countCommand = countSqlParser.getSmartCountSql(sql);
-        sqlCache.put(sql, countCommand);
-        return countCommand;
+        return sqlCache.computeIfAbsent(sql, k -> countSqlParser.getSmartCountSql(k));
     }
 }

@@ -31,7 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
+
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.IncorrectResultSetColumnCountException;
 import org.springframework.jdbc.core.ConnectionCallback;
@@ -1910,14 +1910,12 @@ public class SpringJdbcDaoTest extends BaseTest {
 
     @Test
     public void testNativeExecutorFindOneForScalarWithNull() {
-        // 测试查找不存在的记录
-        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
-            Long result = jdbcDao.nativeExecutor()
-                    .command("select userInfoId from UserInfo where userInfoId = ?")
-                    .parameters(90000L)
-                    .findOneForScalar(Long.class);
-            Assertions.assertNull(result);
-        });
+        // 测试查找不存在的记录，返回 null 而非抛异常
+        Long result = jdbcDao.nativeExecutor()
+                .command("select userInfoId from UserInfo where userInfoId = ?")
+                .parameters(90000L)
+                .findOneForScalar(Long.class);
+        Assertions.assertNull(result);
     }
 
     @Test

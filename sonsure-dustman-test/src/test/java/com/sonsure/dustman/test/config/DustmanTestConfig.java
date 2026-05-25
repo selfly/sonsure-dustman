@@ -1,6 +1,5 @@
 package com.sonsure.dustman.test.config;
 
-import com.sonsure.dustman.jdbc.interceptor.InterceptorChain;
 import com.sonsure.dustman.jdbc.interceptor.PersistContext;
 import com.sonsure.dustman.jdbc.interceptor.PersistInterceptor;
 import com.sonsure.dustman.jdbc.mapping.MappingHandler;
@@ -40,22 +39,20 @@ public class DustmanTestConfig {
         public static final String SQL = "select loginName, pwd from user_info";
 
         @Override
-        public void executeBefore(PersistContext persistContext, InterceptorChain chain) {
-            PersistInterceptor.super.executeBefore(persistContext, chain);
+        public void executeBefore(PersistContext persistContext) {
             if (SQL.equalsIgnoreCase(persistContext.getExecutableCmd().getCommand())) {
                 UserInfo userInfo = new UserInfo();
                 userInfo.setLoginName("interceptorUser");
                 persistContext.setResult(Collections.singletonList(userInfo));
                 persistContext.setSkipExecution(true);
             }
-            chain.execute(persistContext);
         }
     }
 
     public static class TestAfterInterceptor implements PersistInterceptor {
 
         @Override
-        public void executeAfter(PersistContext persistContext, InterceptorChain chain) {
+        public void executeAfter(PersistContext persistContext) {
             Object result = persistContext.getResult();
 
             if (result instanceof List) {
@@ -70,7 +67,6 @@ public class DustmanTestConfig {
                     }
                 }
             }
-            chain.execute(persistContext);
         }
     }
 
