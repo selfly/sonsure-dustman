@@ -475,11 +475,24 @@ public class ExecutableCmdBuilder {
     }
 
     protected String convertCase(String content, CaseStyle caseStyle) {
-        if (CaseStyle.UPPERCASE == caseStyle) {
-            content = content.toUpperCase();
-        } else if (CaseStyle.LOWERCASE == caseStyle) {
-            content = content.toLowerCase();
+        if (caseStyle == CaseStyle.NONE || content == null || content.isEmpty()) {
+            return content;
         }
-        return content;
+        StringBuilder result = new StringBuilder(content.length());
+        boolean inString = false;
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '\'') {
+                inString = !inString;
+                result.append(c);
+            } else if (inString) {
+                result.append(c);
+            } else if (CaseStyle.UPPERCASE == caseStyle) {
+                result.append(Character.toUpperCase(c));
+            } else {
+                result.append(Character.toLowerCase(c));
+            }
+        }
+        return result.toString();
     }
 }
