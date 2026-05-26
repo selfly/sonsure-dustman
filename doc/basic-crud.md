@@ -97,6 +97,6 @@
     });
 
     jdbcDao.executeInRaw(obj -> {
-        // obj可能为Connection或其它原始对象
+        // 这里使用JdbcTemplate实现，obj即为JdbcTemplate对象
         return obj;
     });
