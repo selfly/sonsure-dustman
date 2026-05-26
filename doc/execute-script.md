@@ -5,7 +5,6 @@
 其也是通过`NativeExecutor`来完成的。示例代码：
 
     String script = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("script.sql"));
-    byte[] bytes = FileIOUtils.toByteArray(resourceAsStream);
     jdbcDao.nativeExecutor()
             .command(script)
             .forceNative()
