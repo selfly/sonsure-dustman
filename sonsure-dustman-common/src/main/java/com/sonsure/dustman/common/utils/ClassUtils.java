@@ -426,7 +426,7 @@ public class ClassUtils {
      */
     public static <T> T newInstance(Class<T> clazz) {
         try {
-            return clazz.newInstance();
+            return clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new SonsureException("根据class创建实例失败", e);
         }
@@ -442,7 +442,7 @@ public class ClassUtils {
 
         try {
             Class<?> loadClass = getDefaultClassLoader().loadClass(clazz);
-            return loadClass.newInstance();
+            return loadClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new SonsureException("根据class创建实例失败:" + clazz, e);
         }

@@ -189,7 +189,7 @@ public class Pagination implements Serializable {
     }
 
     /**
-     * 取得当前页显示的项的起始序号 (1-based)。
+     * 取得当前页显示的项的起始偏移量 (0-based)。
      *
      * @return 起始序号
      */

@@ -18,12 +18,12 @@ import java.util.Set;
  */
 public class JakartaValidatorAdapter implements ValidatorAdapter {
 
+    private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
     public JakartaValidatorAdapter() {
-        try (ValidatorFactory vf = Validation.buildDefaultValidatorFactory()) {
-            validator = vf.getValidator();
-        }
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.NonNull;
 
 import javax.sql.DataSource;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -151,7 +152,7 @@ public class JdbcTemplatePersistExecutor extends AbstractPersistExecutor impleme
     @Override
     protected Object doExecuteScript(ExecutableCmd executableCmd) {
         return jdbcOperations.execute((ConnectionCallback<Void>) connection -> {
-            ScriptUtils.executeSqlScript(connection, new ByteArrayResource(executableCmd.getCommand().getBytes()));
+            ScriptUtils.executeSqlScript(connection, new ByteArrayResource(executableCmd.getCommand().getBytes(StandardCharsets.UTF_8)));
             return null;
         });
     }

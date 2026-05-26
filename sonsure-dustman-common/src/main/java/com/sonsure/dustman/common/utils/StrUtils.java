@@ -15,6 +15,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static java.util.Locale.ENGLISH;
+
 /**
  * 字符文本操作
  *
@@ -102,21 +104,16 @@ public class StrUtils {
             return text;
         }
 
-        //截取
-        byte[] contentNameBytes = Arrays.copyOfRange(bytes, 0, length);
-
-        //处理截取了半个汉字的情况
-        int count = 0;
-        for (byte b : contentNameBytes) {
-            if (b < 0) {
-                count++;
-            }
+        //从截断位置向前扫描，移除不完整的字符
+        int end = length;
+        while (end > 0 && (bytes[end - 1] & 0xC0) == 0x80) {
+            end--;
         }
-        if (count % 2 != 0) {
-            contentNameBytes = Arrays.copyOfRange(contentNameBytes, 0, contentNameBytes.length - 1);
+        if (end > 0 && (bytes[end - 1] & 0xC0) == 0xC0) {
+            end--;
         }
 
-        return new String(contentNameBytes, charset);
+        return new String(bytes, 0, end, charset);
     }
 
     public static String reflectionToString(Object obj) {
@@ -198,10 +195,10 @@ public class StrUtils {
     }
 
     public static boolean startsWithIgnoreCase(String str, String prefix) {
-        return str != null && str.toLowerCase().startsWith(prefix.toLowerCase());
+        return str != null && str.toLowerCase(ENGLISH).startsWith(prefix.toLowerCase(ENGLISH));
     }
 
     public static boolean endsWithIgnoreCase(String str, String suffix) {
-        return str != null && str.toLowerCase().endsWith(suffix.toLowerCase());
+        return str != null && str.toLowerCase(ENGLISH).endsWith(suffix.toLowerCase(ENGLISH));
     }
 }

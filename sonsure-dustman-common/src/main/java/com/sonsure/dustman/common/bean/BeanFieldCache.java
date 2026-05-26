@@ -12,6 +12,7 @@ package com.sonsure.dustman.common.bean;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author selfly
@@ -74,7 +75,7 @@ public class BeanFieldCache {
 
         BeanFieldCache beanFieldCache;
 
-        Map<Class<?>, Object> map = classCache.computeIfAbsent(beanClass, k -> new HashMap<>());
+        Map<Class<?>, Object> map = classCache.computeIfAbsent(beanClass, k -> new ConcurrentHashMap<>());
         Class<?> stopCls = stopClass == null ? beanClass : stopClass;
         Object value = map.computeIfAbsent(stopCls, k -> new BeanFieldCache(beanClass, stopClass));
         if (value instanceof Reference) {

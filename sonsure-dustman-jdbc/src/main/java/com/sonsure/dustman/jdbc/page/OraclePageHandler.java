@@ -27,7 +27,7 @@ public class OraclePageHandler extends AbstractPageHandler {
         StringBuilder pageSql = new StringBuilder(200);
         pageSql.append("select * from ( select rownum rownum_,temp_.* from (");
         pageSql.append(command);
-        pageSql.append(") temp_ where rownum <= ").append(pagination.getEndIndex() + 1);
+        pageSql.append(") temp_ where rownum <= ").append(pagination.getEndIndex());
         pageSql.append(") where rownum_ > ").append(pagination.getBeginIndex());
         return pageSql.toString();
     }

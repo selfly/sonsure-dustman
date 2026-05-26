@@ -24,6 +24,12 @@ public class GenericTokenParser {
     private final TokenHandler handler;
 
     public GenericTokenParser(String openToken, String closeToken, TokenHandler handler) {
+        if (openToken == null || openToken.isEmpty()) {
+            throw new IllegalArgumentException("openToken must not be empty");
+        }
+        if (closeToken == null || closeToken.isEmpty()) {
+            throw new IllegalArgumentException("closeToken must not be empty");
+        }
         this.openToken = openToken;
         this.closeToken = closeToken;
         this.handler = handler;

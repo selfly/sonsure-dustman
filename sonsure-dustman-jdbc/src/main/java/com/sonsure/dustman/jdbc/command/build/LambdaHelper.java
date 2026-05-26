@@ -13,20 +13,26 @@ import com.sonsure.dustman.common.utils.ClassUtils;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author liyd
  */
 public class LambdaHelper {
 
+    private static final Map<Class<?>, LambdaGetter> CACHE = new ConcurrentHashMap<>();
+
     public static <T> LambdaGetter getLambdaGetter(GetterFunction<T> lambda) {
-        SerializedLambda invoke = getSerializedLambda(lambda);
-        return new LambdaGetter(invoke);
+        Class<?> lambdaClass = lambda.getClass();
+        return CACHE.computeIfAbsent(lambdaClass, k -> {
+            SerializedLambda invoke = getSerializedLambda(lambda);
+            return new LambdaGetter(invoke);
+        });
     }
 
     public static <T> String getFieldName(GetterFunction<T> lambda) {
-        LambdaGetter lambdaGetter = getLambdaGetter(lambda);
-        return lambdaGetter.getFieldName();
+        return getLambdaGetter(lambda).getFieldName();
     }
 
     private static SerializedLambda getSerializedLambda(Object lambda) {

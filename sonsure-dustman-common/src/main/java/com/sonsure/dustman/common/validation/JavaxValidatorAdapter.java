@@ -18,12 +18,12 @@ import java.util.Set;
  */
 public class JavaxValidatorAdapter implements ValidatorAdapter {
 
+    private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
     public JavaxValidatorAdapter() {
-        try (ValidatorFactory vf = Validation.buildDefaultValidatorFactory()) {
-            validator = vf.getValidator();
-        }
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
     }
 
     @Override

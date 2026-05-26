@@ -91,8 +91,9 @@ public class FileIOUtils {
      * @throws IOException the io exception
      */
     public static List<String> readLines(final InputStream input, final Charset encoding) throws IOException {
-        final InputStreamReader reader = new InputStreamReader(input, encoding);
-        return readLines(reader);
+        try (InputStreamReader reader = new InputStreamReader(input, encoding)) {
+            return readLines(reader);
+        }
     }
 
     /**

@@ -43,14 +43,20 @@ public class NegotiatingPageHandler implements PageHandler {
 
     @Override
     public String getCountCommand(String command, String dialect) {
-
-        return getPageHandler(dialect).getCountCommand(command, dialect);
+        PageHandler pageHandler = getPageHandler(dialect);
+        if (pageHandler == null) {
+            throw new SonsureJdbcException("当前数据库dialect:" + dialect + "没有适配的PageHandler");
+        }
+        return pageHandler.getCountCommand(command, dialect);
     }
 
     @Override
     public String getPageCommand(String command, Pagination pagination, String dialect) {
-
-        return getPageHandler(dialect).getPageCommand(command, pagination, dialect);
+        PageHandler pageHandler = getPageHandler(dialect);
+        if (pageHandler == null) {
+            throw new SonsureJdbcException("当前数据库dialect:" + dialect + "没有适配的PageHandler");
+        }
+        return pageHandler.getPageCommand(command, pagination, dialect);
     }
 
     /**
@@ -67,7 +73,7 @@ public class NegotiatingPageHandler implements PageHandler {
                 }
             }
         }
-        throw new SonsureJdbcException("当前数据库dialect:" + dialect + "没有适配的PageHandler");
+        return null;
     }
 
 }

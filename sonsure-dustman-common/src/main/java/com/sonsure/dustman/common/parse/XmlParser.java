@@ -181,7 +181,7 @@ public final class XmlParser {
         }
         String theXml = xml;
         for (Map.Entry<String, String> entry : properties.entrySet()) {
-            String value = StrUtils.replace(entry.getValue(), "&amp", "&");
+            String value = StrUtils.replace(entry.getValue(), "&amp;", "&");
             value = StrUtils.replace(value, "&", "&amp;");
             theXml = StrUtils.replace(theXml, String.format("${%s}", entry.getKey()), value);
         }

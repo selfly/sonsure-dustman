@@ -143,10 +143,10 @@ public final class PropertyUtils {
      * @return yml resource map
      */
     private static Map<String, String> getYmlResourceMap(URL url) {
-        try {
+        try (InputStream is = url.openStream()) {
             Map<String, String> propMap = new HashMap<>();
             Yaml yaml = new Yaml();
-            Map<String, Object> yamlMap = yaml.load(url.openStream());
+            Map<String, Object> yamlMap = yaml.load(is);
             yml2propMap(yamlMap, "", propMap);
 
             return propMap;

@@ -19,6 +19,7 @@ package com.sonsure.dustman.jdbc.command.named;
 import com.sonsure.dustman.common.utils.StrUtils;
 import com.sonsure.dustman.jdbc.exception.SonsureJdbcException;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -119,8 +120,8 @@ public abstract class NamedParameterUtils {
                         }
                     }
                 } else if (value.getClass().isArray()) {
-                    final Object[] values = (Object[]) value;
-                    for (int k = 0; k < values.length; k++) {
+                    int len = Array.getLength(value);
+                    for (int k = 0; k < len; k++) {
                         if (k > 0) {
                             actualSql.append(", ");
                         }
@@ -166,7 +167,10 @@ public abstract class NamedParameterUtils {
                 } else if (value instanceof Iterable) {
                     ((Iterable<?>) value).forEach(paramArray::add);
                 } else if (value.getClass().isArray()) {
-                    paramArray.addAll(Arrays.asList(((Object[]) value)));
+                    int len = Array.getLength(value);
+                    for (int j = 0; j < len; j++) {
+                        paramArray.add(Array.get(value, j));
+                    }
                 } else if (value instanceof NamedParamHandler) {
                     paramArray.add(((NamedParamHandler) value).getValue(paramName));
                 } else {

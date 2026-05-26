@@ -9,10 +9,10 @@
 
 package com.sonsure.dustman.common.validation;
 
-import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,7 +31,6 @@ public class ValidationResult {
     /**
      * 验证错误
      */
-    @Getter
     private List<ValidationError> errors;
 
     public ValidationResult(boolean isSuccess) {
@@ -40,6 +39,15 @@ public class ValidationResult {
 
     public boolean isSuccess() {
         return isSuccess;
+    }
+
+    /**
+     * 获取错误列表（不可修改）
+     *
+     * @return 错误列表
+     */
+    public List<ValidationError> getErrors() {
+        return errors == null ? Collections.emptyList() : Collections.unmodifiableList(errors);
     }
 
     /**

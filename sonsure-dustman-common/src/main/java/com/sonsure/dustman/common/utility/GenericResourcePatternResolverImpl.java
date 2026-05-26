@@ -8,6 +8,7 @@ import com.sonsure.dustman.common.utils.StrUtils;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -309,22 +310,24 @@ public class GenericResourcePatternResolverImpl implements GenericResourcePatter
         // 设置安全属性，防止ZIP炸弹攻击
         jarConn.setUseCaches(false);
 
-        JarFile jarFile = jarConn.getJarFile();
-        String basePathClean = basePath.startsWith("/") ? basePath.substring(1) : basePath;
-        if (!basePathClean.isEmpty() && !basePathClean.endsWith("/")) {
-            basePathClean += "/";
-        }
+        try (JarFile jarFile = jarConn.getJarFile()) {
+            String basePathClean = basePath.startsWith("/") ? basePath.substring(1) : basePath;
+            if (!basePathClean.isEmpty() && !basePathClean.endsWith("/")) {
+                basePathClean += "/";
+            }
 
-        Enumeration<JarEntry> entries = jarFile.entries();
-        while (entries.hasMoreElements()) {
-            JarEntry entry = entries.nextElement();
-            String entryName = entry.getName();
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String entryName = entry.getName();
 
-            // 检查是否在基础路径下
-            if (!entry.isDirectory() && entryName.startsWith(basePathClean)) {
-                String relativePath = entryName.substring(basePathClean.length());
-                if (pattern.matcher(relativePath).matches()) {
-                    result.add(new JarResource(jarFile, entry, entryName));
+                // 检查是否在基础路径下
+                if (!entry.isDirectory() && entryName.startsWith(basePathClean)) {
+                    String relativePath = entryName.substring(basePathClean.length());
+                    if (pattern.matcher(relativePath).matches()) {
+                        byte[] content = FileIOUtils.toByteArray(jarFile.getInputStream(entry));
+                        result.add(new JarResource(entry, entryName, content));
+                    }
                 }
             }
         }
@@ -389,37 +392,24 @@ public class GenericResourcePatternResolverImpl implements GenericResourcePatter
      * JAR 资源实现
      */
     private static class JarResource implements GenericResource {
-        private final JarFile jarFile;
-        private final JarEntry entry;
         private final String entryName;
+        private final byte[] content;
         // 10MB 限制
         private static final long MAX_FILE_SIZE = 10L * 1024 * 1024;
 
-        public JarResource(JarFile jarFile, JarEntry entry, String entryName) {
-            this.jarFile = jarFile;
-            this.entry = entry;
+        public JarResource(JarEntry entry, String entryName, byte[] content) {
             this.entryName = entryName;
+            this.content = content;
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
             // 安全检查：限制文件大小，防止ZIP炸弹攻击
-            long size = entry.getSize();
-            if (size > MAX_FILE_SIZE) {
-                throw new IOException("File too large: " + entryName + " (size: " + size + ")");
+            if (content.length > MAX_FILE_SIZE) {
+                throw new IOException("File too large: " + entryName + " (size: " + content.length + ")");
             }
 
-            // 检查压缩比例，防止ZIP炸弹
-            long compressedSize = entry.getCompressedSize();
-            if (compressedSize > 0 && size > 0) {
-                double compressionRatio = (double) size / compressedSize;
-                // 压缩比例超过100:1认为是可疑的
-                if (compressionRatio > 100) {
-                    throw new IOException("Suspicious compression ratio detected for: " + entryName);
-                }
-            }
-
-            return jarFile.getInputStream(entry);
+            return new ByteArrayInputStream(content);
         }
 
         @Override
@@ -431,7 +421,7 @@ public class GenericResourcePatternResolverImpl implements GenericResourcePatter
 
         @Override
         public String toString() {
-            return "jar [" + jarFile.getName() + "!/" + entryName + "]";
+            return "jar [" + entryName + "]";
         }
     }
 }
