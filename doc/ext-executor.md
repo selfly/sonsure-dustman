@@ -19,7 +19,7 @@
 最终的调用方式就像下面这样：
 
     //自定义的CountCommandExecutor，传入实体类获取记录数
-    long count = jdbcDao.executor(CountCommandExecutor.class)
+    long count = jdbcDao.createExecutor(CountCommandExecutor.class)
                 .clazz(UserInfo.class)
                 .getCount();
 
@@ -95,24 +95,26 @@ CountCommandContextBuilder 代码：
     
 ## 配置
 
-有了上面的实现代码，需要在声明JdbcDao的时候将我们自定义实现的 CommandExecutor 配置进去，主要配置如下，显示声明了一个 CommandExecutorFactoryImpl 并将我们实现的 CountCommandExecutorBuilderImpl 进入了初始化：
+有了上面的实现代码，需要在声明 JdbcDao 时将我们自定义实现的 CommandExecutor 配置进去，主要配置如下：
 
-    <bean id="commandExecutorFactory" class="com.sonsure.dustman.jdbc.config.CommandExecutorFactoryImpl">
-        <property name="commandExecutorBuilders">
-            <list>
-                <bean class="com.sonsure.dustman.test.executor.CountCommandExecutorBuilderImpl"/>
-            </list>
-        </property>
-    </bean>
+```java
+@Bean
+public JdbcDao jdbcDao(JdbcOperations jdbcOperations) {
+    // 构建自定义的 CommandExecutorFactory
+    CommandExecutorFactoryImpl commandExecutorFactory = new CommandExecutorFactoryImpl();
+    commandExecutorFactory.registerCommandExecutorCreator(new CountCommandExecutorBuilderImpl());
 
-    <bean id="jdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="commandExecutorFactory" ref="commandExecutorFactory"/>
-    </bean>
+    // 构建 JdbcContext
+    JdbcContextImpl jdbcContext = new JdbcContextImpl();
+    jdbcContext.setPersistExecutor(new JdbcTemplatePersistExecutor(jdbcOperations));
+    jdbcContext.setCommandExecutorFactory(commandExecutorFactory);
 
-    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
-        <property name="defaultJdbcEngine" ref="jdbcTemplateEngine"/>
-    </bean>
+    // 构建 JdbcDao
+    JdbcDaoImpl jdbcDao = new JdbcDaoImpl();
+    jdbcDao.setJdbcContext(jdbcContext);
+    return jdbcDao;
+}
+```
     
 ## 最后
 

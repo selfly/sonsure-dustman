@@ -19,6 +19,8 @@
         return factoryBean;
     }
 
+> 注：`JdbcTemplateDaoFactoryBean` 位于 `com.sonsure.dustman.springjdbc.persist` 包。
+
 **方式二**，通过JdbcContext手动创建
 
     @Bean

@@ -53,6 +53,9 @@
     //查询所有列表
     List<UserInfo> users = jdbcDao.findAll(UserInfo.class);
 
+    //按主键查询单个实体
+    UserInfo user = jdbcDao.get(UserInfo.class, 10L);
+
     //实体类方式，不为空的属性为where条件
     UserInfo user = new UserInfo();
     user.setUserAge(10);
@@ -81,3 +84,19 @@
     UserInfo tmp = new UserInfo();
     tmp.setUserAge(10);
     UserInfo user = jdbcDao.findFirst(tmp);
+
+## 直接操作 Connection
+
+当需要直接操作 JDBC Connection 执行原生逻辑时，可使用 `executeInConnection` 和 `executeInRaw`：
+
+    jdbcDao.executeInConnection(connection -> {
+        // 直接操作 java.sql.Connection
+        try (Statement stmt = connection.createStatement()) {
+            return stmt.executeUpdate("UPDATE user_info SET login_name = 'batch'");
+        }
+    });
+
+    jdbcDao.executeInRaw(obj -> {
+        // obj可能为Connection或其它原始对象
+        return obj;
+    });

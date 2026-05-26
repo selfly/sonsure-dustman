@@ -11,29 +11,34 @@ interface QueryCommandExecutor<E extends QueryCommandExecutor<E>> extends Comman
   + paginate(int pageNum, int pageSize): E
   + limit(int offset, int size): E
   + disableCount(): E
-  + count(): long
-  + singleResult(Class<T> cls): T
-  + singleMapResult(): Map<String, Object>
-  + oneColResult(Class<T> clazz): T
-  + oneColList(Class<T> clazz): List<T>
-  + list(Class<T> cls): List<T>
-  + listMaps(): List<Map<String, Object>>
-  + pageResult(Class<T> cls): Page<T>
-  + pageMapResult(): Page<Map<String, Object>>
-  + oneColPageResult(Class<T> clazz): Page<T>
+  + findCount(): long
+  + findOne(Class<T> cls): T
+  + findOneForMap(): Map<String, Object>
+  + findOneForScalar(Class<T> clazz): T
+  + findList(Class<T> cls): List<T>
+  + findListForMap(): List<Map<String, Object>>
+  + findListForScalar(Class<T> clazz): List<T>
+  + findFirst(Class<T> cls): T
+  + findFirstForMap(): Map<String, Object>
+  + findFirstForScalar(Class<T> clazz): T
+  + findPage(Class<T> cls): Page<T>
+  + findPageForMap(): Page<Map<String, Object>>
+  + findPageForScalar(Class<T> clazz): Page<T>
   + default paginate(Pageable pageable): E
-  + default firstResult(Class<T> cls): T
-  + default firstMapResult(): Map<String, Object>
-  + default oneColFirstResult(Class<T> clazz): T
 }
 
 interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>> extends CommandExecutor {
   + where(): E
-  + where(String field, SqlOperator sqlOperator, Object value): E
-  + where(Function<E, R> function, SqlOperator sqlOperator, Object value): E
-  + where(Function<E, R> function, Object value): E
   + where(String field, Object value): E
-  + whereForObject(Object obj): E
+  + where(String field, SqlOperator sqlOperator, Object value): E
+  + where(GetterFunction<T> getter, Object value): E
+  + where(GetterFunction<T> getter, SqlOperator sqlOperator, Object value): E
+  + condition(String field, Object value): E
+  + condition(String field, SqlOperator sqlOperator, Object value): E
+  + condition(GetterFunction<T> getter, Object value): E
+  + condition(GetterFunction<T> getter, SqlOperator sqlOperator, Object value): E
+  + whereForBean(Object bean): E
+  + whereForBeanPrimaryKey(Object bean): E
   + appendSegment(String segment): E
   + appendSegment(String segment, Object value): E
   + openParen(): E
@@ -41,24 +46,23 @@ interface ConditionCommandExecutor<E extends ConditionCommandExecutor<E>> extend
   + and(): E
   + and(String field, Object value): E
   + and(String field, SqlOperator sqlOperator, Object value): E
-  + and(Function<T, R> function, Object value): E
-  + and(Function<T, R> function, SqlOperator sqlOperator, Object value): E
+  + and(GetterFunction<T> getter, Object value): E
+  + and(GetterFunction<T> getter, SqlOperator sqlOperator, Object value): E
   + or(): E
   + or(String field, Object value): E
   + or(String field, SqlOperator sqlOperator, Object value): E
-  + or(Function<T, R> function, Object value): E
-  + or(Function<T, R> function, SqlOperator sqlOperator, Object value): E
+  + or(GetterFunction<T> getter, Object value): E
+  + or(GetterFunction<T> getter, SqlOperator sqlOperator, Object value): E
 }
-
 
 interface Select<M> extends QueryCommandExecutor, ConditionCommandExecutor {
   + as(String alias): Select
-  + addAllColumns(): Select
+  + addColumns(Class<?> clazz): Select
   + addColumn(String... fields): Select
   + addAliasColumn(String tableAlias, String... fields): Select
-  + addColumn(Function<T, R> function): Select
+  + addColumn(GetterFunction<T> getter): Select
   + dropColumn(String... fields): Select
-  + dropColumn(Function<T, R> function): Select
+  + dropColumn(GetterFunction<T> getter): Select
   + join(String table): Select
   + join(Class<?> cls): Select
   + innerJoin(String table): Select
@@ -70,26 +74,25 @@ interface Select<M> extends QueryCommandExecutor, ConditionCommandExecutor {
   + rightJoin(String table): Select
   + rightJoin(Class<?> cls): Select
   + on(String on): Select
-  + on(Function<T1, R1> table1Field, Function<T2, R2> table2Field): Select
-  + on(Function<T1, R1> table1Field, SqlOperator sqlOperator, Function<T2, R2> table2Field): Select
-  + on(SqlPart sqlPart): Select
+  + on(GetterFunction<T1> table1Field, GetterFunction<T2> table2Field): Select
+  + on(GetterFunction<T1> table1Field, SqlOperator sqlOperator, GetterFunction<T2> table2Field): Select
   + groupBy(String... fields): Select
-  + groupBy(Function<T, R> function): Select
+  + groupBy(GetterFunction<T> getter): Select
   + orderBy(String field, OrderBy orderBy): Select
-  + orderBy(Function<T, R> function, OrderBy orderBy): Select
-  + having(String having): Select
-  + singleResult(): M
-  + firstResult(): M
-  + list(): List<M>
-  + pageResult(): Page<M>
+  + orderBy(GetterFunction<T> getter, OrderBy orderBy): Select
+  + having(String having, SqlOperator sqlOperator, Object value): Select
+  + having(GetterFunction<T> getter, SqlOperator sqlOperator, Object value): Select
+  + findOne(): M
+  + findFirst(): M
+  + findList(): List<M>
+  + findPage(): Page<M>
 }
 
 interface Update extends ConditionCommandExecutor {
   + table(Class<?> cls): Update
   + set(String field, Object value): Update
-  + set(Function<E, R> function, Object value): Update
-  + setForObjectWherePk(Object object): Update
-  + setForObject(Object object): Update
+  + set(GetterFunction<T> getter, Object value): Update
+  + setForBean(Object bean): Update
   + updateNull(): Update
   + execute(): int
 }
@@ -102,7 +105,7 @@ interface Delete extends ConditionCommandExecutor {
 interface Insert extends CommandExecutor {
   + into(Class<?> cls): Insert
   + intoField(String field, Object value): Insert
-  + intoField(Function<E, R> function, Object value): Insert
+  + intoField(GetterFunction<T> getter, Object value): Insert
   + intoForObject(Object obj): Insert
   + execute(): Object
 }

@@ -112,6 +112,6 @@
     
 同样使用`jdbcDao`调用：
 
-    List<HbUserInfo> userInfos = jdbcDao.find(HbUserInfo.class);
+    List<HbUserInfo> userInfos = jdbcDao.findList(HbUserInfo.class);
     
 这时底层与数据库的交互已经换成Hibernate了。

@@ -21,7 +21,7 @@
             .namedParameter()
             .where("userAge", SqlOperator.GT, 5)
             .and()
-            .append("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
+            .appendSegment("userInfoId = (select max(t2.userInfoId) from UserInfo t2 where t2.userInfoId < :userInfoId)", params)
             .findOne();
     Assert.assertNotNull(userInfo);
 

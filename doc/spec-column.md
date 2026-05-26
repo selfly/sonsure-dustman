@@ -39,6 +39,12 @@
             .addColumn("t1.loginName as name1")
             .findListForMap();
 
+使用 `addAliasColumn` 方法可以统一指定表别名：
+
+    List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).as("t1")
+            .addAliasColumn("t1", "loginName", "password")
+            .findListForMap();
+
 以下where条件使用不传参方式：
 
     List<Map<String, Object>> list1 = jdbcDao.selectFrom(UserInfo.class).as("t1")

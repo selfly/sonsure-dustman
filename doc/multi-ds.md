@@ -1,47 +1,81 @@
 # 多数据源的使用
 
-在本组件中，对于多个数据源的操作实际上是通过声明相应的`jdbcContext`来完成的，即一个`DataSource`对应一个`jdbcContext`。
+在本组件中，对于多个数据源的操作实际上是通过声明相应的 `JdbcContext` 来完成的，即一个 `DataSource` 对应一个 `JdbcContext`。
 
-以下示例配置分别声明了一个`mysql`和一个`oracle`的`JdbcEngine`操作对象：
+## 配置方式一：使用 FactoryBean
 
-    <bean id="mappingHandler" class="com.sonsure.dustman.jdbc.mapping.DefaultMappingHandler">
-        <constructor-arg name="modelPackages" value="com.sonsure.dustman.test.model.**"/>
-    </bean>
+多个 `JdbcTemplateDaoFactoryBean` 各对应一个数据源：
 
-    <bean id="mysqlJdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
-        <property name="dataSource" ref="mysqlDataSource"/>
-        <property name="mappingHandler" ref="mappingHandler"/>
-    </bean>
+```java
+@Bean
+public JdbcTemplateDaoFactoryBean mysqlJdbcContext(DataSource mysqlDataSource) {
+    JdbcTemplateDaoFactoryBean factoryBean = new JdbcTemplateDaoFactoryBean();
+    factoryBean.setPersistExecutor(new JdbcTemplatePersistExecutor(mysqlDataSource));
+    return factoryBean;
+}
 
-    <bean id="oracleKeyGenerator" class="com.sonsure.dustman.jdbc.persist.OracleKeyGenerator"/>
+@Bean
+public JdbcTemplateDaoFactoryBean oracleJdbcContext(DataSource oracleDataSource) {
+    JdbcTemplateDaoFactoryBean factoryBean = new JdbcTemplateDaoFactoryBean();
+    factoryBean.setPersistExecutor(new JdbcTemplatePersistExecutor(oracleDataSource));
+    // Oracle 序列主键生成器
+    factoryBean.setKeyGenerator(new OracleKeyGenerator());
+    return factoryBean;
+}
 
-    <bean id="oracleJdbcTemplateEngine" class="com.sonsure.dustman.springjdbc.config.JdbcTemplateExecutorFactoryBean">
-        <property name="dataSource" ref="oracleDataSource"/>
-        <property name="mappingHandler" ref="mappingHandler"/>
-        <property name="keyGenerator" ref="oracleKeyGenerator"/>
-    </bean>
+@Bean
+public JdbcDao jdbcDao(JdbcContext mysqlJdbcContext, JdbcContext oracleJdbcContext) {
+    JdbcDaoImpl jdbcDao = new JdbcDaoImpl();
+    jdbcDao.setJdbcContext(mysqlJdbcContext); // 默认数据源
+    Map<String, JdbcContext> contextMap = new HashMap<>();
+    contextMap.put("mysql", mysqlJdbcContext);
+    contextMap.put("oracle", oracleJdbcContext);
+    jdbcDao.setJdbcContextMap(contextMap);
+    return jdbcDao;
+}
+```
 
-    <bean id="jdbcDao" class="com.sonsure.dustman.springjdbc.persist.SpringJdbcTemplateDaoImpl">
-        <property name="defaultJdbcEngine" ref="mysqlJdbcTemplateEngine"/>
-        <property name="jdbcEngineMap">
-            <map>
-                <entry key="mysql" value-ref="mysqlJdbcTemplateEngine"/>
-                <entry key="oracle" value-ref="oracleJdbcTemplateEngine"/>
-            </map>
-        </property>
-    </bean>
+## 配置方式二：手动创建 JdbcContext
 
-`MappingHandler`、`KeyGenerator`等根据实际需要声明。
+```java
+@Bean
+public JdbcContext mysqlJdbcContext(DataSource mysqlDataSource) {
+    JdbcContextImpl jdbcContext = new JdbcContextImpl();
+    jdbcContext.setPersistExecutor(new JdbcTemplatePersistExecutor(mysqlDataSource));
+    return jdbcContext;
+}
 
-将不同的`JdbcEngine`注入到`JdbcDao`的`jdbcEngineMap`属性即可，key即为后面使用时指定的名称。
+@Bean
+public JdbcContext oracleJdbcContext(DataSource oracleDataSource) {
+    JdbcContextImpl jdbcContext = new JdbcContextImpl();
+    jdbcContext.setPersistExecutor(new JdbcTemplatePersistExecutor(oracleDataSource));
+    jdbcContext.setKeyGenerator(new OracleKeyGenerator());
+    return jdbcContext;
+}
 
-以上配置可以通过如下方式指定使用：
+@Bean
+public JdbcDao jdbcDao(JdbcContext mysqlJdbcContext, JdbcContext oracleJdbcContext) {
+    JdbcDaoImpl jdbcDao = new JdbcDaoImpl();
+    jdbcDao.setJdbcContext(mysqlJdbcContext);
+    Map<String, JdbcContext> contextMap = new HashMap<>();
+    contextMap.put("mysql", mysqlJdbcContext);
+    contextMap.put("oracle", oracleJdbcContext);
+    jdbcDao.setJdbcContextMap(contextMap);
+    return jdbcDao;
+}
+```
 
-    //defaultJdbcEngine为mysql，不指定将使用mysql数据源，
-    jdbcDao.get(UserInfo.class,100L);
+## 使用
 
-    //指定使用mysql数据源
-    jdbcDao.use("mysql").get(UserInfo.class,100L);
+```java
+// 默认数据源（mysql）
+jdbcDao.get(UserInfo.class, 100L);
 
-    //指定使用oracle数据源
-    jdbcDao.use("oracle").get(TestUser.class,100L);
+// 指定使用 mysql 数据源
+jdbcDao.use("mysql").get(UserInfo.class, 100L);
+
+// 指定使用 oracle 数据源
+jdbcDao.use("oracle").get(TestUser.class, 100L);
+```
+
+配置说明：`MappingHandler`、`KeyGenerator`、`PageHandler` 等组件均可根据不同数据源按需独立配置。
